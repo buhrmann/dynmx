@@ -46,10 +46,10 @@ void Light::update() const
 
     glEnable(light);
 
-    glLightfv( light, GL_AMBIENT, m_ambient.m);
-    glLightfv( light, GL_DIFFUSE, m_diffuse.m);
-    glLightfv( light, GL_SPECULAR, m_specular.m);
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, m_ambientGlobal.m);
+    glLightfv( light, GL_AMBIENT, &m_ambient.x);
+    glLightfv( light, GL_DIFFUSE, &m_diffuse.x);
+    glLightfv( light, GL_SPECULAR, &m_specular.x);
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, &m_ambientGlobal.x);
 
     Vec3f position = m_TM.getTranslation();
     Vec4f direction = m_TM.getRow(0);
@@ -70,7 +70,7 @@ void Light::update() const
       position[3] = 1.0;
       glLightfv(light, GL_POSITION, position );
       glLightf(light, GL_SPOT_CUTOFF, m_spotCutoff);
-      glLightfv(light, GL_SPOT_DIRECTION, direction.m);
+      glLightfv(light, GL_SPOT_DIRECTION, &direction.x);
       glLightf(light, GL_SPOT_EXPONENT, m_spotExponent);
       break;
     default:
