@@ -1,0 +1,445 @@
+#ifndef __OFX_3d__H_
+#define __OFX_3d__H_
+
+#include <OpenGL/glu.h>
+#include <GLUT/glut.h>
+#include "cinder/Matrix.h"
+
+namespace dmx
+{
+
+  typedef cinder::Matrix44f Mat4f;
+  typedef cinder::Vec3f Vec3f;
+  typedef cinder::Vec4f Vec4f;
+
+  // static draw functions ...
+  // ---------------------------------------------------------
+  static void setTransform(const Mat4f& matrix)
+	{
+		glMultMatrixf(matrix.m);
+	}
+
+  static void setColor3(const Vec3f& c)
+	{
+		glColor3f(c[0], c[1], c[2]);
+	}
+
+	static void setColor4(const Vec3f& c)
+	{
+		glColor4f(c[0], c[1], c[2], c[3]);
+	}
+
+	static void setColorMaterial(float r, float g, float b, float alpha)
+	{
+		GLfloat light_ambient[4],light_diffuse[4],light_specular[4];
+		light_ambient[0] = r*0.3f;
+		light_ambient[1] = g*0.3f;
+		light_ambient[2] = b*0.3f;
+		light_ambient[3] = alpha;
+		light_diffuse[0] = r*0.7f;
+		light_diffuse[1] = g*0.7f;
+		light_diffuse[2] = b*0.7f;
+		light_diffuse[3] = alpha;
+		light_specular[0] = r*0.2f;
+		light_specular[1] = g*0.2f;
+		light_specular[2] = b*0.2f;
+		light_specular[3] = alpha;
+		glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, light_ambient);
+		glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, light_diffuse);
+		glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, light_specular);
+		glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, 5.0f);
+	}
+	static void setColorMaterial(const Vec3f& c){ setColorMaterial(c[0], c[1], c[2], c[3]);};
+
+	static void drawBasis(float l, bool annotate = false)
+	{
+		glBegin(GL_LINES);
+			glColor3f(1,0,0);
+			glVertex3f(0,0,0);
+			glVertex3f(l,0,0);
+      
+			glColor3f(0,1,0);
+			glVertex3f(0,0,0);
+			glVertex3f(0,l,0);
+      
+			glColor3f(0,0,1);
+			glVertex3f(0,0,0);
+			glVertex3f(0,0,l);
+		glEnd();
+
+    if(annotate)
+    {
+      const char* c = "xyz";
+      glColor3f(1,0,0);
+      glRasterPos3f(l*1.1, 0, 0);
+      glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c[0]);
+
+      glColor3f(0,1,0);
+      glRasterPos3f(0, l*1.1, 0);
+      glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c[1]);
+
+      glColor3f(0,0,1);
+      glRasterPos3f(0, 0, l*1.1);
+      glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c[2]);
+    }
+	}
+
+  static void drawBox(float x, float y, float z)
+  {
+		float lx = x*0.5f;
+		float ly = y*0.5f;
+		float lz = z*0.5f;
+
+  	glBegin(GL_QUADS);
+
+		glNormal3f (0,1,0);
+		glVertex3f( lx, ly,-lz);
+		glVertex3f(-lx, ly,-lz);
+		glVertex3f(-lx, ly, lz);
+		glVertex3f( lx, ly, lz);
+
+		glNormal3f (0,-1,0);
+		glVertex3f( lx,-ly, lz);
+		glVertex3f(-lx,-ly, lz);
+		glVertex3f(-lx,-ly,-lz);
+		glVertex3f( lx,-ly,-lz);
+
+		glNormal3f (0,0,1);
+		glVertex3f( lx, ly, lz);
+		glVertex3f(-lx, ly, lz);
+		glVertex3f(-lx,-ly, lz);
+		glVertex3f( lx,-ly, lz);
+
+		glNormal3f (0,0,-1);
+		glVertex3f( lx,-ly,-lz);
+		glVertex3f(-lx,-ly,-lz);
+		glVertex3f(-lx, ly,-lz);
+		glVertex3f( lx, ly,-lz);
+
+		glNormal3f (-1,0,0);
+		glVertex3f(-lx, ly, lz);
+		glVertex3f(-lx, ly,-lz);
+		glVertex3f(-lx,-ly,-lz);
+		glVertex3f(-lx,-ly, lz);
+
+		glNormal3f (1,0,0);
+		glVertex3f( lx, ly,-lz);
+		glVertex3f( lx, ly, lz);
+		glVertex3f( lx,-ly, lz);
+		glVertex3f( lx,-ly,-lz);
+		glEnd();
+  }
+
+  static void drawString(const Vec3f& p, const char *s)
+	{
+		char c;
+		glRasterPos3f(p[0], p[1], p[2]);
+		for ( ; (c = *s) != '\0'; s++ )
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+	}
+
+		// in the z plane
+	static void drawRectangle(float lx, float ly, GLenum mode = GL_QUADS)
+	{
+	  lx *= 0.5;
+	  ly *= 0.5;
+
+    // TODO: performance hit ?
+    // as 2d, make sure it's drawn on both side
+    glPushAttrib(GL_ENABLE_BIT);
+    glDisable(GL_CULL_FACE);
+	  glBegin(mode);
+      glNormal3f (0,0,1);
+      glVertex3f( lx, ly, 0.0f);
+      glVertex3f(-lx, ly, 0.0f);
+      glVertex3f(-lx,-ly, 0.0f);
+      glVertex3f( lx,-ly, 0.0f);
+	  glEnd();
+	  glPopAttrib();
+	}
+
+	static void drawFrame(float lx, float ly)
+	{
+    lx *= 0.5;
+    ly *= 0.5;
+    glBegin(GL_LINE_STRIP);
+      glVertex3f( -lx, -ly,  0.0f);
+      glVertex3f( -lx,  ly,  0.0f);
+      glVertex3f(  lx,  ly,  0.0f);
+      glVertex3f(  lx, -ly,  0.0f);
+      glVertex3f( -lx, -ly,  0.0f);
+	  glEnd();
+	}
+
+//	static void drawLine(const Vec3f& from, const Vec3f& to)
+//	{
+//	  glBegin (GL_LINES);
+//      glVertex3fv(from.data);
+//      glVertex3fv(to.data);
+//    glEnd ();
+//	}
+//
+//	static void drawTriangle(const Vec3f& a, const Vec3f& b, const Vec3f& c)
+//	{
+//	  glBegin(GL_TRIANGLES);
+//      glVertex3fv(a.data);
+//      glVertex3fv(b.data);
+//      glVertex3fv(c.data);
+//    glEnd();
+//	}
+
+	// equilateral in z-plane
+	static void drawTriangle(float s)
+	{
+    glBegin(GL_TRIANGLES);
+      glVertex3f( s,  0.0f,  0.0f);
+      glVertex3f(-s, -s,  0.0f);
+      glVertex3f(-s,  s,  0.0f);      
+    glEnd();
+	}
+
+  static void drawVectorAt(const Vec3f& p, const Vec3f& v)
+	{
+	  glBegin(GL_LINES);
+      glVertex3f(p[0], p[1], p[2]);
+      glVertex3f(p[0]+v[0], p[1]+v[1], p[2]+v[2]);
+	  glEnd();
+	}
+
+	// Draws a point as 3 intersecting lines
+	static void drawPoint(const Vec3f& p, float s)
+	{
+	  glBegin(GL_LINES);
+      glVertex3f(p[0]-s, p[1], p[2]);
+      glVertex3f(p[0]+s, p[1], p[2]);
+
+      glVertex3f(p[0], p[1]-s, p[2]);
+      glVertex3f(p[0], p[1]+s, p[2]);
+
+      glVertex3f(p[0], p[1], p[2]-s);
+      glVertex3f(p[0], p[1], p[2]+s);
+	  glEnd();
+	}
+
+	/// Draws a grid of size x*y with distance between lines equal to res
+	static void drawGrid(float x, float y, float res)
+	{
+	  x *= 0.5;
+    y *= 0.5;
+    for(float i = -x; i <= x; i += res)
+	  {
+      glBegin(GL_LINES);
+        glVertex3f(-x, i, 0.0f);
+        glVertex3f(x,  i, 0.0f);
+        glVertex3f(i, -y, 0.0f);
+        glVertex3f(i,  y, 0.0f);
+      glEnd();
+	  }
+	}
+
+	// uses corner control points to evaluate a grid on board
+	static void drawEvalGrid(const GLfloat* grid, int n, int m)
+	{
+      glMap2f(GL_MAP2_VERTEX_3, 0.0, 1.0, 3, 2, 0.0, 1.0, 2 * 3, 2, grid);
+
+      // when rendering surface mesh
+      glEnable(GL_MAP2_VERTEX_3);
+      glMapGrid2f(n, 0.0, 1.0, m, 0.0, 1.0);
+      glEvalMesh2(GL_LINE, 0, n, 0, m);
+	}
+
+  static void drawDisk(float radius1, float radius2, int slices, int rings, GLenum mode=GLU_FILL, GLenum shade=GLU_SMOOTH )
+	{
+	  GLUquadricObj* obj = gluNewQuadric();
+	  gluQuadricDrawStyle(obj, mode);
+	  gluQuadricNormals(obj, shade);
+		gluDisk(obj, radius2, radius1, slices, rings);
+    gluDeleteQuadric(obj);
+	}
+
+	static void drawSphere(float radius, int slices, int stacks, GLenum mode=GLU_FILL, GLenum shade=GLU_SMOOTH)
+	{
+	  GLUquadricObj* obj = gluNewQuadric();
+	  gluQuadricDrawStyle(obj, mode);
+	  gluQuadricNormals(obj, shade);
+		gluSphere(obj, radius, slices, stacks);
+    gluDeleteQuadric(obj);
+	}
+
+	// along z-Axis
+	static void drawCylinder(float length, float radius1, float radius2, int slices, int stacks, GLenum mode=GLU_FILL)
+	{
+	  //draws hollow cylinder
+	  GLUquadricObj* obj = gluNewQuadric();
+	  gluQuadricDrawStyle(obj, mode);
+	  gluQuadricNormals(obj, GLU_SMOOTH);
+	  glPushMatrix();
+		glTranslatef(0,0,-length/2);
+		gluCylinder(obj, radius1, radius2, length, slices, stacks);
+		//bottom disk
+		glFrontFace(GL_CW);
+		gluDisk(obj, 0, radius1, slices, 4);
+		glFrontFace(GL_CCW);
+		//top disk
+		glPushMatrix();
+			glTranslatef( 0, 0, length );
+			gluDisk(obj, 0, radius2, slices, 4);
+		glPopMatrix();
+      glPopMatrix();
+	  gluDeleteQuadric(obj);
+	}
+
+  static void drawCylinder(const Vec3f& p1, const Vec3f& p2, float radius1, float radius2, int slices, int stacks, GLenum mode=GLU_FILL)
+  {
+    float length = (p2 - p1).length(); //length
+    Vec3f v1(p2 - p1);  //vector showing from p2 to p1
+		Vec3f v2(0.0, 0.0, 1.0);  //vector showing in z-axis
+    v1.normalize();
+    Mat4f tm;
+		//if v1 is not lying on z-axis, calculate rotation matrix
+		/*(if( !(v1.x == 0 && v1.y == 0) ){
+			XVector n( (v1^v2) / (v1^v2).Length() );
+
+			double tempACos = (v1*v2) / (v1.Length() * v2.Length());
+			double alpha =  acos( tempACos );
+
+			tm.makeRotate(alpha, -n[0], -n[1], -n[2]);
+		}*/
+		Vec3f n = v1.cross(v2);// n perp to v1
+		//v2 = v1^n;
+		tm.setRow(0, cinder::Vec4f(v2, 1));
+		tm.setRow(1, cinder::Vec4f(n, 1));
+		tm.setRow(2, cinder::Vec4f(v1, 1));
+
+		//find middle point between two given points and move object to location
+		Vec3f pos = p1 + (p2 - p1) * 0.5;
+    tm.setRow(4, cinder::Vec4f(pos, 1));
+
+		glPushMatrix();
+		glMultMatrixf(tm.m);
+		drawCylinder(length, radius1, radius2, slices, stacks, mode);
+		glPopMatrix();
+  }
+
+	static void drawCapsule(float length, float radius, int slices, int stacks, GLenum mode=GLU_FILL)
+	{
+	  GLUquadricObj* obj = gluNewQuadric();
+	  gluQuadricDrawStyle(obj, mode);
+	  gluQuadricNormals(obj, GLU_SMOOTH);
+
+	  // cylinder
+	  glPushMatrix();
+	  glTranslatef(0,0,-length/2);
+		  gluCylinder(obj, radius, radius, length, slices, stacks);
+	  glPopMatrix();
+
+	  // first end-cap
+	  glPushMatrix();
+	  glTranslatef( 0, 0, length*0.5 );
+		gluSphere(obj, radius, slices, stacks);
+	  glPopMatrix();
+
+	  glPushMatrix();
+	  glTranslatef( 0, 0, -length*0.5 );
+		gluSphere(obj, radius, slices, stacks);
+	  glPopMatrix();
+
+	  gluDeleteQuadric(obj);
+
+	}
+
+	// forward declaration: implementation at bottom of file
+	static void setShadowTransform(const Vec3f& normal, const Vec3f& origin, const Vec3f& light)
+	{
+    float  dot;
+    float  shadowMat[4][4];
+
+    Vec3f ground = normal;
+    ground[3] = - normal.dot(origin);
+
+    dot = ground.dot(light);
+
+    shadowMat[0][0] = dot - light[0] * ground[0];
+    shadowMat[1][0] = 0.0 - light[0] * ground[1];
+    shadowMat[2][0] = 0.0 - light[0] * ground[2];
+    shadowMat[3][0] = 0.0 - light[0] * ground[3];
+
+    shadowMat[0][1] = 0.0 - light[1] * ground[0];
+    shadowMat[1][1] = dot - light[1] * ground[1];
+    shadowMat[2][1] = 0.0 - light[1] * ground[2];
+    shadowMat[3][1] = 0.0 - light[1] * ground[3];
+
+    shadowMat[0][2] = 0.0 - light[2] * ground[0];
+    shadowMat[1][2] = 0.0 - light[2] * ground[1];
+    shadowMat[2][2] = dot - light[2] * ground[2];
+    shadowMat[3][2] = 0.0 - light[2] * ground[3];
+
+    shadowMat[0][3] = 0.0 - light[3] * ground[0];
+    shadowMat[1][3] = 0.0 - light[3] * ground[1];
+    shadowMat[2][3] = 0.0 - light[3] * ground[2];
+    shadowMat[3][3] = dot - light[3] * ground[3];
+
+    glMultMatrixf((const GLfloat*)shadowMat);
+  }
+
+  static Vec3f getColorMapRainbow(float yval)
+  {
+    if (yval < 0.2) // purple to blue ramp
+    {
+      return Vec3f(0.5*(1.0-yval/0.2), 0.0, 0.5+(0.5*yval/0.2));
+    }
+    else if ((yval >= 0.2) && (yval < 0.40)) // blue to cyan ramp
+    {
+      return Vec3f(0.0, (yval-0.2)*5.0, 1.0);
+    }
+    else if ((yval >= 0.40) && (yval < 0.6)) // cyan to green ramp
+    {
+      return Vec3f(0.0, 1.0, (0.6-yval)*5.0);
+    }
+    else if ((yval >= 0.6) && (yval < 0.8 )) // green to yellow ramp
+    {
+      return Vec3f((yval-0.6)*5.0, 1.0, 0.0);
+    }
+    else // yellow to red ramp^
+    {
+      return Vec3f(1.0, (1.0-yval)*5.0, 0.0);
+    }
+  }
+
+  static Vec3f getColorMapLuminance(float yval)
+  {
+    if (yval < 0.30)
+    {
+      return Vec3f(yval/0.3, 0, 0);
+    }
+    else if ((yval>=0.30) && (yval < 0.89))
+    {
+      return Vec3f(1.0, (yval-0.3)/0.59, 0.0);
+    }
+    else
+    {
+      return Vec3f(1.0, 1.0, (yval-0.89)/0.11);
+    }
+  }
+  
+  // assumes val in [-1, 1]
+  static Vec3f getColorMapBlueRed(float val)
+  {
+    assert(fabs(val) <= 1.0);
+    
+    static const Vec3f positive (180.0/255.0, 4.0/255.0, 38.0/255.0);
+    static const Vec3f negative (59.0/255.0, 76.0/255.0, 192.0/255.0);
+    static const Vec3f neutral (221.0/255.0, 221.0/255.0, 221.0/255.0);
+    if(val >= 0)
+    {
+      return neutral + val * (positive - neutral);
+    }
+    else
+    {
+      return neutral - val * (negative - neutral);
+    }
+  };
+
+}
+
+#endif
