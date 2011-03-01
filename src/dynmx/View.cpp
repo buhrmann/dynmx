@@ -23,6 +23,11 @@ void View::init()
 {
 
   m_backgroundColor = Vec4f(0.3f, 0.3f, 0.3f, 1.0);
+  const float g = 0.6f;
+  m_background.topLeft = ci::ColorA(g, g, g, 1.0f);
+  m_background.topRight= ci::ColorA(g, g, g, 1.0f);
+  m_background.bottomLeft = ci::ColorA::white();
+  m_background.bottomRight = ci::ColorA::white();
   
   // setup openGL modes
   glEnable(GL_LIGHTING);
@@ -57,17 +62,18 @@ void View::init()
   
   // set up the cameras
 	CameraPersp cam;
-	cam.setEyePoint(Vec3f(5.0f, 10.0f, 10.0f));
+	cam.setEyePoint(Vec3f(0.0f, 1.0f, 2.0f));
 	cam.setCenterOfInterestPoint(Vec3f(0.0f, 0.0f, 0.0f));
+  cam.setWorldUp(Vec3f(0,1,0));
 	cam.setPerspective(60.0f, getWindowAspectRatio(), 1.0f, 1000.0f);
 	m_cam3d.setCurrentCam(cam);
     
-  Vec3f centre(ci::app::getWindowWidth() / 2.0f,  ci::app::getWindowHeight() / 2.0f, 0.0f);
-	m_cam2d.setEyePoint(centre + Vec3f(0, 0, -1));
-	m_cam2d.setCenterOfInterestPoint( Vec3f(0.0f, 0.0f, 0.0f) );
-	m_cam2d.setPerspective( 60.0f, getWindowAspectRatio(), 1.0f, 1000.0f );
+  //Vec3f centre(ci::app::getWindowWidth() / 2.0f,  ci::app::getWindowHeight() / 2.0f, 0.0f);
+	//m_cam2d.setEyePoint(centre + Vec3f(0, 0, -1));
+	//m_cam2d.setCenterOfInterestPoint( Vec3f(0.0f, 0.0f, 0.0f) );
+	//m_cam2d.setPerspective( 60.0f, getWindowAspectRatio(), 1.0f, 1000.0f );
+  m_cam2d.setOrtho(0, ci::app::getWindowWidth(), ci::app::getWindowHeight(), 0, 0.01f, 100.0f);
 
-  //gui.loadFromXML();
   buildGui();
   
   setupScene();
@@ -79,15 +85,14 @@ void View::draw()
 {
   // Clear the background
 	glClearColor(m_backgroundColor.x, m_backgroundColor.y, m_backgroundColor.z, 1.0f);  
-  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-  // Set perspective viewing transformation
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
+  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ); 
     
   // small viewport for picking
   if(RenderState::g_renderPass == RenderState::RENDER_PICKING)
   {
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity(); 
+    // Set perspective viewing transformation
     GLint viewport[4];
   	glGetIntegerv (GL_VIEWPORT, viewport);
     gluPickMatrix (
@@ -95,15 +100,15 @@ void View::draw()
       (GLdouble) (viewport[3] - m_mouse.y),
       10, 10,
       viewport);
+    gluPerspective(60, getWindowAspectRatio(), 1, 50);
+  }
+  else
+  {
+    gl::setProjection(m_cam3d.getCamera());
   }
   
-  gluPerspective(45, getWindowAspectRatio(), 1, 50);
-
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
-
-  gl::setMatrices(m_cam3d.getCamera());
-
+  gl::setModelView(m_cam3d.getCamera());
+      
   // picking
   if(RenderState::g_renderPass == RenderState::RENDER_PICKING)
   {
@@ -145,11 +150,13 @@ void View::draw()
       // shadows
       if(m_drawShadows)
       {
-        Vec3f origin(0,0,0);
-        Vec3f normal(0,0,1);
-        //RenderState::startShadowMode(normal, origin, &m_light.m_TM.getRow(0));
+        Vec4f origin(0,0,0,1);
+        Vec4f normal(0,0,1,1);
+        Vec4f dir = m_light.m_TM.getRow(0);
+        //Vec3f dir = Vec3f(m_light.m_TM.getRow(0).x, m_light.m_TM.getRow(0).y, m_light.m_TM.getRow(0).z);
+        RenderState::startShadowMode(normal, origin, dir);
         m_scene3d.update();
-        //RenderState::stopShadowMode();
+        RenderState::stopShadowMode();
       }
 
       // custom 3d drawing
@@ -164,17 +171,17 @@ void View::draw()
     //glBlendFunc(GL_SRC_COLOR, GL_ONE);
     glDisable(GL_CULL_FACE);
 
-    glMatrixMode (GL_PROJECTION);
-    glLoadIdentity ();
-    gluOrtho2D (0, getWindowWidth(), 0, getWindowHeight());
-    glMatrixMode (GL_MODELVIEW);
-    glLoadIdentity ();
-      
+    //gl::setMatrices(m_cam2d);
+    gl::setMatricesWindow(getWindowWidth(), getWindowHeight(), true);
+    
     // custom 2d drawing
     if(m_draw2d)
     {
+      // draw a background quad with potentially four differently coloured corners
+      dmx::drawRectangle(getWindowWidth(), getWindowHeight(), m_background.topLeft, m_background.topRight,
+        m_background.bottomLeft, m_background.bottomRight);
       m_scene2d.update();
-      draw2d();   
+      draw2d();
     }
 
     // finally draw the GUI on top
@@ -266,14 +273,14 @@ void View::keyDown(KeyEvent event)
 //----------------------------------------------------------------------------------------------------------------------
 void View::keyUp(KeyEvent event)
 {
+  m_scene2d.onKeyPress(event);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 void View::mouseMove(MouseEvent event)
 {
-  //update the mouse position
-  m_mouse.x = event.getX();
-  m_mouse.y = event.getY();
+  // keep track of the mouse
+  m_mouse = event.getPos();
   
   m_scene2d.onMouseMove(Vec3f(m_mouse.x, m_mouse.y, 0));  
 }
@@ -284,13 +291,11 @@ void View::mouseDrag(MouseEvent event)
   // gui
   //if(!gui.isOn())
   {
-    //Calculate how much the mouse actually moved
-    int dx = event.getX() - m_mouse.x;
-    int dy = event.getY() - m_mouse.y;
+    // keep track of the mouse
+    m_mouse = event.getPos();
 
-    //update the mouse position
-    m_mouse.x = event.getX();
-    m_mouse.y = event.getY();
+    // let the camera handle the interaction
+    m_cam3d.mouseDrag( event.getPos(), event.isLeftDown(), event.isMiddleDown(), event.isRightDown() ); 
   }
 }
 
@@ -312,19 +317,22 @@ void View::mouseDown(MouseEvent event)
     }
   }
 
-  //m_mouse.buttonPressed(x,y,button);
+  // let the camera handle the interaction
+  m_cam3d.mouseDown( event.getPos() );
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 void View::mouseUp(MouseEvent event)
 {
-    //m_mouse.buttonReleased();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 void View::resize(ResizeEvent event)
 {
-  //m_easyCam2d.perspective(65, (float) w / (float) h, 0, 10000);
+	// adjust aspect ratio
+	CameraPersp cam = m_cam3d.getCamera();
+	cam.setAspectRatio( getWindowAspectRatio() );
+	m_cam3d.setCurrentCam( cam );
 }
 
 } // namespace dmx

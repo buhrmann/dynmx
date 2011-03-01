@@ -94,6 +94,8 @@ public:
   void randomizeOutput(double lb, double ub, RandomState &rs);
   void randomizeWeights(double lb, double ub);
   void randomizeWeights(double lb, double ub, RandomState &rs);  
+  void randomizeBiases(double lb, double ub);
+  void randomizeTimeConstants(double lb, double ub);
 
   // internal data
   int size;

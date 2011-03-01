@@ -16,6 +16,6 @@ const float PI_OVER_FOUR = 0.785398163397448f;
 const float DEG_TO_RAD = PI / 180.0;
 const float RAD_TO_DEG = 180.0 / PI;
 
-static const float degreeToRadians(float deg) { return deg * DEG_TO_RAD; };
+static const float degreesToRadians(float deg) { return deg * DEG_TO_RAD; };
 
 static const float radiansToDegrees(float rad) { return rad * RAD_TO_DEG; };

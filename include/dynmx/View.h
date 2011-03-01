@@ -49,9 +49,17 @@ public:
   NodeGeometry* m_selectedNode;
   Light m_light;
   ci::MayaCamUI	m_cam3d;
-  ci::CameraPersp	m_cam2d;
+  ci::CameraOrtho m_cam2d;
 	ci::Vec2i m_mouse; 
   ci::Vec4f m_backgroundColor;
+
+  struct BackGround
+  {
+    ci::ColorA topLeft;
+    ci::ColorA topRight;
+    ci::ColorA bottomLeft;
+    ci::ColorA bottomRight;
+  };
 
   struct
   {
@@ -61,6 +69,8 @@ public:
     bool m_draw3d:1;
     bool m_draw2d:1;
   };
+  
+  BackGround m_background;
 
   // stuff for picking objects in the scene
   static const int m_selectBufSize;

@@ -28,6 +28,16 @@ GA::GA(int popsize, int genomeLength, int demeWidth) :
   m_genomeLength(genomeLength),
   m_demeWidth(demeWidth)
   { 
+    // allocate 
+    m_genomes = new double*[m_popSize];
+    for(int i = 0; i < m_popSize; i++)
+      m_genomes[i] = new double[m_genomeLength];
+
+    m_fitnesses = new float[m_popSize];     
+    
+    m_weightedAverageGenome = new double[m_popSize]; 
+    
+    // reset to default values
     init(); 
   };
 
@@ -56,22 +66,14 @@ void GA::init()
   m_generation = 0;
   m_idum = (long)-time(0);	// seed random number generator
   m_currentGenome = GA_NONE_SELECTED;
-  
-  // allocate 
-  m_genomes = new double*[m_popSize];
-  for(int i = 0; i < m_popSize; i++)
-    m_genomes[i] = new double[m_popSize];
 
   // random initialization
   for (int i = 0; i < m_popSize; i++)
     for (int j = 0; j < m_genomeLength; j++)
       m_genomes[i][j] = ran1(&m_idum);
 
-  m_fitnesses = new float[m_popSize];
   for(int i = 0; i < m_popSize; i++)
     m_fitnesses[i] = -1.0f;
-
-  m_weightedAverageGenome = new double[m_popSize];
   
   // select first pair of genomes for tournament
   startNextTournament();
@@ -468,9 +470,9 @@ void GA::printBestGenome(const char* fnm) const
   if (fp)
   {
     fprintf(fp, "%i\t", m_generation);
-    float junk;
+    float fitness;
     for (int i=0; i < m_genomeLength; i++)    
-      fprintf(fp, "%lf ", getBestGenome(junk)[i]);
+      fprintf(fp, "%lf ", getBestGenome(fitness)[i]);
     fprintf(fp, "\n");
     fclose(fp);
   }

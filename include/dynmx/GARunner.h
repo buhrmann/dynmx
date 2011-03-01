@@ -51,6 +51,8 @@ public:
   virtual void update(float dt);
   virtual void init();
   
+  Evolvable* getEvolvable() { return m_evolvable; };
+  
 protected:  
   
   Evolvable* m_evolvable;

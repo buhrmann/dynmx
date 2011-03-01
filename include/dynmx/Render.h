@@ -4,6 +4,7 @@
 #include <OpenGL/glu.h>
 #include <GLUT/glut.h>
 #include "cinder/Matrix.h"
+#include "cinder/Color.h"
 
 namespace dmx
 {
@@ -24,7 +25,7 @@ namespace dmx
 		glColor3f(c[0], c[1], c[2]);
 	}
 
-	static void setColor4(const Vec3f& c)
+	static void setColor4(const Vec4f& c)
 	{
 		glColor4f(c[0], c[1], c[2], c[3]);
 	}
@@ -138,7 +139,7 @@ namespace dmx
 			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
 	}
 
-		// in the z plane
+  // in the y plane
 	static void drawRectangle(float lx, float ly, GLenum mode = GL_QUADS)
 	{
 	  lx *= 0.5;
@@ -152,22 +153,57 @@ namespace dmx
       glNormal3f (0,0,1);
       glVertex3f( lx, ly, 0.0f);
       glVertex3f(-lx, ly, 0.0f);
-      glVertex3f(-lx,-ly, 0.0f);
-      glVertex3f( lx,-ly, 0.0f);
+      glVertex3f(-lx, -ly, 0.0f);
+      glVertex3f( lx, -ly, 0.0f);
 	  glEnd();
 	  glPopAttrib();
 	}
+  
+  // in the y plane
+	static void drawRectangleCentred(float lx, float ly, ci::ColorA tl, ci::ColorA tr, ci::ColorA bl, ci::ColorA br)
+	{
+	  lx *= 0.5;
+	  ly *= 0.5;
+
+	  glBegin(GL_QUADS);
+      glNormal3f (0,0,1);
+      glColor4f(br.r, br.g, br.g, br.a);      
+      glVertex3f( lx, ly, 0.0f);
+      glColor4f(bl.r, bl.g, bl.g, bl.a);      
+      glVertex3f(-lx, ly, 0.0f);
+      glColor4f(tl.r, tl.g, tl.g, tl.a);
+      glVertex3f(-lx, -ly, 0.0f);
+      glColor4f(tr.r, tr.g, tr.g, tr.a);
+      glVertex3f( lx, -ly, 0.0f);
+	  glEnd();
+	}  
+
+	static void drawRectangle(float lx, float ly, ci::ColorA tl, ci::ColorA tr, ci::ColorA bl, ci::ColorA br)
+	{
+	  glBegin(GL_QUADS);
+      glNormal3f (0,0,1);
+      glColor4f(br.r, br.g, br.g, br.a);      
+      glVertex3f( lx, ly, 0.0f);
+      glColor4f(bl.r, bl.g, bl.g, bl.a);      
+      glVertex3f(0, ly, 0.0f);
+      glColor4f(tl.r, tl.g, tl.g, tl.a);
+      glVertex3f(0, 0, 0.0f);
+      glColor4f(tr.r, tr.g, tr.g, tr.a);
+      glVertex3f( lx, 0, 0.0f);
+	  glEnd();
+	}  
+
 
 	static void drawFrame(float lx, float ly)
 	{
     lx *= 0.5;
     ly *= 0.5;
     glBegin(GL_LINE_STRIP);
-      glVertex3f( -lx, -ly,  0.0f);
-      glVertex3f( -lx,  ly,  0.0f);
-      glVertex3f(  lx,  ly,  0.0f);
-      glVertex3f(  lx, -ly,  0.0f);
-      glVertex3f( -lx, -ly,  0.0f);
+      glVertex3f( -lx, -ly, 0.0f);
+      glVertex3f( -lx, ly, 0.0f);
+      glVertex3f(  lx, ly, 0.0f);
+      glVertex3f(  lx, -ly, 0.0f);
+      glVertex3f( -lx, -ly, 0.0f);
 	  glEnd();
 	}
 
@@ -193,8 +229,8 @@ namespace dmx
 	{
     glBegin(GL_TRIANGLES);
       glVertex3f( s,  0.0f,  0.0f);
-      glVertex3f(-s, -s,  0.0f);
-      glVertex3f(-s,  s,  0.0f);      
+      glVertex3f(-s, 0.0f, -s);
+      glVertex3f(-s, 0.0f, s);      
     glEnd();
 	}
 
@@ -229,10 +265,10 @@ namespace dmx
     for(float i = -x; i <= x; i += res)
 	  {
       glBegin(GL_LINES);
-        glVertex3f(-x, i, 0.0f);
-        glVertex3f(x,  i, 0.0f);
-        glVertex3f(i, -y, 0.0f);
-        glVertex3f(i,  y, 0.0f);
+        glVertex3f(-x, 0.0f, i);
+        glVertex3f(x,  0.0f, i);
+        glVertex3f(i, 0.0f, -y);
+        glVertex3f(i, 0.0f, y);
       glEnd();
 	  }
 	}
@@ -256,6 +292,16 @@ namespace dmx
 		gluDisk(obj, radius2, radius1, slices, rings);
     gluDeleteQuadric(obj);
 	}
+  
+  static void drawPartialDisk(float innerRadius, float outerRadius, int slices, int rings, float startAngle, float sweepAngle, 
+    GLenum mode=GLU_FILL, GLenum shade=GLU_SMOOTH )
+	{
+	  GLUquadricObj* obj = gluNewQuadric();
+	  gluQuadricDrawStyle(obj, mode);
+	  gluQuadricNormals(obj, shade);
+		gluPartialDisk(obj, innerRadius, outerRadius, slices, rings, startAngle, sweepAngle);
+    gluDeleteQuadric(obj);
+	}  
 
 	static void drawSphere(float radius, int slices, int stacks, GLenum mode=GLU_FILL, GLenum shade=GLU_SMOOTH)
 	{
@@ -349,13 +395,15 @@ namespace dmx
 	}
 
 	// forward declaration: implementation at bottom of file
-	static void setShadowTransform(const Vec3f& normal, const Vec3f& origin, const Vec3f& light)
+	static void setShadowTransform(const Vec4f& ground, const Vec4f& origin, const Vec4f& light)
 	{
-    float  dot;
+    /*float  dot;
     float  shadowMat[4][4];
 
-    Vec3f ground = normal;
-    ground[3] = - normal.dot(origin);
+    Vec4f ground = normal;
+    Vec3f n3 (normal.x, normal.y, normal.z);
+    Vec3f o3 (origin.x, origin.y, origin.z); 
+    ground[3] = - n3.dot(o3);
 
     dot = ground.dot(light);
 
@@ -380,6 +428,36 @@ namespace dmx
     shadowMat[3][3] = dot - light[3] * ground[3];
 
     glMultMatrixf((const GLfloat*)shadowMat);
+    */
+    float  dot;
+    float  shadowMat[4][4];
+
+    dot = ground[0] * light[0] +
+          ground[1] * light[1] +
+          ground[2] * light[2] +
+          ground[3] * light[3];
+    
+    shadowMat[0][0] = dot - light[0] * ground[0];
+    shadowMat[1][0] = 0.0 - light[0] * ground[1];
+    shadowMat[2][0] = 0.0 - light[0] * ground[2];
+    shadowMat[3][0] = 0.0 - light[0] * ground[3];
+    
+    shadowMat[0][1] = 0.0 - light[1] * ground[0];
+    shadowMat[1][1] = dot - light[1] * ground[1];
+    shadowMat[2][1] = 0.0 - light[1] * ground[2];
+    shadowMat[3][1] = 0.0 - light[1] * ground[3];
+    
+    shadowMat[0][2] = 0.0 - light[2] * ground[0];
+    shadowMat[1][2] = 0.0 - light[2] * ground[1];
+    shadowMat[2][2] = dot - light[2] * ground[2];
+    shadowMat[3][2] = 0.0 - light[2] * ground[3];
+    
+    shadowMat[0][3] = 0.0 - light[3] * ground[0];
+    shadowMat[1][3] = 0.0 - light[3] * ground[1];
+    shadowMat[2][3] = 0.0 - light[3] * ground[2];
+    shadowMat[3][3] = dot - light[3] * ground[3];
+
+    glMultMatrixf((const GLfloat*)shadowMat); 
   }
 
   static Vec3f getColorMapRainbow(float yval)

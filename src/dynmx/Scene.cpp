@@ -1,5 +1,6 @@
 
 #include "Scene.h"
+#include "cinder/gl/gl.h"
 
 namespace dmx
 {
@@ -62,7 +63,7 @@ void RenderState::startWireframeMode()
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-void RenderState::startShadowMode(const Vec3f& normal, const Vec3f& origin, const Vec3f& light)
+void RenderState::startShadowMode(const Vec4f& normal, const Vec4f& origin, const Vec4f& light)
 {
   g_renderPass = RENDER_SHADOWS;
   glPushAttrib(GL_LIGHTING_BIT | GL_DEPTH_BUFFER_BIT);
@@ -92,7 +93,9 @@ Node::Node() :
 // ---------------------------------------------------------------------------------------------------------------------
 void Node::print()
 { 
+#ifdef _DEBUG
   printf("Node %i: %s | N: %i U: %i \n", m_uniqueID, NodeTypeNames[m_type], NUM_NODES, UNIQUE_IDS); 
+#endif
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -137,6 +140,15 @@ void NodeGroup::onMouseMove(const Vec3f& mPos)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+void NodeGroup::onKeyPress(ci::app::KeyEvent e)
+{
+  for(int i = 0; i < m_children.size(); i++)
+  {
+    m_children[i]->onKeyPress(e);
+  }  
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 Node* NodeGroup::getNode(int pickID)
 {
   Node* pickedNode = 0;
@@ -161,7 +173,7 @@ NodeGeometry::NodeGeometry() :
   m_pickColor(1,0.4,0,1),
   m_outlineWidth(1.0),
   m_picked(false),
-  m_hasShadow(true),
+  m_hasShadow(false),
   m_isSelectable(true),
   m_dl(-1)
 {
@@ -327,9 +339,9 @@ void Capsule::init()
 //----------------------------------------------------------------------------------------------------------------------
 void Grid::createGeometry()
 {
-  float x = m_xl/2;
-  float y = m_yl/2;
-  GLfloat grid[2][2][3] = { {{-x, -y, 0.0}, {x, -y, 0.0}}, {{-x, y, 0.0}, {x, y, 0.0}} };
+  float x = m_xl / 2;
+  float y = m_yl / 2;
+  GLfloat grid[2][2][3] = { {{-x, 0.0f, -y}, {x, 0.0f, -y}}, {{-x, 0.0f, y}, {x, 0.0f, y}} };
   m_dl = glGenLists(1);
   glNewList(m_dl,GL_COMPILE);
     drawEvalGrid(&grid[0][0][0], m_Nx, m_Ny);
@@ -369,8 +381,9 @@ void Grid::init()
 // A graph/plot
 //----------------------------------------------------------------------------------------------------------------------
 Plot::Plot(float w, float h, int nr, int N) :
-  m_nr(nr), m_N(N), m_points(nr, std::vector<float>()), m_w(w), m_h(h), m_maxY(1), m_minY(0)
+  m_nr(nr), m_N(N), m_points(nr, std::vector<float>()), /*m_paths(nr),*/ m_w(w), m_h(h), m_maxY(1), m_minY(0)
 { 
+
   init(); 
 }
 
@@ -411,12 +424,15 @@ void Plot::update() const
     }
   }
   
+//  for(int path = 0; path < m_nr; path++)
+//  {
+//    ci::gl::draw(m_paths[path]);
+//  }
+  
   // box
   glColor4f(0.0, 0.0, 0.0, 1);
-//  drawLine(Vec3f(0, 0, 0), Vec3f(m_w, 0, 0)); // xAxis
-//  drawLine(Vec3f(0, 0, 0), Vec3f(0, m_h, 0)); // yAxis
-//  drawLine(Vec3f(0, m_h, 0), Vec3f(m_h/20, m_h, 0)); // end
-//  drawLine(Vec3f(m_w, 0, 0), Vec3f(m_w, m_h/20, 0)); // end
+  ci::gl::drawLine(Vec3f(0.5, m_h+0.5, 0), Vec3f(m_w+0.5, m_h+0.5, 0)); // xAxis
+  ci::gl::drawLine(Vec3f(0.5, m_h, 0), Vec3f(0.5, 0, 0)); // yAxis
 
   glPopMatrix();
   glPopAttrib();
@@ -429,12 +445,25 @@ void Plot::addPoint(float p, int pID)
   assert(pID < m_nr);
 
   m_points[pID].push_back(p);
+  
   if(p > m_maxY)
     m_maxY = p;
   if(p < m_minY)
     m_minY = p;
+    
+//  float widthRec = 1.0 / (float)m_N * m_w;
+//  float scale = m_maxY - m_minY;
+//  float scaleRec = scale > 0 ? 1.0 / scale : 0.0;  
+//  if(m_paths[pID].empty())
+//    m_paths[pID].moveTo(ci::Vec2f(0, p));
+//  else
+//    m_paths[pID].lineTo(ci::Vec2f(m_paths[pID].getNumPoints() * widthRec, m_h * (p * scaleRec)));
+    
   if(m_points[pID].size() > m_N)
     m_points[pID].erase(m_points[pID].begin());
+    
+//  if(m_paths[pID].getNumPoints() > m_N)
+//    m_paths[pID].removeSegment(m_paths[pID].getNumSegments() - 1);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -19,7 +19,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // Implementation of MinJerkTrajectory
 //----------------------------------------------------------------------------------------------------------------------
-const Pos& MinJerkTrajectory::update(float dt)
+void MinJerkTrajectory::update(float dt)
 {
   time += dt;
   float t = time / duration;

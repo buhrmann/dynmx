@@ -124,7 +124,7 @@ void CTRNN::decodeGenome(const double* params, int numInputs)
   for(int i = 0; i < size; i++)
   {
     setBias        (i, -10.0 + 20.0 * params[I + 2 * i]);
-    setTimeConstant(i, -10.0 + 20.0 * params[I + 2 * i + 1]);
+    setTimeConstant(i, 0.2 + 2.0 * params[I + 2 * i + 1]);
   }
   
   // weights
@@ -134,7 +134,7 @@ void CTRNN::decodeGenome(const double* params, int numInputs)
   {
     for(int j = 0; j < size; j++)
     {
-      setWeight(i, j, params[I + id]);
+      setWeight(i, j, -10.0 + 20.0 * params[I + id]);
       id++;
     }
   }
@@ -164,6 +164,18 @@ void CTRNN::randomizeOutput(double lb, double ub, RandomState &rs)
 {
 	for (int i = 0; i < size; i++)
     setOutput(i, rs.UniformRandom(lb, ub));
+}
+
+void CTRNN::randomizeBiases(double lb, double ub)
+{
+	for (int i = 0; i < size; i++)
+    setBias(i, UniformRandom(lb, ub));
+}
+
+void CTRNN::randomizeTimeConstants(double lb, double ub)
+{
+	for (int i = 0; i < size; i++)
+    setTimeConstant(i, UniformRandom(lb, ub));
 }
 
 void CTRNN::randomizeWeights(double lb, double ub)

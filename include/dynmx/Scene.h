@@ -5,6 +5,9 @@
 
 //#include "ofx3DModelLoader.h"
 #include "cinder/Matrix.h"
+#include "cinder/Path2d.h"
+#include "cinder/app/App.h"
+
 #include "Render.h"
 
 namespace dmx 
@@ -29,6 +32,7 @@ enum NodeType
   NUM_NODETYPES
 };
 
+#ifdef _DEBUG
 static const char* NodeTypeNames [NUM_NODETYPES] =
 {
   "Invalid!",
@@ -45,6 +49,7 @@ static const char* NodeTypeNames [NUM_NODETYPES] =
   "Value-Vector",
   "Light",
 };
+#endif
 
 // Global render state
 // ---------------------------------------------------------------------------------------------------------------------
@@ -75,7 +80,7 @@ public :
   static void stopOutlineMode() { glPopAttrib(); };
   static void startWireframeMode();
   static void stopWireframeMode() { glPopAttrib(); };
-  static void startShadowMode(const cinder::Vec3f& normal, const cinder::Vec3f& origin, const cinder::Vec3f& light);
+  static void startShadowMode(const cinder::Vec4f& normal, const cinder::Vec4f& origin, const cinder::Vec4f& light);
   static void stopShadowMode() { glPopMatrix(); glPopAttrib(); };
 
 }; // class RenderState
@@ -102,6 +107,7 @@ public:
   virtual Node* getNode(int pickID) { return 0; };
   
   virtual void onMouseMove(const cinder::Vec3f& mousePos) {};
+  virtual void onKeyPress(cinder::app::KeyEvent e) {};
 
   virtual void print();
 
@@ -131,6 +137,7 @@ public:
   // recursively descend into tree to look for picked node
   virtual Node* getNode(int pickID);
   virtual void onMouseMove(const cinder::Vec3f& mousePos);
+  virtual void onKeyPress(ci::app::KeyEvent e);
   
   std::vector<Node*> m_children;
 
@@ -317,6 +324,7 @@ protected:
   virtual void init();
 
   std::vector<std::vector<float> > m_points;
+  //std::vector<ci::Path2d> m_paths;
   int m_nr;
   int m_N;
   float m_w;
@@ -350,7 +358,7 @@ public:
     glScalef(m_scale, m_scale, m_scale);
     
     // Align top left corner
-    glTranslatef(0.5, -0.5, 0.0);
+    glTranslatef(0.5, 0.5, 0.0);
     
     cinder::Vec3f col;
     for(int i = 0; i < m_N; i++)
@@ -358,26 +366,18 @@ public:
       for(int j = 0; j < m_M; j++)
       {
         glPushMatrix();
-        // Align top left corner
-        glTranslatef(i, -j, 0.0);
+        glTranslatef(i, j, 0.0);
+        
         float w = m_data[i][j] / m_maxVal;
-#define DRAW_COLOR_CODED
-#ifdef DRAW_COLOR_CODED          
-        //col = getColorMapRainbow(w);
-        //col = getColorMapLuminance(w);
-        col = getColorMapBlueRed(w);
-        //col.Set(w,w,w,1);
+        col = w > 0 ? Vec3f(0,0,0) : Vec3f(235.0/255.0, 0.0/255.0, 103.0/255.0); //Vec3f(215.0/255.0, 19.0/255.0, 69.0/255.0);
         glColor4f(col.x, col.y, col.z, 1);
         drawRectangle(w*0.98, w*0.98);
-#else
-        glColor4f(col.x, col.y, col.z, 1.0);         
-        rawRectangle(w, w);
-#endif
+
         if (i == m_iSel && j == m_jSel)
         {
-          glColor4f(1, 0, 0, 1);         
+          glLineWidth(2.0f);
+          glColor3f(1, 1, 1);         
           drawFrame(1, 1);  
-                             
         }
         glPopMatrix();
       }
@@ -391,12 +391,13 @@ public:
   {
     const Vec3f& pos = m_pTM->getTranslation();
     const float xMax = pos.x + m_N * m_scale;
-    const float yMin = pos.y - m_M * m_scale;
-    if((mP.x > pos.x) && (mP.x < xMax) && (mP.y < pos.y) && (mP.y > yMin))
+    const float yMax = pos.y + m_M * m_scale;
+    if((mP.x > pos.x) && (mP.x < xMax) && (mP.y > pos.y) && (mP.y < yMax))
     {      
       Vec3f mPosLocal = mP - pos;
-      m_iSel = (int) mPosLocal.x / (int) m_scale;
-      m_jSel = (int) -mPosLocal.y / (int) m_scale;
+      m_iSel = (int) (mPosLocal.x / m_scale);
+      m_jSel = (int) (mPosLocal.y / m_scale);
+      assert(m_iSel < m_N && m_jSel < m_M);
     }
     else 
     {
@@ -447,44 +448,38 @@ public:
     glPushMatrix();
     glMultMatrixf(m_pTM->m);
     glScalef(m_scale, m_scale, m_scale);
+
     // Aligh top left corner
-    glTranslatef(0.5, -0.5, 0.0);
+    glTranslatef(0.5, 0.5, 0.0);
     
+    glColor3f(0,0,0);
+    glLineWidth(2.0);
     for(int i = 0; i < m_N; i++)
-    {
-      glPushMatrix();
-      glTranslatef(i, 0, 0.0);
-      float w = m_data[i] / m_maxVal;
-#define DRAW_COLOR_CODED
-#ifdef DRAW_COLOR_CODED          
-      //col = ofx3d::getColorMapRainbow(w);
-      //col = ofx3d::getColorMapLuminance(1-w);
-      glColor4f(1-w,1-w,1-w,1);
-      drawRectangle(w*0.98, w*0.98);
-#else
-      glColor4f(0,0,0, 1);         
-      drawRectangle(w, w);
-#endif        
-      if (i == m_iSel)
-      {    
-        glColor4f(1, 0, 0, 1);      
-        drawFrame(1, 1);              
+    {   
+      float w = m_data[i] / m_maxVal;        
+      drawRectangle(w*0.98, w*0.98);       
+      if(i == m_iSel)
+      {
+        glColor3f(1,1,1);
+        drawFrame(1, 1);
+        glColor3f(0,0,0);
       }
-      glPopMatrix();
+      glTranslatef(1,0,0); // move on to next
     }
     glPopMatrix();
     glPopAttrib();
   }
   
-  virtual void onMouseMove(const Vec3f& mP)
+  virtual void onMouseMove(const Vec3f& p)
   {
     Vec3f pos = m_pTM->getTranslation();
     const float xMax = pos.x + m_N * m_scale;
-    const float yMin = pos.y - m_scale;
-    if((mP.x > pos.x) && (mP.x < xMax) && (mP.y < pos.y) && (mP.y > yMin))
+    const float yMax = pos.y + m_scale;
+    if((p.x > pos.x) && (p.x < xMax) && (p.y > pos.y) && (p.y < yMax))
     {      
-      Vec3f mPosLocal = mP - pos;
-      m_iSel = (int) mPosLocal.x / (int) m_scale;
+      Vec3f posLocal = p - pos;
+      m_iSel = (int) (posLocal.x / m_scale);
+      assert(m_iSel < m_N);
     }
     else
     {
