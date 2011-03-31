@@ -96,7 +96,7 @@ public:
   static int UNIQUE_IDS;
 
   virtual ~Node() { NUM_NODES--; };
-  virtual void update() const = 0;
+  virtual void update() = 0;
 
   // only effective when not externally driven !
   virtual void translate(const cinder::Vec3f& p) { m_TM.translate(p); };
@@ -132,7 +132,7 @@ class NodeGroup : public Node
 public:
 
   NodeGroup();
-  virtual void update() const;
+  virtual void update();
 
   // recursively descend into tree to look for picked node
   virtual Node* getNode(int pickID);
@@ -152,7 +152,7 @@ class NodeGeometry : public Node
 {
 public:
   virtual ~NodeGeometry(){ glDeleteLists(m_dl,1); };
-  virtual void update() const;
+  virtual void update();
 
   virtual Node* getNode(int pickID);
   virtual void createGeometry() = 0;
@@ -278,13 +278,11 @@ public:
   Grid(float xl, float yl, int nX = 2, int nY = 2) : m_xl(xl), m_yl(yl), m_Nx(nX), m_Ny(nY)  { init(); };
   virtual void createGeometry();
 
-  float
-    m_xl,
-    m_yl;
+  float m_xl;
+  float m_yl;
 
-  int
-    m_Nx,
-    m_Ny;
+  int m_Nx;
+  int m_Ny;
 
 protected:
   virtual void init();
@@ -316,7 +314,7 @@ public:
 
   Plot(float w = 2.0, float h = 1.0, int nr = 1, int N = 100);
 
-  virtual void update() const;
+  virtual void update();
   void addPoint(float p, int pID = 0);
   virtual Node* getNode(int pickID) { if (m_uniqueID == pickID) return this; else return 0; };
 
@@ -333,6 +331,41 @@ protected:
   float m_minY;
 };
 
+
+//----------------------------------------------------------------------------------------------------------------------
+// A matrix viz node
+//----------------------------------------------------------------------------------------------------------------------
+class RealMatrixViz : public Node
+{
+public:
+
+  RealMatrixViz(double **data, int n, int m, float width = 100.0f, double maxVal = 1.0);
+  virtual Node* getNode(int pickID){ if(m_uniqueID == pickID) return this; else return 0;};
+  virtual void update();
+  
+protected:
+  virtual void init()
+  {
+    m_type = NODE_VALUEMATRIX;
+  #ifdef _DEBUG
+    print();
+  #endif
+  };
+    
+public:  
+  int m_iSel, m_jSel;  
+
+protected:
+  double** m_data;
+  float m_scale;
+  double m_maxVal;
+  int m_N, m_M;
+  GLuint m_vbo[2];
+  //GLfloat *m_vertices, *m_colors;
+
+};
+  
+
 //----------------------------------------------------------------------------------------------------------------------
 // A matrix viz node
 //----------------------------------------------------------------------------------------------------------------------
@@ -346,7 +379,7 @@ public:
 
   virtual Node* getNode(int pickID){ if(m_uniqueID == pickID) return this; else return 0;};
   
-  virtual void update() const
+  virtual void update()
   {
     glPushAttrib(GL_COLOR_BUFFER_BIT | GL_CURRENT_BIT | GL_LINE_BIT | GL_LIGHTING_BIT);
     glDisable(GL_LIGHTING);
@@ -372,7 +405,7 @@ public:
         col = w > 0 ? Vec3f(0,0,0) : Vec3f(235.0/255.0, 0.0/255.0, 103.0/255.0); //Vec3f(215.0/255.0, 19.0/255.0, 69.0/255.0);
         glColor4f(col.x, col.y, col.z, 1);
         drawRectangle(w*0.98, w*0.98);
-
+        //ci::gl::drawSolidRect(ci::Rectf(ci::Area(ci::Vec2f(0.0f,0.0f), ci::Vec2f(1.0f, 1.0f))), false);
         if (i == m_iSel && j == m_jSel)
         {
           glLineWidth(2.0f);
@@ -439,7 +472,7 @@ public:
   VectorView(Type *d, int n, float s = 1.0f, float maxVal = 1.0f) : 
     m_data(d), m_N(n), m_scale(s/n), m_maxVal(maxVal), m_iSel(-1)  { init(); };
 
-  void update() const
+  void update()
   {
     glPushAttrib(GL_COLOR_BUFFER_BIT | GL_CURRENT_BIT | GL_LINE_BIT | GL_LIGHTING_BIT);
     glDisable(GL_LIGHTING);

@@ -43,35 +43,32 @@ void Arm3dView::init()
   m_children.push_back(&m_shoulder);
 }
 
-void Arm3dView::update(float time)
+void Arm3dView::update()
 {
   // update pose
-  Vec4f origin (0, 0, 1, 1);
-  m_TM.createRotation(Vec3f(0, 1, 0), PI_OVER_TWO); // 90deg
-  m_TM.setRow(3, origin);
+  Vec3f origin (0, 0, 0);
+  m_TM = ci::Matrix44f::createRotation(Vec3f(0, 0, 1), PI_OVER_TWO); // 90deg
+  m_TM.translate(origin);
   
   const float shdAngle = m_arm->getJointAngle(JT_shoulder);
-  Mat4f uArmRot;
-  uArmRot.createRotation(Vec3f(0.0f, -1.0f, 0.0f), shdAngle + PI_OVER_TWO);  
-  m_upperArm.m_TM = uArmRot;
+  m_upperArm.m_TM = Mat4f::createRotation(Vec3f(0.0f, -1.0f, 0.0f), shdAngle + PI_OVER_TWO);  
   
   const float elbAngle = m_arm->getJointAngle(JT_elbow);
-  Mat4f lArmRot;
-  lArmRot.createRotation(Vec3f(0.0f, -1.0f, 0.0f), elbAngle);
-  m_lowerArm.m_TM = uArmRot * lArmRot; 
+  Mat4f lArmRot = Mat4f::createRotation(Vec3f(0.0f, -1.0f, 0.0f), elbAngle);
+  m_lowerArm.m_TM = m_upperArm.m_TM * lArmRot; 
   
   float x, y;
   m_arm->getPointOnUpperArm(0.5, x, y);
-  Vec4f midPos1(x, 0.0f, y, 1.0);
+  Vec4f midPos1(x, y, 0.0f, 1.0);
   
   m_arm->getPointOnLowerArm(0.5, x, y);
-  Vec4f midPos2(x, 0.0f, y, 1.0); 
+  Vec4f midPos2(x, y, 0.0f, 1.0); 
   
   m_lowerArm.m_TM.setRow(3, midPos2);
   m_upperArm.m_TM.setRow(3, midPos1);
    
   m_arm->getElbowPos(x, y);
-  Vec4f elbPos(x, 0.0f, y, 1.0);
+  Vec4f elbPos(x, y, 0.0f, 1.0);
   m_elbow.m_TM.setRow(3, elbPos);
   
   m_shoulder.m_TM.setRow(3, Vec4f(0.0f, 0.0f, 0.0f, 1.0));

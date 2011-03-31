@@ -26,7 +26,7 @@ public:
   CTRNNViz(CTRNN* ctrnn, float width) : m_ctrnn(ctrnn), m_width(width) { init(); };
   
   void setCTRNN(CTRNN* ctrnn) { m_ctrnn = ctrnn; };
-  virtual void update() const;
+  virtual void update();
   virtual void onMouseMove(const Vec3f& mPos);
   virtual void onKeyPress(ci::app::KeyEvent e);
   

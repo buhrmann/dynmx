@@ -82,6 +82,7 @@ public:
   void setExternalInput(int i, double value) { externalinputs[i] = value; };
   void setWeight(int from, int to, double value) { weights[from][to] = value; };  
   void setCenterCrossing(void);
+  void setActivationFunction(double (*pt2Func)(double)) { m_activationFunction = pt2Func; };
 
   // Input and output
   //friend ostream& operator<<(ostream& os, CTRNN& c);
@@ -96,6 +97,9 @@ public:
   void randomizeWeights(double lb, double ub, RandomState &rs);  
   void randomizeBiases(double lb, double ub);
   void randomizeTimeConstants(double lb, double ub);
+  
+  // function pointer for avoiding conditional statements
+  double (*m_activationFunction)(double);
 
   // internal data
   int size;

@@ -57,7 +57,7 @@ void CTRNNViz::init()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void CTRNNViz::update() const
+void CTRNNViz::update()
 { 
   ci::Font font("Arial", 11);
 

@@ -52,6 +52,8 @@ public:
   virtual void init();
   
   Evolvable* getEvolvable() { return m_evolvable; };
+  GA* getGA() { return m_ga; };
+  const GADescriptor& getGADesc() { return m_gaDesc; };
   
 protected:  
   

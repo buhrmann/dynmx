@@ -31,7 +31,6 @@ public:
     m_prevTime = currentTime;
     
     update(deltaTime); 
-
   };
   
   virtual void update(float dt) { m_model->update(dt); };

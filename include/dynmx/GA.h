@@ -17,10 +17,10 @@
 #include <math.h>
 #include <stdio.h>
 #include <vector>
+#include "MathUtils.h"
 
 #define GA_BOUND_CHECK 0  // 0 = clamping, 1 = mirroring
 #define MAX_NUM_PARALLEL_EVALS 8
-
 
 // holds data for typical usage of a GA
 // ---------------------------------------------------------------------------------------------------------------------
@@ -30,9 +30,11 @@ struct GADescriptor
   int numTrials;
   int numGenerations;
   int populationSize;
+  int genomeSize;
   int demeSize;
   
-  GADescriptor() : trialDuration(1.0f), numTrials(1), numGenerations(100), populationSize(50), demeSize(5) {};
+  GADescriptor() : trialDuration(1.0f), numTrials(1), numGenerations(100), populationSize(50), 
+    demeSize(5), genomeSize(10) {};
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -44,6 +46,7 @@ class GA
 public:
 
   GA(int popsize=100, int genlength=10, int demeWidth = 3);
+  GA(const GADescriptor& desc);
   ~GA();
 
   // interface for repeated evaluation of individual genomes
@@ -70,6 +73,7 @@ public:
   
   /// Returns complete population, e.g. for drawing
   double** getPopulation() const { return m_genomes; };
+  float* getFitnesses() const {return m_fitnesses; };
 
   void setRandomSeed(long seed) { m_idum = seed; };
   void setDemeWidth(int width) { m_demeWidth = width; };
@@ -93,6 +97,7 @@ protected:
   } m_currentGenome;
 
   void init();
+  void reset();
   
   // internal interface for repeated evaluation of individual genomes
   // selects two random genomes for tournament from neighborhood in population
@@ -113,10 +118,6 @@ protected:
   // print out result of evolution
   void printFitness(const char* fnm) const;
   void printBestGenome(const char* fnm) const;
-
-  // random number generators
-  double ran1(long *idum);
-  double gasdev(long *idum);
 
   // the population of genomes: array of arrays of type SCALAR (float/double)
   double** m_genomes;

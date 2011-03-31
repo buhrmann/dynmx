@@ -5,6 +5,8 @@
 #include <GLUT/glut.h>
 #include "cinder/Matrix.h"
 #include "cinder/Color.h"
+#include "cinder/gl/Fbo.h"
+#include "cinder/gl/GlslProg.h"
 
 namespace dmx
 {
@@ -51,6 +53,7 @@ namespace dmx
 		glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, 5.0f);
 	}
 	static void setColorMaterial(const Vec3f& c){ setColorMaterial(c[0], c[1], c[2], c[3]);};
+
 
 	static void drawBasis(float l, bool annotate = false)
 	{
@@ -192,6 +195,134 @@ namespace dmx
       glVertex3f( lx, 0, 0.0f);
 	  glEnd();
 	}  
+  
+  static void drawSquares(int N=100, int M=100)
+  {
+  int dl = glGenLists(1);
+  glNewList(dl, GL_COMPILE);
+    glPushMatrix();
+    float scale = 300.0f / N;
+    glScalef(scale,scale,scale);
+    glTranslatef(N/2, M/2, 0);
+    for(int i=0; i<N; i++)
+    {
+      for(int j=0; j<M; j++)
+      {
+        glPushMatrix();
+        glTranslatef((float)i, (float)j, 0);
+        float id = (float)i*M+j;
+        float c = id / (N*M);
+        glColor3f(c,c,c);
+        drawRectangle(1,1);
+        glPopMatrix();
+      }
+    }
+    glPopMatrix();
+  glEndList();
+  glCallList(dl);
+  } 
+  
+  static GLuint vbo[2];
+  static bool vboInited = false;
+  
+  static void drawSquaresVB(float width, int N=200, int M=200)
+  {
+    float s = width/N;
+    int numVerts = N*M*4;
+    GLfloat verts[numVerts*2];
+    GLfloat cols[numVerts*3];
+
+    for(int i = 0; i < N; i++)
+    {
+      for(int j = 0; j < M; j++)
+      {
+        int sId = i*M+j;
+        int vId = sId*8; // (2x4 coords)
+
+        verts[vId + 0] = i*s; 
+        verts[vId + 1] = j*s; 
+        verts[vId + 2] = i*s; 
+        verts[vId + 3] = j*s + s; 
+        verts[vId + 4] = i*s + s; 
+        verts[vId + 5] = j*s + s; 
+        verts[vId + 6] = i*s + s; 
+        verts[vId + 7] = j*s; 
+        
+        int cId = sId*12; // (3x4 coords)
+        float color =  (float)sId / (float)(N*M);
+        for(int c = 0; c < 12; c++)
+        {
+          cols[cId + c] = color;
+        }
+      }
+    }
+    
+    bool useVA = true;
+    if(useVA)
+    {
+      glEnableClientState( GL_VERTEX_ARRAY );
+      glEnableClientState( GL_COLOR_ARRAY );      
+      
+      glColorPointer(3, GL_FLOAT, 0, cols);
+      glVertexPointer(2, GL_FLOAT, 0, verts);
+
+      glDrawArrays( GL_QUADS, 0, numVerts );
+      
+      glDisableClientState(GL_COLOR_ARRAY);
+      glDisableClientState(GL_VERTEX_ARRAY);
+    }
+    else
+    {
+      if(!vboInited)
+      {
+        glGenBuffersARB(2, &vbo[0]);
+        vboInited = true;        
+      }
+      
+      // render into fbo
+      const bool useFbo = false;                     
+      ci::gl::Fbo::Format format;
+      format.enableDepthBuffer(false);
+      format.enableColorBuffer(true);
+      ci::gl::Fbo myFbo( 640, 480, format );          
+      if(useFbo)
+      {          
+        myFbo.bindFramebuffer();  
+      }
+            
+      glEnableClientState(GL_VERTEX_ARRAY);
+      glEnableClientState(GL_COLOR_ARRAY); 
+
+      // copy vertex data
+      glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo[0]);
+      glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(verts), verts, GL_STATIC_DRAW_ARB);
+      glVertexPointer(2, GL_FLOAT, 0, 0);  
+      
+      // copy color data
+      glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo[1]);
+      glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(cols), cols, GL_STATIC_DRAW_ARB);      
+      glColorPointer(3, GL_FLOAT, 0, 0);
+
+      glDrawArrays(GL_QUADS, 0, numVerts); 
+      
+      glDisableClientState(GL_COLOR_ARRAY);      
+      glDisableClientState(GL_VERTEX_ARRAY); 
+      
+      // reset
+      glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);  
+      
+      if(useFbo)
+      {
+        myFbo.unbindFramebuffer(); 
+        ci::gl::draw(myFbo.getTexture(0), myFbo.getTexture(0).getBounds());
+//      ci::gl::GlslProg blurShader;
+//      blurShader.uniform( "blurRadius", 5.0f );
+//      blurShader.bind();
+//      ci::gl::draw( myFbo.getTexture() ); // draw the contents of the Fbo by using it as a texture
+//      blurShader.unbind();          
+      }          
+    }
+  }     
 
 
 	static void drawFrame(float lx, float ly)

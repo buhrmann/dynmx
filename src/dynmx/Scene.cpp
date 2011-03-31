@@ -116,7 +116,7 @@ void NodeGroup::init()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void NodeGroup::update() const
+void NodeGroup::update()
 {
   glPushMatrix();
   glMultMatrixf(m_pTM->m);
@@ -180,7 +180,7 @@ NodeGeometry::NodeGeometry() :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void NodeGeometry::update() const
+void NodeGeometry::update()
 {
   assert(m_dl > -1);
 
@@ -200,7 +200,7 @@ void NodeGeometry::update() const
     if(m_picked)
     {
       glColor4f(m_pickColor.x, m_pickColor.y, m_pickColor.z, m_pickColor.w);
-      glLineWidth(4*m_outlineWidth);
+      glLineWidth(4 * m_outlineWidth);
     }
     else
     {
@@ -356,6 +356,94 @@ void Grid::init()
 #endif
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+// vertex array/buffer
+//----------------------------------------------------------------------------------------------------------------------
+RealMatrixViz::RealMatrixViz(double **d, int N, int M, float width, double maxVal) : 
+  m_data(d), m_N(N), m_M(M), m_maxVal(maxVal), m_iSel(-1), m_jSel(-1)
+{
+  init();
+  
+  // choose the larger side as the one that's specified 
+  m_scale = N > M ? width / N : width / M;
+  
+  // stack space for vertex data
+  const int numVerts = N*M*4;
+  GLfloat verts[numVerts*2];
+  GLfloat cols[numVerts*3];
+  
+  float s = m_scale;
+  
+  // create vertices
+  for(int i = 0; i < N; i++)
+  {
+    for(int j = 0; j < M; j++)
+    {
+      int sId = i*M+j;
+      int vId = sId*8; // (2x4 coords)
+
+      verts[vId + 0] = i*s; 
+      verts[vId + 1] = j*s; 
+      verts[vId + 2] = i*s; 
+      verts[vId + 3] = j*s + s; 
+      verts[vId + 4] = i*s + s; 
+      verts[vId + 5] = j*s + s; 
+      verts[vId + 6] = i*s + s; 
+      verts[vId + 7] = j*s; 
+      
+      int cId = sId*12; // (3x4 coords)
+      double color = m_data[i][j] / m_maxVal;// (float)sId / (float)(N*M);
+      for(int c = 0; c < 12; c++)
+      {
+        cols[cId + c] = color;
+      }
+    }
+  }
+  
+  // create vertex and color buffers
+  glGenBuffersARB(2, &m_vbo[0]);
+  
+  // copy vertex data
+  glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbo[0]);
+  glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(verts), verts, GL_STATIC_DRAW_ARB);  
+  // copy color data
+  glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbo[1]);
+  glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(cols), cols, GL_STATIC_DRAW_ARB);   
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+void RealMatrixViz::update()
+{
+  glPushAttrib(GL_COLOR_BUFFER_BIT | GL_CURRENT_BIT | GL_LINE_BIT | GL_LIGHTING_BIT);
+  glDisable(GL_LIGHTING);
+  glLineWidth(1);
+
+  glPushMatrix();
+  glMultMatrixf(m_pTM->m);
+  
+  // draw vertex array
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_COLOR_ARRAY); 
+
+  glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbo[0]);
+  glVertexPointer(2, GL_FLOAT, 0, 0);  
+  
+  glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbo[1]);
+  glColorPointer(3, GL_FLOAT, 0, 0);
+
+  glDrawArrays(GL_QUADS, 0, m_N * m_M * 4); 
+  
+  glDisableClientState(GL_COLOR_ARRAY);      
+  glDisableClientState(GL_VERTEX_ARRAY); 
+  
+  // reset
+  glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+  
+  glPopMatrix();
+  glPopAttrib();
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // A 3d model in .obj format loaded from file
 //----------------------------------------------------------------------------------------------------------------------
@@ -388,7 +476,7 @@ Plot::Plot(float w, float h, int nr, int N) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void Plot::update() const
+void Plot::update()
 {
   glPushAttrib(GL_COLOR_BUFFER_BIT | GL_CURRENT_BIT | GL_LINE_BIT | GL_LIGHTING_BIT);
   glDisable(GL_LIGHTING);

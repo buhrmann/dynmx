@@ -24,7 +24,7 @@ public:
   Arm3dView(Arm2d* model) : m_arm(model) { init(); };
   
   void setModel(Arm2d* model) { m_arm = model; };
-  virtual void update(float time);
+  virtual void update();
   
 protected:
   virtual void init();

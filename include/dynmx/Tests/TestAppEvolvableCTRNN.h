@@ -20,9 +20,9 @@ public:
 
   TestAppEvolvableCTRNN()
   {
-    m_evoCtrnn = new TestEvolvableCTRNN(12);   
+    m_evoCtrnn = new TestEvolvableCTRNN(12);
     m_model = new dmx::GARunner(m_evoCtrnn);
-    m_view = new TestViewEvolvableCTRNN(m_evoCtrnn);
+    m_view = new TestViewEvolvableCTRNN(this, (dmx::GARunner*)m_model);
   };
   
   virtual void update() { App::update(1.0f / 30.0f); };

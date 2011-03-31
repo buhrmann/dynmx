@@ -37,7 +37,7 @@ double RandomState::ran1(void)
 {
 	if (!iy) SetRandomSeed(1);
 	long k = idum/IQ;
-	idum = IA*(idum-k*IQ)-IR*k;
+	idum = IAA*(idum-k*IQ)-IR*k;
 	if (idum < 0) idum += IM;
 	int j = iy/NDIV;
 	iy = iv[j];
@@ -57,7 +57,7 @@ void RandomState::SetRandomSeed(long s)
 	if (idum == 0) idum = 1;
 	for (int j = NTAB+7; j >= 0; j--) {
 		long k = (idum)/IQ;
-		idum = IA*(idum-k*IQ)-IR*k;
+		idum = IAA*(idum-k*IQ)-IR*k;
 		if (idum < 0) idum += IM;
 		if (j < NTAB) iv[j] = idum;
 	}

@@ -30,7 +30,7 @@ public:
 	virtual ~Light(){};
 
 
-  virtual void update() const;
+  virtual void update();
 	void toggle() { m_enabled = !m_enabled; };  
 
 	int m_id;

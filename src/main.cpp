@@ -10,7 +10,9 @@
 #include "TestApp.h"
 #include "TestAppCTRNN.h"
 #include "TestAppEvolvableCTRNN.h"
+#include "TestAppArm.h"
 
 //CINDER_APP_BASIC( TestApp, ci::app::RendererGl )
 //CINDER_APP_BASIC( TestAppCTRNN, ci::app::RendererGl )
-CINDER_APP_BASIC( TestAppEvolvableCTRNN, ci::app::RendererGl )
+//CINDER_APP_BASIC( TestAppEvolvableCTRNN, ci::app::RendererGl )
+CINDER_APP_BASIC( TestAppArm, ci::app::RendererGl )

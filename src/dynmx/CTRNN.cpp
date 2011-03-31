@@ -96,6 +96,8 @@ CTRNN::CTRNN(int newsize)
   std::fill(gains, gains + size, 1.0);
   std::fill(taus, taus + size, 1.0);
   std::fill(Rtaus, Rtaus + size, 1.0);
+  
+  m_activationFunction = &sigmoid;
 }
 
 
@@ -211,7 +213,8 @@ void CTRNN::update(double stepsize)
   // Update the outputs of all neurons.
   for (int i = 0; i < size; i++)
   {
-    outputs[i] = sigmoid(states[i] + biases[i]);
+    //outputs[i] = sigmoid(states[i] + biases[i]);
+    outputs[i] = (*m_activationFunction)(states[i] + biases[i]);
   }
 }
 

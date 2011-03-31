@@ -11,6 +11,7 @@
 #define _OFX_TEST_VIEW_EVOLVABLE_CTRNN_
 
 #include "View.h"
+#include "GAViz.h"
 #include "CTRNNViz.h"
 #include "TestEvolvableCTRNN.h"
 
@@ -21,8 +22,11 @@ class TestViewEvolvableCTRNN : public dmx::View
 public:
 
   //--------------------------------------------------------------------------------------------------------------------
-  TestViewEvolvableCTRNN() : m_evoCtrnn(0) {};
-  TestViewEvolvableCTRNN(TestEvolvableCTRNN* evo) : m_evoCtrnn(evo) {};
+  TestViewEvolvableCTRNN() : m_gaRunner(0) {};
+  TestViewEvolvableCTRNN(dmx::App* app, dmx::GARunner* gaRunner) : m_app(app), m_gaRunner(gaRunner)
+  {
+    m_evoCtrnn= (TestEvolvableCTRNN*) m_gaRunner->getEvolvable();
+  };
   
   // functions to be implemented by subclasses
   //--------------------------------------------------------------------------------------------------------------------
@@ -30,16 +34,39 @@ public:
   {
     assert(m_evoCtrnn);
     
-    m_ctrnnView = new dmx::CTRNNViz(m_evoCtrnn->m_ctrnn, 175);
-    m_ctrnnView->translate(ci::Vec3f(50, 50, 0));
-    m_scene2d.m_children.push_back(m_ctrnnView);
+    m_ctrnnViz = new dmx::CTRNNViz(m_evoCtrnn->m_ctrnn, 175);
+    m_ctrnnViz->translate(ci::Vec3f(50, 50, 0));
+    
+    m_gaViz = new dmx::GAViz(m_gaRunner, 500.0);
+    m_gaViz->translate(ci::Vec3f(50, 50, 0));
+    
+    m_matrixViz = new dmx::RealMatrixViz(
+    m_gaRunner->getGA()->getPopulation(), 
+    m_gaRunner->getGA()->getPopulationSize(), 
+    m_gaRunner->getGA()->getGenomeSize(),
+      500.0, 1.0);
+    m_matrixViz->translate(ci::Vec3f(50, 50, 0));
+    
+    m_scene2d.m_children.push_back(m_matrixViz);
+    m_scene2d.m_children.push_back(m_ctrnnViz);
+    //m_scene2d.m_children.push_back(m_gaViz);	
+
   };
   
   //--------------------------------------------------------------------------------------------------------------------
   virtual void draw3d(){};
   
   //---------------------------------------------------------------------------------------------------------------------
-  virtual void draw2d(){};
+  virtual void draw2d()
+  {
+    glColor3f(0,0,0);
+    //dmx::drawSquaresVB(750, 300, 300);
+    
+    ci::Vec2f pos (10, 10); 
+    char str[128];
+    sprintf(str, "fps: %f", m_app->getAverageFps());
+    ci::gl::drawString(str, pos, ci::ColorA(0,0,0));
+  };
   
   //---------------------------------------------------------------------------------------------------------------------
   virtual void keyDown (ci::app::KeyEvent event)
@@ -47,14 +74,8 @@ public:
     View::keyDown(event);
     switch(event.getChar()) 
     {
-      case 'r': 
-        m_evoCtrnn->m_ctrnn->randomizeWeights(-10, 10);
-        m_evoCtrnn->m_ctrnn->randomizeBiases(-10.0f, 10.0f);
-        m_evoCtrnn->m_ctrnn->randomizeTimeConstants(2.0 / 30.0, 5.0f);         
-        break;
-      case 'c':
-        m_evoCtrnn->m_ctrnn->setCenterCrossing();
-        break;
+    default:
+      break;
     }
   }
   
@@ -63,7 +84,11 @@ public:
   
   
   TestEvolvableCTRNN* m_evoCtrnn; 
-  dmx::CTRNNViz* m_ctrnnView;
+  dmx::GARunner* m_gaRunner;
+  dmx::CTRNNViz* m_ctrnnViz;
+  dmx::GAViz* m_gaViz;
+  dmx::RealMatrixViz* m_matrixViz;
+  dmx::App* m_app;
 };
 
 #endif
