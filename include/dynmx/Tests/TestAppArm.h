@@ -20,11 +20,13 @@ public:
   
   TestAppArm()
   {
-    Arm2d arm;
-    m_model = new TestModelArm(&arm);
-    m_view = new TestViewArm(&arm);
+    m_arm = new Arm2d();
+    m_model = new TestModelArm(m_arm);
+    m_view = new TestViewArm(m_arm);
+    m_view->m_app = this;
   };
   
+  Arm2d* m_arm;
 };
 
 #endif

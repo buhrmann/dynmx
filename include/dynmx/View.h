@@ -13,12 +13,16 @@
 #include "cinder/app/AppBasic.h"
 #include "cinder/Camera.h"
 #include "cinder/MayaCamUI.h"
+#include "cinder/params/Params.h"
 
 #include "Scene.h"
 #include "Light.h"
 
 namespace dmx
 {
+  
+// forward declarations
+class App;
 
 class View
 {
@@ -52,6 +56,8 @@ public:
   ci::CameraOrtho m_cam2d;
 	ci::Vec2i m_mouse; 
   ci::Vec4f m_backgroundColor;
+  ci::params::InterfaceGl m_hud;
+  
 
   struct BackGround
   {
@@ -75,6 +81,8 @@ public:
   // stuff for picking objects in the scene
   static const int m_selectBufSize;
   GLuint m_selectionBuffer[128];
+  
+  App* m_app;
 };
 
 }

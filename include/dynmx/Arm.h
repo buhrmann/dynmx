@@ -12,6 +12,8 @@
 
 #include <queue>
 
+static const int MaxTrajPoints = 100;
+
 enum Joint
 {
   JT_invalid = -1,
@@ -63,7 +65,7 @@ class PD
 public:
 
   PD() : m_target(0.0f), m_targetPrev(0), m_P(10.0f), m_D(1.0f), m_posFunction(kLinear), m_velFunction(kLinear),
-    m_numFramesDelay(4) {};
+    m_numFramesDelay(0) {};
   
   float update(float target, float pos, float vel, float dt);
   
@@ -100,14 +102,19 @@ public:
   void update(float torque1, float torque2, float timeStep);
   void updatePD(float angle1, float angle2, float timeStep); 
   void updatePosition(float x, float y, float timeStep); 
-  void getPointOnUpperArm(float distanceFromJoint, float&x, float& y) const;
-  void getPointOnLowerArm(float distanceFromJoint, float&x, float& y) const;  
-  float getJointAngle(Joint joint) const { return m_angles[joint]; } ;
+  Pos getPointOnUpperArm(float distanceFromJoint) const;
+  Pos getPointOnLowerArm(float distanceFromJoint) const;  
+  float getJointAngle(Joint joint) { return m_angles[joint]; };
+  float getDesiredJointAngle(Joint joint) { return m_anglesDes[joint]; };
   float getLength(Joint joint) const { return m_lengths[joint]; } ;
-  void getEffectorPos(float& x, float& y) const { x = m_effectorPos[0]; y = m_effectorPos[1];  };
-  void getElbowPos(float& x, float& y) const { x = m_elbowPos[0]; y = m_elbowPos[1];  };
+  const Pos& getEffectorPos() const { return m_effectorPos; };
+  Pos& getEffectorPos() { return m_effectorPos; };
+  const Pos& getElbowPos() const { return m_elbowPos; };
+  Pos& getElbowPos() { return m_elbowPos; };
   void forwardKinematics();
-  void inverseKinematics(float posX, float posY, float elbDir, float& elbAngle, float& shdAngle);
+  void forwardKinematics(float elbAngle, float shdAngle, Pos& elbPos, Pos& effPos);
+  void inverseKinematics(const Pos& pos, float elbDir, float& elbAngle, float& shdAngle);  
+  const std::vector<Pos>& getTrajectory() { return m_trajectory; };
   
   PD m_pd[2];
   
@@ -118,10 +125,15 @@ protected:
   // states
   float 
     m_angles[2],
+    m_anglesDes[2],
     m_velocities[2],
-    m_accelerations[2],
-    m_elbowPos[2],
-    m_effectorPos[2];
+    m_accelerations[2];
+  
+  Pos
+    m_elbowPos,
+    m_effectorPos;
+  
+  std::vector<Pos> m_trajectory;
   
   // parameters
   float

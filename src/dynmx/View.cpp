@@ -24,10 +24,10 @@ void View::init()
 
   m_backgroundColor = Vec4f(0.3f, 0.3f, 0.3f, 1.0);
   const float g = 0.6f;
-  m_background.topLeft = ci::ColorA(g, g, g, 1.0f);
-  m_background.topRight= ci::ColorA(g, g, g, 1.0f);
-  m_background.bottomLeft = ci::ColorA::white();
-  m_background.bottomRight = ci::ColorA::white();
+  m_background.topLeft = ci::ColorA(g, g, g, 0.5f);
+  m_background.topRight= ci::ColorA(g, g, g, 0.5f);
+  m_background.bottomLeft = ci::ColorA(1,1,1,0.5);
+  m_background.bottomRight = ci::ColorA(1,1,1,0.5);
   
   // setup openGL modes
   glEnable(GL_LIGHTING);
@@ -74,6 +74,7 @@ void View::init()
 	//m_cam2d.setPerspective( 60.0f, getWindowAspectRatio(), 1.0f, 1000.0f );
   m_cam2d.setOrtho(0, ci::app::getWindowWidth(), ci::app::getWindowHeight(), 0, 0.01f, 100.0f);
 
+  m_hud = params::InterfaceGl( "Tweakbar", Vec2i( 200, 400 ) );
   buildGui();
   
   setupScene();
@@ -186,7 +187,7 @@ void View::draw()
 
     // finally draw the GUI on top
     glDisable(GL_BLEND);
-    //gui.draw();
+    ci::params::InterfaceGl::draw();
     
     glPopAttrib();
   } // when in render mode

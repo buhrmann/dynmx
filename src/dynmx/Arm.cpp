@@ -80,7 +80,7 @@ float PD::update(float target, float pos, float vel, float dt)
   float velErr = targetVel - vel;
   if(m_velFunction == kAsinh)
   {
-   velErr = asinh(velErr);
+    velErr = asinh(velErr);
   }
 
   return m_P * posErr + m_D * velErr;
@@ -92,7 +92,7 @@ float PD::update(float target, float pos, float vel, float dt)
 //----------------------------------------------------------------------------------------------------------------------
 Arm2d::Arm2d()
 {
-  init();
+  //init();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -109,6 +109,7 @@ void Arm2d::init(float elbAngle, float shdAngle)
   
   for(int i = 0; i < 2; i++)
   {
+    m_anglesDes[i] = 0.0f;
     m_velocities[i] = 0.0f;
     m_accelerations[i] = 0.0f;
   }
@@ -121,44 +122,51 @@ void Arm2d::init(float elbAngle, float shdAngle)
 
 // takes proportional distance from joint along bone d
 //----------------------------------------------------------------------------------------------------------------------
-void Arm2d::getPointOnUpperArm(float d, float&x, float& y) const
+Pos Arm2d::getPointOnUpperArm(float d) const
 {
-  x = d * (m_elbowPos[0]); 
-  y = d * (m_elbowPos[1]); 
+  return Pos(d * m_elbowPos.x, d * m_elbowPos.y); 
 }
 
 // takes proportional distance from joint along bone d
 //----------------------------------------------------------------------------------------------------------------------
-void Arm2d::getPointOnLowerArm(float d, float&x, float& y) const
+Pos Arm2d::getPointOnLowerArm(float d) const
 {
-  x = m_elbowPos[0] + d * (m_effectorPos[0] - m_elbowPos[0]); 
-  y = m_elbowPos[1] + d * (m_effectorPos[1] - m_elbowPos[1]);
+  return Pos(
+    m_elbowPos.x + d * (m_effectorPos.x - m_elbowPos.x), 
+    m_elbowPos.y + d * (m_effectorPos.y - m_elbowPos.y)
+  );
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 void Arm2d::forwardKinematics()
 {
-  m_elbowPos[0] = m_lengths[JT_shoulder] * cos(m_angles[JT_shoulder]);
-  m_elbowPos[1] = m_lengths[JT_shoulder] * sin(m_angles[JT_shoulder]);
+  forwardKinematics(m_angles[JT_elbow], m_angles[JT_shoulder], m_elbowPos, m_effectorPos);
+}
 
-  m_effectorPos[0] = m_elbowPos[0] +  (m_lengths[JT_elbow] * cos(m_angles[JT_elbow] + m_angles[JT_shoulder]));
-  m_effectorPos[1] = m_elbowPos[1] + (m_lengths[JT_elbow] * sin(m_angles[JT_elbow] + m_angles[JT_shoulder]));
+// Make externally useful
+//----------------------------------------------------------------------------------------------------------------------
+void Arm2d::forwardKinematics(float elbAngle, float shdAngle, Pos& elbPos, Pos& effPos)
+{
+  elbPos.x = m_lengths[JT_shoulder] * cos(shdAngle);
+  elbPos.y = m_lengths[JT_shoulder] * sin(shdAngle);
+
+  effPos.x = elbPos.x + (m_lengths[JT_elbow] * cos(elbAngle + shdAngle));
+  effPos.y = elbPos.y + (m_lengths[JT_elbow] * sin(elbAngle + shdAngle));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void Arm2d::inverseKinematics(float x, float y, float elbDir, float& elbAngle, float& shdAngle)
+void Arm2d::inverseKinematics(const Pos& pos, float elbDir, float& elbAngle, float& shdAngle)
 {
-
-  float eAngle = x*x + y*y - m_lengthsSq[JT_elbow] - m_lengthsSq[JT_shoulder];
+  float eAngle = pos.x*pos.x + pos.y*pos.y - m_lengthsSq[JT_elbow] - m_lengthsSq[JT_shoulder];
   eAngle /= 2 * m_lengths[JT_elbow] * m_lengths[JT_shoulder];
   // clamp to [-1, 1]
   eAngle = eAngle < -1 ? -1 : eAngle > 1 ? 1 : eAngle;
-  elbAngle = elbDir * acosf(eAngle);
+  elbAngle = elbDir * fabs(acosf(eAngle));
   
   float t1 = m_lengths[JT_shoulder] +  m_lengths[JT_elbow] * cos(elbAngle);
   float t2 = m_lengths[JT_elbow] * sin(elbAngle);
-  float xx = x * t1 + y * t2;
-  float yy = y * t1 - x * t2;
+  float xx = pos.x * t1 + pos.y * t2;
+  float yy = pos.y * t1 - pos.x * t2;
   shdAngle = atan2(yy, xx);
 }
 
@@ -181,8 +189,8 @@ void Arm2d::setParameters(float mass1, float mass2, float length1, float length2
   m_lengths[JT_shoulder] = length2;
   m_inertias[JT_elbow] = inertia1;
   m_inertias[JT_shoulder] = inertia2;
-  m_frictions[JT_elbow] = 0.1f;
-  m_frictions[JT_shoulder] = 0.1f;
+  m_frictions[JT_elbow] = 0.12f;
+  m_frictions[JT_shoulder] = 0.12f;
   m_gravity = 9.81;
   preCompute();
 }
@@ -192,16 +200,16 @@ void Arm2d::updatePosition(float x, float y, float timeStep)
 {
   // check not out of range
   float reachDist = m_lengths[0] + m_lengths[1];
-  float magSq = x*x + y*y;
+  float magSq = (x * x) + (y * y);
   if(magSq > reachDist*reachDist)
   {
     float mag = sqrtf(magSq);
-    x = x/mag * (reachDist - 0.0001f);
-    y = y/mag * (reachDist - 0.0001f);
+    x = x / mag * (reachDist - 0.0001f);
+    y = y / mag * (reachDist - 0.0001f);
   }
-  float elbAngle, shdAngle;
-  inverseKinematics(x, y, 1.0f, elbAngle, shdAngle);
-  updatePD(elbAngle, shdAngle, timeStep);
+  
+  inverseKinematics(Pos(x, y), 1.0f, m_anglesDes[JT_elbow], m_anglesDes[JT_shoulder]);
+  updatePD(m_anglesDes[JT_elbow], m_anglesDes[JT_shoulder], timeStep);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -209,7 +217,7 @@ void Arm2d::updatePD(float angle1, float angle2, float dt)
 {
   float elbTorque = m_pd[JT_elbow].update(angle1, m_angles[JT_elbow], m_velocities[JT_elbow], dt);
   float shdTorque = m_pd[JT_shoulder].update(angle2, m_angles[JT_shoulder], m_velocities[JT_shoulder], dt);
-  update(elbTorque, shdTorque, dt);
+  update(elbTorque*100*dt, shdTorque*100*dt, dt);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -243,7 +251,7 @@ void Arm2d::update(float torqElb, float torqShd, float timeStep)
                                               + (m_massElbLLHalf * cosElbAngle));
   
   // shoulder gravity is elbow gravity + shoulder
-  gravity +=   m_gravity * (m_masses[JT_elbow] + m_masses[JT_shoulder]) * m_lengths[JT_shoulder] * sinf(m_angles[JT_shoulder]);
+  gravity += m_gravity * (m_masses[JT_elbow] + m_masses[JT_shoulder]) * m_lengths[JT_shoulder] * sinf(m_angles[JT_shoulder]);
   damping = m_frictions[JT_shoulder] * m_velocities[JT_shoulder];
   float shdAcceleration = (torqShd - interInertia - coriolis - gravity - damping) / normalInertia;
   
@@ -284,6 +292,13 @@ void Arm2d::update(float torqElb, float torqShd, float timeStep)
   
   // get new end effector position
   forwardKinematics();
+  
+  // store trajectory
+  m_trajectory.push_back(m_effectorPos);
+  if(m_trajectory.size() > MaxTrajPoints)
+  {
+    m_trajectory.erase(m_trajectory.begin());
+  }
   
 #define CHECK_ROUND_TRIP 0
 #if CHECK_ROUND_TRIP
