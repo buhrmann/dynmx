@@ -7,8 +7,8 @@
  *
  */
 
+#include "Dynmx.h"
 #include "TestApp.h"
-#include "TestAppCTRNN.h"
 #include "TestAppEvolvableCTRNN.h"
 #include "TestAppArm.h"
 

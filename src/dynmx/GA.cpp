@@ -11,14 +11,10 @@
 * NaturalMotion in writing.
 *
 */
+#include "Dynmx.h"
 #include "GA.h"
 #include <time.h>
 #include "assert.h"
-
-#ifdef WIN32
-# pragma warning( disable : 4996 ) 
-#endif
-
 
 // --------------------------------------------------------------------------------------------
 // con- and destructor

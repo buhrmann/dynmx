@@ -120,7 +120,7 @@ void NodeGroup::update()
 {
   glPushMatrix();
   glMultMatrixf(m_pTM->m);
-  for(int i = 0; i < m_children.size(); i++)
+  for(size_t i = 0; i < m_children.size(); i++)
   {
     m_children[i]->update();
   }
@@ -133,7 +133,7 @@ void NodeGroup::onMouseMove(const Vec3f& mPos)
   // update mouse info: transform mouse position into local space
   Vec3f mPosLocal = m_pTM->getTranslation();
   mPosLocal = mPos - mPosLocal;
-  for(int i = 0; i < m_children.size(); i++)
+  for(size_t i = 0; i < m_children.size(); i++)
   {
     m_children[i]->onMouseMove(mPosLocal);
   }
@@ -142,7 +142,7 @@ void NodeGroup::onMouseMove(const Vec3f& mPos)
 //----------------------------------------------------------------------------------------------------------------------
 void NodeGroup::onKeyPress(ci::app::KeyEvent e)
 {
-  for(int i = 0; i < m_children.size(); i++)
+  for(size_t i = 0; i < m_children.size(); i++)
   {
     m_children[i]->onKeyPress(e);
   }  
@@ -152,7 +152,7 @@ void NodeGroup::onKeyPress(ci::app::KeyEvent e)
 Node* NodeGroup::getNode(int pickID)
 {
   Node* pickedNode = 0;
-  for(int i = 0; i < m_children.size(); i++)
+  for(size_t i = 0; i < m_children.size(); i++)
   {
     pickedNode = m_children[i]->getNode(pickID);
     if(pickedNode != 0)
@@ -370,8 +370,8 @@ RealMatrixViz::RealMatrixViz(double **d, int N, int M, float width, double maxVa
   
   // stack space for vertex data
   const int numVerts = N*M*4;
-  GLfloat verts[numVerts*2];
-  GLfloat cols[numVerts*3];
+  GLfloat* verts = new GLfloat[numVerts*2];
+  GLfloat* cols = new GLfloat[numVerts*3];
   
   float s = m_scale;
   
@@ -496,7 +496,7 @@ void Plot::update()
       Vec3f col = getColorMapRainbow((float)pl / m_nr);
       glColor4f(col.x, col.y, col.z, 1.0);
       glBegin(GL_LINE_STRIP);
-      for(int i = 0; i < m_points[pl].size() - 1; i++)
+      for(size_t i = 0; i < m_points[pl].size() - 1; i++)
       {
         float x1 = (i + 1) * widthRec;
         float x2 = (i + 2) * widthRec;

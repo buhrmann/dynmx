@@ -77,7 +77,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   virtual void buildGui() 
   { 
-    m_hud.addParam( "FPS", &m_fixedFrameRate, "min=10 max=300 step=5"); 
+    //m_hud.addParam( "FPS", &m_fixedFrameRate, "min=10 max=300 step=5"); 
     m_hud.addParam( "Elb P", &m_arm->m_pd[JT_elbow].m_P, "min=0.1 max=20.0 step=0.5" );
     m_hud.addParam( "Elb D", &m_arm->m_pd[JT_elbow].m_D, "min=0.1 max=20.0 step=0.5" );
     m_hud.addParam( "Shd P", &m_arm->m_pd[JT_shoulder].m_P, "min=0.1 max=50.0 step=0.5" );
@@ -88,7 +88,7 @@ public:
   Arm2d* m_arm; 
   dmx::Arm3dView* m_armView;
   dmx::Plot* m_plot;  
-  int m_fixedFrameRate;
+  int32_t m_fixedFrameRate;
 };
 
 #endif

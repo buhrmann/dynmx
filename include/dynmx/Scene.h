@@ -2,6 +2,7 @@
 #define _OFXNODE_
 
 #include <vector>
+#include "Dynmx.h" 
 
 //#include "ofx3DModelLoader.h"
 #include "cinder/Matrix.h"
@@ -324,7 +325,7 @@ protected:
   std::vector<std::vector<float> > m_points;
   //std::vector<ci::Path2d> m_paths;
   int m_nr;
-  int m_N;
+  uint8_t m_N;
   float m_w;
   float m_h;
   float m_maxY;

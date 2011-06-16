@@ -1,8 +1,17 @@
 #ifndef __OFX_3d__H_
 #define __OFX_3d__H_
 
+#include "Dynmx.h"
+
+#ifdef DYNMX_MAC
 #include <OpenGL/glu.h>
 #include <GLUT/glut.h>
+#else
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <glut.h>
+#endif
+
 #include "cinder/Matrix.h"
 #include "cinder/Color.h"
 #include "cinder/gl/Fbo.h"
@@ -228,9 +237,9 @@ namespace dmx
   static void drawSquaresVB(float width, int N=200, int M=200)
   {
     float s = width/N;
-    int numVerts = N*M*4;
-    GLfloat verts[numVerts*2];
-    GLfloat cols[numVerts*3];
+    const int numVerts = N*M*4;
+    GLfloat* verts = new GLfloat[numVerts*2];
+    GLfloat* cols = new GLfloat[numVerts*3];
 
     for(int i = 0; i < N; i++)
     {
@@ -322,6 +331,8 @@ namespace dmx
 //      blurShader.unbind();          
       }          
     }
+    delete [] verts;
+    delete [] cols;
   }     
 
 
@@ -489,7 +500,7 @@ namespace dmx
 		tm.setRow(2, cinder::Vec4f(v1, 1));
 
 		//find middle point between two given points and move object to location
-		Vec3f pos = p1 + (p2 - p1) * 0.5;
+		Vec3f pos = p1 + (p2 - p1) * 0.5f;
     tm.setRow(4, cinder::Vec4f(pos, 1));
 
 		glPushMatrix();

@@ -25,7 +25,7 @@ public:
     reset();
   };
   
-  TestEvolvableCTRNN() { delete m_ctrnn; };
+  ~TestEvolvableCTRNN() { delete m_ctrnn; };
 
   // inherited from ofxEvolvable 
   virtual int getNumGenes();

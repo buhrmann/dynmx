@@ -8,13 +8,17 @@
  */
 
 #include "Arm.h"
-#include <math.h>
+#include "MathUtils.h"
 
 #ifndef PI
 #define PI 3.14159265
 #define PI_OVER_TWO 1.5707963
 #define PI_OVER_FOUR 0.7853981
 #endif
+
+// Helper needed, as function is not implemented on windows
+//----------------------------------------------------------------------------------------------------------------------
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // Implementation of MinJerkTrajectory
@@ -191,7 +195,7 @@ void Arm2d::setParameters(float mass1, float mass2, float length1, float length2
   m_inertias[JT_shoulder] = inertia2;
   m_frictions[JT_elbow] = 0.12f;
   m_frictions[JT_shoulder] = 0.12f;
-  m_gravity = 9.81;
+  m_gravity = 9.81f;
   preCompute();
 }
 

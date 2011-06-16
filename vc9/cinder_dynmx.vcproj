@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\include;..\..\cinder\include;..\..\cinder\boost"
+				AdditionalIncludeDirectories="..\glut\include\;..\include\dynmx\tests;..\include\dynmx;..\include;..\..\cinder\include;..\..\cinder\boost"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;NOMINMAX"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -64,7 +64,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="cinder_d.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\cinder\lib;..\..\cinder\lib\msw"
+				AdditionalLibraryDirectories="..\glut\lib\win;..\..\cinder\lib;..\..\cinder\lib\msw"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
@@ -180,7 +180,51 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\src\cinder_dynmxApp.cpp"
+				RelativePath="..\src\dynmx\Arm.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\dynmx\ArmView.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\dynmx\CTRNN.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\dynmx\CTRNNViz.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\dynmx\GA.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\dynmx\GARunner.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\dynmx\GAViz.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\dynmx\Light.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\main.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\dynmx\Random.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\dynmx\Scene.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\dynmx\View.cpp"
 				>
 			</File>
 		</Filter>
@@ -190,7 +234,71 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\include\dynmx\App.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dynmx\Arm.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dynmx\ArmView.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dynmx\CTRNN.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dynmx\CTRNNViz.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dynmx\Dynmx.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dynmx\GA.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dynmx\GARunner.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dynmx\GAViz.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dynmx\Light.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\dynmx\MathUtils.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dynmx\Model.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dynmx\Random.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dynmx\Render.h"
+				>
+			</File>
+			<File
 				RelativePath="..\include\Resources.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dynmx\Scene.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dynmx\View.h"
 				>
 			</File>
 		</Filter>
@@ -202,7 +310,59 @@
 			<File
 				RelativePath=".\Resources.rc"
 				>
-			</File>			
+			</File>
+		</Filter>
+		<Filter
+			Name="Tests"
+			>
+			<File
+				RelativePath="..\include\dynmx\Tests\TestApp.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dynmx\Tests\TestAppArm.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dynmx\Tests\TestAppEvolvableCTRNN.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dynmx\Tests\TestEvolvable.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dynmx\Tests\TestEvolvableCTRNN.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dynmx\Tests\TestModel.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dynmx\Tests\TestModelArm.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dynmx\Tests\TestModelCTRNN.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dynmx\Tests\TestView.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dynmx\Tests\TestViewArm.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dynmx\Tests\TestViewCTRNN.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dynmx\Tests\TestViewEvolvableCTRNN.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

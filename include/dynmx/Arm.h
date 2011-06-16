@@ -72,7 +72,7 @@ public:
   std::queue<float> m_prevPositions;
   std::queue<float> m_prevVelocities;
   
-  int 
+  unsigned int 
     m_numFramesDelay,
     m_posFunction,
     m_velFunction;

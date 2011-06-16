@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -13,20 +13,140 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
+    <Filter Include="Tests">
+      <UniqueIdentifier>{f14bed43-69e5-4f8f-944c-06642c383222}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="main">
+      <UniqueIdentifier>{9d2da8c2-7910-451f-abbc-86499c9fd765}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\src\cinder_dynmxApp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\include\Resources.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>  
   <ItemGroup>
     <ResourceCompile Include="Resources.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
-  </ItemGroup>  
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\dynmx\View.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dynmx\App.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dynmx\Arm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dynmx\ArmView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dynmx\CTRNN.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dynmx\CTRNNViz.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dynmx\GA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dynmx\GARunner.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dynmx\GAViz.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dynmx\Light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dynmx\Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dynmx\Random.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dynmx\Render.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dynmx\Scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\dynmx\MathUtils.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dynmx\Tests\TestViewEvolvableCTRNN.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dynmx\Tests\TestApp.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dynmx\Tests\TestAppArm.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dynmx\Tests\TestAppEvolvableCTRNN.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dynmx\Tests\TestEvolvable.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dynmx\Tests\TestEvolvableCTRNN.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dynmx\Tests\TestModel.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dynmx\Tests\TestModelArm.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dynmx\Tests\TestModelCTRNN.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dynmx\Tests\TestView.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dynmx\Tests\TestViewArm.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\dynmx\Tests\TestViewCTRNN.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Resources.h">
+      <Filter>main</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\dynmx\View.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\dynmx\Arm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\dynmx\ArmView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\dynmx\CTRNN.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\dynmx\CTRNNViz.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\dynmx\GA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\dynmx\GARunner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\dynmx\GAViz.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\dynmx\Light.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\dynmx\Random.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\dynmx\Scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\main.cpp">
+      <Filter>main</Filter>
+    </ClCompile>
+  </ItemGroup>
 </Project>

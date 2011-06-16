@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -47,7 +47,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\include;..\..\cinder\include;..\..\cinder\boost</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\include\dynmx;..\..\cinder\include;..\..\cinder\boost</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -104,14 +104,54 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\cinder_dynmxApp.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\include\Resources.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
-  </ItemGroup>  
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\dynmx\App.h" />
+    <ClInclude Include="..\include\dynmx\Arm.h" />
+    <ClInclude Include="..\include\dynmx\ArmView.h" />
+    <ClInclude Include="..\include\dynmx\CTRNN.h" />
+    <ClInclude Include="..\include\dynmx\CTRNNViz.h" />
+    <ClInclude Include="..\include\dynmx\GA.h" />
+    <ClInclude Include="..\include\dynmx\GARunner.h" />
+    <ClInclude Include="..\include\dynmx\GAViz.h" />
+    <ClInclude Include="..\include\dynmx\Light.h" />
+    <ClInclude Include="..\include\dynmx\Model.h" />
+    <ClInclude Include="..\include\dynmx\Random.h" />
+    <ClInclude Include="..\include\dynmx\Render.h" />
+    <ClInclude Include="..\include\dynmx\Scene.h" />
+    <ClInclude Include="..\include\dynmx\Tests\TestApp.h" />
+    <ClInclude Include="..\include\dynmx\Tests\TestAppArm.h" />
+    <ClInclude Include="..\include\dynmx\Tests\TestAppEvolvableCTRNN.h" />
+    <ClInclude Include="..\include\dynmx\Tests\TestEvolvable.h" />
+    <ClInclude Include="..\include\dynmx\Tests\TestEvolvableCTRNN.h" />
+    <ClInclude Include="..\include\dynmx\Tests\TestModel.h" />
+    <ClInclude Include="..\include\dynmx\Tests\TestModelArm.h" />
+    <ClInclude Include="..\include\dynmx\Tests\TestModelCTRNN.h" />
+    <ClInclude Include="..\include\dynmx\Tests\TestView.h" />
+    <ClInclude Include="..\include\dynmx\Tests\TestViewArm.h" />
+    <ClInclude Include="..\include\dynmx\Tests\TestViewCTRNN.h" />
+    <ClInclude Include="..\include\dynmx\Tests\TestViewEvolvableCTRNN.h" />
+    <ClInclude Include="..\include\dynmx\View.h" />
+    <ClInclude Include="..\include\Resources.h" />
+    <ClInclude Include="..\src\dynmx\MathUtils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\dynmx\Arm.cpp" />
+    <ClCompile Include="..\src\dynmx\ArmView.cpp" />
+    <ClCompile Include="..\src\dynmx\CTRNN.cpp" />
+    <ClCompile Include="..\src\dynmx\CTRNNViz.cpp" />
+    <ClCompile Include="..\src\dynmx\GA.cpp" />
+    <ClCompile Include="..\src\dynmx\GARunner.cpp" />
+    <ClCompile Include="..\src\dynmx\GAViz.cpp" />
+    <ClCompile Include="..\src\dynmx\Light.cpp" />
+    <ClCompile Include="..\src\dynmx\Random.cpp" />
+    <ClCompile Include="..\src\dynmx\Scene.cpp" />
+    <ClCompile Include="..\src\dynmx\View.cpp" />
+    <ClCompile Include="..\src\main.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\include\dynmx\Tests;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

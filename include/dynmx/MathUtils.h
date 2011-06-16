@@ -10,20 +10,31 @@
 #ifndef _MATH_UTILS_
 #define _MATH_UTILS_
 
+#include "Dynmx.h"
 #include <math.h>
 
 const float PI = 3.1415926535897932384626433832795f;
-const float TWO_PI = 6.283185307179586;
+const float TWO_PI = 6.283185307179586f;
 const float PI_OVER_180 = 0.017453292519943295769236907684886f;
 const float PI_OVER_180_REC = 57.295779513082325f;
 const float PI_OVER_TWO = 1.570796326794897f;
 const float PI_OVER_FOUR = 0.785398163397448f;
 
-const float DEG_TO_RAD = PI / 180.0;
-const float RAD_TO_DEG = 180.0 / PI;
+const float DEG_TO_RAD = PI / 180.0f;
+const float RAD_TO_DEG = 180.0f / PI;
 
+//----------------------------------------------------------------------------------------------------------------------
+#ifdef DYNMX_WIN
+static const float asinh(float v)
+{
+  return log(v + sqrt(v*v + 1));
+}
+#endif
+
+//----------------------------------------------------------------------------------------------------------------------
 static const float degreesToRadians(float deg) { return deg * DEG_TO_RAD; };
 
+//----------------------------------------------------------------------------------------------------------------------
 static const float radiansToDegrees(float rad) { return rad * RAD_TO_DEG; };
 
 //----------------------------------------------------------------------------------------------------------------------

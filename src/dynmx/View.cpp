@@ -212,7 +212,7 @@ int View::pick(int x, int y)
   minZ = 0xffffffff;
   if(hits > 0)
   {
-    for (unsigned int i = 0; i < hits; i++)
+    for (int i = 0; i < hits; i++)
     {
       names = *ptr;
       ptr++;

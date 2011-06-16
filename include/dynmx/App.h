@@ -11,6 +11,7 @@
 #define _DMX_APP_
 
 #include "cinder/app/AppBasic.h"
+#include "Dynmx.h"
 #include "Model.h"
 #include "View.h"
 

@@ -10,13 +10,14 @@
 #ifndef _DMX_VIEW_
 #define _DMX_VIEW_
 
+#include "Dynmx.h"
+#include "Scene.h"
+#include "Light.h"
+
 #include "cinder/app/AppBasic.h"
 #include "cinder/Camera.h"
 #include "cinder/MayaCamUI.h"
 #include "cinder/params/Params.h"
-
-#include "Scene.h"
-#include "Light.h"
 
 namespace dmx
 {
