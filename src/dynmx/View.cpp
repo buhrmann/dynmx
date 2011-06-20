@@ -304,6 +304,7 @@ void View::mouseDrag(MouseEvent event)
 void View::mouseDown(MouseEvent event)
 {
   int N = pick(event.getX(), event.getY());
+  
   // only update mouse/camera when we didn't hit anything
   if(N == 0)
   {

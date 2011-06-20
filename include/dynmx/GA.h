@@ -17,6 +17,9 @@
 #include <math.h>
 #include <stdio.h>
 #include <vector>
+
+#include "cinder/xml.h"
+
 #include "MathUtils.h"
 
 #define GA_BOUND_CHECK 0  // 0 = clamping, 1 = mirroring
@@ -79,8 +82,11 @@ public:
   void setDemeWidth(int width) { m_demeWidth = width; };
   void setMutationMax(double mut) { m_maxMutation = mut; };
   void setRecombinationRate(double rcr) { m_recombinationRate = rcr; };
-  void loadPopulation(const char* fnm);
-  void savePopulation(const char* fnm) const;
+  
+  void loadPopulation(const std::string fnm);
+  void savePopulation(const std::string fnm) const;
+  void toXml(ci::XmlTree& xml, bool includeGenomes = true) const;
+  bool fromXml(const ci::XmlTree& xml, bool includeGenomes = true);
 
   /// Allow manual setting of the genomes in the population
   void setGenome(int iGenome, const double *genome, float fitness);
@@ -116,8 +122,8 @@ protected:
   bool pairIsDifferentFrom(int& indA, int& indB, int* existingPairs, int numExistingPairs);
   
   // print out result of evolution
-  void printFitness(const char* fnm) const;
-  void printBestGenome(const char* fnm) const;
+  void printFitness(const std::string fnm) const;
+  void printBestGenome(const std::string fnm) const;
 
   // the population of genomes: array of arrays of type SCALAR (float/double)
   double** m_genomes;

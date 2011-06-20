@@ -1,16 +1,11 @@
 /*
-* Copyright (c) 2009 NaturalMotion Ltd. All rights reserved.
-*
-* Not to be copied, adapted, modified, used, distributed, sold,
-* licensed or commercially exploited in any manner without the
-* written consent of NaturalMotion.
-*
-* All non public elements of this software are the confidential
-* information of NaturalMotion and may not be disclosed to any
-* person nor used for any purpose not expressly approved by
-* NaturalMotion in writing.
-*
-*/
+ *  GA.cpp
+ *  cinder_dynmx
+ *
+ *  Created by Thomas Buhrmann on 01/03/2011.
+ *  Copyright 2011 __MyCompanyName__. All rights reserved.
+ *
+ */
 #include "Dynmx.h"
 #include "GA.h"
 #include <time.h>
@@ -268,8 +263,8 @@ void GA::performTournament(int indA, float fitA, int indB, float fitB)
   // reset at end of generation
   if ((m_tournament + 1) % m_popSize == 0)
   {
-    printFitness("/Users/thomasbuhrmann/Code/Results/GATest/GA_fitness.txt");
-    printBestGenome("/Users/thomasbuhrmann/Code/Results/GATest/GA_bestGenome.txt");
+    printFitness(dmx::DATA_DIR + "GA_fitness.txt");
+    printBestGenome(dmx::DATA_DIR + "GA_bestGenome.txt");
     m_generation++;    
   }
 }
@@ -362,9 +357,9 @@ void GA::setGenome(int iGenome, const double *genome, float fitness)
 // --------------------------------------------------------------------------------------------
 // load a previously saved population
 // --------------------------------------------------------------------------------------------
-void GA::loadPopulation(const char* fnm)
+void GA::loadPopulation(const std::string fnm)
 {
-  FILE* fp = fopen(fnm, "r");
+  FILE* fp = fopen(fnm.c_str(), "r");
   if (fp)
   {
     // sanity check some things that must be the same
@@ -413,16 +408,16 @@ void GA::loadPopulation(const char* fnm)
   }
   else
   {
-    printf("Couldn't open population file for reading: %s\n", fnm);
+    printf("Couldn't open population file for reading: %s\n", fnm.c_str());
   }
 }
 
 // --------------------------------------------------------------------------------------------
 // save final population
 // --------------------------------------------------------------------------------------------
-void GA::savePopulation(const char* fnm) const
+void GA::savePopulation(const std::string fnm) const
 {
-  FILE* fp = fopen(fnm,"w+");
+  FILE* fp = fopen(fnm.c_str(), "w+");
   if (fp)
   {
     fprintf(fp, "%d\n", m_genomeLength);
@@ -452,20 +447,93 @@ void GA::savePopulation(const char* fnm) const
   }
   else
   {
-    printf("Couldn't open population file for writing: %s\n", fnm);
+    printf("Couldn't open population file for writing: %s\n", fnm.c_str());
   }
+}
+
+//--------------------------------------------------------------------------------------------
+void GA::toXml(ci::XmlTree& parent, bool includeGenomes) const
+{
+  ci::XmlTree ga ("GA", "");
+
+  // Parameters
+  ga.setAttribute("GenomeLength", m_genomeLength);
+  ga.setAttribute("PopulationSize", m_popSize);
+  ga.setAttribute("DemeWidth", m_demeWidth);
+  ga.setAttribute("Generation", m_generation);
+  ga.setAttribute("Tournament", m_tournament);
+  ga.setAttribute("MaxMutation", m_maxMutation);
+  ga.setAttribute("RecombinationRate", m_recombinationRate);
+  
+  // Population
+  if(includeGenomes)
+  {
+    for (int i = 0; i < m_popSize; i++)
+    {
+      ci::XmlTree genome ("Genome", "");
+      genome.setAttribute("Index", i);
+      genome.setAttribute("Fitness", m_fitnesses[i]);
+      for (int j = 0; j < m_genomeLength; j++)
+      {
+        ci::XmlTree gene ("Gene", "");
+        gene.setAttribute("Index", j);
+        gene.setAttribute("Value", m_genomes[i][j]);
+        genome.push_back(gene);
+      }
+      ga.push_back(genome);
+    }
+  }
+
+  parent.push_back(ga);
+};
+
+// --------------------------------------------------------------------------------------------
+bool GA::fromXml(const ci::XmlTree& parent, bool includeGenomes)
+{
+  const ci::XmlTree& ga = parent.getChild("GA");
+  int genomeLength = ga.getAttributeValue<int>("GenomeLength");
+  int popSize = ga.getAttributeValue<int>("PopulationSize");
+  
+  // We can only read data from a GA of the same size as the current
+  if(genomeLength == m_genomeLength && popSize == m_popSize)
+  {
+    m_demeWidth = ga.getAttributeValue<int>("DemeWidth");
+    m_generation = ga.getAttributeValue<int>("Generation");
+    m_tournament = ga.getAttributeValue<int>("Tournament");
+    m_maxMutation = ga.getAttributeValue<float>("MaxMutation");
+    m_recombinationRate = ga.getAttributeValue<float>("RecombinationRate");
+    
+    // Read all genomes (children of GA)
+    int i, j;
+    i = j = 0;
+    for(ci::XmlTree::ConstIter genome = ga.begin(); genome != ga.end(); ++genome)
+    {
+      m_fitnesses[i] = genome->getAttributeValue<float>("Fitness");    
+      // Genes are stored as children of Gene
+      j = 0;
+      for(ci::XmlTree::ConstIter gene = genome->begin(); gene != genome->end(); ++gene)
+      {
+        m_genomes[i][j] = gene->getAttributeValue<float>("Value");
+        j++;
+      }
+      i++;
+    }
+    return true;
+  }
+  
+  return false;
 }
 
 // --------------------------------------------------------------------------------------------
 // File output
 // --------------------------------------------------------------------------------------------
-void GA::printFitness(const char* fnm) const
+void GA::printFitness(const std::string fnm) const
 {
   float max = -1.0f;
   (void) getBestGenome(max);
   float avg = getAvgFitness();
 
-  FILE* fp = fopen(fnm, "a");
+  FILE* fp = fopen(fnm.c_str(), "a");
   if (fp)
   {
     fprintf(fp,"%i\t%f\t%f\n", m_generation, max, avg);
@@ -474,10 +542,10 @@ void GA::printFitness(const char* fnm) const
 }
 
 // --------------------------------------------------------------------------------------------
-void GA::printBestGenome(const char* fnm) const
+void GA::printBestGenome(const std::string fnm) const
 {
   // save best agent
-  FILE* fp = fopen(fnm, "a");
+  FILE* fp = fopen(fnm.c_str(), "a");
   if (fp)
   {
     fprintf(fp, "%i\t", m_generation);

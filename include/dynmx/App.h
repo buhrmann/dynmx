@@ -18,83 +18,135 @@
 namespace dmx
 {
 
+//----------------------------------------------------------------------------------------------------------------------  
 class App : public cinder::app::AppBasic
 {
 
 public:
 
-  // inherited from ci::AppBasic
-  virtual void update() 
-  {
-    // get duration of frame
-    //double currentTime = getElapsedSeconds();
-    //double deltaTime = currentTime - m_prevTime;
-    //m_prevTime = currentTime;
-    //update(deltaTime); 
-    update(m_fixedTimeStep);
-  };
+  // Inherited from ci::AppBasic
+  //----------------------------------------------------------------------------------------------------------------------
+  virtual void update();
+  virtual void update(float dt);
   
-  virtual void update(float dt) { if(!m_paused) m_model->update(dt); };
+  //--------------------------------------------------------------------------------------------------------------------
+  virtual void setup();
+
+  //--------------------------------------------------------------------------------------------------------------------
+	virtual void prepareSettings( Settings *settings );
   
-  virtual void setup()
-  { 
-    m_paused = false;
-    m_fixedTimeStep = 1.0f / 100.0f;
-    
-    m_prevTime = getElapsedSeconds();
-    m_model->init(); 
-    if(m_view) 
-      m_view->init(); 
-  }; 
+  //--------------------------------------------------------------------------------------------------------------------
+  void setFixedTimeStep(float dt);
   
-	virtual void prepareSettings( Settings *settings )
-  {
-  	settings->setWindowSize( 800, 600 );
-    settings->setFrameRate( 60.0f );
-    settings->setFullScreen( false );
-  };
+  //--------------------------------------------------------------------------------------------------------------------
+  void togglePause();
   
-  void setFixedTimeStep(float dt) { m_fixedTimeStep = dt; };
-  void togglePause() { m_paused = !m_paused; };
-      
-  virtual void draw() { if(m_view) m_view->draw(); };
+  //--------------------------------------------------------------------------------------------------------------------
+  virtual void draw();
   
-  virtual void mouseMove(ci::app::MouseEvent event) { m_view->mouseMove(event); };
-  virtual void mouseDrag(ci::app::MouseEvent event) { m_view->mouseDrag(event); };
-  virtual void mouseDown(ci::app::MouseEvent event) { m_view->mouseDown(event); };
-  virtual void mouseUp(ci::app::MouseEvent event)   { m_view->mouseUp(event); };  
-	virtual void keyDown(ci::app::KeyEvent event)     { m_view->keyDown(event); };  
-  virtual void keyUp(ci::app::KeyEvent event) 
-  {
-    switch(event.getChar())
-    {
-      case ' ':
-        m_paused = !m_paused;  
-        break;
-      case 's':
-        {
-          if(m_paused)
-            m_model->update(m_fixedTimeStep);
-        }
-        break;
-    }
-      
-    // let view respond to key
-    m_view->keyUp(event); 
-  };
+  // Mouse and keyboard interaction
+  //--------------------------------------------------------------------------------------------------------------------
+  virtual void mouseMove(ci::app::MouseEvent event);
+  virtual void mouseDrag(ci::app::MouseEvent event);
+  virtual void mouseDown(ci::app::MouseEvent event);
+  virtual void mouseUp(ci::app::MouseEvent event);
+	virtual void keyDown(ci::app::KeyEvent event);
+  virtual void keyUp(ci::app::KeyEvent event); 
   
-  virtual void resize(ci::app::ResizeEvent event)   { m_view->resize(event); };
+  //--------------------------------------------------------------------------------------------------------------------
+  virtual void resize(ci::app::ResizeEvent event);
   
   Model* m_model;
   View* m_view;
   
 protected:
   
-  double m_prevTime;
-  bool m_paused;
-  float m_fixedTimeStep;
+  double m_prevTime;      /// For calculating elapsed time
+  bool m_paused;          /// Pause the model, while allowing interaction with view
+  float m_fixedTimeStep;  /// When using fixed timeStep instead of elapsed time since last frame 
   
 }; // class App
+  
+  
+//----------------------------------------------------------------------------------------------------------------------
+// Inline implementations
+//----------------------------------------------------------------------------------------------------------------------  
+
+//----------------------------------------------------------------------------------------------------------------------
+inline void App::update() 
+{
+  // Calculate duration of frame
+#if 0  
+  double currentTime = getElapsedSeconds();
+  double deltaTime = currentTime - m_prevTime;
+  m_prevTime = currentTime;
+  update(deltaTime); 
+#endif
+  
+  update(m_fixedTimeStep);
+}
+
+//--------------------------------------------------------------------------------------------------------------------
+void App::update(float dt) 
+{ 
+  if(!m_paused)
+  {
+    m_model->update(dt); 
+  }
+}
+
+//--------------------------------------------------------------------------------------------------------------------
+void App::setup()
+{ 
+  m_paused = false;
+  m_fixedTimeStep = 1.0f / 100.0f;
+  
+  m_prevTime = getElapsedSeconds();
+  m_model->init(); 
+  if(m_view)
+  {
+    m_view->init(); 
+  }
+} 
+
+//--------------------------------------------------------------------------------------------------------------------
+void App::prepareSettings( Settings *settings )
+{
+  settings->setWindowSize( 800, 600 );
+  settings->setFrameRate( 60.0f );
+  settings->setFullScreen( false );
+}
+
+//--------------------------------------------------------------------------------------------------------------------
+void App::setFixedTimeStep(float dt)            { m_fixedTimeStep = dt; }
+void App::togglePause()                         { m_paused = !m_paused; }
+void App::draw()                                { if(m_view) m_view->draw();}
+void App::resize(ci::app::ResizeEvent event)    { m_view->resize(event); };
+void App::mouseMove(ci::app::MouseEvent event)  { m_view->mouseMove(event); }
+void App::mouseDrag(ci::app::MouseEvent event)  { m_view->mouseDrag(event); }
+void App::mouseDown(ci::app::MouseEvent event)  { m_view->mouseDown(event); }
+void App::mouseUp(ci::app::MouseEvent event)    { m_view->mouseUp(event); }  
+void App::keyDown(ci::app::KeyEvent event)      { m_view->keyDown(event); }  
+
+//--------------------------------------------------------------------------------------------------------------------
+void App::keyUp(ci::app::KeyEvent event) 
+{
+  switch(event.getChar())
+  {
+    case ' ':
+      m_paused = !m_paused;  
+      break;
+    case 's':
+    {
+      if(m_paused)
+        m_model->update(m_fixedTimeStep);
+    }
+      break;
+  }
+  
+  // let view respond to key
+  m_view->keyUp(event); 
+}
 
 } // namespace dmx
 

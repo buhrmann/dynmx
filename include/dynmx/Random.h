@@ -13,7 +13,7 @@ using namespace std;
 
 
 // Functions to manipulate the global random state for backward compatibility
-
+//----------------------------------------------------------------------------------------------------------------------
 void SetRandomSeed(long seed);
 long GetRandomSeed(void);
 void WriteRandomState(ostream& os);
@@ -27,13 +27,11 @@ int ProbabilisticChoice(double prob);
 
 
 // The RandomState class declaration
-
+//----------------------------------------------------------------------------------------------------------------------
 class RandomState 
 {
 public:
-  // The constructor
   RandomState(long seed = 0) {SetRandomSeed(seed); gaussian_flag = 0;};
-  // The destructor
   ~RandomState() {};
   
   // Accessors

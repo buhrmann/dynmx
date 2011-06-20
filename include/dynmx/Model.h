@@ -10,11 +10,13 @@
 #ifndef _DMX_MODEL_BASE_
 #define _DMX_MODEL_BASE_
 
-// Interface for a simulation that can run without visualization
-// ---------------------------------------------------------------------------------------------------------------------
+#include "Dynmx.h"
+
 namespace dmx
 {
 
+// Interface for a simulation that can run without visualization
+// ---------------------------------------------------------------------------------------------------------------------
 class Model
 {
 public:

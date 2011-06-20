@@ -542,54 +542,6 @@ protected:
     m_N;
 };
 
-
-// A multiplot node
-// -------------------------------------------------------------------
-/*class ofxMultiplot : public ofxNodeGroup
-{
-public:
-
-  ofxMultiplot (float w = 2.0, float h = 1.0, int nr=1, int N=100) :
-    m_w(w), m_h(h), m_nr(nr), m_N(N) { init(); };
-
-  virtual void update() const
-  {
-    for(int i=0; i < m_nn.size; i++)
-    {
-      ((ofxPlot*)m_children[i])->addPoint(1 - m_nn.outputs[i+1]);
-    }
-    ofxNodeGroup::update();
-  }
-
-protected:
-  virtual void init()
-  {
-    m_type = NODE_CUSTOM;
-#ifdef _DEBUG
-    print();
-#endif
-    for(int i=0; i < m_nn.size; i++)
-    {
-      ofxPlot* plot = new ofxPlot(4*m_scale, m_scale, 100); // 2d
-      plot->translate(2*m_scale, -m_nn.size*m_scale/2 + i*m_scale, 0);
-      m_children.push_back(plot);
-    }
-    ofxValueVector* outputs = new ofxValueVector(m_nn.outputs.get(), m_nn.size, m_scale);
-    ofxValueMatrix* weights = new ofxValueMatrix(m_nn.weights.get(), m_nn.size, m_nn.size, m_scale);
-    weights->translate(-m_scale*m_nn.size,0,0);
-    m_children.push_back(weights);
-    m_children.push_back(outputs);
-  };
-
-  CTRNN& m_nn;
-  float m_scale;
-  float m_w;
-  float m_h;
-  int m_nr;
-  int m_N;  
-};
- */
-
 } //namespace dmx
 #endif
 

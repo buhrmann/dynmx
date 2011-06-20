@@ -8,6 +8,9 @@
  */
 
 #include "GARunner.h"
+#ifdef DEBUGGING
+#include <iostream>
+#endif
 
 namespace dmx
 {
@@ -21,6 +24,8 @@ GARunner::GARunner(Evolvable* evolvable) : m_evolvable(evolvable)
 //----------------------------------------------------------------------------------------------------------------------
 void GARunner::init()
 {
+  m_verbosity = kGAVerbosityNone;
+  
   // load GA desciptor from file ...
   // m_gaDesc.load("");
   
@@ -53,7 +58,12 @@ void GARunner::update(float dt)
   else
   {
     // End of trial: update GA
-    m_accFitness += m_evolvable->getFitness();
+    const float fitness = m_evolvable->getFitness();
+#ifdef DEBUGGING
+    std::cout << "Trial " << m_trial << ": fitness = " << fitness << std::endl; 
+#endif
+    
+    m_accFitness += fitness;
     m_trial++;
     
     // Finished all trials? Move on to evaluate next genome.
@@ -66,7 +76,7 @@ void GARunner::update(float dt)
       m_evolvable->decodeGenome(m_ga->getCurrentGenome());
       m_trial = 0;
       m_accFitness = 0.0;
-      m_numGenomesTested++;     
+      m_numGenomesTested++;
     }
     
     // Reset simulation for new trial

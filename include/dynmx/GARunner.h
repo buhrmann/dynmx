@@ -46,6 +46,16 @@ static double mapUnitIntervalToRange(double val, double min, double max)
 class GARunner : public Model
 {
 public:
+  
+  enum GAVerbosity
+  {
+    kGAVerbosityNone,
+    kGAVerbosityTrial,
+    kGAVerbosityGenome,
+    kGAVerbosityPopulation,
+    kGAVerbosityMax
+  };
+  
   GARunner(Evolvable* evolvable);
   
   virtual void update(float dt);
@@ -54,6 +64,8 @@ public:
   Evolvable* getEvolvable() { return m_evolvable; };
   GA* getGA() { return m_ga; };
   const GADescriptor& getGADesc() { return m_gaDesc; };
+  
+  void setVerbosity(GAVerbosity v) { m_verbosity = v; };
   
 protected:  
   
@@ -64,9 +76,12 @@ protected:
   
   float m_time;
   float m_accFitness;
-  int m_trial;
-  int m_numGenomesTested;
+  uint16_t m_trial;
+  uint32_t m_numGenomesTested;
+  
+  bool m_verbosity;
 };
 
 } // namespace dmx
+
 #endif

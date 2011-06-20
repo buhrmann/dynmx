@@ -13,11 +13,11 @@ using namespace std;
 
 
 // A global random state
-
+//----------------------------------------------------------------------------------------------------------------------
 RandomState GRS;
 
 // Functions to manipulate the global random state for backward compatibility
-
+//----------------------------------------------------------------------------------------------------------------------
 void SetRandomSeed(long seed) {GRS.SetRandomSeed(seed);};
 long GetRandomSeed(void) {return GRS.GetRandomSeed();};
 void WriteRandomState(ostream& os) {GRS.WriteRandomState(os);};
@@ -29,10 +29,9 @@ int UniformRandomInteger(int min,int max) {return GRS.UniformRandomInteger(min, 
 double GaussianRandom(double mean, double variance) {return GRS.GaussianRandom(mean, variance);};
 int ProbabilisticChoice(double prob) {return GRS.ProbabilisticChoice(prob);};
 
-
 // Return a uniform deviate between 0 and 1 exclusive with a period >10^8.
 // Adapted from Ran1 in Numerical Recipes, p. 280.
-
+//----------------------------------------------------------------------------------------------------------------------
 double RandomState::ran1(void)
 {
 	if (!iy) SetRandomSeed(1);
@@ -47,10 +46,9 @@ double RandomState::ran1(void)
 	else return temp;	
 }
 
-
 // Seed the random number generator.
 // Adapted from Ran1 from Numerical Recipes, p. 280.
-
+//----------------------------------------------------------------------------------------------------------------------
 void RandomState::SetRandomSeed(long s)
 {
 	idum = seed = s;
@@ -64,17 +62,15 @@ void RandomState::SetRandomSeed(long s)
 	iy = iv[0];
 }
 
-
 // Return the current random seed
-
+//----------------------------------------------------------------------------------------------------------------------
 long RandomState::GetRandomSeed(void)
 {
 	return seed;
 }
 
-
 // Write a random state to a stream
-
+//----------------------------------------------------------------------------------------------------------------------
 void RandomState::BinaryWriteRandomState (ofstream& bosf)
 {
   bosf.write((const char*) &(seed), sizeof(seed));
@@ -87,6 +83,7 @@ void RandomState::BinaryWriteRandomState (ofstream& bosf)
     bosf.write((const char*) &(iv[i]), sizeof(iv[i]));
 }
 
+//----------------------------------------------------------------------------------------------------------------------
 void RandomState::WriteRandomState(ostream& os)
 {
 	os << seed << " " << idum << " " << iy << " ";
@@ -96,9 +93,8 @@ void RandomState::WriteRandomState(ostream& os)
 	os << endl;
 }
 
-
 // Read a random state from a stream
-
+//----------------------------------------------------------------------------------------------------------------------
 void RandomState::ReadRandomState(istream& is)
 {
 	is >> seed;
@@ -111,6 +107,7 @@ void RandomState::ReadRandomState(istream& is)
 		is >> iv[i];
 }
 
+//----------------------------------------------------------------------------------------------------------------------
 void RandomState::BinaryReadRandomState (ifstream& bisf)
 {
   bisf.read((char*) &(seed), sizeof(seed));
@@ -123,27 +120,24 @@ void RandomState::BinaryReadRandomState (ifstream& bisf)
     bisf.read((char*) &(iv[i]), sizeof(iv[i]));
 }
 
-
 // Return a uniformly-distributed random double between MIN and MAX exclusive.
-
+//----------------------------------------------------------------------------------------------------------------------
 double RandomState::UniformRandom(double min, double max)
 {
 	return (max - min) * ran1() + min;
 }
 
-
 // Return a uniformly-distributed random integer between MIN and MAX inclusive.
-
+//----------------------------------------------------------------------------------------------------------------------
 int RandomState::UniformRandomInteger(int min, int max)
 {	
 	return (int)floor(0.5+UniformRandom(min-0.5,max+0.5));
 }
 
-
 // Generate two normally-distributed random variables gx1 and gX2 for use by
 // GaussianRandom.  Based on the algorithm described in Volume 2 of "The Art 
 // of Computer Progamming" by Donald Knuth (p. 117).
-
+//----------------------------------------------------------------------------------------------------------------------
 void RandomState::GenerateNormals(void)
 {
 	double v1,v2,s,d;
@@ -162,9 +156,8 @@ void RandomState::GenerateNormals(void)
 	gX2 = v2 * d;
 }
 
-
 // Generate a Gaussian random variable.
-
+//----------------------------------------------------------------------------------------------------------------------
 double RandomState::GaussianRandom(double mean, double variance)
 {
 	if (!gaussian_flag) {
@@ -178,10 +171,8 @@ double RandomState::GaussianRandom(double mean, double variance)
 	}
 }
 
-
-
 // Return 1 with a probability PROB, else return 0
-
+//----------------------------------------------------------------------------------------------------------------------
 int RandomState::ProbabilisticChoice(double prob)
 {
 	return (UniformRandom(0.0,1.0) <= prob)?1:0;
