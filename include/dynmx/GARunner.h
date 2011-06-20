@@ -12,6 +12,9 @@
 
 #include "Model.h"
 #include "GA.h"
+
+#include "cinder/xml.h"
+
 #include <assert.h>
 
 namespace dmx
@@ -50,13 +53,13 @@ public:
   enum GAVerbosity
   {
     kGAVerbosityNone,
+    kGAVerbosityPopulation,    
+    kGAVerbosityGenome,    
     kGAVerbosityTrial,
-    kGAVerbosityGenome,
-    kGAVerbosityPopulation,
     kGAVerbosityMax
   };
   
-  GARunner(Evolvable* evolvable);
+  GARunner(Evolvable* evolvable, ci::XmlTree* xml = 0);
   
   virtual void update(float dt);
   virtual void init();
@@ -66,8 +69,11 @@ public:
   const GADescriptor& getGADesc() { return m_gaDesc; };
   
   void setVerbosity(GAVerbosity v) { m_verbosity = v; };
+  void setXmlTree(ci::XmlTree* xml) { m_xmlTree = xml; };
   
 protected:  
+  
+  void generationToXml(ci::XmlTree* xml, uint32_t gen, const double* genome, float bestFit, float avgFit);
   
   Evolvable* m_evolvable;
   
@@ -77,9 +83,11 @@ protected:
   float m_time;
   float m_accFitness;
   uint16_t m_trial;
-  uint32_t m_numGenomesTested;
+  uint32_t m_prevGeneration;  /// For detecting if GA has incremented a generation
   
-  bool m_verbosity;
+  GAVerbosity m_verbosity;
+  
+  ci::XmlTree* m_xmlTree;
 };
 
 } // namespace dmx

@@ -25,7 +25,7 @@ int UniformRandomInteger(int min,int max);
 double GaussianRandom(double mean, double variance);
 int ProbabilisticChoice(double prob);
 
-
+//----------------------------------------------------------------------------------------------------------------------  
 // The RandomState class declaration
 //----------------------------------------------------------------------------------------------------------------------
 class RandomState 

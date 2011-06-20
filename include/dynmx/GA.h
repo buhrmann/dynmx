@@ -25,7 +25,8 @@
 #define GA_BOUND_CHECK 0  // 0 = clamping, 1 = mirroring
 #define MAX_NUM_PARALLEL_EVALS 8
 
-// holds data for typical usage of a GA
+//----------------------------------------------------------------------------------------------------------------------  
+// Holds data for typical usage of a GA
 // ---------------------------------------------------------------------------------------------------------------------
 struct GADescriptor
 {
@@ -33,23 +34,21 @@ struct GADescriptor
   int numTrials;
   int numGenerations;
   int populationSize;
-  int genomeSize;
   int demeSize;
   
-  GADescriptor() : trialDuration(1.0f), numTrials(1), numGenerations(100), populationSize(50), 
-    demeSize(5), genomeSize(10) {};
+  GADescriptor() : trialDuration(1.0f), numTrials(2), numGenerations(10), populationSize(50), 
+    demeSize(5) {};
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // Microbial GA with Demes				      
 // for details see http://www.cogs.susx.ac.uk/users/inmanh/MicrobialGA_ECAL2009.pdf 
-// ---------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 class GA
 {
 public:
 
   GA(int popsize=100, int genlength=10, int demeWidth = 3);
-  GA(const GADescriptor& desc);
   ~GA();
 
   // interface for repeated evaluation of individual genomes
@@ -63,9 +62,9 @@ public:
   const std::vector<const double*> getNTournamentPairs(int n);
   void setNFitnessPairs(const std::vector<float>& fitnesses);
   
-  int getGenomeSize() const { return m_genomeLength; };
-  int getPopulationSize() const { return m_popSize; };
-  int getCurrentGeneration () const { return m_generation;};
+  uint16_t getGenomeSize() const { return m_genomeLength; };
+  uint16_t getPopulationSize() const { return m_popSize; };
+  uint32_t getCurrentGeneration () const { return m_generation; };
 
   /// Returns the best genome found so far and its fitness
   const double* getBestGenome(float &fitness) const;
@@ -83,8 +82,6 @@ public:
   void setMutationMax(double mut) { m_maxMutation = mut; };
   void setRecombinationRate(double rcr) { m_recombinationRate = rcr; };
   
-  void loadPopulation(const std::string fnm);
-  void savePopulation(const std::string fnm) const;
   void toXml(ci::XmlTree& xml, bool includeGenomes = true) const;
   bool fromXml(const ci::XmlTree& xml, bool includeGenomes = true);
 
@@ -111,19 +108,15 @@ protected:
   void finishThisTournament();  
 
   // determines winner and loser of tournament and mutates loser
-  void performTournament(int indA, float fitA, int indB, float fitB);
+  void performTournament(uint16_t indA, float fitA, uint16_t indB, float fitB);
   // loser of a tournament is being replaced by mutated version of the winner
-  void mutate(int winner, int loser);
+  void mutate(uint16_t winner, uint16_t loser);
   // returns indices for a random pair of genomes from a neighbourhood defined by demeWidth
-  void getRandomPairInDeme(int& indA, int& indB);
+  void getRandomPairInDeme(uint16_t& indA, uint16_t& indB);
   // returns indices for a random pair of genomes that is different from a list of already existing pairs
-  void getDifferentRandomPair(int& indA, int& indB, int* existingPairs, int numExistingPairs);
+  void getDifferentRandomPair(uint16_t& indA, uint16_t& indB, uint16_t* existingPairs, uint16_t numExistingPairs);
   // checks whether a pair of genomes is different from a list of already existing pairs
-  bool pairIsDifferentFrom(int& indA, int& indB, int* existingPairs, int numExistingPairs);
-  
-  // print out result of evolution
-  void printFitness(const std::string fnm) const;
-  void printBestGenome(const std::string fnm) const;
+  bool pairIsDifferentFrom(uint16_t& indA, uint16_t& indB, uint16_t* existingPairs, uint16_t numExistingPairs);
 
   // the population of genomes: array of arrays of type SCALAR (float/double)
   double** m_genomes;
@@ -133,20 +126,20 @@ protected:
   double *m_weightedAverageGenome;
   
   // stores indices of pairs of requested genomes for parallel evaluations
-  int m_requestedGenomes[2 * MAX_NUM_PARALLEL_EVALS];
+  uint16_t m_requestedGenomes[2 * MAX_NUM_PARALLEL_EVALS];
 
-  int m_popSize;
-  int m_genomeLength;
-  int m_demeWidth;		// width of 1d neighborhood
-  int m_generation;   // current generation
-  int m_tournament;   // current tournament (number of evaluations so far)
-  int m_currentIndA;  // genomes in current tournament
-  int m_currentIndB;
+  uint32_t m_generation;      // current generation  
+  uint16_t m_demeWidth;       // width of 1d neighborhood    
+  uint16_t m_popSize;
+  uint16_t m_genomeLength;  
+  uint16_t m_tournament;      // current tournament (number of evaluations so far)
+  uint16_t m_currentIndA;     // genomes in current tournament
+  uint16_t m_currentIndB;
 
-  long m_idum;        // seed for random number generator
+  long m_idum;                // seed for random number generator
 
-  double m_maxMutation;		    // amount of Gaussian vector mutation
-  double m_recombinationRate;  // amount of Gaussian vector mutation
+  double m_maxMutation;       // amount of Gaussian vector mutation
+  double m_recombinationRate; // amount of Gaussian vector mutation
 
   float 
     m_fitnessA,   // fitness of first individual in current tournament

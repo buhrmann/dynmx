@@ -20,18 +20,12 @@ public:
 
   TestAppEvolvableCTRNN()
   {
-    m_evoCtrnn = new TestEvolvableCTRNN(12);
+    m_evoCtrnn = new TestEvolvableCTRNN(6);
     m_model = new dmx::GARunner(m_evoCtrnn);
     m_view = new TestViewEvolvableCTRNN(this, (dmx::GARunner*)m_model);
   };
   
-  virtual void update() { App::update(1.0f / 30.0f); };
-  
-	virtual void prepareSettings( Settings *settings )
-  {
-    App::prepareSettings(settings);
-    settings->setFrameRate( 2000.0f );
-  };
+  virtual void update() { dmx::App::update(1.0f / 30.0f); };
     
   TestEvolvableCTRNN* m_evoCtrnn;
 };

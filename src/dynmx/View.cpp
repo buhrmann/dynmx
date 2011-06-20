@@ -75,6 +75,8 @@ void View::init()
   m_cam2d.setOrtho(0, ci::app::getWindowWidth(), ci::app::getWindowHeight(), 0, 0.01f, 100.0f);
 
   m_hud = params::InterfaceGl( "Tweakbar", Vec2i( 200, 400 ) );
+  m_hud.setOptions("", "iconified=true");
+  
   buildGui();
   
   setupScene();

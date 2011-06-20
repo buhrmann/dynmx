@@ -9,44 +9,95 @@
 
 #include "Dynmx.h"
 #include "TestApp.h"
+#include "TestAppCTRNN.h"
 #include "TestAppEvolvableCTRNN.h"
 #include "TestAppArm.h"
 
 #include "cinder/xml.h"
 
-#define VISUALISATION 0
+// Toggle profiling
+#define PROFILING 0
 
-#if VISUALISATION
-//CINDER_APP_BASIC( TestApp, ci::app::RendererGl )
-//CINDER_APP_BASIC( TestAppCTRNN, ci::app::RendererGl )
-CINDER_APP_BASIC( TestAppEvolvableCTRNN, ci::app::RendererGl )
-//CINDER_APP_BASIC( TestAppArm, ci::app::RendererGl )
+// Choose experiment to run
+#define EXPERIMENT TestAppEvolvableCTRNN
 
-#else
-int main( int argc, char * const argv[] )
+// Which renderer to launch with
+#define RENDERER ci::app::RendererGl
+
+// Cross-Platform app launching
+#ifdef DYNMX_WIN
+#define LAUNCH(APP, RENDERER, NAME) cinder::app::AppBasic::executeLaunch(APP, RENDERER, #NAME);
+#else DYNMX_MAC
+#define LAUNCH(APP, RENDERER, NAME) cinder::app::AppBasic::executeLaunch(APP, RENDERER, #NAME, argc, argv);
+#endif
+
+// Launches a visual simulation
+//----------------------------------------------------------------------------------------------------------------------
+void runVisual( int argc, char * const argv[] )
 {
-  // Run
+  cinder::app::AppBasic *app = new EXPERIMENT;
+  cinder::app::Renderer *ren = new RENDERER;
+  LAUNCH(app, ren, EXPERIMENT);
+}
+
+// Runs a console only simulation
+//----------------------------------------------------------------------------------------------------------------------
+void runNonVisual()
+{
+  // Create
+  ci::XmlTree progressLog ("GAEvolution", "");
   TestEvolvableCTRNN m_evoCtrnn (12);
-  dmx::GARunner gaRunner (&m_evoCtrnn);
+  dmx::GARunner gaRunner (&m_evoCtrnn);//, &progressLog);
+  gaRunner.setVerbosity(dmx::GARunner::kGAVerbosityMax);
+  const bool incremental = false;
+  if(incremental)
+  {
+    ci::XmlTree previousExp (ci::loadFile(std::string(DATA_BASE_DIR) + "11_06_20__12_21_18/GA_FinalPopulation.xml"));
+    gaRunner.getGA()->fromXml(previousExp.getChild("Experiment"));
+  }
+  
+  // Run
   const float dt = 1.0f / 30.0f;
-  while(gaRunner.getGA()->getCurrentGeneration() < 2)
+  const int numGenerations = 10;
+  while(gaRunner.getGA()->getCurrentGeneration() < numGenerations)
   {
     gaRunner.update(dt);
   }
   
   // Store results and setup
-  gaRunner.getGA()->savePopulation(dmx::DATA_DIR + "GA_EndPopulation.txt");
-  ci::XmlTree store ("Experiment", "");
-  gaRunner.getGA()->toXml(store, true);
-  store.write(ci::writeFile(dmx::DATA_DIR + "GA_EndPopulation.xml"));
-  
-  // test roundtrip
-  dmx::GARunner gaRunner2 (&m_evoCtrnn);
-  ci::XmlTree test (ci::loadFile(dmx::DATA_DIR + "GA_EndPopulation.xml"));
-  gaRunner2.getGA()->fromXml(test.getChild("Experiment"));
-  ci::XmlTree store2 ("Experiment", "");
-  gaRunner2.getGA()->toXml(store2, true);
-  store2.write(ci::writeFile(dmx::DATA_DIR + "GA_EndPopulation2.xml"));
+  ci::XmlTree experimentLog ("Experiment", "");
+  gaRunner.getGA()->toXml(experimentLog, true);
+  experimentLog.write(ci::writeFile(dmx::DATA_DIR + "GA_FinalPopulation.xml"));
+  progressLog.write(ci::writeFile(dmx::DATA_DIR + "GA_Evolution.xml"));   
 }
 
-#endif
+//----------------------------------------------------------------------------------------------------------------------
+int main( int argc, char * const argv[] )
+{
+  // Cinder++ needs to set itself up (sets up memory on Mac, does nothing on windoze)
+  ci::app::AppBasic::prepareLaunch();
+  
+#if PROFILING
+  cout << "Start of Main" << endl;
+#endif  
+  
+  const bool visual = true;
+  if(visual)
+  {
+    runVisual(argc, argv);
+  }
+  else
+  {
+    runNonVisual();
+  }
+  
+#if PROFILING
+  cout << "End of Main" << endl;
+#endif   
+  
+  // Cinder++ wants to clean up after itself
+  ci::app::AppBasic::cleanupLaunch();
+  
+  return 0;
+}
+

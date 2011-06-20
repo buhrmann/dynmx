@@ -25,7 +25,7 @@ public:
   TestViewEvolvableCTRNN() : m_gaRunner(0) {};
   TestViewEvolvableCTRNN(dmx::App* app, dmx::GARunner* gaRunner) : m_app(app), m_gaRunner(gaRunner)
   {
-    m_evoCtrnn= (TestEvolvableCTRNN*) m_gaRunner->getEvolvable();
+    m_evoCtrnn = (TestEvolvableCTRNN*) m_gaRunner->getEvolvable();
   };
   
   // functions to be implemented by subclasses
@@ -36,21 +36,21 @@ public:
     
     m_ctrnnViz = new dmx::CTRNNViz(m_evoCtrnn->m_ctrnn, 175);
     m_ctrnnViz->translate(ci::Vec3f(50, 50, 0));
+    m_scene2d.m_children.push_back(m_ctrnnViz);
     
+#if 0  
     m_gaViz = new dmx::GAViz(m_gaRunner, 500.0);
-    m_gaViz->translate(ci::Vec3f(50, 50, 0));
-    
+    m_gaViz->translate(ci::Vec3f(50, 50, 0));    
+    m_scene2d.m_children.push_back(m_gaViz);	    
+#else
     m_matrixViz = new dmx::RealMatrixViz(
     m_gaRunner->getGA()->getPopulation(), 
     m_gaRunner->getGA()->getPopulationSize(), 
     m_gaRunner->getGA()->getGenomeSize(),
-      500.0, 1.0);
+      250.0, 1.0);
     m_matrixViz->translate(ci::Vec3f(50, 50, 0));
-    
-    m_scene2d.m_children.push_back(m_matrixViz);
-    m_scene2d.m_children.push_back(m_ctrnnViz);
-    //m_scene2d.m_children.push_back(m_gaViz);	
-
+    m_scene2d.m_children.push_back(m_matrixViz); 
+#endif    
   };
   
   //--------------------------------------------------------------------------------------------------------------------
@@ -59,6 +59,7 @@ public:
   //---------------------------------------------------------------------------------------------------------------------
   virtual void draw2d()
   {
+#if 1    
     glColor3f(0,0,0);
     //dmx::drawSquaresVB(750, 300, 300);
     
@@ -66,6 +67,7 @@ public:
     char str[128];
     sprintf(str, "fps: %f", m_app->getAverageFps());
     ci::gl::drawString(str, pos, ci::ColorA(0,0,0));
+#endif
   };
   
   //---------------------------------------------------------------------------------------------------------------------

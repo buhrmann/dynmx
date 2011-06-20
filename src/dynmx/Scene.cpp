@@ -369,7 +369,9 @@ RealMatrixViz::RealMatrixViz(double **d, int N, int M, float width, double maxVa
   m_scale = N > M ? width / N : width / M;
   
   // stack space for vertex data
-  const int numVerts = N*M*4;
+  const int numVerts = N * M * 4;
+  const int numVertCoords = numVerts * 2;
+  const int numColorCoords = numVerts * 3;   
   GLfloat* verts = new GLfloat[numVerts*2];
   GLfloat* cols = new GLfloat[numVerts*3];
   
@@ -406,10 +408,15 @@ RealMatrixViz::RealMatrixViz(double **d, int N, int M, float width, double maxVa
   
   // copy vertex data
   glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbo[0]);
-  glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(verts), verts, GL_STATIC_DRAW_ARB);  
+  //glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(verts), verts, GL_STATIC_DRAW_ARB);
+  glBufferDataARB(GL_ARRAY_BUFFER_ARB, numVertCoords * sizeof(GLfloat), verts, GL_STATIC_DRAW_ARB);  
+  
+  
   // copy color data
   glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbo[1]);
-  glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(cols), cols, GL_STATIC_DRAW_ARB);   
+  //glBufferDataARB(GL_ARRAY_BUFFER_ARB, sizeof(cols), cols, GL_STATIC_DRAW_ARB);
+  glBufferDataARB(GL_ARRAY_BUFFER_ARB, numColorCoords * sizeof(GLfloat), cols, GL_STATIC_DRAW_ARB);
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------

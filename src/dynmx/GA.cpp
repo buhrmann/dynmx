@@ -6,30 +6,21 @@
  *  Copyright 2011 __MyCompanyName__. All rights reserved.
  *
  */
+
 #include "Dynmx.h"
 #include "GA.h"
+
 #include <time.h>
 #include "assert.h"
-
-// --------------------------------------------------------------------------------------------
-// con- and destructor
-// --------------------------------------------------------------------------------------------
-GA::GA(const GADescriptor& desc) :
-  m_popSize(desc.populationSize), 
-  m_genomeLength(desc.genomeSize),
-  m_demeWidth(desc.demeSize)
-{
-  init(); 
-}
 
 // --------------------------------------------------------------------------------------------
 GA::GA(int popsize, int genomeLength, int demeWidth) : 
   m_popSize(popsize), 
   m_genomeLength(genomeLength),
   m_demeWidth(demeWidth)
-  { 
-    init();
-  };
+{ 
+  init();
+}
 
 // Allocation
 // --------------------------------------------------------------------------------------------
@@ -38,10 +29,11 @@ void GA::init()
   // allocate 
   m_genomes = new double*[m_popSize];
   for(int i = 0; i < m_popSize; i++)
+  {
     m_genomes[i] = new double[m_genomeLength];
+  }
 
   m_fitnesses = new float[m_popSize];     
-  
   m_weightedAverageGenome = new double[m_popSize]; 
   
   reset();
@@ -51,7 +43,9 @@ void GA::init()
 GA::~GA()
 {  
   for(int i = 0; i < m_popSize; ++i)
+  {
     delete [] m_genomes[i];
+  }
     
   delete [] m_genomes;
   delete [] m_fitnesses;
@@ -75,11 +69,17 @@ void GA::reset()
 
   // random initialization
   for (int i = 0; i < m_popSize; i++)
+  {
     for (int j = 0; j < m_genomeLength; j++)
+    {
       m_genomes[i][j] = ran1(&m_idum);
+    }
+  }
 
   for(int i = 0; i < m_popSize; i++)
+  {
     m_fitnesses[i] = -1.0f;
+  }
   
   // select first pair of genomes for tournament
   startNextTournament();
@@ -91,18 +91,22 @@ void GA::reset()
 const double* GA::getCurrentGenome() const
 {
   if(m_currentGenome == GA_FIRST_GENOME)
+  {
     return m_genomes[m_currentIndA];
+  }
   else 
+  {
     return m_genomes[m_currentIndB];
+  }
 }
 
 // --------------------------------------------------------------------------------------------
 // simply return the best genome found so far
 // --------------------------------------------------------------------------------------------
-const double* GA::getBestGenome(float &fitness) const
+const double* GA::getBestGenome(float& fitness) const
 {
   fitness = -1.0f;
-  double *result = 0;
+  double* result = 0;
   for (int i = 0 ; i < m_popSize ; ++i)
   {
     if (m_fitnesses[i] >= fitness)
@@ -130,7 +134,9 @@ const double* GA::getWeightedAverageGenome(float &fitness) const
 {
   fitness = 0.0f;
   for (int i = 0 ; i < m_genomeLength ; ++i)
+  {
     m_weightedAverageGenome[i] = 0.0f;
+  }
 
   float totalFitness = 0.0f;
   for (int i = 0 ; i < m_popSize ; ++i)
@@ -143,12 +149,14 @@ const double* GA::getWeightedAverageGenome(float &fitness) const
         m_weightedAverageGenome[j] += m_genomes[i][j] * m_fitnesses[i];
     }
   }
+  
   if (totalFitness > 0.0f)
   {
     fitness /= totalFitness;
     for (int i = 0 ; i < m_genomeLength ; ++i)
       m_weightedAverageGenome[i] /= totalFitness;
   }
+  
   return m_weightedAverageGenome;
 }
 
@@ -158,16 +166,16 @@ const double* GA::getWeightedAverageGenome(float &fitness) const
 // --------------------------------------------------------------------------------------------
 void GA::setFitness(float fit)
 {
-  // If 1st genome: simply cache fitness
   if(m_currentGenome == GA_FIRST_GENOME)
   {
+    // If 1st genome: simply cache fitness    
     m_fitnessA = fit;
     m_currentGenome = GA_SECOND_GENOME;
     m_fitnesses[m_currentIndA] = fit;
   }
-  // If 2nd genome, finish tournament also
   else if(m_currentGenome == GA_SECOND_GENOME)
   {
+    // If 2nd genome, finish tournament also    
     m_fitnessB = fit;
     m_fitnesses[m_currentIndB] = fit;
     finishThisTournament();
@@ -178,18 +186,20 @@ void GA::setFitness(float fit)
 // --------------------------------------------------------------------------------------------
 // returns indices for a random pair of genomes from a neighbourhood defined by demeWidth
 // --------------------------------------------------------------------------------------------
-void GA::getRandomPairInDeme(int& indA, int& indB)
+void GA::getRandomPairInDeme(uint16_t& indA, uint16_t& indB)
 {
-  indA = (int)(m_popSize*ran1(&m_idum));
+  indA = (uint16_t)(m_popSize * ran1(&m_idum));
   indB = indA;
   while (indB == indA)
-    indB = (indA + 1 + (int)(m_demeWidth*ran1(&m_idum))) % m_popSize;
+  {
+    indB = (indA + 1 + (uint16_t)(m_demeWidth * ran1(&m_idum))) % m_popSize;
+  }
 }
 
 // --------------------------------------------------------------------------------------------
 // returns indices for a random pair of genomes that is different from a list of already existing pairs
 // --------------------------------------------------------------------------------------------
-void GA::getDifferentRandomPair(int& indA, int& indB, int* existingPairs, int numPairs)
+void GA::getDifferentRandomPair(uint16_t& indA, uint16_t& indB, uint16_t* existingPairs, uint16_t numPairs)
 {
   do
   {
@@ -200,7 +210,7 @@ void GA::getDifferentRandomPair(int& indA, int& indB, int* existingPairs, int nu
 // --------------------------------------------------------------------------------------------
 // checks whether a pair of genomes is different from a list of already existing pairs
 // --------------------------------------------------------------------------------------------
-bool GA::pairIsDifferentFrom(int& indA, int& indB, int* existingPairs, int numExistingPairs)
+bool GA::pairIsDifferentFrom(uint16_t& indA, uint16_t& indB, uint16_t* existingPairs, uint16_t numExistingPairs)
 {
   bool isDifferent = true;
   for(int i = 0; i < numExistingPairs; i++)
@@ -237,7 +247,7 @@ void GA::finishThisTournament()
 // --------------------------------------------------------------------------------------------
 // decide winner and loser and perform mutation
 // --------------------------------------------------------------------------------------------
-void GA::performTournament(int indA, float fitA, int indB, float fitB)
+void GA::performTournament(uint16_t indA, float fitA, uint16_t indB, float fitB)
 {
   int winner, loser;
   if (fitA > fitB)
@@ -261,10 +271,8 @@ void GA::performTournament(int indA, float fitA, int indB, float fitB)
   m_tournament++;
 
   // reset at end of generation
-  if ((m_tournament + 1) % m_popSize == 0)
+  if (m_tournament % m_popSize == 0)
   {
-    printFitness(dmx::DATA_DIR + "GA_fitness.txt");
-    printBestGenome(dmx::DATA_DIR + "GA_bestGenome.txt");
     m_generation++;    
   }
 }
@@ -290,20 +298,23 @@ const std::vector<const double*> GA::getNTournamentPairs(int n)
   // collect pointers
   std::vector<const double*> tournamentPairs;
   for(int i = 0; i < n * 2; i++)
+  {
     tournamentPairs.push_back(m_genomes[m_requestedGenomes[i]]);
+  }
+  
   return tournamentPairs;
 }
 
 // --------------------------------------------------------------------------------------------
 void GA::setNFitnessPairs(const std::vector<float>& fitnesses)
 {
-  assert((fitnesses.size() < 2*MAX_NUM_PARALLEL_EVALS) && (fitnesses.size() % 2 == 0));
+  assert((fitnesses.size() < 2 * MAX_NUM_PARALLEL_EVALS) && (fitnesses.size() % 2 == 0));
 
   // use fitness to perform tournament/mutation
-  for (int i=0; i<(int) fitnesses.size()/2; i++)
+  for (int i = 0; i < (int) fitnesses.size() / 2; i++)
   {
-    int indA = 2*i;
-    int indB = 2*i+1;
+    int indA = 2 * i;
+    int indB = 2 * i + 1;
     performTournament(m_requestedGenomes[indA], fitnesses[indA], m_requestedGenomes[indB], fitnesses[indB]);
   }
 }
@@ -311,13 +322,15 @@ void GA::setNFitnessPairs(const std::vector<float>& fitnesses)
 // --------------------------------------------------------------------------------------------
 // mutate loser with features from winner (genotype must stay within [0,1] boundaries)
 // --------------------------------------------------------------------------------------------
-void GA::mutate(int winner, int loser)
+void GA::mutate(uint16_t winner, uint16_t loser)
 {
-  for (int i=0; i < m_genomeLength; i++)
+  for (int i = 0; i < m_genomeLength; i++)
   {      
     // recombination/genetic infection (some genes are copied from winner to loser)
     if (ran1(&m_idum) < m_recombinationRate) 
+    {
       m_genomes[loser][i] = m_genomes[winner][i];
+    }
 
     // gaussian mutation
     m_genomes[loser][i] += (float) (gasdev(&m_idum) * m_maxMutation);
@@ -354,102 +367,6 @@ void GA::setGenome(int iGenome, const double *genome, float fitness)
   m_fitnesses[iGenome] = fitness;
 }
 
-// --------------------------------------------------------------------------------------------
-// load a previously saved population
-// --------------------------------------------------------------------------------------------
-void GA::loadPopulation(const std::string fnm)
-{
-  FILE* fp = fopen(fnm.c_str(), "r");
-  if (fp)
-  {
-    // sanity check some things that must be the same
-    int genomeLength;
-    fscanf(fp, "%d", &genomeLength);
-    if (genomeLength != m_genomeLength)
-    {
-      printf("Attempt to load a different genome length\n");
-      fclose(fp);
-      return;
-    }
-
-    int popSize;
-    fscanf(fp, "%d", &popSize);
-    if (popSize != m_popSize)
-    {
-      printf("Attempt to load a different population size\n");
-      fclose(fp);
-      return;
-    }
-
-    // overwrite internal settings
-    fscanf(fp, "%d", &m_demeWidth);
-    fscanf(fp, "%d", &m_generation);
-    fscanf(fp, "%d", &m_tournament);
-    fscanf(fp, "%d", &m_currentIndA);
-    fscanf(fp, "%d", &m_currentIndB);
-
-    fscanf(fp, "%lf", &m_maxMutation);
-    fscanf(fp, "%lf", &m_recombinationRate);
-    fscanf(fp, "%g", &m_fitnessA);
-    fscanf(fp, "%g", &m_fitnessB);
-    for (int i = 0; i < m_popSize; i++)
-    {
-      float fitness;
-      fscanf(fp, "%f\t", &fitness); 
-      m_fitnesses[i] = fitness;
-      for (int j=0; j < m_genomeLength; j++)
-      {
-        double tempD;
-        fscanf(fp, "%lf\t", &tempD); 
-        m_genomes[i][j] = tempD;
-      }
-    }
-    fclose(fp);
-  }
-  else
-  {
-    printf("Couldn't open population file for reading: %s\n", fnm.c_str());
-  }
-}
-
-// --------------------------------------------------------------------------------------------
-// save final population
-// --------------------------------------------------------------------------------------------
-void GA::savePopulation(const std::string fnm) const
-{
-  FILE* fp = fopen(fnm.c_str(), "w+");
-  if (fp)
-  {
-    fprintf(fp, "%d\n", m_genomeLength);
-    fprintf(fp, "%d\n", m_popSize);
-
-    // overwrite internal settings
-    fprintf(fp, "%d\n", m_demeWidth);
-    fprintf(fp, "%d\n", m_generation);
-    fprintf(fp, "%d\n", m_tournament);
-    fprintf(fp, "%d\n", m_currentIndA);
-    fprintf(fp, "%d\n", m_currentIndB);
-
-    fprintf(fp, "%lf\n", m_maxMutation);
-    fprintf(fp, "%lf\n", m_recombinationRate);
-    fprintf(fp, "%g\n", m_fitnessA);
-    fprintf(fp, "%g\n", m_fitnessB);
-
-    for (int i=0; i < m_popSize; i++)
-    {
-      fprintf(fp, "%f\t", m_fitnesses[i]);
-      for (int j=0; j < m_genomeLength; j++)
-        fprintf(fp, "%lf\t", m_genomes[i][j]);
-      fprintf(fp, "\n");
-    }
-    fflush(fp);
-    fclose(fp);
-  }
-  else
-  {
-    printf("Couldn't open population file for writing: %s\n", fnm.c_str());
-  }
-}
 
 //--------------------------------------------------------------------------------------------
 void GA::toXml(ci::XmlTree& parent, bool includeGenomes) const
@@ -460,8 +377,6 @@ void GA::toXml(ci::XmlTree& parent, bool includeGenomes) const
   ga.setAttribute("GenomeLength", m_genomeLength);
   ga.setAttribute("PopulationSize", m_popSize);
   ga.setAttribute("DemeWidth", m_demeWidth);
-  ga.setAttribute("Generation", m_generation);
-  ga.setAttribute("Tournament", m_tournament);
   ga.setAttribute("MaxMutation", m_maxMutation);
   ga.setAttribute("RecombinationRate", m_recombinationRate);
   
@@ -490,6 +405,8 @@ void GA::toXml(ci::XmlTree& parent, bool includeGenomes) const
 // --------------------------------------------------------------------------------------------
 bool GA::fromXml(const ci::XmlTree& parent, bool includeGenomes)
 {
+  assert(parent.hasChild("GA"));
+  
   const ci::XmlTree& ga = parent.getChild("GA");
   int genomeLength = ga.getAttributeValue<int>("GenomeLength");
   int popSize = ga.getAttributeValue<int>("PopulationSize");
@@ -498,8 +415,6 @@ bool GA::fromXml(const ci::XmlTree& parent, bool includeGenomes)
   if(genomeLength == m_genomeLength && popSize == m_popSize)
   {
     m_demeWidth = ga.getAttributeValue<int>("DemeWidth");
-    m_generation = ga.getAttributeValue<int>("Generation");
-    m_tournament = ga.getAttributeValue<int>("Tournament");
     m_maxMutation = ga.getAttributeValue<float>("MaxMutation");
     m_recombinationRate = ga.getAttributeValue<float>("RecombinationRate");
     
@@ -524,38 +439,6 @@ bool GA::fromXml(const ci::XmlTree& parent, bool includeGenomes)
   return false;
 }
 
-// --------------------------------------------------------------------------------------------
-// File output
-// --------------------------------------------------------------------------------------------
-void GA::printFitness(const std::string fnm) const
-{
-  float max = -1.0f;
-  (void) getBestGenome(max);
-  float avg = getAvgFitness();
-
-  FILE* fp = fopen(fnm.c_str(), "a");
-  if (fp)
-  {
-    fprintf(fp,"%i\t%f\t%f\n", m_generation, max, avg);
-    fclose(fp);
-  }
-}
-
-// --------------------------------------------------------------------------------------------
-void GA::printBestGenome(const std::string fnm) const
-{
-  // save best agent
-  FILE* fp = fopen(fnm.c_str(), "a");
-  if (fp)
-  {
-    fprintf(fp, "%i\t", m_generation);
-    float fitness;
-    for (int i=0; i < m_genomeLength; i++)    
-      fprintf(fp, "%lf ", getBestGenome(fitness)[i]);
-    fprintf(fp, "\n");
-    fclose(fp);
-  }
-}
 
 
 
