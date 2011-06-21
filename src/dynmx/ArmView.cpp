@@ -54,10 +54,10 @@ void Arm3dView::update()
 
   Pos pos;
   pos = m_arm->getPointOnUpperArm(0.5);
-  Vec3f midPos1(pos.x, pos.y, 0);
+  Vec4f midPos1(pos.x, pos.y, 0, 1);
   
   pos = m_arm->getPointOnLowerArm(0.5);
-  Vec3f midPos2(pos.x, pos.y, 0);
+  Vec4f midPos2(pos.x, pos.y, 0, 1);
   
   const float shdAngle = m_arm->getJointAngle(JT_shoulder);
   m_upperArm.m_TM.setToIdentity(); 
@@ -76,11 +76,11 @@ void Arm3dView::update()
   m_lowerArm.m_TM.rotate(Vec3f(1.0f, 0.0f, 0.0f), shdAngle + elbAngle);  
   
   pos = m_arm->getElbowPos();
-  Vec3f elbPos(pos.x, pos.y, 0.0f);
+  Vec4f elbPos(pos.x, pos.y, 0.0f, 1);
   m_elbow.m_TM.setToIdentity(); 
   m_elbow.m_TM.translate(elbPos);
   
-  m_shoulder.m_TM.translate(Vec3f(0.0f, 0.0f, 0.0f));
+  m_shoulder.m_TM.translate(Vec4f(0.0f, 0.0f, 0.0f, 1.0f));
   
   // overlay desired state
   float desElbAngle = m_arm->getDesiredJointAngle(JT_elbow); 

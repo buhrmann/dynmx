@@ -51,7 +51,7 @@ void Light::update()
     glLightfv( light, GL_SPECULAR, &m_specular.x);
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, &m_ambientGlobal.x);
 
-    Vec4f position = Vec4f(m_TM.getTranslation());
+    Vec4f position = m_TM.getTranslate();
     Vec4f direction = m_TM.getRow(0);
 
     switch (m_lightType)

@@ -32,7 +32,7 @@ void GAViz::init()
     m_gaRunner->getGA()->getFitnesses(), 
     m_gaRunner->getGA()->getPopulationSize(), 
     m_width, 1.0); 
-  m_fitness->translate(Vec3f(0, 0.5 * m_unitSize, 0));
+  m_fitness->translate(Vec4f(0, 0.5 * m_unitSize, 0, 1));
   
   // genomes
   m_genomes = new MatrixView<double>(
@@ -40,11 +40,11 @@ void GAViz::init()
     m_gaRunner->getGA()->getPopulationSize(), 
     m_gaRunner->getGA()->getGenomeSize(),
      m_width, 10.0);
-  m_genomes->translate(Vec3f(0, 3 * m_unitSize, 0));
+  m_genomes->translate(Vec4f(0, 3 * m_unitSize, 0, 1));
     
   // output plot
   m_plot = new Plot(300.0, 180, 2, 100);
-  m_plot->translate(Vec3f(m_width * 1.5, 0, 0));  
+  m_plot->translate(Vec4f(m_width * 1.5, 0, 0, 1));  
     
   // add to this
   m_children.push_back(m_fitness);
@@ -70,7 +70,7 @@ void GAViz::update()
   {    
     ci::Color textColor (0,0,0);
     // draw stuff not already in child nodes
-    ci::Vec2f pos = ci::Vec2f(m_pTM->getTranslation());
+    ci::Vec2f pos = ci::Vec2f(m_pTM->getTranslate());
     glColor3f(0,0,0);
     
     // fitnesses section

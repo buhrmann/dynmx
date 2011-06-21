@@ -19,7 +19,7 @@
 #define PROFILING 0
 
 // Choose experiment to run
-#define EXPERIMENT TestAppEvolvableCTRNN
+#define EXPERIMENT TestAppArm
 
 // Which renderer to launch with
 #define RENDERER ci::app::RendererGl

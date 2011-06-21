@@ -32,7 +32,7 @@ public:
     
     dmx::Sphere* sphere = new dmx::Sphere(0.1, 16);
     sphere->createGeometry();
-    sphere->translate(ci::Vec3f(0,0,1));
+    sphere->translate(ci::Vec4f(0,0,1,1));
     sphere->m_outlineColor = ci::Vec4f(1.0, 1.0, 1.0, 0.3);
     m_scene3d.m_children.push_back(sphere);
     

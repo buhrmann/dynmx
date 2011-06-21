@@ -119,7 +119,7 @@ void NodeGroup::init()
 void NodeGroup::update()
 {
   glPushMatrix();
-  glMultMatrixf(m_pTM->m);
+  glMultMatrixf(*m_pTM);
   for(size_t i = 0; i < m_children.size(); i++)
   {
     m_children[i]->update();
@@ -128,10 +128,10 @@ void NodeGroup::update()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void NodeGroup::onMouseMove(const Vec3f& mPos)
+void NodeGroup::onMouseMove(const Vec4f& mPos)
 {
   // update mouse info: transform mouse position into local space
-  Vec3f mPosLocal = m_pTM->getTranslation();
+  Vec4f mPosLocal = m_pTM->getTranslate();
   mPosLocal = mPos - mPosLocal;
   for(size_t i = 0; i < m_children.size(); i++)
   {
@@ -221,7 +221,7 @@ void NodeGeometry::update()
   // draw geometry
   glPushName(m_uniqueID); // name for picking
   glPushMatrix();
-    glMultMatrixf(m_pTM->m);
+    glMultMatrixf(*m_pTM);
     glCallList(m_dl);
   glPopMatrix();
   glPopAttrib();
@@ -427,7 +427,7 @@ void RealMatrixViz::update()
   glLineWidth(1);
 
   glPushMatrix();
-  glMultMatrixf(m_pTM->m);
+  glMultMatrixf(*m_pTM);
   
   // draw vertex array
   glEnableClientState(GL_VERTEX_ARRAY);
@@ -490,7 +490,7 @@ void Plot::update()
   glLineWidth(1);
 
   glPushMatrix();
-  glMultMatrixf(m_pTM->m);
+  glMultMatrixf(*m_pTM);
 
   float widthRec = 1.0 / (float)m_N * m_w;
   float scale = m_maxY - m_minY;

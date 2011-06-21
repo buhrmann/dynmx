@@ -35,12 +35,12 @@ public:
     
     // 3d view
     m_armView = new dmx::Arm3dView(m_arm);
-    //m_armView->translate(ci::Vec3f(50, 50, 0));
+    //m_armView->translate(ci::Vec4f(50, 50, 0, 1));
     m_scene3d.m_children.push_back(m_armView);
     
     // 2d view
     m_plot = new dmx::Plot(300.0, 180, 2, 100);
-    m_plot->translate(ci::Vec3f(50, 50, 0)); 
+    m_plot->translate(ci::Vec4f(50, 50, 0, 1)); 
     m_scene2d.m_children.push_back(m_plot);
   };
   

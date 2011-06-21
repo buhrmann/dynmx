@@ -28,8 +28,18 @@ namespace dmx
   // ---------------------------------------------------------
   static void setTransform(const Mat4f& matrix)
 	{
-		glMultMatrixf(matrix.m);
+		glMultMatrixf(matrix);
 	}
+  
+  static void translate(const Vec4f& pos)
+  {
+    glTranslatef(pos.x, pos.y, pos.z);
+  }
+  
+  static void translate(const Vec3f& pos)
+  {
+    glTranslatef(pos.x, pos.y, pos.z);
+  }
 
   static void setColor3(const Vec3f& c)
 	{
@@ -504,7 +514,7 @@ namespace dmx
     tm.setRow(4, cinder::Vec4f(pos, 1));
 
 		glPushMatrix();
-		glMultMatrixf(tm.m);
+		glMultMatrixf(tm);
 		drawCylinder(length, radius1, radius2, slices, stacks, mode);
 		glPopMatrix();
   }

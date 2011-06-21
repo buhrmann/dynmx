@@ -27,7 +27,7 @@ public:
   
   void setCTRNN(CTRNN* ctrnn) { m_ctrnn = ctrnn; };
   virtual void update();
-  virtual void onMouseMove(const Vec3f& mPos);
+  virtual void onMouseMove(const Vec4f& mPos);
   virtual void onKeyPress(ci::app::KeyEvent e);
   
 protected:

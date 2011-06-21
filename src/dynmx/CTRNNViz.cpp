@@ -32,16 +32,16 @@ void CTRNNViz::init()
   
   // output vector
   m_outputs = new VectorView<double>(m_ctrnn->outputs, m_ctrnn->size, m_width, 1.0); 
-  m_outputs->translate(Vec3f(0, 0.5 * m_unitSize, 0));
+  m_outputs->translate(Vec4f(0, 0.5 * m_unitSize, 0, 1));
   
   // weight matrix
   m_weights = new MatrixView<double>(
     m_ctrnn->weights, m_ctrnn->size, m_ctrnn->size, m_width, 10.0);
-  m_weights->translate(Vec3f(0, 3 * m_unitSize, 0));
+  m_weights->translate(Vec4f(0, 3 * m_unitSize, 0, 1));
     
   // output plot
   m_plot = new Plot(300.0, 180, m_ctrnn->size, 100);
-  m_plot->translate(Vec3f(m_width * 1.5, 0, 0));  
+  m_plot->translate(Vec4f(m_width * 1.5, 0, 0, 1));  
   
 //	ci::TextLayout layout;
 //	layout.clear( ci::ColorA( 0.2f, 0.2f, 0.2f, 0.2f ) );
@@ -82,7 +82,7 @@ void CTRNNViz::update()
     
     glPushMatrix();
     // plot data
-    ci::gl::translate(m_pTM->getTranslation());    
+    dmx::translate(m_pTM->getTranslate());
     m_children[2]->update();    
     
     // outputs section
@@ -94,7 +94,7 @@ void CTRNNViz::update()
     
     // left upper corner of wheel's bounding box at 0,0:    
     ci::Vec3f radiusOffset(r3, r3 + 10.5, 0);
-    ci::gl::translate(radiusOffset);
+    dmx::translate(radiusOffset);
         
     // connectivity
     for(int i = 0; i < m_ctrnn->size; i++)
@@ -170,10 +170,12 @@ void CTRNNViz::update()
   
   // draw as matrix
   if(m_mode == 0)
-  {    
+  {     
     ci::Color textColor (0,0,0);
     // draw stuff not already in child nodes
-    ci::Vec2f pos = ci::Vec2f(m_pTM->getTranslation());
+    ci::Vec4f pos4 = m_pTM->getTranslate();
+    ci::Vec2f pos (pos4.x, pos4.y);
+    //ci::Vec2f pos = ci::Vec2f(m_pTM->getTranslate());
     glColor3f(0,0,0);
     
     // outputs section
@@ -227,17 +229,17 @@ void CTRNNViz::update()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void CTRNNViz::onMouseMove(const Vec3f& mPos)
+void CTRNNViz::onMouseMove(const Vec4f& mPos)
 {
   const float r3 = m_width / 2;
   const float r2 = r3 - 5;
   const float r1 = r2 - 10;
   
-  // left upper corner of bounding box at 0,0:    
-  ci::Vec3f radiusOffset(r3, r3 + 10.5, 0);
+  // left upper cornString Wall Shelf Systemer of bounding box at 0,0:    
+  ci::Vec4f radiusOffset(r3, r3 + 10.5, 0, 1);
   
   // update mouse info: transform mouse position into local space
-  Vec3f posLocal = mPos - m_pTM->getTranslation();
+  Vec4f posLocal = mPos - m_pTM->getTranslate();
   posLocal -= radiusOffset;
   m_mPos = ci::Vec2f(posLocal.x, posLocal.y);
   float radius = posLocal.length();

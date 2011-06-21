@@ -35,12 +35,12 @@ public:
     assert(m_evoCtrnn);
     
     m_ctrnnViz = new dmx::CTRNNViz(m_evoCtrnn->m_ctrnn, 175);
-    m_ctrnnViz->translate(ci::Vec3f(50, 50, 0));
+    m_ctrnnViz->translate(ci::Vec4f(50, 50, 0, 1));
     m_scene2d.m_children.push_back(m_ctrnnViz);
     
 #if 0  
     m_gaViz = new dmx::GAViz(m_gaRunner, 500.0);
-    m_gaViz->translate(ci::Vec3f(50, 50, 0));    
+    m_gaViz->translate(ci::Vec4f(50, 50, 0, 1));    
     m_scene2d.m_children.push_back(m_gaViz);	    
 #else
     m_matrixViz = new dmx::RealMatrixViz(
@@ -48,7 +48,7 @@ public:
     m_gaRunner->getGA()->getPopulationSize(), 
     m_gaRunner->getGA()->getGenomeSize(),
       250.0, 1.0);
-    m_matrixViz->translate(ci::Vec3f(50, 50, 0));
+    m_matrixViz->translate(ci::Vec4f(50, 250, 0, 1));
     m_scene2d.m_children.push_back(m_matrixViz); 
 #endif    
   };

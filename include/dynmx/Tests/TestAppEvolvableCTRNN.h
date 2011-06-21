@@ -20,7 +20,7 @@ public:
 
   TestAppEvolvableCTRNN()
   {
-    m_evoCtrnn = new TestEvolvableCTRNN(6);
+    m_evoCtrnn = new TestEvolvableCTRNN(8);
     m_model = new dmx::GARunner(m_evoCtrnn);
     m_view = new TestViewEvolvableCTRNN(this, (dmx::GARunner*)m_model);
   };

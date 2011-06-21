@@ -101,14 +101,14 @@ public:
   virtual void update() = 0;
 
   // only effective when not externally driven !
-  virtual void translate(const cinder::Vec3f& p) { m_TM.translate(p); };
+  virtual void translate(const cinder::Vec4f& p) { m_TM.translate(p); };
 
   void attachDriver(cinder::Matrix44f* m) { m_pTM = m; m_isDriven = true; };
   void detachDriver() { m_pTM = &m_TM; m_isDriven = false; };
 
   virtual Node* getNode(int pickID) { return 0; };
   
-  virtual void onMouseMove(const cinder::Vec3f& mousePos) {};
+  virtual void onMouseMove(const cinder::Vec4f& mousePos) {};
   virtual void onKeyPress(cinder::app::KeyEvent e) {};
 
   virtual void print();
@@ -138,7 +138,7 @@ public:
 
   // recursively descend into tree to look for picked node
   virtual Node* getNode(int pickID);
-  virtual void onMouseMove(const cinder::Vec3f& mousePos);
+  virtual void onMouseMove(const cinder::Vec4f& mousePos);
   virtual void onKeyPress(ci::app::KeyEvent e);
   
   std::vector<Node*> m_children;
@@ -388,7 +388,7 @@ public:
     glLineWidth(1);
 
     glPushMatrix();
-    glMultMatrixf(m_pTM->m);
+    glMultMatrixf(*m_pTM);
 
     glScalef(m_scale, m_scale, m_scale);
     
@@ -422,14 +422,14 @@ public:
     glPopAttrib();
   };  
   
-  virtual void onMouseMove(const Vec3f& mP)
+  virtual void onMouseMove(const Vec4f& mP)
   {
-    const Vec3f& pos = m_pTM->getTranslation();
+    const Vec4f& pos = m_pTM->getTranslate();
     const float xMax = pos.x + m_N * m_scale;
     const float yMax = pos.y + m_M * m_scale;
     if((mP.x > pos.x) && (mP.x < xMax) && (mP.y > pos.y) && (mP.y < yMax))
     {      
-      Vec3f mPosLocal = mP - pos;
+      Vec4f mPosLocal = mP - pos;
       m_iSel = (int) (mPosLocal.x / m_scale);
       m_jSel = (int) (mPosLocal.y / m_scale);
       assert(m_iSel < m_N && m_jSel < m_M);
@@ -481,7 +481,7 @@ public:
     glLineWidth(1);
 
     glPushMatrix();
-    glMultMatrixf(m_pTM->m);
+    glMultMatrixf(*m_pTM);
     glScalef(m_scale, m_scale, m_scale);
 
     // Aligh top left corner
@@ -505,14 +505,14 @@ public:
     glPopAttrib();
   }
   
-  virtual void onMouseMove(const Vec3f& p)
+  virtual void onMouseMove(const Vec4f& p)
   {
-    Vec3f pos = m_pTM->getTranslation();
+    Vec4f pos = m_pTM->getTranslate();
     const float xMax = pos.x + m_N * m_scale;
     const float yMax = pos.y + m_scale;
     if((p.x > pos.x) && (p.x < xMax) && (p.y > pos.y) && (p.y < yMax))
     {      
-      Vec3f posLocal = p - pos;
+      Vec4f posLocal = p - pos;
       m_iSel = (int) (posLocal.x / m_scale);
       assert(m_iSel < m_N);
     }
