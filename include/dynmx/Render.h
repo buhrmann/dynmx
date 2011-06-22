@@ -1,3 +1,12 @@
+/*
+ *  Render.h
+ *  cinder_dynmx
+ *
+ *  Created by Thomas Buhrmann on 24/01/2011.
+ *  Copyright 2011 __MyCompanyName__. All rights reserved.
+ *
+ */
+ 
 #ifndef __OFX_3d__H_
 #define __OFX_3d__H_
 

@@ -28,6 +28,8 @@ public:
     m_view = new TestViewCTRNN(m_ctrnn);
   };
   
+  virtual ~TestAppCTRNN() { delete m_ctrnn; };
+  
   CTRNN* m_ctrnn;
 };
 

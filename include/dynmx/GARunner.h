@@ -59,17 +59,18 @@ public:
     kGAVerbosityMax
   };
   
-  GARunner(Evolvable* evolvable, ci::XmlTree* xml = 0);
+  GARunner(Evolvable* evolvable);
   
+  //Iinherited from Model
   virtual void update(float dt);
   virtual void init();
+  virtual bool hasFinished() { return m_ga->getCurrentGeneration() == m_gaDesc.numGenerations; };
   
   Evolvable* getEvolvable() { return m_evolvable; };
   GA* getGA() { return m_ga; };
   const GADescriptor& getGADesc() { return m_gaDesc; };
   
   void setVerbosity(GAVerbosity v) { m_verbosity = v; };
-  void setXmlTree(ci::XmlTree* xml) { m_xmlTree = xml; };
   
 protected:  
   
@@ -87,7 +88,8 @@ protected:
   
   GAVerbosity m_verbosity;
   
-  ci::XmlTree* m_xmlTree;
+  ci::XmlTree* m_progressLog;
+  ci::XmlTree* m_resultsLog;
 };
 
 } // namespace dmx

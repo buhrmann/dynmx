@@ -21,6 +21,8 @@
 
 namespace dmx
 {
+// indicated that the view doesn't want to override the app's default frame rate
+#define DEFAULT_FRAME_RATE -1
   
 // Forward declarations
 class App;
@@ -41,6 +43,8 @@ public:
   // core functionality
   virtual void init();
   virtual void draw();
+  
+  virtual int getDesiredFrameRate() { return DEFAULT_FRAME_RATE; } ;
 
   virtual void mouseMove(ci::app::MouseEvent event);
   virtual void mouseDrag(ci::app::MouseEvent event);
@@ -85,8 +89,6 @@ public:
   // stuff for picking objects in the scene
   static const int m_selectBufSize;
   GLuint m_selectionBuffer[128];
-  
-  App* m_app;
 };
 
 }

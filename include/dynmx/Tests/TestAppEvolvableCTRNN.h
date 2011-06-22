@@ -18,16 +18,12 @@ class TestAppEvolvableCTRNN : public dmx::App
 {
 public:
 
-  TestAppEvolvableCTRNN()
+  TestAppEvolvableCTRNN(TestEvolvableCTRNN* evoCtrnn)
   {
-    m_evoCtrnn = new TestEvolvableCTRNN(8);
-    m_model = new dmx::GARunner(m_evoCtrnn);
-    m_view = new TestViewEvolvableCTRNN(this, (dmx::GARunner*)m_model);
+    m_model = new dmx::GARunner(evoCtrnn);
+    m_view = new TestViewEvolvableCTRNN(this, m_model);
   };
-  
-  virtual void update() { dmx::App::update(1.0f / 30.0f); };
     
-  TestEvolvableCTRNN* m_evoCtrnn;
 };
 
 #endif

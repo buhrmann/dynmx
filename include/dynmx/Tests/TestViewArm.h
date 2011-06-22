@@ -44,10 +44,17 @@ public:
     m_scene2d.m_children.push_back(m_plot);
   };
   
+  
+  //--------------------------------------------------------------------------------------------------------------------
+  virtual int getDesiredFrameRate()
+  {
+    return m_fixedFrameRate;
+  }
+  
   //--------------------------------------------------------------------------------------------------------------------
   virtual void draw3d()
   {
-    m_app->setFixedTimeStep(1.0f / (float)m_fixedFrameRate);
+    //m_app->setFixedTimeStep(1.0f / (float)m_fixedFrameRate);
     dmx::drawBasis(0.1f);
   };
   
@@ -77,7 +84,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   virtual void buildGui() 
   { 
-    //m_hud.addParam( "FPS", &m_fixedFrameRate, "min=10 max=300 step=5"); 
+    m_hud.addParam( "FPS", &m_fixedFrameRate, "min=10 max=300 step=5"); 
     m_hud.addParam( "Elb P", &m_arm->m_pd[JT_elbow].m_P, "min=0.1 max=20.0 step=0.5" );
     m_hud.addParam( "Elb D", &m_arm->m_pd[JT_elbow].m_D, "min=0.1 max=20.0 step=0.5" );
     m_hud.addParam( "Shd P", &m_arm->m_pd[JT_shoulder].m_P, "min=0.1 max=50.0 step=0.5" );

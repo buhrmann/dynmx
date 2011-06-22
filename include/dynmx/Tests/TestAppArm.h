@@ -23,8 +23,9 @@ public:
     m_arm = new Arm2d();
     m_model = new TestModelArm(m_arm);
     m_view = new TestViewArm(m_arm);
-    m_view->m_app = this;
   };
+  
+  virtual ~TestAppArm() { delete m_arm; };
   
   Arm2d* m_arm;
 };

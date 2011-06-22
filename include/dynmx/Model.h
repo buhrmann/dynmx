@@ -21,8 +21,14 @@ namespace dmx
 class Model
 {
 public:
+  // Needs to be able to as new after this function has been called.
   virtual void init() {};
-  virtual void update(float dt){};
+  
+  // Called every frame: do stuff here.
+  virtual void update(float dt) {};
+  
+  // Signals that this model doesn't want/need to be updated anymore.
+  virtual bool hasFinished() { return false; };
 };
 
 }

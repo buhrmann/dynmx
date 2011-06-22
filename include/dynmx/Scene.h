@@ -1,3 +1,12 @@
+/*
+ *  Scene.h
+ *  cinder_dynmx
+ *
+ *  Created by Thomas Buhrmann on 24/01/2011.
+ *  Copyright 2011 __MyCompanyName__. All rights reserved.
+ *
+ */
+ 
 #ifndef _OFXNODE_
 #define _OFXNODE_
 

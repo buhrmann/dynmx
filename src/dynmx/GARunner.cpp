@@ -16,7 +16,7 @@ namespace dmx
 {
 
 //----------------------------------------------------------------------------------------------------------------------
-GARunner::GARunner(Evolvable* evolvable, ci::XmlTree* xml) : m_evolvable(evolvable), m_xmlTree(xml)
+GARunner::GARunner(Evolvable* evolvable) : m_evolvable(evolvable)
 {
   init();
 }
@@ -24,6 +24,13 @@ GARunner::GARunner(Evolvable* evolvable, ci::XmlTree* xml) : m_evolvable(evolvab
 //----------------------------------------------------------------------------------------------------------------------
 void GARunner::init()
 {
+  const ci::XmlTree* settings = SETTINGS;
+  if (settings->hasChild("Config/GA"))
+  {
+    const ci::XmlTree& ga = settings->getChild("Config/GA");
+    m_gaDesc.populationSize = ga.getChild("PopulationSize").getAttributeValue<int>("Value");
+  }
+
   m_verbosity = kGAVerbosityNone;
   
   // load GA desciptor from file ...
@@ -43,6 +50,9 @@ void GARunner::init()
   // setup simulation model
   m_evolvable->decodeGenome(m_ga->getCurrentGenome());
   m_evolvable->reset();
+  
+  m_progressLog = new ci::XmlTree("GAProgress", ""); 
+  m_resultsLog = new ci::XmlTree("GAResult", "");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -95,20 +105,26 @@ void GARunner::update(float dt)
         const double* bestGenome = m_ga->getBestGenome(bestFitness);
         const float avgFitness = m_ga->getAvgFitness();  
         
-        if (m_xmlTree != 0)
-        {
-          generationToXml(m_xmlTree, currentGen, bestGenome, bestFitness, avgFitness);
-        }
+        generationToXml(m_progressLog, currentGen, bestGenome, bestFitness, avgFitness);
         
-        #if DEBUGGING
+#if DEBUGGING
         if (m_verbosity >= kGAVerbosityPopulation)
         {
           std::cout << "Generation " << currentGen 
                     << ": BestFit = " << bestFitness << " | AvgFit = " << avgFitness << std::endl; 
         }
 #endif     
-        
         m_prevGeneration = currentGen;
+        
+        // When the maximum number of generations has been reached. 
+        //---------------------------------------------------------
+        if (hasFinished())
+        { 
+          // Write results to file
+          getGA()->toXml(*m_resultsLog, true);
+          m_resultsLog->write(ci::writeFile(dmx::DATA_DIR + "GA_Result.xml"));
+          m_progressLog->write(ci::writeFile(dmx::DATA_DIR + "GA_Progress.xml"));  
+        }
       }
     }
     

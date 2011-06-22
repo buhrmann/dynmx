@@ -11,6 +11,8 @@
 
 #include <string>
 
+#include "cinder/xml.h"
+
 // Platform specifics
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
 #define DYNMX_WIN
@@ -43,6 +45,7 @@ namespace dmx
   
 #define DATA_BASE_DIR "/Users/thomasbuhrmann/Experiments/"
 #define DATA_DIR Globals::Inst()->getDataDir()
+#define SETTINGS Globals::Inst()->getSettings()
 
 //----------------------------------------------------------------------------------------------------------------------    
 // Singleton for global settings determined at runtime
@@ -52,14 +55,16 @@ class Globals
 public:
   static Globals* Inst();
   void initialise();
-  std::string getDataDir() { return dataDir; };
+  std::string getDataDir() { return m_dataDir; };
+  ci::XmlTree* getSettings() { return m_settings; };
   
 protected:
   Globals();
   
 private:
   static Globals* pInstance;
-  std::string dataDir; 
+  std::string m_dataDir; 
+  ci::XmlTree* m_settings;
 };
   
 } // namespace dmx

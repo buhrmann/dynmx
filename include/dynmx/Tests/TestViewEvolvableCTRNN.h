@@ -23,7 +23,7 @@ public:
 
   //--------------------------------------------------------------------------------------------------------------------
   TestViewEvolvableCTRNN() : m_gaRunner(0) {};
-  TestViewEvolvableCTRNN(dmx::App* app, dmx::GARunner* gaRunner) : m_app(app), m_gaRunner(gaRunner)
+  TestViewEvolvableCTRNN(dmx::App* app, dmx::Model* gaRunner) : m_app(app), m_gaRunner((dmx::GARunner*)gaRunner)
   {
     m_evoCtrnn = (TestEvolvableCTRNN*) m_gaRunner->getEvolvable();
   };
