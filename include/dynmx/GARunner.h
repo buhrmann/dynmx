@@ -21,7 +21,7 @@ namespace dmx
 {
 
 //----------------------------------------------------------------------------------------------------------------------
-// Interface for GA helper
+// Interface for an evolvable model
 //----------------------------------------------------------------------------------------------------------------------
 class Evolvable
 {
@@ -55,20 +55,18 @@ public:
     kGAVerbosityNone,
     kGAVerbosityPopulation,    
     kGAVerbosityGenome,    
-    kGAVerbosityTrial,
-    kGAVerbosityMax
+    kGAVerbosityTrial
   };
   
   GARunner(Evolvable* evolvable);
   
-  //Iinherited from Model
+  // Inherited from Model
   virtual void update(float dt);
   virtual void init();
-  virtual bool hasFinished() { return m_ga->getCurrentGeneration() == m_gaDesc.numGenerations; };
+  virtual bool hasFinished() { return m_ga->getCurrentGeneration() == m_numGenerations; };
   
   Evolvable* getEvolvable() { return m_evolvable; };
   GA* getGA() { return m_ga; };
-  const GADescriptor& getGADesc() { return m_gaDesc; };
   
   void setVerbosity(GAVerbosity v) { m_verbosity = v; };
   
@@ -76,17 +74,21 @@ protected:
   
   void generationToXml(ci::XmlTree* xml, uint32_t gen, const double* genome, float bestFit, float avgFit);
   
+  // An instance of the model to evolve
   Evolvable* m_evolvable;
   
+  // An instance of the actual algorithm
   GA* m_ga;
-  GADescriptor m_gaDesc;
   
   float m_time;
   float m_accFitness;
+  float m_trialDuration;  
   uint16_t m_trial;
+  uint16_t m_numTrials;
   uint32_t m_prevGeneration;  /// For detecting if GA has incremented a generation
+  uint32_t m_numGenerations;
   
-  GAVerbosity m_verbosity;
+  int m_verbosity;
   
   ci::XmlTree* m_progressLog;
   ci::XmlTree* m_resultsLog;

@@ -42,7 +42,7 @@ typedef int uint64_t;
 
 namespace dmx
 {
-  
+
 #define DATA_BASE_DIR "/Users/thomasbuhrmann/Experiments/"
 #define DATA_DIR Globals::Inst()->getDataDir()
 #define SETTINGS Globals::Inst()->getSettings()

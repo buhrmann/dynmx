@@ -25,21 +25,6 @@
 #define GA_BOUND_CHECK 0  // 0 = clamping, 1 = mirroring
 #define MAX_NUM_PARALLEL_EVALS 8
 
-//----------------------------------------------------------------------------------------------------------------------  
-// Holds data for typical usage of a GA
-// ---------------------------------------------------------------------------------------------------------------------
-struct GADescriptor
-{
-  float trialDuration;
-  int numTrials;
-  int numGenerations;
-  int populationSize;
-  int demeSize;
-  
-  GADescriptor() : trialDuration(1.0f), numTrials(2), numGenerations(10), populationSize(50), 
-    demeSize(5) {};
-};
-
 //----------------------------------------------------------------------------------------------------------------------
 // Microbial GA with Demes				      
 // for details see http://www.cogs.susx.ac.uk/users/inmanh/MicrobialGA_ECAL2009.pdf 

@@ -32,6 +32,7 @@ class App;
 //----------------------------------------------------------------------------------------------------------------------
 class View
 {
+
 public:
 
   // functions to be implemented by subclasses
@@ -55,6 +56,12 @@ public:
   virtual void resize(ci::app::ResizeEvent event);
   virtual int pick(int x, int y);
   
+  // Getter and Setter for name, to be used by Factories e.g.
+  const std::string& getName() const { return m_name; };
+  void setName(const std::string& name) { m_name = name; };
+  
+protected: 
+
   // scene graph stuff
   NodeGroup m_scene3d;
   NodeGroup m_scene2d;
@@ -66,7 +73,6 @@ public:
   ci::Vec4f m_backgroundColor;
   ci::params::InterfaceGl m_hud;
   
-
   struct BackGround
   {
     ci::ColorA topLeft;
@@ -89,6 +95,8 @@ public:
   // stuff for picking objects in the scene
   static const int m_selectBufSize;
   GLuint m_selectionBuffer[128];
+  
+  std::string m_name;
 };
 
 }

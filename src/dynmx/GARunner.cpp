@@ -8,9 +8,17 @@
  */
 
 #include "GARunner.h"
+
 #if DEBUGGING
 #include <iostream>
 #endif
+
+#define DEFAULT_GA_POPSIZE 50
+#define DEFAULT_GA_DEMESIZE 5
+#define DEFAULT_GA_MUTATIONMAX 0.01f
+#define DEFAULT_GA_RECOMBINATIONRATE 0.05f
+#define DEFAULT_GA_NUMTRIALS
+#define DEFAULT_GA_
 
 namespace dmx
 {
@@ -24,23 +32,44 @@ GARunner::GARunner(Evolvable* evolvable) : m_evolvable(evolvable)
 //----------------------------------------------------------------------------------------------------------------------
 void GARunner::init()
 {
+  const int numGenes = m_evolvable->getNumGenes();
+  
+  // Create an instance of the actual GA algorithm
   const ci::XmlTree* settings = SETTINGS;
   if (settings->hasChild("Config/GA"))
   {
+    // Use setting from globals file
     const ci::XmlTree& ga = settings->getChild("Config/GA");
-    m_gaDesc.populationSize = ga.getChild("PopulationSize").getAttributeValue<int>("Value");
+    int populationSize = ga.getChild("PopulationSize").getAttributeValue<int>("Value");
+    int demeSize = ga.getChild("DemeSize").getAttributeValue<int>("Value");
+    
+    m_ga = new GA(populationSize, numGenes, demeSize);
+    m_ga->setRecombinationRate(ga.getChild("RecombinationRate").getAttributeValue<float>("Value"));
+    m_ga->setMutationMax(ga.getChild("MutationMax").getAttributeValue<float>("Value"));
+            
+    m_numGenerations = ga.getChild("NumGenerations").getAttributeValue<int>("Value");
+    m_numTrials = ga.getChild("NumTrials").getAttributeValue<int>("Value");
+    m_trialDuration = ga.getChild("TrialDuration").getAttributeValue<float>("Value");
+  }
+  else
+  {
+    // If we have no config file, use default values instead
+    m_ga = new GA(DEFAULT_GA_POPSIZE, numGenes, DEFAULT_GA_DEMESIZE);
+    m_ga->setRecombinationRate(DEFAULT_GA_RECOMBINATIONRATE);
+    m_ga->setMutationMax(DEFAULT_GA_MUTATIONMAX);
+    m_numTrials = 1;
+    m_trialDuration = 1.0f;
+    m_numGenerations = 10;
   }
 
-  m_verbosity = kGAVerbosityNone;
-  
-  // load GA desciptor from file ...
-  // m_gaDesc.load("");
-  
-  // create GA
-  const int numGenes = m_evolvable->getNumGenes();
-  m_ga = new GA(m_gaDesc.populationSize, numGenes, m_gaDesc.demeSize);
-  // setup mutation parameters etc..
-  // m_ga.set(...
+  if(settings->hasChild("Config/Globals"))
+  {
+    m_verbosity = settings->getChild("Config/Globals/DebugLevel").getAttributeValue<int>("Value");
+  }
+  else
+  {
+    m_verbosity = kGAVerbosityNone;
+  }
   
   m_time = 0.0f;
   m_accFitness = 0.0f;
@@ -60,7 +89,7 @@ void GARunner::update(float dt)
 {
   m_time += dt;
   
-  if(m_time < m_gaDesc.trialDuration)
+  if(m_time < m_trialDuration)
   {
     // Update simulation
     //-------------------------------------------------------
@@ -81,9 +110,9 @@ void GARunner::update(float dt)
     
     // Finished all trials? Move on to evaluate next genome.
     //-------------------------------------------------------
-    if (m_trial == m_gaDesc.numTrials)
+    if (m_trial == m_numTrials)
     {
-      m_accFitness /= m_gaDesc.numTrials;
+      m_accFitness /= m_numTrials;
 #if DEBUGGING
       if( m_verbosity >= kGAVerbosityGenome)
         std::cout << "Total fitness = " << m_accFitness << std::endl; 

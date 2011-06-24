@@ -13,6 +13,8 @@
 #include "Simulation.h"
 #include "Model.h"
 
+#define DEFAULT_TIMESTEP 0.03333f
+
 namespace dmx
 {
 
@@ -46,7 +48,13 @@ void Simulation::runVisual()
 //----------------------------------------------------------------------------------------------------------------------
 void Simulation::runNonVisual()
 {
-  const float dt = 1.0f / 30.0f;
+  // Read global config
+  float dt = DEFAULT_TIMESTEP;
+  if (SETTINGS->hasChild("Config/Globals/FrameRate"))
+  {
+    dt = 1.0f / SETTINGS->getChild("Config/Globals/FrameRate").getAttributeValue<int>("Value");
+  }
+  
   while(!m_model->hasFinished())
   {
     m_model->update(dt);

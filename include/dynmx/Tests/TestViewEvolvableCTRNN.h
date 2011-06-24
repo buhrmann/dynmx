@@ -28,7 +28,7 @@ public:
     m_evoCtrnn = (TestEvolvableCTRNN*) m_gaRunner->getEvolvable();
   };
   
-  // functions to be implemented by subclasses
+  // Functions to be implemented by subclasses
   //--------------------------------------------------------------------------------------------------------------------
   virtual void setupScene()
   {
@@ -58,8 +58,7 @@ public:
   
   //---------------------------------------------------------------------------------------------------------------------
   virtual void draw2d()
-  {
-#if 1    
+  {   
     glColor3f(0,0,0);
     //dmx::drawSquaresVB(750, 300, 300);
     
@@ -67,7 +66,6 @@ public:
     char str[128];
     sprintf(str, "fps: %f", m_app->getAverageFps());
     ci::gl::drawString(str, pos, ci::ColorA(0,0,0));
-#endif
   };
   
   //---------------------------------------------------------------------------------------------------------------------

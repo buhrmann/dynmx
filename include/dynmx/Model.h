@@ -20,6 +20,7 @@ namespace dmx
 // ---------------------------------------------------------------------------------------------------------------------
 class Model
 {
+
 public:
   // Needs to be able to as new after this function has been called.
   virtual void init() {};
@@ -29,6 +30,14 @@ public:
   
   // Signals that this model doesn't want/need to be updated anymore.
   virtual bool hasFinished() { return false; };
+  
+  // Getter and Setter for name, to be used by Factories e.g.
+  const std::string& getName() const { return m_name; };
+  void setName(const std::string& name) { m_name = name; };
+  
+protected:
+
+  std::string m_name;
 };
 
 }

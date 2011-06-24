@@ -30,8 +30,8 @@ public:
   
 protected:
 
-  void runVisual();
-  void runNonVisual();
+  virtual void runVisual();
+  virtual void runNonVisual();
     
   Model* m_model;
   App* m_app;

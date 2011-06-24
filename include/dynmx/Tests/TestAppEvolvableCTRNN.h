@@ -18,9 +18,9 @@ class TestAppEvolvableCTRNN : public dmx::App
 {
 public:
 
-  TestAppEvolvableCTRNN(TestEvolvableCTRNN* evoCtrnn)
+  TestAppEvolvableCTRNN(dmx::GARunner* gaRunner)
   {
-    m_model = new dmx::GARunner(evoCtrnn);
+    m_model = gaRunner;
     m_view = new TestViewEvolvableCTRNN(this, m_model);
   };
     

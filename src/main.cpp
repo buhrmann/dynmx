@@ -7,35 +7,20 @@
  *
  */
 
-#include "Dynmx.h"
-#include "TestApp.h"
-#include "TestAppCTRNN.h"
-#include "TestAppEvolvableCTRNN.h"
-#include "TestAppArm.h"
-
-#include "EvoApp.h"
-#include "Model.h"
-#include "TestEvolvableCTRNN.h"
+#include "Simulation.h"
+#include "SimulationFactory.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 int main( int argc, char * const argv[] )
 {
-  const bool visual = false;
+  // Createa a simulation, using the global config file as input
+  dmx::Simulation* sim = dmx::SimulationFactory::create();
   
-  TestEvolvableCTRNN ctrnn (5);
-  if(visual)
-  {
-    TestAppEvolvableCTRNN app (&ctrnn);
-    dmx::EvoApp evoApp(&ctrnn, &app);
-    evoApp.start(true);
-  }
-  else
-  {
-    dmx::EvoApp evoApp(&ctrnn);
-    evoApp.start(true);    
-  }
-
+  // Kick off the simulation. If non-visual this returns whenever the model's hasFinished functions returns true.
+  // If visual, might run until window is closed. 
+  sim->start();
    
+  // Everything went fine apparently.
   return 0;
 }
 
