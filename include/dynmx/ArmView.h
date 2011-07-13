@@ -16,24 +16,26 @@
 namespace dmx
 {
 
-//----------------------------------------------------------------------------------------------------------------------  
-//
-//----------------------------------------------------------------------------------------------------------------------    
+//----------------------------------------------------------------------------------------------------------------------
+// 3d visualisation of the Arm model
+//----------------------------------------------------------------------------------------------------------------------
 class Arm3dView : public NodeGroup
 {
   
 public:
   
-  Arm3dView(Arm2d* model) : m_arm(model) { init(); };
+  Arm3dView(Arm* model, bool hasMuscles = false) : m_arm(model), m_hasMuscles(hasMuscles) { init(); };
   
-  void setModel(Arm2d* model) { m_arm = model; };
+  void setModel(Arm* model) { m_arm = model; };
   virtual void update();
   
 protected:
   virtual void init();
   
   // pointer to model to retrieve updated coordinates from
-  Arm2d* m_arm;
+  Arm* m_arm;
+  
+  bool m_hasMuscles;
   
   // the rendered geometry
   Capsule m_lowerArm;

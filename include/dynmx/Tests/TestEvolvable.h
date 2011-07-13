@@ -18,7 +18,7 @@ class TestEvolvable : public dmx::Evolvable
 {
 public:
 
-  // these two need to be kept in sync!
+  // These two need to be kept in sync!
   enum Fitness_Func
   {
     kSphere = 0,

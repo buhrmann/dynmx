@@ -22,7 +22,7 @@ class Model
 {
 
 public:
-  // Needs to be able to as new after this function has been called.
+  // Needs to be able to run as new after this function has been called.
   virtual void init() {};
   
   // Called every frame: do stuff here.

@@ -7,6 +7,9 @@
  *
  */
 
+#ifndef _DMX_TEST_MODEL_CTRNN_
+#define _DMX_TEST_MODEL_CTRNN_
+
 #include "Model.h"
 #include "CTRNN.h"
 
@@ -14,10 +17,14 @@
 class TestModelCTRNN : public dmx::Model
 {
 public:
-  TestModelCTRNN() : m_ctrnn(0) {};
-  TestModelCTRNN(CTRNN* ctrnn) : m_ctrnn(ctrnn) { init(); };
-  virtual void init() { assert(m_ctrnn); m_ctrnn->randomizeState(-0.01, 0.01); m_ctrnn->randomizeWeights(-10.01, 10.01);};
-  virtual void update(float dt) { m_ctrnn->update(1.0f/10.0f); };
   
+  TestModelCTRNN() : m_ctrnn(0) {};
+  TestModelCTRNN(int numNeurons) { m_ctrnn = new CTRNN(numNeurons); init(); };
+  
+  virtual void init() { assert(m_ctrnn); m_ctrnn->randomizeState(-0.01, 0.01); m_ctrnn->randomizeWeights(-10.01, 10.01);};
+  
+  virtual void update(float dt) { m_ctrnn->update(dt); };
   CTRNN* m_ctrnn;
 };
+
+#endif

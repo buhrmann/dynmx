@@ -18,7 +18,8 @@ int main( int argc, char * const argv[] )
   
   // Kick off the simulation. If non-visual this returns whenever the model's hasFinished functions returns true.
   // If visual, might run until window is closed. 
-  sim->start();
+  if(sim)
+    sim->start();
    
   // Everything went fine apparently.
   return 0;

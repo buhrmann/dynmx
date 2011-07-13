@@ -1,25 +1,25 @@
 //
-//  TestModelArm.h
+//  TestModelArmMuscles.h
 //  cinder_dynmx
 //
 //  Created by Thomas Buhrmann on 29/03/2011.
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
-#ifndef _DMX_TEST_MODEL_ARM_
-#define _DMX_TEST_MODEL_ARM_
+#ifndef _DMX_TEST_MODEL_ARM_MUSCLED_
+#define _DMX_TEST_MODEL_ARM_MUSCLED_
 
 #include "Dynmx.h"
 #include "Model.h"
-#include "ArmPD.h"
+#include "ArmMuscled.h"
 #include "Random.h"
 
 //----------------------------------------------------------------------------------------------------------------------
-class TestModelArm : public dmx::Model
+class TestModelArmMuscled : public dmx::Model
 {
 public:
 
-  TestModelArm() : m_arm(0), m_time(0) { m_arm = new dmx::ArmPD(); };
+  TestModelArmMuscled() : m_arm(0), m_time(0) { m_arm = new dmx::ArmMuscled(); };
   
   virtual void init() 
   { 
@@ -33,33 +33,19 @@ public:
     const float lowerArmInertia = lowerArmLength * lowerArmLength * lowerArmMass / 12.0f;
     const float upperArmInertia = upperArmLength * upperArmLength * upperArmMass / 12.0f;
     const float initialElbowAngle = 0.5f * PI;
-    const float initialShoulderAngle = 0.5f * PI;
+    const float initialShoulderAngle = 0.0f * PI;
     m_arm->setParameters(lowerArmMass, upperArmMass, lowerArmLength, upperArmLength, lowerArmInertia, upperArmInertia);
     m_arm->setGravity(9.81f);    
     m_arm->init(initialElbowAngle, initialShoulderAngle);
-        
-    // PDs
-    m_arm->m_pd[0].m_P = 15.0f;
-    m_arm->m_pd[0].m_D = 3.05f;
-    
-    m_arm->m_pd[1].m_P = 50.0f;
-    m_arm->m_pd[1].m_D = 5.1f;    
   }
   
   virtual void update(float dt)
   { 
     m_time += dt;
-    //double angle = UniformRandom(0, TWO_PI);
-    double angle = 4.0f * m_time;
-    const float radius = 0.15f;
-    float x = radius * sinf(angle);
-    float y = radius * cosf(angle);
-    //m_arm->update(0.0f, 0.0f, 1.0f / 100.0f); 
-    m_arm->updatePosition(0.4f + x, y, dt);
-    
+    m_arm->updateMuscles(dt);    
   };
   
-  dmx::ArmPD* m_arm;
+  dmx::ArmMuscled* m_arm;
   float m_time;
 };
 

@@ -13,6 +13,9 @@
 #include <time.h>
 #include "assert.h"
 
+// TODO: MAX_FLOAT
+#define MAX_NEG_FLOAT -99999999.0f
+
 // --------------------------------------------------------------------------------------------
 GA::GA(int popsize, int genomeLength, int demeWidth) : 
   m_popSize(popsize), 
@@ -105,7 +108,7 @@ const double* GA::getCurrentGenome() const
 // --------------------------------------------------------------------------------------------
 const double* GA::getBestGenome(float& fitness) const
 {
-  fitness = -1.0f;
+  fitness = MAX_NEG_FLOAT;
   double* result = 0;
   for (int i = 0 ; i < m_popSize ; ++i)
   {

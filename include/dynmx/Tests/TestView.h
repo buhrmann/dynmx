@@ -60,9 +60,6 @@ public:
   {
     if(m_model)
     {
-      //ofSetColor(255, 130, 0);
-      //ofFill();		// draw "filled shapes"
-      //ofCircle(100, 100, m_model->m_val*100);
       glPushMatrix();
       glTranslatef(0, 0, 0);
       dmx::drawDisk(100, m_model->m_val*50 + 50, 16, 16);

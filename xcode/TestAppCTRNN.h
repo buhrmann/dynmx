@@ -17,18 +17,15 @@ class TestAppCTRNN : public dmx::App
 {
 public:
 
-  TestAppCTRNN()
+  TestAppCTRNN(TestModelCTRNN* model)
   {
-    m_ctrnn = new CTRNN(12);
-    m_ctrnn->randomizeState(-1.0f, 1.0f);
-    m_ctrnn->randomizeWeights(-10.0f, 10.0f);
-    m_ctrnn->randomizeBiases(-10.0f, 10.0f);
-    m_ctrnn->randomizeTimeConstants(2.0 / 30.0, 5.0f);    
-    m_model = new TestModelCTRNN(m_ctrnn);
-    m_view = new TestViewCTRNN(m_ctrnn);
+    model->m_ctrnn->randomizeState(-1.0f, 1.0f);
+    model->m_ctrnn->randomizeWeights(-10.0f, 10.0f);
+    model->m_ctrnn->randomizeBiases(-10.0f, 10.0f);
+    model->m_ctrnn->randomizeTimeConstants(2.0 / 30.0, 5.0f);
+    m_model = model; 
+    m_view = new TestViewCTRNN(model->m_ctrnn);
   };
-  
-  virtual ~TestAppCTRNN() { delete m_ctrnn; };
   
   CTRNN* m_ctrnn;
 };

@@ -55,7 +55,7 @@ void Simulation::runNonVisual()
     dt = 1.0f / SETTINGS->getChild("Config/Globals/FrameRate").getAttributeValue<int>("Value");
   }
   
-  while(!m_model->hasFinished())
+    while(!m_model->hasFinished())
   {
     m_model->update(dt);
   }

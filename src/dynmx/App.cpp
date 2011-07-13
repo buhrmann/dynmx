@@ -15,7 +15,7 @@ namespace dmx
 //--------------------------------------------------------------------------------------------------------------------
 void App::setup()
 { 
-  m_paused = false;
+  m_paused = true;
   m_useFixedTimeStep = true;
   m_fixedTimeStep = 1.0f / 100.0f;
   
@@ -90,7 +90,10 @@ void App::keyUp(ci::app::KeyEvent event)
     {
       if(m_paused)
         m_model->update(m_fixedTimeStep);
+      break;
     }
+    case 'i':
+      m_model->init();
       break;
   }
   

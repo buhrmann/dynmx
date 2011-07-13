@@ -7,10 +7,16 @@
  *
  */
 
-#ifndef _ARM2D_
-#define _ARM2D_
+#ifndef _DMX_ARM_
+#define _DMX_ARM_
 
-#include <queue>
+#include "Dynmx.h"
+#include "cinder/Vector.h"
+
+namespace dmx
+{
+
+typedef ci::Vec2f Pos;
 
 static const int MaxTrajPoints = 100;
 
@@ -20,16 +26,6 @@ enum Joint
   JT_elbow = 0,
   JT_shoulder = 1,
   Jt_maxNumber
-};
-
-//----------------------------------------------------------------------------------------------------------------------
-/// Helper for independence from other math libraries
-//----------------------------------------------------------------------------------------------------------------------
-struct Pos
-{
-  Pos() : x(0), y(0) {};
-  Pos(float newX, float newY) : x(newX), y(newY) {};
-  float x, y;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -50,80 +46,41 @@ struct MinJerkTrajectory
 };
 
 //----------------------------------------------------------------------------------------------------------------------
-/// Simple controller
-//----------------------------------------------------------------------------------------------------------------------
-class PD
-{
-  
-  enum NonLinearity
-  {
-    kLinear = 0,
-    kExponential,
-    kAsinh
-  };
-  
-public:
-
-  PD() : m_target(0.0f), m_targetPrev(0), m_P(10.0f), m_D(1.0f), m_posFunction(kLinear), m_velFunction(kLinear),
-    m_numFramesDelay(0) {};
-  
-  float update(float target, float pos, float vel, float dt);
-  
-  std::queue<float> m_prevPositions;
-  std::queue<float> m_prevVelocities;
-  
-  unsigned int 
-    m_numFramesDelay,
-    m_posFunction,
-    m_velFunction;
-  
-  float
-    m_target,
-    m_targetPrev,
-    m_P,
-    m_D;
-};
-
-//----------------------------------------------------------------------------------------------------------------------
 /// Implements equations of motion for a planar two-jointed arm
 //----------------------------------------------------------------------------------------------------------------------
-class Arm2d
+class Arm
 {
   
 public:
   
-  Arm2d();
-  ~Arm2d();
+  Arm();
+  ~Arm();
   
-  void init(float elbAngle = 0.0f, float shdAngle = 0.0f);
+  virtual void init(float elbAngle = 0.0f, float shdAngle = 0.0f);
   void setParameters(float mass1, float mass2, float length1, float length2, float inertia1, float inertia2);
   void setGravity(float g) { m_gravity = g; };
   
-  void update(float torque1, float torque2, float timeStep);
-  void updatePD(float angle1, float angle2, float timeStep); 
-  void updatePosition(float x, float y, float timeStep); 
+  void update(double torque1, double torque2, float timeStep);
   Pos getPointOnUpperArm(float distanceFromJoint) const;
   Pos getPointOnLowerArm(float distanceFromJoint) const;  
-  float getJointAngle(Joint joint) { return m_angles[joint]; };
-  float getDesiredJointAngle(Joint joint) { return m_anglesDes[joint]; };
+  double getJointAngle(Joint joint) { return m_angles[joint]; };
+  double getDesiredJointAngle(Joint joint) { return m_anglesDes[joint]; };
   float getLength(Joint joint) const { return m_lengths[joint]; } ;
   const Pos& getEffectorPos() const { return m_effectorPos; };
   Pos& getEffectorPos() { return m_effectorPos; };
   const Pos& getElbowPos() const { return m_elbowPos; };
   Pos& getElbowPos() { return m_elbowPos; };
   void forwardKinematics();
-  void forwardKinematics(float elbAngle, float shdAngle, Pos& elbPos, Pos& effPos);
-  void inverseKinematics(const Pos& pos, float elbDir, float& elbAngle, float& shdAngle);  
+  void forwardKinematics(double elbAngle, double shdAngle, Pos& elbPos, Pos& effPos);
+  void inverseKinematics(const Pos& pos, float elbDir, double& elbAngle, double& shdAngle);  
   const std::vector<Pos>& getTrajectory() { return m_trajectory; };
-  
-  PD m_pd[2];
   
 protected:
 
   void preCompute();
   
   // states
-  float 
+  double 
     m_angles[2],
     m_anglesDes[2],
     m_velocities[2],
@@ -136,21 +93,22 @@ protected:
   std::vector<Pos> m_trajectory;
   
   // parameters
-  float
+  double
     m_gravity,
     m_lengths[2],
     m_masses[2],
     m_inertias[2],
     m_frictions[2],
-    m_limits[2];
+    m_limits[2][2];
   
   // internal pre-computed values
-  float
+  double
     m_lengthsSq[2],
     m_massElbLSq4,
     m_massElbLLHalf,
     m_massElbLL;
-  
 };
+
+} // namespace dmx
 
 #endif

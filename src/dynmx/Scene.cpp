@@ -497,25 +497,32 @@ void Plot::update()
   float scaleRec = scale > 0 ? 1.0 / scale : 0.0;
   for(int pl = 0; pl < m_nr; pl++)
   {
-    if(m_points[pl].size() > 1)
+    const int numPoints =  m_points[pl].size();
+    if(numPoints > 1)
     {
       // line plot
       Vec3f col = getColorMapRainbow((float)pl / m_nr);
       glColor4f(col.x, col.y, col.z, 1.0);
-      glBegin(GL_LINE_STRIP);
-      for(size_t i = 0; i < m_points[pl].size() - 1; i++)
+      glBegin(GL_LINE_STRIP);      
+      float x1, x2, y1, y2;
+      for(size_t i = 0; i < numPoints - 1; i++)
       {
-        float x1 = (i + 1) * widthRec;
-        float x2 = (i + 2) * widthRec;
-        float y1 = m_h * ((m_points[pl][i]   - m_minY) * scaleRec);
-        float y2 = m_h * ((m_points[pl][i+1] - m_minY) * scaleRec);
+        x1 = (i + 1) * widthRec;
+        x2 = (i + 2) * widthRec;
+        y1 = m_h - m_h * ((m_points[pl][i]   + m_minY) * scaleRec);
+        y2 = m_h - m_h * ((m_points[pl][i+1] + m_minY) * scaleRec);
         glVertex3f(x1, y1, 0);
         glVertex3f(x2, y2, 0);
-#ifdef _DEBUG
-  //printf("Plot: %f %f\n", x1, y1);
-#endif
       }
       glEnd();
+#if DEBUGGING      
+      // show current value
+      float current = m_points[pl][numPoints - 1];
+      char str [16]; 
+      sprintf(str, "%2.4f", current);
+      glColor3f(0,0,0);
+      drawString(Vec3f(x2, y2, 0), str); 
+#endif
     }
   }
   

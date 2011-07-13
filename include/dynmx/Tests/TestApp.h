@@ -20,10 +20,10 @@ class TestApp : public dmx::App
 {
 public:
 
-  TestApp()
+  TestApp(TestModel* model)
   {
-    m_model = new TestModel();
-    m_view = new TestView((TestModel*)m_model);
+    m_model = model;
+    m_view = new TestView(model);
   };
   
 };

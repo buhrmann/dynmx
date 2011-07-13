@@ -10,9 +10,13 @@
 #include "ArmView.h"
 #include "MathUtils.h"
 
+// Todo: this is nasty!
+#include "ArmMuscled.h"
+
 namespace dmx
 {
 
+//----------------------------------------------------------------------------------------------------------------------
 void Arm3dView::init()
 {
   NodeGroup::init();
@@ -45,6 +49,7 @@ void Arm3dView::init()
   m_children.push_back(&m_shoulder);
 }
 
+//----------------------------------------------------------------------------------------------------------------------
 void Arm3dView::update()
 {
   // update pose
@@ -116,7 +121,29 @@ void Arm3dView::update()
   
   // render
   NodeGroup::update();
-
+  
+  // Todo: this is nasty!
+  if(m_hasMuscles)
+  {
+    const ArmMuscled* armMusc = (ArmMuscled*)m_arm;
+    for(size_t i = 0; i < armMusc->getNumMuscles(); ++i)
+    {
+      const Muscle& muscle = armMusc->getMuscle(i);
+      const int lastPathPoint = muscle.getNumPathPoints() - 1;
+      for(size_t j = 0; j < lastPathPoint; ++j)
+      {
+        const ci::Vec3f& p1 = m_TM.transformPoint(ci::Vec3f(muscle.getPathPointWorld(j)));
+        const ci::Vec3f& p2 = m_TM.transformPoint(ci::Vec3f(muscle.getPathPointWorld(j + 1)));
+        const ci::Vec3f col = getColorMapBlueRed(-1 + muscle.getNormalisedLength());
+        glColor3f(col.x, col.y, col.z);
+        ci::gl::drawLine(p1, p2);
+        glPointSize(2.0f);
+        glBegin(GL_POINTS);
+        glVertex3f(p1.x, p1.y, p1.z);
+        glEnd();
+      }
+    }
+  }
 }
 
 } // namespace dmx

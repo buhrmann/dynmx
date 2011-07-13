@@ -13,21 +13,34 @@
 #include "Arm.h"
 #include "TestViewArm.h"
 #include "TestModelArm.h"
+#include "TestModelArmMuscled.h"
 
+//----------------------------------------------------------------------------------------------------------------------
 class TestAppArm : public dmx::App
 {
 public:
   
-  TestAppArm()
+  TestAppArm(TestModelArm* armModel)
   {
-    m_arm = new Arm2d();
-    m_model = new TestModelArm(m_arm);
-    m_view = new TestViewArm(m_arm);
+    m_model = armModel;
+    m_view = new TestViewArm(armModel->m_arm);
   };
   
-  virtual ~TestAppArm() { delete m_arm; };
+  dmx::Arm* m_arm;
+};
+
+//----------------------------------------------------------------------------------------------------------------------
+class TestAppArmMuscled : public dmx::App
+{
+public:
   
-  Arm2d* m_arm;
+  TestAppArmMuscled(TestModelArm* armModel)
+  {
+    m_model = armModel;
+    m_view = new TestViewArm(armModel->m_arm, true);
+  };
+  
+  dmx::Arm* m_arm;
 };
 
 #endif

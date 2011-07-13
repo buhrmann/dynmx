@@ -167,7 +167,7 @@ namespace dmx
 		char c;
 		glRasterPos3f(p[0], p[1], p[2]);
 		for ( ; (c = *s) != '\0'; s++ )
-			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, c);
 	}
 
   // in the y plane

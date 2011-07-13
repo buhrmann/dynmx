@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef _OFX_TEST_VIEW_CTRNN_
-#define _OFX_TEST_VIEW_CTRNN_
+#ifndef _DMX_TEST_VIEW_CTRNN_
+#define _DMX_TEST_VIEW_CTRNN_
 
 #include "View.h"
 #include "CTRNN.h"
