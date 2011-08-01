@@ -13,16 +13,35 @@
 namespace dmx
 {
 
+//----------------------------------------------------------------------------------------------------------------------  
+void ArmPD::init()
+{
+  // First let base of arm init
+  Arm::init();  
+}
+  
+//----------------------------------------------------------------------------------------------------------------------  
+void ArmPD::reset()
+{
+  // Let base class do its initialisation first.
+  Arm::reset();  
+  m_pd[0].reset();
+  m_pd[1].reset();
+  
+  m_desiredAngle[0] = m_desiredAngle[1] = 0.0;  
+}
+  
 //----------------------------------------------------------------------------------------------------------------------
-void ArmPD::updatePD(float angle1, float angle2, float dt)
+void ArmPD::updatePD(float dt, float angle1, float angle2)
 {
   float elbTorque = m_pd[JT_elbow].update(angle1, m_angles[JT_elbow], m_velocities[JT_elbow], dt);
   float shdTorque = m_pd[JT_shoulder].update(angle2, m_angles[JT_shoulder], m_velocities[JT_shoulder], dt);
-  update(elbTorque*100*dt, shdTorque*100*dt, dt);
+  update(dt, elbTorque*dt, shdTorque*dt);
+  update(dt);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void ArmPD::updatePosition(float x, float y, float timeStep)
+void ArmPD::updatePosition(float timeStep, float x, float y)
 {
   // check not out of range
   float reachDist = m_lengths[0] + m_lengths[1];
@@ -34,8 +53,8 @@ void ArmPD::updatePosition(float x, float y, float timeStep)
     y = y / mag * (reachDist - 0.0001f);
   }
   
-  inverseKinematics(Pos(x, y), 1.0f, m_anglesDes[JT_elbow], m_anglesDes[JT_shoulder]);
-  updatePD(m_anglesDes[JT_elbow], m_anglesDes[JT_shoulder], timeStep);
+  inverseKinematics(Pos(x, y), 1.0f, m_desiredAngle[JT_elbow], m_desiredAngle[JT_shoulder]);
+  updatePD(timeStep, m_desiredAngle[JT_elbow], m_desiredAngle[JT_shoulder]);
 }
 
 

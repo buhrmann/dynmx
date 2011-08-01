@@ -33,6 +33,8 @@ public:
   virtual void update();
   virtual void update(float dt);
   
+  virtual void shutDown() { m_model->shutDown(); };
+  
   //--------------------------------------------------------------------------------------------------------------------
   virtual void setup();
 

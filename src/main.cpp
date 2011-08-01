@@ -10,6 +10,8 @@
 #include "Simulation.h"
 #include "SimulationFactory.h"
 
+//#include <mach-o/dyld.h>
+
 //----------------------------------------------------------------------------------------------------------------------
 int main( int argc, char * const argv[] )
 {
@@ -18,8 +20,10 @@ int main( int argc, char * const argv[] )
   
   // Kick off the simulation. If non-visual this returns whenever the model's hasFinished functions returns true.
   // If visual, might run until window is closed. 
-  if(sim)
+  if (sim)
+  {
     sim->start();
+  }
    
   // Everything went fine apparently.
   return 0;

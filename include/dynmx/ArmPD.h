@@ -23,15 +23,24 @@ class ArmPD : public Arm
 {
 
 public:
+  
+  virtual void init();
+  virtual void reset();
 
   /// Tick arm model given desired joint angles
   void updatePD(float angle1, float angle2, float timeStep); 
   
   /// Tick arm model given a desired end-effector position
   void updatePosition(float x, float y, float timeStep); 
+  
+  double getDesiredJointAngle(Joint j) { assert(j == JT_elbow || j == JT_shoulder); return m_desiredAngle[j]; };
 
   // Per-joint proportional-derivative controllers.
   PD m_pd[2];
+  
+protected:
+  
+  double m_desiredAngle[2];
  
 }; // class ArmPD
 

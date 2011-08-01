@@ -88,7 +88,7 @@ Simulation* SimulationFactory::create()
   }
   else if ("TestCTRNN" == modelName)
   {
-    const int numNeurons = SETTINGS->getChild("Config/Model/NumNeurons").getAttributeValue<int>("Value");
+    const int numNeurons = SETTINGS->getChild("Config/CTRNN/NumNeurons").getAttributeValue<int>("Value");
     model = new TestModelCTRNN(numNeurons);
     if(visual)
     {

@@ -25,38 +25,26 @@ public:
   { 
     assert(m_arm); 
     
-    // arm: parameters from Karniel and Inbar
-    const float lowerArmMass = 1.3f;
-    const float upperArmMass = 2.52f;
-    const float lowerArmLength = 0.32f;
-    const float upperArmLength = 0.33f;
-    const float lowerArmInertia = lowerArmLength * lowerArmLength * lowerArmMass / 12.0f;
-    const float upperArmInertia = upperArmLength * upperArmLength * upperArmMass / 12.0f;
-    const float initialElbowAngle = 0.5f * PI;
-    const float initialShoulderAngle = 0.5f * PI;
-    m_arm->setParameters(lowerArmMass, upperArmMass, lowerArmLength, upperArmLength, lowerArmInertia, upperArmInertia);
-    m_arm->setGravity(9.81f);    
-    m_arm->init(initialElbowAngle, initialShoulderAngle);
+    m_arm->init();
         
     // PDs
-    m_arm->m_pd[0].m_P = 15.0f;
-    m_arm->m_pd[0].m_D = 3.05f;
+    m_arm->m_pd[0].m_P = 1.0f;
+    m_arm->m_pd[0].m_D = -0.05f;
     
-    m_arm->m_pd[1].m_P = 50.0f;
-    m_arm->m_pd[1].m_D = 5.1f;    
-  }
+    m_arm->m_pd[1].m_P = 1.0f;
+    m_arm->m_pd[1].m_D = -0.1f;    
+  };
+  
+  virtual void reset() { m_arm->reset(); };
   
   virtual void update(float dt)
   { 
     m_time += dt;
-    //double angle = UniformRandom(0, TWO_PI);
-    double angle = 4.0f * m_time;
+    double angle = 1.0f * m_time;
     const float radius = 0.15f;
     float x = radius * sinf(angle);
     float y = radius * cosf(angle);
-    //m_arm->update(0.0f, 0.0f, 1.0f / 100.0f); 
-    m_arm->updatePosition(0.4f + x, y, dt);
-    
+    m_arm->updatePosition(dt, 0.4f + x, y);    
   };
   
   dmx::ArmPD* m_arm;

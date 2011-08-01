@@ -8,7 +8,7 @@
  */
 
 #include "Muscle.h"
-#include "Arm.h"
+#include "ArmMuscled.h"
 #include "MathUtils.h"
 
 namespace dmx
@@ -21,115 +21,94 @@ static const float Klen = 0.25f; // shape parameter for lengthening
 static const float Kmax = 1.5f;  // lenghthening asymptote
 static const float Kslope = 2.0f; // multiple of shortening slope at v=0
 static const float Ksub = (Klen / Kslope) * ((1 - Kmax) / (1 + Klen));
-
+  
+// Width (in terms of normalised muscle length) of the parabola describing active force generation.
+// I.e. beyond normalised lengths of 1+width or 1-width, no force will be generated. 
+static const float activeForceWidth = 0.5;
+// Normalised length beyond which the passive elastic element generates force
+static const float passiveForceSlackLength = 1.4;
+// Normalised amount of passive force at the length of activeForceWidth, i.e. where active force becomes 0.
+static const float passiveForceAtWidth = 0.5;
 
 //----------------------------------------------------------------------------------------------------------------------  
 void Muscle::init()
 {
-  transformPathToWorld();
-  m_length = calcLength();
-  
   // assume initial setup represents rest configuration
-  m_lengthOpt = m_length;
+  //m_lengthOpt = m_length;
   
-  // Todo: calculate passiveForceGain, such that it is 0.5*F0 at maximum length (where active force is 0)
-  m_passiveForceGain = 1.0;
+  // Calculate passiveForceGain, such that it is 0.5*F0 at maximum length (where active force is 0)
+  // Assumes the passive force is calculated as a scaled parabola, see below.
+  m_passiveForceGain = passiveForceAtWidth / sqr((1+activeForceWidth) - passiveForceSlackLength);
   
-  m_maxVelocity = 10.0 * m_lengthOpt;
+  m_tauAct = 0.04;
+  m_tauDeact = 0.07;
+  
+  reset();
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-void Muscle::addPathPoint(const ci::Vec2f& point, int jointId)
+//----------------------------------------------------------------------------------------------------------------------  
+void Muscle::reset()
 {
-  m_path.push_back(MusclePathPoint());
-  const size_t i = m_path.size() - 1;
-  m_path[i].local = point;
-  m_path[i].joint = jointId;
+  updateLengthAndMomentArm();
+  
+  m_lengthNorm = m_length /  m_lengthOpt;
+  m_velocityNorm = m_velocity / m_maxVelocity;
+  
+  m_passiveForceNorm = 0.0;
+  m_activeForceNorm = 0.0;
+  m_velocityForceNorm = 0.0;  
+  
+  m_velocity = 0.0; 
+  m_excitation = 0.0;  
+  m_activation = 0.0;    
 }
+
+//----------------------------------------------------------------------------------------------------------------------  
+void Muscle::setParameters(double maxIsoForce, double optimalLength, double maxVelocity)
+{
+  m_lengthOpt = optimalLength;
+  m_maxVelocity = maxVelocity * m_lengthOpt;
+  m_maxForce = maxIsoForce;
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 void Muscle::update(float dt)
 {
-  transformPathToWorld();
-  
   double prevLength = m_length;
-  m_length = calcLength();
+
+  updateLengthAndMomentArm();
+
   m_velocity = (m_length - prevLength) / dt;
   
   // Dimensionless variables for Hill-model
   m_lengthNorm = m_length /  m_lengthOpt;
   m_velocityNorm = m_velocity / m_maxVelocity;
   
+  // Calculate individual constitutive forces
+  m_passiveForceNorm = calcPassiveForceNorm(m_lengthNorm);
+  m_activeForceNorm = calcActiveForceNorm(m_lengthNorm);
+  m_velocityForceNorm = calcVelocityForceNorm(m_velocityNorm);
   
-#if 0  
-  if(m_length > m_lengthOpt)
-  {
-    m_force = m_length - m_lengthOpt;
-    m_force *= 100.0f;
-  }
-  else
-  { 
-    m_force = 0.0f;
-  }
-#endif  
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-void Muscle::transformPathToWorld()
-{
-  ci::Vec3f upperDir (m_arm->getElbowPos());
-  ci::Vec3f lowerDir (m_arm->getEffectorPos() - m_arm->getElbowPos());
+  // Muscle activation from neural excitation
+   m_activation = calcActivation(m_activation, m_excitation, dt);
   
-  // Get local "up" direction vectors, orthogonal to bone 
-  const ci::Vec3f ortho (0,0,1);
-  ci::Vec3f upperUp = upperDir.cross(ortho);
-  ci::Vec3f lowerUp = lowerDir.cross(ortho);
-  upperUp.normalize();
-  lowerUp.normalize();
+  // Calculate overall response
+  m_force = (m_activation * m_maxForce * m_activeForceNorm * m_velocityForceNorm) + (m_maxForce * m_passiveForceNorm); 
   
-  for(size_t i = 0; i < m_path.size(); ++i)
-  {
-    ci::Vec3f p;
-    
-    if (m_path[i].joint == JT_elbow)
-    {
-      p = ci::Vec3f(m_arm->getPointOnLowerArm(m_path[i].local.x));
-      p += lowerUp * m_path[i].local.y;
-    }
-    else 
-    {
-      p = ci::Vec3f(m_arm->getPointOnUpperArm(m_path[i].local.x));
-      p += upperUp * m_path[i].local.y;
-    }
-
-    m_path[i].world = ci::Vec2f(p.x, p.y);    
-  }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-double Muscle::calcLength()
-{
-  double length = 0.0;
-  const int N = m_path.size() - 1;
-  for(size_t i = 0; i < N; ++i)
-  {
-    const ci::Vec2f diff = m_path[i].world - m_path[i+1].world; 
-    length += diff.length();
-  }
-  return length;
 }
 
 // Parabola centred on optimal length
 //----------------------------------------------------------------------------------------------------------------------
-double Muscle::calcActiveForceNorm()
+double Muscle::calcActiveForceNorm(double lengthNorm)
 {
 #define SIMPLE_AFORCE_METHOD 1
 #if SIMPLE_AFORCE_METHOD
   // Simple parabola. The 0.5-1.5 range roughly determined from Murray,Delp. That paper also suggests that
   // flexors mostly operate on the ascending leg, while flexors symmetrically on the peak of the parabola.
-  if(m_lengthNorm >= 0.5 && m_lengthNorm <= 1.5)
+  if(lengthNorm >= activeForceWidth && lengthNorm <= (1 + activeForceWidth))
   {
-    return 1.0 - sqr(2.0 * (m_lengthNorm - 1.0));
+    return 1.0 - sqr(2.0 * (lengthNorm - 1.0));
   }
   else 
   {
@@ -138,16 +117,15 @@ double Muscle::calcActiveForceNorm()
 
 #else
   // Kistemaker's method
-  const float k = 4.0; // 1 / width^2
-  return (-k * sqr(m_lengthNorm)) + (2 * k * m_lengthNorm) - k + 1.0;
+  const double k = 4.0; // 1 / width^2, with width = 0.5
+  return (-k * sqr(lengthNorm)) + (2 * k * lengthNorm) - k + 1.0;
 #endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------  
-double Muscle::calcPassiveForceNorm()
+double Muscle::calcPassiveForceNorm(double lengthNorm)
 {
-  const float slackLengthNorm = 1.4;
-  double slackDist = m_lengthNorm - slackLengthNorm;
+  double slackDist = lengthNorm - passiveForceSlackLength;
   if(slackDist > 0)
   {
     return m_passiveForceGain * sqr(slackDist);
@@ -159,9 +137,9 @@ double Muscle::calcPassiveForceNorm()
 }
   
 //---------------------------------------------------------------------------------------------------------------------- 
-double Muscle::calcVelocityForceNorm()
+double Muscle::calcVelocityForceNorm(double velocityNorm)
 {
-  const float& v = m_velocityNorm;
+  const double& v = velocityNorm;
 	if(v < -1)
   {
 		return 0.0;
@@ -176,14 +154,14 @@ double Muscle::calcVelocityForceNorm()
   }
 }
 
-// Activation level filter
+// Muscle actication from neural excitation
 //---------------------------------------------------------------------------------------------------------------------- 
-double Muscle::updateActivation(float dt)
+double Muscle::calcActivation(double activation, double excitation, float dt)
 {
-  const float tau = m_excitation >= m_activation ? m_tauAct : m_tauDeact;
-  m_activation += ((m_excitation - m_activation) / tau) * dt;	// else if activity decreasing
+  const double tau = excitation >= activation ? m_tauAct : m_tauDeact;
+  return activation + ((excitation - activation) / tau) * dt;	// else if activity decreasing
 }
-
-
+  
+  
 } // namespace dmx
 

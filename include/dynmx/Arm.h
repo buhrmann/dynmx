@@ -11,6 +11,7 @@
 #define _DMX_ARM_
 
 #include "Dynmx.h"
+#include "Model.h"
 #include "cinder/Vector.h"
 
 namespace dmx
@@ -48,7 +49,7 @@ struct MinJerkTrajectory
 //----------------------------------------------------------------------------------------------------------------------
 /// Implements equations of motion for a planar two-jointed arm
 //----------------------------------------------------------------------------------------------------------------------
-class Arm
+class Arm : public Model
 {
   
 public:
@@ -56,15 +57,22 @@ public:
   Arm();
   ~Arm();
   
-  virtual void init(float elbAngle = 0.0f, float shdAngle = 0.0f);
-  void setParameters(float mass1, float mass2, float length1, float length2, float inertia1, float inertia2);
+  // Inherited from class Model
+  virtual void init();
+  virtual void reset() { reset(0.0, 0.0); };
+  virtual void update(float dt) { update(dt, 0.0, 0.0); };
+  
+  void reset(float elbAngle, float shdAngle);  
+  void update(float dt, double torque1, double torque2);
+  
+  void setParameters(float mass1, float mass2, float length1, float length2);
+  void setFriction(float elbF, float shdF) { m_frictions[JT_elbow] = elbF; m_frictions[JT_shoulder] = shdF; };
+  void setLimit(Joint jt, float upper, float lower) { assert(jt >=0 && jt < 2); m_limits[jt][0] = upper; m_limits[jt][1] = lower; };
   void setGravity(float g) { m_gravity = g; };
   
-  void update(double torque1, double torque2, float timeStep);
   Pos getPointOnUpperArm(float distanceFromJoint) const;
   Pos getPointOnLowerArm(float distanceFromJoint) const;  
   double getJointAngle(Joint joint) { return m_angles[joint]; };
-  double getDesiredJointAngle(Joint joint) { return m_anglesDes[joint]; };
   float getLength(Joint joint) const { return m_lengths[joint]; } ;
   const Pos& getEffectorPos() const { return m_effectorPos; };
   Pos& getEffectorPos() { return m_effectorPos; };
@@ -82,7 +90,6 @@ protected:
   // states
   double 
     m_angles[2],
-    m_anglesDes[2],
     m_velocities[2],
     m_accelerations[2];
   

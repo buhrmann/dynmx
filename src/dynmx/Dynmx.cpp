@@ -9,6 +9,8 @@
 #include "Dynmx.h"
 #include <time.h>
 #include "boost/filesystem.hpp"
+#include <mach-o/dyld.h>
+#include <stdlib.h>
 
 namespace dmx
 {
@@ -40,10 +42,44 @@ void Globals::initialise()
   char dateTime[TimeMaxChar];
   dateTime[0] = '\0';
   strftime(dateTime, TimeMaxChar, "%y_%m_%d__%H_%M_%S", localtime(&now));   
-  m_dataDir = std::string(DATA_BASE_DIR) + dateTime + "/";
-  boost::filesystem::create_directory(m_dataDir);
+  std::string baseDir;
   
-  m_settings = new ci::XmlTree(ci::loadFile(std::string(DATA_BASE_DIR) + "Config.xml"));
+  // Get the base directory to save data to and read the config from
+#if DEPLOYING and defined DYNMX_MAC
+  char path[1024];
+  char path2[1024];
+  uint32_t size = sizeof(path);
+  _NSGetExecutablePath(path, &size);
+  realpath(path, path2);
+  std::string p(path2);
+  boost::filesystem::path bp (p);
+  baseDir = bp.parent_path().parent_path().parent_path().parent_path().string() + "/";
+#else
+  baseDir = std::string(DATA_BASE_DIR);
+#endif
+  
+  // Actually create the data directory
+  m_dataDir = baseDir + dateTime + "/";
+  boost::filesystem::create_directory(boost::filesystem::path(m_dataDir));
+  
+  // Now load the xml file
+  m_settings = 0;
+  // Iterator over base directory's contents
+  boost::filesystem::directory_iterator end_itr;
+  for (boost::filesystem::directory_iterator itr(baseDir); itr != end_itr; ++itr)
+  {
+    // If it's not a directory ...
+    if (!is_directory(itr->status()))
+    {
+      // ... and the filename contains the xml ending      
+      std::string fnm = itr->path().filename().string();
+      if(fnm.find(".xml") != std::string::npos)
+      {
+        // ... then load the file
+        m_settings = new ci::XmlTree(ci::loadFile(baseDir + fnm));
+      }               
+    }
+  }
 }
 
 } // namespace dmx

@@ -8,6 +8,7 @@
  */
  
 #include "App.h"
+#include "cinder/app/KeyEvent.h"
 
 namespace dmx
 {
@@ -81,19 +82,19 @@ void App::keyDown(ci::app::KeyEvent event)      { m_view->keyDown(event); }
 //--------------------------------------------------------------------------------------------------------------------
 void App::keyUp(ci::app::KeyEvent event) 
 {
-  switch(event.getChar())
+  switch(event.getCode())
   {
-    case ' ':
+    case ci::app::KeyEvent::KEY_SPACE:
       m_paused = !m_paused;  
       break;
-    case 's':
+    case ci::app::KeyEvent::KEY_RETURN:
     {
       if(m_paused)
         m_model->update(m_fixedTimeStep);
       break;
     }
-    case 'i':
-      m_model->init();
+    case ci::app::KeyEvent::KEY_r:
+      m_model->reset();
       break;
   }
   

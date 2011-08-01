@@ -25,7 +25,7 @@ GA::GA(int popsize, int genomeLength, int demeWidth) :
   init();
 }
 
-// Allocation
+// Allocation only
 // --------------------------------------------------------------------------------------------
 void GA::init()
 {
@@ -38,6 +38,10 @@ void GA::init()
 
   m_fitnesses = new float[m_popSize];     
   m_weightedAverageGenome = new double[m_popSize]; 
+  
+  // Some defaults, though should be set externally and not subsequently reset to these defaults
+  m_maxMutation = 0.01;      // amount of mutation  (scales a gaussian random variable)
+  m_recombinationRate = 0.05; // probability of copying a gene from winner to loser of tournament  
   
   reset();
 }
@@ -60,10 +64,6 @@ GA::~GA()
 // --------------------------------------------------------------------------------------------
 void GA::reset()
 {
-  // some defaults
-  m_maxMutation = 0.01;      // amount of mutation  (scales a gaussian random variable)
-  m_recombinationRate = 0.05; // probability of copying a gene from winner to loser of tournament
-
   // initialization
   m_tournament = 0;
   m_generation = 0;

@@ -21,8 +21,8 @@ public:
   TestModelCTRNN() : m_ctrnn(0) {};
   TestModelCTRNN(int numNeurons) { m_ctrnn = new CTRNN(numNeurons); init(); };
   
-  virtual void init() { assert(m_ctrnn); m_ctrnn->randomizeState(-0.01, 0.01); m_ctrnn->randomizeWeights(-10.01, 10.01);};
-  
+  virtual void init() { assert(m_ctrnn); reset(); };
+  virtual void reset() { m_ctrnn->randomizeState(-0.01, 0.01); m_ctrnn->randomizeWeights(-10.01, 10.01); };
   virtual void update(float dt) { m_ctrnn->update(dt); };
   CTRNN* m_ctrnn;
 };

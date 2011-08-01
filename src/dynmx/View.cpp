@@ -8,6 +8,7 @@
  */
 
 #include "View.h"
+#include "cinder/app/KeyEvent.h"
 
 namespace dmx
 {
@@ -26,8 +27,8 @@ void View::init()
   const float g = 0.6f;
   m_background.topLeft = ci::ColorA(g, g, g, 0.5f);
   m_background.topRight= ci::ColorA(g, g, g, 0.5f);
-  m_background.bottomLeft = ci::ColorA(1,1,1,0.5);
-  m_background.bottomRight = ci::ColorA(1,1,1,0.5);
+  m_background.bottomLeft = ci::ColorA(1,1,1,0.0);
+  m_background.bottomRight = ci::ColorA(1,1,1,0.0);
   
   // setup openGL modes
   glEnable(GL_LIGHTING);
@@ -45,7 +46,8 @@ void View::init()
   m_drawOutlines = true;
   m_drawShadows = true;
   m_draw3d = true;
-  m_draw2d = true;
+  m_draw2d = false;
+  m_showMenu = false;
 
   // use simpler color control !
   glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE ) ;
@@ -62,17 +64,13 @@ void View::init()
   
   // set up the cameras
 	CameraPersp cam;
-	cam.setEyePoint(Vec3f(0.0f, 1.0f, 2.0f));
+	cam.setEyePoint(Vec3f(0.0f, 0.0f, 1.0f));
 	cam.setCenterOfInterestPoint(Vec3f(0.0f, 0.0f, 0.0f));
   cam.setWorldUp(Vec3f(0,1,0));
-	cam.setPerspective(60.0f, getWindowAspectRatio(), 1.0f, 1000.0f);
+	cam.setPerspective(60.0f, getWindowAspectRatio(), 0.001f, 100.0f);
 	m_cam3d.setCurrentCam(cam);
     
-  //Vec3f centre(ci::app::getWindowWidth() / 2.0f,  ci::app::getWindowHeight() / 2.0f, 0.0f);
-	//m_cam2d.setEyePoint(centre + Vec3f(0, 0, -1));
-	//m_cam2d.setCenterOfInterestPoint( Vec3f(0.0f, 0.0f, 0.0f) );
-	//m_cam2d.setPerspective( 60.0f, getWindowAspectRatio(), 1.0f, 1000.0f );
-  m_cam2d.setOrtho(0, ci::app::getWindowWidth(), ci::app::getWindowHeight(), 0, 0.01f, 100.0f);
+  m_cam2d.setOrtho(0, ci::app::getWindowWidth(), ci::app::getWindowHeight(), 0, 0.001f, 100.0f);
 
   m_hud = params::InterfaceGl( "Tweakbar", Vec2i( 200, 400 ) );
   m_hud.setOptions("", "iconified=true");
@@ -247,26 +245,42 @@ int View::pick(int x, int y)
 //----------------------------------------------------------------------------------------------------------------------
 void View::keyDown(KeyEvent event)
 {
-  switch(event.getChar()) 
+  switch(event.getCode()) 
   {
-    case '2': 
+    case ci::app::KeyEvent::KEY_2: 
       m_draw2d = !m_draw2d; 
       break;
-    case '3': 
+    case ci::app::KeyEvent::KEY_3: 
       m_draw3d = !m_draw3d; 
       break;
-    case '=': 
+    case ci::app::KeyEvent::KEY_w:
+      m_drawWireframe = !m_drawWireframe;
+      break;
+    case ci::app::KeyEvent::KEY_o:
+      m_drawOutlines = !m_drawOutlines;
+      break;
+    case ci::app::KeyEvent::KEY_s:
+      m_drawShadows = !m_drawShadows;
+      break;      
+    case ci::app::KeyEvent::KEY_TAB:
+      m_showMenu = !m_showMenu;
+      if(m_showMenu)
+        m_hud.setOptions("", "iconified=false");
+      else
+        m_hud.setOptions("", "iconified=true");
+      break;
+    case ci::app::KeyEvent::KEY_EQUALS: 
       //gui.nextPage(); 
       //gui.show(); 
       break;
-    case ' ': 
+    case ci::app::KeyEvent::KEY_SPACE: 
       //gui.toggleDraw();
       //m_easyCam3d.fix(gui.isOn());
       break;
-    case '[': 
+    case ci::app::KeyEvent::KEY_LEFTBRACKET: 
       //gui.prevPage(); 
       break;
-    case ']': 
+    case ci::app::KeyEvent::KEY_RIGHTBRACKET: 
       //gui.nextPage(); 
       break;
     //case 'p': gui.nextPageWithBlank(); break;

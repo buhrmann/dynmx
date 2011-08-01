@@ -71,17 +71,25 @@ void GARunner::init()
     m_verbosity = kGAVerbosityNone;
   }
   
+  reset();
+  
+  m_progressLog = new ci::XmlTree("GAProgress", ""); 
+  m_resultsLog = new ci::XmlTree("GAResult", "");
+}
+  
+//----------------------------------------------------------------------------------------------------------------------
+void GARunner::reset()
+{
   m_time = 0.0f;
   m_accFitness = 0.0f;
   m_trial = 0;
   m_prevGeneration = 0;
   
+  m_ga->reset();
+  
   // setup simulation model
   m_evolvable->decodeGenome(m_ga->getCurrentGenome());
-  m_evolvable->reset();
-  
-  m_progressLog = new ci::XmlTree("GAProgress", ""); 
-  m_resultsLog = new ci::XmlTree("GAResult", "");
+  m_evolvable->reset();  
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -41,7 +41,8 @@ void Simulation::start()
 void Simulation::runVisual()
 {
   char** const argv = 0;
-  cinder::app::Renderer* renderer = new ci::app::RendererGl;
+  const int antiAliasingSteps = 4; // Todo: read from config.xml.
+  cinder::app::Renderer* renderer = new ci::app::RendererGl(antiAliasingSteps);
   cinder::app::AppBasic::executeLaunch((ci::app::AppBasic*)m_app, renderer, "Test", 0, argv);  
 }
 
@@ -55,7 +56,7 @@ void Simulation::runNonVisual()
     dt = 1.0f / SETTINGS->getChild("Config/Globals/FrameRate").getAttributeValue<int>("Value");
   }
   
-    while(!m_model->hasFinished())
+  while(!m_model->hasFinished())
   {
     m_model->update(dt);
   }

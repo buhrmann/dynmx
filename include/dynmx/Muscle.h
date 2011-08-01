@@ -11,66 +11,76 @@
 #define _DMX_MUSCLE_
 
 #include "Dynmx.h"
+#include "Model.h"
 #include "cinder/Vector.h"
+
+#include <iostream>
+#include <fstream>
 
 namespace dmx
 {
 
-class Arm;
+class ArmMuscled;
 struct MusclePathPoint;
-
-//----------------------------------------------------------------------------------------------------------------------
-//----------------------------------------------------------------------------------------------------------------------
-struct MusclePathPoint
-{
-  ci::Vec2f local;  /// Specified as local distance from joint along bone and perpendicular to bone.
-  ci::Vec2f world;  /// Converted from local point into world;
-  int joint;        /// Joint the point is local to.
-};
-
+class Recorder;
+  
 //----------------------------------------------------------------------------------------------------------------------
 // Hill-type non-linear muscle model
 //----------------------------------------------------------------------------------------------------------------------
-class Muscle
+class Muscle : public Model
 {
 
+friend class Arm3dView;
+  
 public:
-
-  Muscle(Arm* arm) : m_arm(arm), m_length(0.0), m_lengthOpt(1.0), m_velocity(0.0), m_excitation(0.0) {};
   
-  void addPathPoint(const ci::Vec2f& point, int jointId);  
+  typedef ci::Vec2f Pos;   
   
-  void init();
+  // Inherited from class Model
+  virtual void init();
+  virtual void reset();  
+  virtual void update(float dt);
   
-  void update(float dt);
+  void setExcitation(double e) { assert(e >=0 && e <= 1); m_excitation = e; };
   
+  void setParameters(double maxIsoForce, double optimalLength, double maxVelocity);
+  
+  // Getters
   double getLength() const { return m_length; };
   double getNormalisedLength() const { return m_lengthNorm; };
   double getVelocity() const { return m_velocity; };
+  double getNormalisedVelocity() const { return m_velocityNorm; };
   double getForce() const { return m_force; };
-  int getNumPathPoints() const { return m_path.size(); };
-  const ci::Vec2f& getPathPointWorld(int i) const { assert(i < m_path.size()); return m_path[i].world; };
+  double getActiveForce() const { return m_activeForceNorm; };
+  double getPassiveForce() const { return m_passiveForceNorm; };
+  double getVelocityForce() const { return m_velocityForceNorm; };
+  double getExcitation() const { return m_excitation; };
+  double* getExcitation() { return &m_excitation; }; 
+  double getActivation() const { return m_activation; };
+  bool isMonoArticulate() const { return m_isMonoArticulate; };
+  bool isFlexor() const { return m_isFlexor; };
+  
+  virtual Pos getOriginWorld() = 0;
+  virtual Pos getInsertionWorld() = 0;
   
 protected:
 
-  void transformPathToWorld();
-  double calcLength();
+  virtual void updateLengthAndMomentArm() = 0;
   
-  double calcActiveForceNorm();
-  double calcPassiveForceNorm();
-  double calcVelocityForceNorm();
-  double calcActivation();
+  double calcActiveForceNorm(double lengthNorm);
+  double calcPassiveForceNorm(double lengthNorm);
+  double calcVelocityForceNorm(double velNorm);
+  double calcActivation(double activation, double excitation, float dt);
 
-  Arm* m_arm;
-  
-  // Each Pos defines a waypoint along the muscle path. X specifies the distance from the root joint along the bone, 
-  // and Y the perpendicular distance from the bone.
-  std::vector<MusclePathPoint> m_path;
+  ArmMuscled* m_arm;
 
   // Parameters different per muscle
   double m_maxForce; 
   double m_maxVelocity; 
   double m_lengthOpt;
+  
+  bool m_isMonoArticulate;
+  bool m_isFlexor;  
   
   // Parameters automatically determined for all muscles
   double m_passiveForceGain;  // How much passive elasticity is produced
@@ -78,12 +88,16 @@ protected:
   double m_tauDeact;          // time constant describing decreasing activation
   
   // State
-  double m_excitation;    // neural input
-  double m_activation;    // muscle activation
+  double m_excitation;        // neural input
+  double m_activation;        // muscle activation
   double m_length;
-  double m_lengthNorm;    // scaled by optimal length
+  double m_lengthNorm;        // scaled by optimal length
   double m_velocity;
-  double m_velocityNorm;  // scaled my maximum velocity
+  double m_velocityNorm;      // scaled my maximum velocity
+  double m_passiveForceNorm;  //
+  double m_activeForceNorm;   //
+  double m_velocityForceNorm; //
+  double m_momentArm;
   double m_force;
   double m_torque[2];     // around the two joints
 };

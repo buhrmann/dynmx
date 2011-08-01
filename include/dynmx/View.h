@@ -88,6 +88,7 @@ protected:
     bool m_drawShadows:1;
     bool m_draw3d:1;
     bool m_draw2d:1;
+    bool m_showMenu;
   };
   
   BackGround m_background;

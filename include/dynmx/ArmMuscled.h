@@ -24,20 +24,24 @@ class ArmMuscled : public Arm
 
 public:
 
-  /// 
-  void init(float elbAngle = 0.0f, float shdAngle = 0.0f);
+  /// Functions inherited from class Model
+  virtual void init();
+  virtual void reset(float elbAngle = 0.0f, float shdAngle = 0.0f);
 
   /// Tick arm model given desired joint angles
-  void updateMuscles(float timeStep); 
+  void update(float timeStep); 
   
   int getNumMuscles() const { return m_muscles.size(); };
-  const Muscle& getMuscle(int i) const { assert(i < m_muscles.size()); return m_muscles[i]; };
+  Muscle* getMuscle(int i) { assert(i < m_muscles.size()); return m_muscles[i]; };
 
+  float getJointRadius(int joint) const { return m_jointRadius[joint]; }; 
 
 protected:
 
   // Six muscles: 2 per joint and two biarticulated.
-  std::vector<Muscle> m_muscles;
+  std::vector<Muscle*> m_muscles;
+
+  float m_jointRadius[2];
  
 }; // class ArmPD
 

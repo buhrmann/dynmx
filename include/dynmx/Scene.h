@@ -30,6 +30,7 @@ enum NodeType
   NODE_AXES,
   NODE_BOX,
   NODE_SPHERE,
+  NODE_DISK,
   NODE_CYLINDER,
   NODE_CAPSULE,
   NODE_GRID,
@@ -111,6 +112,7 @@ public:
 
   // only effective when not externally driven !
   virtual void translate(const cinder::Vec4f& p) { m_TM.translate(p); };
+  virtual void rotate(const cinder::Vec4f& axis, float radians) { m_TM.rotate(axis, radians); };
 
   void attachDriver(cinder::Matrix44f* m) { m_pTM = m; m_isDriven = true; };
   void detachDriver() { m_pTM = &m_TM; m_isDriven = false; };
@@ -237,6 +239,25 @@ public:
 protected:
   virtual void init();
 };
+  
+//----------------------------------------------------------------------------------------------------------------------
+// A disk
+//----------------------------------------------------------------------------------------------------------------------
+class Disk : public NodeGeometry
+{
+public:
+  
+  Disk() : m_radius1(1), m_radius2(0), m_resolution(16) { init(); };
+  Disk(float r1, float r2, int resolution = 16) : m_radius1(r1), m_radius2(r2), m_resolution(resolution) { init(); };
+  virtual void createGeometry();
+  
+  float m_radius1;
+  float m_radius2;
+  int m_resolution;
+  
+protected:
+  virtual void init();
+};
 
 //----------------------------------------------------------------------------------------------------------------------
 // A cylinder with flat ends
@@ -245,15 +266,16 @@ class Cylinder : public NodeGeometry
 {
 public:
 
-  Cylinder() : m_radius1(1), m_radius2(1), m_length(1), m_resolution(16) { init(); };
-  Cylinder(float r, float l, int res = 16) : m_radius1(r), m_radius2(r), m_length(l), m_resolution(res) { init(); };
-  Cylinder(float r1, float r2, float l, int res = 16) : m_radius1(r1), m_radius2(r2), m_length(l), m_resolution(res) { init(); };
+  Cylinder() : m_radius1(1), m_radius2(1), m_length(1), m_slices(16), m_stacks(2) { init(); };
+  Cylinder(float r, float l, int slices = 16, int stacks = 2) : m_radius1(r), m_radius2(r), m_length(l), m_slices(slices), m_stacks(stacks) { init(); };
+  Cylinder(float r1, float r2, float l, int slices = 16, int stacks = 2) : m_radius1(r1), m_radius2(r2), m_length(l), m_slices(slices), m_stacks(stacks){ init(); };
   virtual void createGeometry();
 
   float m_radius1;
   float m_radius2;
   float m_length;
-  int m_resolution;
+  int m_slices;
+  int m_stacks;
 
 protected:
   virtual void init();
@@ -327,13 +349,14 @@ public:
 
   virtual void update();
   void addPoint(float p, int pID = 0);
-  virtual Node* getNode(int pickID) { if (m_uniqueID == pickID) return this; else return 0; };
+  void setLabel(int pId, const std::string& name);
+  virtual Node* getNode(int pickID) { if (m_uniqueID == pickID) return this; else return 0; };  
 
 protected:
   virtual void init();
 
   std::vector<std::vector<float> > m_points;
-  //std::vector<ci::Path2d> m_paths;
+  std::vector<std::string> m_names;
   int m_nr;
   uint8_t m_N;
   float m_w;

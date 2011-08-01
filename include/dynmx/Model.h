@@ -23,13 +23,18 @@ class Model
 
 public:
   // Needs to be able to run as new after this function has been called.
-  virtual void init() {};
+  virtual void init() = 0;
+  
+  virtual void reset() = 0;
   
   // Called every frame: do stuff here.
-  virtual void update(float dt) {};
+  virtual void update(float dt) = 0;
   
   // Signals that this model doesn't want/need to be updated anymore.
   virtual bool hasFinished() { return false; };
+  
+  // Called before application exit
+  virtual void shutDown() {};
   
   // Getter and Setter for name, to be used by Factories e.g.
   const std::string& getName() const { return m_name; };

@@ -30,6 +30,7 @@ namespace dmx
 {
 
   typedef cinder::Matrix44f Mat4f;
+  typedef cinder::Vec3f Vec2f;
   typedef cinder::Vec3f Vec3f;
   typedef cinder::Vec4f Vec4f;
 
@@ -481,8 +482,10 @@ namespace dmx
 	  gluQuadricDrawStyle(obj, mode);
 	  gluQuadricNormals(obj, GLU_SMOOTH);
 	  glPushMatrix();
-		glTranslatef(0,0,-length/2);
+		glTranslatef(0,0,-length/2);    
 		gluCylinder(obj, radius1, radius2, length, slices, stacks);
+
+#if 1    
 		//bottom disk
 		glFrontFace(GL_CW);
 		gluDisk(obj, 0, radius1, slices, 4);
@@ -492,7 +495,9 @@ namespace dmx
 			glTranslatef( 0, 0, length );
 			gluDisk(obj, 0, radius2, slices, 4);
 		glPopMatrix();
-      glPopMatrix();
+#endif
+    
+    glPopMatrix();
 	  gluDeleteQuadric(obj);
 	}
 

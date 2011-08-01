@@ -45,11 +45,11 @@ void MinJerkTrajectory::setNew(const Pos& initPos, const Pos& finalPos, float du
 
 //----------------------------------------------------------------------------------------------------------------------
 // Typical dimensions from Arnon(1990), referenced in 
-// Karniel and Inbar (1997), "A model for learning human reaching movements"
+// Karniel and Inbar (1997), "A model for learning human reaching movements", and (1996).
+// Also see Gribble (1998), or Uno and Kawato (1989).
 //----------------------------------------------------------------------------------------------------------------------
 Arm::Arm()
 {
-  //init();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -58,25 +58,79 @@ Arm::~Arm()
   
 }
 
+//----------------------------------------------------------------------------------------------------------------------  
+void Arm::init()
+{  
+  m_gravity = 9.81;
+  
+  const ci::XmlTree* settings = SETTINGS;
+  if (settings->hasChild("Config/Arm"))
+  {
+    // Use setting from globals file
+    const ci::XmlTree& xml = settings->getChild("Config/Arm");
+    double upperArmLength = xml.getChild("UpperArm").getAttributeValue<double>("Length");
+    double lowerArmLength = xml.getChild("LowerArm").getAttributeValue<double>("Length");
+    double upperArmMass = xml.getChild("UpperArm").getAttributeValue<double>("Mass");
+    double lowerArmMass = xml.getChild("LowerArm").getAttributeValue<double>("Mass");
+    setParameters(lowerArmMass, upperArmMass, lowerArmLength, upperArmLength);
+    
+    double shoulderFriction = xml.getChild("Shoulder").getAttributeValue<double>("Friction");    
+    double elbowFriction = xml.getChild("Elbow").getAttributeValue<double>("Friction");
+    setFriction(elbowFriction, shoulderFriction);
+    
+    double shoulderUpperLimit = PI * xml.getChild("Shoulder").getAttributeValue<double>("UpperLimit");
+    double shoulderLowerLimit = PI * xml.getChild("Shoulder").getAttributeValue<double>("LowerLimit");
+    setLimit(JT_shoulder, shoulderUpperLimit, shoulderLowerLimit);    
+    
+    double elbowUpperLimit = PI * xml.getChild("Elbow").getAttributeValue<double>("UpperLimit");
+    double elbowLowerLimit = PI * xml.getChild("Elbow").getAttributeValue<double>("LowerLimit");
+    setLimit(JT_elbow, elbowUpperLimit, elbowLowerLimit);
+  }
+  else
+  {
+  
+#define ARM_USE_KARNIEL_PARAMS 1
+#if ARM_USE_KARNIEL_PARAMS
+    // Parameters from Karniel and Inbar
+    const float lowerArmMass = 1.3f;
+    const float upperArmMass = 2.52f;
+    const float lowerArmLength = 0.32f;
+    const float upperArmLength = 0.33f;
+#else
+    // Parameters from Gribble
+    const float lowerArmMass = 1.65f;
+    const float upperArmMass = 2.1f;
+    const float lowerArmLength = 0.34f;
+    const float upperArmLength = 0.46f;    
+#endif
+    
+    setParameters(lowerArmMass, upperArmMass, lowerArmLength, upperArmLength);
+    
+    // Todo: should be possible to make 0, but currently unstable
+    m_frictions[0] = m_frictions[1] = 0.12;
+
+    // setup limits
+    const float limit = PI * 0.75f;
+    m_limits[JT_shoulder][0] = limit;
+    m_limits[JT_shoulder][1] = -limit;  
+    m_limits[JT_elbow][0] = limit;
+    m_limits[JT_elbow][1] = -limit; //-0.01f;    
+  }    
+    
+  reset(0,0);
+}  
+
 //----------------------------------------------------------------------------------------------------------------------
-void Arm::init(float elbAngle, float shdAngle)
+void Arm::reset(float elbAngle, float shdAngle)
 {
   m_angles[JT_elbow] = elbAngle;
   m_angles[JT_shoulder] = shdAngle;
   
   for(int i = 0; i < 2; i++)
   {
-    m_anglesDes[i] = 0.0;
     m_velocities[i] = 0.0;
     m_accelerations[i] = 0.0;
   }
-  
-  // setup limits
-  const float limit = PI * 0.75f;
-  m_limits[JT_shoulder][0] = limit;
-  m_limits[JT_shoulder][1] = -limit;  
-  m_limits[JT_elbow][0] = limit;
-  m_limits[JT_elbow][1] = -0.01f;
   
   forwardKinematics();
 }
@@ -142,22 +196,20 @@ void Arm::preCompute()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void Arm::setParameters(float mass1, float mass2, float length1, float length2, float inertia1, float inertia2)
+void Arm::setParameters(float mass1, float mass2, float length1, float length2)
 {
   m_masses[JT_elbow] = mass1;
   m_masses[JT_shoulder] = mass2;
   m_lengths[JT_elbow] = length1;
   m_lengths[JT_shoulder] = length2;
-  m_inertias[JT_elbow] = inertia1;
-  m_inertias[JT_shoulder] = inertia2;
-  m_frictions[JT_elbow] = 0.12;
-  m_frictions[JT_shoulder] = 0.12;
-  m_gravity = 9.81;
+  m_inertias[JT_elbow] = (m_masses[JT_elbow] * sqr(m_lengths[JT_elbow])) / 12.0;
+  m_inertias[JT_shoulder] = (m_masses[JT_shoulder] * sqr(m_lengths[JT_shoulder])) / 12.0;
   preCompute();
 }
 
+// Equations from Hollerbach and Flash 1981.   
 //----------------------------------------------------------------------------------------------------------------------
-void Arm::update(double torqElb, double torqShd, float timeStep)
+void Arm::update(float timeStep, double torqElb, double torqShd)
 {
   // calculate these only once:
   double cosElbAngle = cosf(m_angles[JT_elbow]);
@@ -165,26 +217,24 @@ void Arm::update(double torqElb, double torqShd, float timeStep)
   double sinElbShd = sinf(m_angles[JT_elbow] + m_angles[JT_shoulder]);
   
   // compute elbow acceleration
-  double coriolis = m_massElbLLHalf * m_velocities[JT_shoulder] * m_velocities[JT_shoulder] * sinElbAngle;
-  double normalInertia = m_inertias[JT_elbow] + m_massElbLSq4;
+  double coriolis = m_massElbLLHalf * sqr(m_velocities[JT_shoulder]) * sinElbAngle;
+  double normalInertia = /*m_acceleration[JT_elbow] **/ (m_inertias[JT_elbow] + m_massElbLSq4);
   double interInertia = m_accelerations[JT_shoulder] * (m_inertias[JT_elbow] + m_massElbLLHalf * cosElbAngle + m_massElbLSq4); 
   double gravity = m_gravity * m_masses[JT_elbow] * m_lengths[JT_elbow] * sinElbShd;
   double damping = m_frictions[JT_elbow] * m_velocities[JT_elbow];
   double elbAcceleration = (torqElb - interInertia - coriolis - gravity - damping) / normalInertia;
   
   // compute shoulder acceleration
-  coriolis = - m_massElbLLHalf * m_velocities[JT_elbow] * m_velocities[JT_elbow] * sinElbAngle
+  coriolis = - m_massElbLLHalf * sqr(m_velocities[JT_elbow]) * sinElbAngle
               - m_massElbLL * m_velocities[JT_elbow] * m_velocities[JT_shoulder] * sinElbAngle;
   
-  normalInertia = (m_inertias[JT_elbow] + m_inertias[JT_shoulder] 
+  normalInertia = /*m_accelerations[JT_shoulder] **/ (m_inertias[JT_elbow] + m_inertias[JT_shoulder] 
                    + m_massElbLL * cosElbAngle 
                    + (m_masses[JT_shoulder] * m_lengthsSq[JT_shoulder]) / 4.0f
                    + m_massElbLSq4 
                    + (m_masses[JT_elbow] * m_lengthsSq[JT_shoulder]) );
   
-  interInertia = m_accelerations[JT_elbow] * (m_inertias[JT_elbow] 
-                                              + m_massElbLSq4 
-                                              + (m_massElbLLHalf * cosElbAngle));
+  interInertia = m_accelerations[JT_elbow] * (m_inertias[JT_elbow] + m_massElbLSq4 + (m_massElbLLHalf * cosElbAngle));
   
   // shoulder gravity is elbow gravity + shoulder
   gravity += m_gravity * (m_masses[JT_elbow] + m_masses[JT_shoulder]) * m_lengths[JT_shoulder] * sinf(m_angles[JT_shoulder]);

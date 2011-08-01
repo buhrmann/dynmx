@@ -296,13 +296,32 @@ void Sphere::init()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+// A disk
+//----------------------------------------------------------------------------------------------------------------------
+void Disk::createGeometry()
+{
+  m_dl = glGenLists(1);
+  glNewList(m_dl,GL_COMPILE);
+    drawDisk(m_radius1, m_radius2, m_resolution, m_resolution);
+  glEndList();
+}
+
+void Disk::init()
+{
+  m_type = NODE_DISK;
+#ifdef _DEBUG
+  print();
+#endif
+}  
+  
+//----------------------------------------------------------------------------------------------------------------------
 // A cylinder with flat ends
 //----------------------------------------------------------------------------------------------------------------------
 void Cylinder::createGeometry()
 {
   m_dl = glGenLists(1);
   glNewList(m_dl,GL_COMPILE);
-    drawCylinder(m_length, m_radius1, m_radius2, m_resolution, m_resolution, GLU_FILL);
+    drawCylinder(m_length, m_radius1, m_radius2, m_slices, m_stacks, GLU_FILL);
   glEndList();
 }
 
@@ -476,7 +495,10 @@ void RealMatrixViz::update()
 // A graph/plot
 //----------------------------------------------------------------------------------------------------------------------
 Plot::Plot(float w, float h, int nr, int N) :
-  m_nr(nr), m_N(N), m_points(nr, std::vector<float>()), /*m_paths(nr),*/ m_w(w), m_h(h), m_maxY(1), m_minY(0)
+  m_points(nr, std::vector<float>()), 
+  m_names(nr, std::string()), 
+  m_nr(nr), m_N(N), 
+  m_w(w), m_h(h), m_maxY(1), m_minY(0)
 { 
 
   init(); 
@@ -503,33 +525,30 @@ void Plot::update()
       // line plot
       Vec3f col = getColorMapRainbow((float)pl / m_nr);
       glColor4f(col.x, col.y, col.z, 1.0);
-      glBegin(GL_LINE_STRIP);      
-      float x1, x2, y1, y2;
-      for(size_t i = 0; i < numPoints - 1; i++)
+      float lineVerts[numPoints*2];
+      glEnableClientState( GL_VERTEX_ARRAY );
+      glVertexPointer( 2, GL_FLOAT, 0, lineVerts );      
+      for(size_t i = 0; i < numPoints; i++)
       {
-        x1 = (i + 1) * widthRec;
-        x2 = (i + 2) * widthRec;
-        y1 = m_h - m_h * ((m_points[pl][i]   + m_minY) * scaleRec);
-        y2 = m_h - m_h * ((m_points[pl][i+1] + m_minY) * scaleRec);
-        glVertex3f(x1, y1, 0);
-        glVertex3f(x2, y2, 0);
+        lineVerts[i*2 + 0] = i * widthRec;
+        lineVerts[i*2 + 1] = m_h - m_h * ((m_points[pl][i]   + m_minY) * scaleRec);
       }
-      glEnd();
+      glDrawArrays( GL_LINE_STRIP, 0, numPoints);
+      glDisableClientState( GL_VERTEX_ARRAY);       
+      
 #if DEBUGGING      
       // show current value
       float current = m_points[pl][numPoints - 1];
-      char str [16]; 
-      sprintf(str, "%2.4f", current);
+      char str [64]; 
+      if(m_names[pl] != "")
+        sprintf(str, "%s: %2.4f", m_names[pl].c_str(), current);
+      else
+        sprintf(str, "%2.4f", current);        
       glColor3f(0,0,0);
-      drawString(Vec3f(x2, y2, 0), str); 
+      drawString(Vec3f(lineVerts[numPoints*2-2], lineVerts[numPoints*2-1], 0), str); 
 #endif
     }
   }
-  
-//  for(int path = 0; path < m_nr; path++)
-//  {
-//    ci::gl::draw(m_paths[path]);
-//  }
   
   // box
   glColor4f(0.0, 0.0, 0.0, 1);
@@ -553,19 +572,15 @@ void Plot::addPoint(float p, int pID)
   if(p < m_minY)
     m_minY = p;
     
-//  float widthRec = 1.0 / (float)m_N * m_w;
-//  float scale = m_maxY - m_minY;
-//  float scaleRec = scale > 0 ? 1.0 / scale : 0.0;  
-//  if(m_paths[pID].empty())
-//    m_paths[pID].moveTo(ci::Vec2f(0, p));
-//  else
-//    m_paths[pID].lineTo(ci::Vec2f(m_paths[pID].getNumPoints() * widthRec, m_h * (p * scaleRec)));
-    
   if(m_points[pID].size() > m_N)
-    m_points[pID].erase(m_points[pID].begin());
-    
-//  if(m_paths[pID].getNumPoints() > m_N)
-//    m_paths[pID].removeSegment(m_paths[pID].getNumSegments() - 1);
+    m_points[pID].erase(m_points[pID].begin());    
+}
+
+//----------------------------------------------------------------------------------------------------------------------  
+void Plot::setLabel(int pId, const std::string& name)
+{
+  assert(pId >= 0 && pId < m_names.size());
+  m_names[pId] = name;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

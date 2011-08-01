@@ -36,6 +36,8 @@ public:
   GA(int popsize=100, int genlength=10, int demeWidth = 3);
   ~GA();
 
+  void reset();
+  
   // interface for repeated evaluation of individual genomes
   /// Returns pointer to one of two genomes in current tournament, but doesn't allow modification of its contents
   const double* getCurrentGenome() const;
@@ -85,7 +87,6 @@ protected:
   } m_currentGenome;
 
   void init();
-  void reset();
   
   // internal interface for repeated evaluation of individual genomes
   // selects two random genomes for tournament from neighborhood in population

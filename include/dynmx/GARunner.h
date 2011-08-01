@@ -63,6 +63,7 @@ public:
   // Inherited from Model
   virtual void update(float dt);
   virtual void init();
+  virtual void reset();
   virtual bool hasFinished() { return m_ga->getCurrentGeneration() == m_numGenerations; };
   
   Evolvable* getEvolvable() { return m_evolvable; };

@@ -12,6 +12,7 @@
 
 #include "Dynmx.h"
 #include <math.h>
+#include <sstream>
 
 const float PI = 3.1415926535897932384626433832795f;
 const float TWO_PI = 6.283185307179586f;
@@ -40,6 +41,15 @@ static const float degreesToRadians(float deg) { return deg * DEG_TO_RAD; };
 
 //----------------------------------------------------------------------------------------------------------------------
 static const float radiansToDegrees(float rad) { return rad * RAD_TO_DEG; };
+
+//----------------------------------------------------------------------------------------------------------------------
+template <class T>
+static inline std::string toString (const T& t)
+{
+  std::stringstream ss;
+  ss << t;
+  return ss.str();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // Fast random number generator from Numerical Recipes in C					            	
