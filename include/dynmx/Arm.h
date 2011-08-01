@@ -86,6 +86,10 @@ public:
 protected:
 
   void preCompute();
+  void solveEuler(const double* torques, float dt);
+  void solveImprovedEuler(const double* torques, float dt);
+  void computeAccelerations(const double* angles, const double* velocities, const double* accel, const double* torques,
+                            double* newAccel);
   
   // states
   double 
