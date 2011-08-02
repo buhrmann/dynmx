@@ -43,6 +43,13 @@ static const float degreesToRadians(float deg) { return deg * DEG_TO_RAD; };
 static const float radiansToDegrees(float rad) { return rad * RAD_TO_DEG; };
 
 //----------------------------------------------------------------------------------------------------------------------
+template<class T>
+static inline T clamp(T Value, T Min, T Max)
+{
+  return (Value < Min)? Min : (Value > Max)? Max : Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 template <class T>
 static inline std::string toString (const T& t)
 {

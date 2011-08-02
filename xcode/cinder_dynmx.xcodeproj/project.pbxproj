@@ -18,6 +18,7 @@
 		5323E6B60EAFCA7E003A9687 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5323E6B50EAFCA7E003A9687 /* QTKit.framework */; };
 		53E3CDFC0E86099300238D2B /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53E3CDFB0E86099300238D2B /* Carbon.framework */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		D60CB06913E8361A00AAF10C /* EPController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D60CB06813E8361A00AAF10C /* EPController.cpp */; };
 		D6108AD413D0481000680AD5 /* Recorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6108AD313D0481000680AD5 /* Recorder.cpp */; };
 		D628908E13B4D16000653F04 /* SimulationFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D628908D13B4D16000653F04 /* SimulationFactory.cpp */; };
 		D62AB6F013D73336003020F7 /* MuscleMonoWrap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D62AB6EF13D73336003020F7 /* MuscleMonoWrap.cpp */; };
@@ -65,6 +66,8 @@
 		53E3CDFB0E86099300238D2B /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* cinder_dynmx.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = cinder_dynmx.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D60CB06813E8361A00AAF10C /* EPController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EPController.cpp; sourceTree = "<group>"; };
+		D60CB06A13E8362F00AAF10C /* EPController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EPController.h; path = ../include/dynmx/EPController.h; sourceTree = SOURCE_ROOT; };
 		D6108AD213D047F800680AD5 /* Recorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Recorder.h; path = ../include/dynmx/Recorder.h; sourceTree = SOURCE_ROOT; };
 		D6108AD313D0481000680AD5 /* Recorder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Recorder.cpp; sourceTree = "<group>"; };
 		D628908D13B4D16000653F04 /* SimulationFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SimulationFactory.cpp; sourceTree = "<group>"; };
@@ -322,6 +325,8 @@
 				D62AB6EF13D73336003020F7 /* MuscleMonoWrap.cpp */,
 				D62AB6F513D73389003020F7 /* MuscleBiWrap.h */,
 				D62AB6F313D7336A003020F7 /* MuscleBiWrap.cpp */,
+				D60CB06A13E8362F00AAF10C /* EPController.h */,
+				D60CB06813E8361A00AAF10C /* EPController.cpp */,
 			);
 			name = Arm;
 			sourceTree = "<group>";
@@ -434,6 +439,7 @@
 				D6F3F47F13D5BD09009715BC /* ArmView2d.cpp in Sources */,
 				D62AB6F013D73336003020F7 /* MuscleMonoWrap.cpp in Sources */,
 				D62AB6F413D7336A003020F7 /* MuscleBiWrap.cpp in Sources */,
+				D60CB06913E8361A00AAF10C /* EPController.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
