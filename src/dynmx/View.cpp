@@ -72,15 +72,21 @@ void View::init()
     
   m_cam2d.setOrtho(0, ci::app::getWindowWidth(), ci::app::getWindowHeight(), 0, 0.001f, 100.0f);
 
-  m_hud = params::InterfaceGl( "Tweakbar", Vec2i( 200, 400 ) );
-  m_hud.setOptions("", "iconified=true");
+#if USE_SIMPLE_GUI  
+  m_gui = new mowa::sgui::SimpleGUI(ci::app::App::get());
+  mowa::sgui::SimpleGUI::lightColor = ColorA(1, 1, 153/255, 1);
+  m_gui->addColumn();
+  m_gui->addLabel("Controls");
+#else
+  m_gui = params::InterfaceGl( "Tweakbar", Vec2i( 200, 400 ) );
+  m_gui.setOptions("", "iconified=true");
+#endif  
   
   buildGui();
   
   setupScene();
 }
 
-//----------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------
 void View::draw()
 {
@@ -109,6 +115,9 @@ void View::draw()
   }
   
   gl::setModelView(m_cam3d.getCamera());
+  
+  // Unproject 2d mouse position into 3d mouse coordinates
+  m_mouseWorld = screenToWorld(m_mouse);
       
   // picking
   if(RenderState::g_renderPass == RenderState::RENDER_PICKING)
@@ -162,6 +171,12 @@ void View::draw()
 
       // custom 3d drawing
       draw3d();
+      
+      // draw projected mouse position
+//      glPushMatrix();
+//      glTranslatef(m_mouseWorld);
+//      drawFrame(0.1, 0.1);
+//      glPopMatrix();
     }
 
     // 2D stuff
@@ -187,7 +202,14 @@ void View::draw()
 
     // finally draw the GUI on top
     glDisable(GL_BLEND);
+#if USE_SIMPLE_GUI
+    if(m_showMenu)
+    {
+      m_gui->draw();
+    }
+#else    
     ci::params::InterfaceGl::draw();
+#endif
     
     glPopAttrib();
   } // when in render mode
@@ -264,26 +286,13 @@ void View::keyDown(KeyEvent event)
       break;      
     case ci::app::KeyEvent::KEY_TAB:
       m_showMenu = !m_showMenu;
+#if !USE_SIMPLE_GUI      
       if(m_showMenu)
-        m_hud.setOptions("", "iconified=false");
+        m_gui.setOptions("", "iconified=false");
       else
-        m_hud.setOptions("", "iconified=true");
+        m_gui.setOptions("", "iconified=true");
+#endif      
       break;
-    case ci::app::KeyEvent::KEY_EQUALS: 
-      //gui.nextPage(); 
-      //gui.show(); 
-      break;
-    case ci::app::KeyEvent::KEY_SPACE: 
-      //gui.toggleDraw();
-      //m_easyCam3d.fix(gui.isOn());
-      break;
-    case ci::app::KeyEvent::KEY_LEFTBRACKET: 
-      //gui.prevPage(); 
-      break;
-    case ci::app::KeyEvent::KEY_RIGHTBRACKET: 
-      //gui.nextPage(); 
-      break;
-    //case 'p': gui.nextPageWithBlank(); break;
   }
 }
 
@@ -351,6 +360,53 @@ void View::resize(ResizeEvent event)
 	CameraPersp cam = m_cam3d.getCamera();
 	cam.setAspectRatio( getWindowAspectRatio() );
 	m_cam3d.setCurrentCam( cam );
+  
+  // Update window size
+  m_windowSize = Rectf(0.0f, 0.0f, (float)event.getWidth(), (float)event.getHeight());  
+}
+
+//----------------------------------------------------------------------------------------------------------------------  
+ci::Vec3f View::screenToWorld(const ci::Vec2i& point)
+{
+	// Find near and far plane intersections
+	Vec3f point3f = Vec3f((float)point.x, m_windowSize.getHeight() * 0.5f - (float)point.y, 0.0f);
+	Vec3f nearPlane = unproject(point3f);
+	Vec3f farPlane = unproject(Vec3f(point3f.x, point3f.y, 1.0f));
+  
+	// Calculate X, Y and return point
+	float theta = (0.0f - nearPlane.z) / (farPlane.z - nearPlane.z);
+	return Vec3f(nearPlane.x + theta * (farPlane.x - nearPlane.x), 
+               nearPlane.y + theta * (farPlane.y - nearPlane.y), 
+               0.0f);
+}
+  
+//----------------------------------------------------------------------------------------------------------------------  
+ci::Vec3f View::unproject(const ci::Vec3f& point)
+{
+	// Find the inverse Modelview-Projection-Matrix
+	Matrix44f mInvMVP = ci::gl::getProjection() * ci::gl::getModelView();
+	mInvMVP.invert();
+  
+	// Transform to normalized coordinates in the range [-1, 1]
+	Vec4f pointNormal;
+  ci::Area viewport = ci::gl::getViewport();
+	pointNormal.x = (point.x - viewport.getX1()) / viewport.getWidth() * 2.0f - 1.0f;
+	pointNormal.y = (point.y - viewport.getY1()) / viewport.getHeight() * 2.0f;
+	pointNormal.z = 2.0f * point.z - 1.0f;
+	pointNormal.w = 1.0f;
+  
+	// Find the object's coordinates
+	Vec4f pointCoord = mInvMVP * pointNormal;
+	if (pointCoord.w != 0.0f)
+  {
+		pointCoord.w = 1.0f / pointCoord.w;
+  }
+  
+	// Return coordinate
+	return Vec3f(pointCoord.x * pointCoord.w, 
+               pointCoord.y * pointCoord.w, 
+               pointCoord.z * pointCoord.w);
+  
 }
 
 } // namespace dmx

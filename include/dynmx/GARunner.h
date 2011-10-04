@@ -23,17 +23,20 @@ namespace dmx
 //----------------------------------------------------------------------------------------------------------------------
 // Interface for an evolvable model
 //----------------------------------------------------------------------------------------------------------------------
-class Evolvable
+class Evolvable : public Model
 {
 public:
   virtual int getNumGenes() = 0;
   virtual void decodeGenome(const double* genome) = 0;
   virtual float getFitness() = 0;
+  
+  // An evolvable can just return  its fitness explicitly, so doesn't necessarily need an update etc...
   virtual void update(float dt) {};
+  virtual void init() {};
   virtual void reset() {};
 };
 
-// helpers
+// Helpers
 //----------------------------------------------------------------------------------------------------------------------
 static double mapUnitIntervalToRange(double val, double min, double max)
 {
@@ -63,7 +66,8 @@ public:
   // Inherited from Model
   virtual void update(float dt);
   virtual void init();
-  virtual void reset();
+  virtual void reset() { reset(true); };
+  virtual void reset(bool randomiseGenomes);
   virtual bool hasFinished() { return m_ga->getCurrentGeneration() == m_numGenerations; };
   
   Evolvable* getEvolvable() { return m_evolvable; };
@@ -83,11 +87,14 @@ protected:
   
   float m_time;
   float m_accFitness;
-  float m_trialDuration;  
   uint16_t m_trial;
   uint16_t m_numTrials;
   uint32_t m_prevGeneration;  /// For detecting if GA has incremented a generation
   uint32_t m_numGenerations;
+  
+  
+  double m_reducedMutationMax;
+  int m_reduceMutationMaxAt;
   
   int m_verbosity;
   

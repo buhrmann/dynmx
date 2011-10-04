@@ -51,6 +51,15 @@ void EPController::reset()
 void EPController::update(float dt)
 {
   double length = m_muscle->getLength();
+  
+  assert(length >=0 && length <= 10);
+  
+  if(length > 10.0)
+  {
+    length = 1.0;
+    return;
+  }
+  
   double velocity = m_muscle->getVelocity();
   
   // If we're dealing with delayed feedback
@@ -77,17 +86,21 @@ void EPController::update(float dt)
   }
   
   // Regular "PD"-like components
-  m_activation = m_pGain * (m_desiredLength - length) + m_dGain * velocity;
+  m_activation = m_pGain * (length - m_desiredLength) + m_dGain * velocity;
   
   // Calculate target velocity here if needed
   if(m_vGain > 0.0)
   {
     m_desiredVelocity = (m_desiredLength - m_desiredLengthPrev) / dt;
-    m_activation += m_vGain * (m_desiredVelocity - velocity);
+    m_activation += m_vGain * (velocity - m_desiredVelocity);
   }  
   
   // Clamp to allowed range
-	clamp(m_activation, 0.0, 1.0);
+	m_activation = clamp(m_activation, 0.0, 1.0);
+  if(m_activation > 1.0 || m_activation < 0.0)
+  {
+    m_activation = 0.0;
+  }
   
 }
   

@@ -11,9 +11,8 @@
 
 #include "Dynmx.h"
 #include "Simulation.h"
+#include "App.h"
 #include "Model.h"
-
-#define DEFAULT_TIMESTEP 0.03333f
 
 namespace dmx
 {
@@ -39,7 +38,7 @@ void Simulation::start()
 
 //----------------------------------------------------------------------------------------------------------------------
 void Simulation::runVisual()
-{
+{  
   char** const argv = 0;
   const int antiAliasingSteps = 4; // Todo: read from config.xml.
   cinder::app::Renderer* renderer = new ci::app::RendererGl(antiAliasingSteps);

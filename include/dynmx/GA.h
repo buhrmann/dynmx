@@ -36,7 +36,7 @@ public:
   GA(int popsize=100, int genlength=10, int demeWidth = 3);
   ~GA();
 
-  void reset();
+  void reset(bool randomizeGenomes = true);
   
   // interface for repeated evaluation of individual genomes
   /// Returns pointer to one of two genomes in current tournament, but doesn't allow modification of its contents

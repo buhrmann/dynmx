@@ -21,6 +21,13 @@ namespace dmx
 {
 
 //----------------------------------------------------------------------------------------------------------------------
+Vec3f Arm3dView::toLocalSpace(Vec3f p)
+{
+  p -= m_TM.getTranslate().xyz();
+  return m_TM.preMultiply(p);
+}
+  
+//----------------------------------------------------------------------------------------------------------------------
 void Arm3dView::init()
 {
   NodeGroup::init();
@@ -115,7 +122,10 @@ void Arm3dView::update()
   m_lowerArm.m_TM.rotate(Vec3f(0.0f, 0.0f, 1.0f), shdAngle + elbAngle);  
 #endif  
   
+  m_elbow.m_TM.setToIdentity();
+  m_elbow.m_TM.rotate(Vec3f(0.0f, 0.0f, 1.0f), shdAngle); 
   m_elbow.m_TM.setTranslate(Vec3f(m_arm->getElbowPos()));
+
   
   // After updating poses, render the scene graph objects
   //NodeGroup::update();  
@@ -126,12 +136,12 @@ void Arm3dView::update()
   glMultMatrixf(*m_pTM);
   
   // Desired kinematic state
-#if 0
+#if 1
   const bool drawDesired = true;
   if(drawDesired)
   {
-    double desElbAngle = ((ArmPD*)m_arm)->getDesiredJointAngle(JT_elbow); 
-    double desShdAngle = ((ArmPD*)m_arm)->getDesiredJointAngle(JT_shoulder); 
+    double desElbAngle = ((ArmMuscled*)m_arm)->getDesiredJointAngle(JT_elbow); 
+    double desShdAngle = ((ArmMuscled*)m_arm)->getDesiredJointAngle(JT_shoulder); 
     Pos p1, p2;
     m_arm->forwardKinematics(desElbAngle, desShdAngle, p1, p2);
     glColor4f(1.0, 0.25, 0.25, 0.5);
@@ -159,18 +169,29 @@ void Arm3dView::update()
   ci::gl::drawLine(Vec3f(m_arm->getElbowPos()), Vec3f(m_arm->getEffectorPos()));  
   glLineWidth(1.0);  
   
+  // Joints and limits
   glPushMatrix();
   glMultMatrixf(m_elbow.m_TM);
-  drawDisk(m_elbow.m_radius1, 0, 16, 1);
+  float r = m_hasMuscles ? ((ArmMuscled*)m_arm)->getJointRadius(JT_elbow) : 1.1 * m_lowerArm.m_radius1; 
+  drawDisk(r, 0, 16, 1);
+  float limMin = m_arm->getJointLimitLower(JT_elbow) * RAD_TO_DEG;
+  float limMax = m_arm->getJointLimitUpper(JT_elbow) * RAD_TO_DEG;
+  glColor4f(1,1,1,0.5);
+  drawPartialDisk(r, r+0.01, 16, 1, 90 - limMin, -(limMax - limMin));
   glPopMatrix();
   
+  glColor3f(0,0,0);
   glPushMatrix();
-  glMultMatrixf(m_shoulder.m_TM);
-  drawDisk(m_shoulder.m_radius1, 0, 16, 1);
+  //glMultMatrixf(m_shoulder.m_TM);
+  r = m_hasMuscles ? ((ArmMuscled*)m_arm)->getJointRadius(JT_shoulder) : 1.1 * m_upperArm.m_radius1;
+  drawDisk(r, 0, 16, 1);
+  limMin = m_arm->getJointLimitLower(JT_shoulder) * RAD_TO_DEG;
+  limMax = m_arm->getJointLimitUpper(JT_shoulder) * RAD_TO_DEG;  
+  glColor4f(1,1,1,0.5);
+  drawPartialDisk(r, r+0.01, 16, 1, 90 - limMin, -(limMax - limMin));
   glPopMatrix();
-
   
-  // draw trajectory
+  // Trajectory
   int numTrajPoints = m_arm->getTrajectory().size();
   for(int i = 0; i < numTrajPoints - 1; ++i)
   {
@@ -190,10 +211,15 @@ void Arm3dView::update()
     // TEST
     for(size_t i = 0; i < armMusc->getNumMuscles(); ++i)
     {
-      if(armMusc->getMuscle(i)->isMonoArticulate())
+      float l = armMusc->getMuscle(i)->getNormalisedLength() - 1;
+      l = clamp(l, -1.0f, 1.0f);
+      setColor3(getColorMapBlueRed(l));
+      /*
+      if(armMusc->getMuscle(i)->isMonoArticulate())        
         glColor3f(0.9, 0.9, 0.9);
       else
         glColor3f(0.6, 0.6, 0.6);    
+       */
       
       Vec3f origin = Vec3f(armMusc->getMuscle(i)->getOriginWorld());
       Vec3f insertion = Vec3f(armMusc->getMuscle(i)->getInsertionWorld());
@@ -209,15 +235,18 @@ void Arm3dView::update()
         MuscleMonoWrap* m = ((MuscleMonoWrap*)armMusc->getMuscle(i));        
         if(!m->m_muscleWraps)
         {
-          ci::Vec2f dir = m->getInsertionWorld() - m->getOriginWorld();
-          dir.normalize();
+          //ci::Vec2f dir = m->getInsertionWorld() - m->getOriginWorld();
+          //dir.normalize();
           // Only hold in the non-wrapping case. Otherwise we need to do a proper projection (dot product).
-          ci::Vec2f closestPoint = m->getOriginWorld() + dir * m->m_originCapsuleDist;
+          //ci::Vec2f closestPoint = m->getOriginWorld() + dir * m->m_originCapsuleDist;
           //ci::Vec2f maVec = closestPoint - m_arm->getElbowPos();
           //float ma = maVec.length();
           //const bool muscleWraps = ma < r && m_arm->getJointAngle(JT_elbow) < PI_OVER_TWO;
           //ci::gl::drawLine(ci::Vec3f(closestPoint), ci::Vec3f(m_arm->getElbowPos())); 
           ci::gl::drawLine(origin, insertion); 
+          // Indicate optimal length
+          //ci::Vec3f l0Pos = origin + m->getOptimalLength() * (insertion - origin).normalized();
+          //drawPoint(l0Pos, 4.0);
         }    
         else
         {
@@ -241,6 +270,9 @@ void Arm3dView::update()
       } // is mono
       else 
       {
+        glPushAttrib (GL_LINE_BIT);
+        glEnable(GL_LINE_STIPPLE);
+        glLineStipple (1, 0xAAAA);
         MuscleBiWrap* m = ((MuscleBiWrap*)armMusc->getMuscle(i));
         if (m->wrapsElbow() && m->wrapsShoulder())
         {
@@ -315,6 +347,7 @@ void Arm3dView::update()
           //glColor3f(1,1,1);
           ci::gl::drawLine(origin, insertion);          
         }
+        glPopAttrib();
       }
     } // for all muscles
   } // if has muscles

@@ -13,12 +13,16 @@
 #include "Scene.h"
 #include "Arm.h"
 #include "ArmMuscled.h"
+#include "Scene.h"
 #include "ArmView3d.h"
 
 #include "cinder/gl/gl.h"
 #include "cinder/Matrix.h"
+#include "SimpleGUI.h"
 
 #define NUM_MUSCLES 6
+
+#define HAS_REFLEX 1
 
 // ---------------------------------------------------------------------------------------------------------------------
 class TestViewArm : public dmx::View
@@ -27,8 +31,9 @@ class TestViewArm : public dmx::View
 public:
   
   //--------------------------------------------------------------------------------------------------------------------
-  TestViewArm() : m_arm(0), m_hasMuscles(false), m_fixedFrameRate(100) {};
-  TestViewArm(dmx::Arm* arm, bool hasMuscles = false) : m_arm(arm), m_hasMuscles(hasMuscles), m_fixedFrameRate(100) {};
+  TestViewArm() : m_arm(0), m_hasMuscles(false), m_fixedFrameRate(100), m_selectedMuscle(0) {};
+  TestViewArm(dmx::Arm* arm, bool hasMuscles = false) : m_arm(arm), m_hasMuscles(hasMuscles), 
+    m_fixedFrameRate(DEFAULT_FRAME_RATE), m_selectedMuscle(0) {};
   
   // functions to be implemented by subclasses
   //--------------------------------------------------------------------------------------------------------------------
@@ -48,16 +53,34 @@ public:
     m_scene3d.m_children.push_back(m_armView);
     
     // 2d view
-    m_plot = new dmx::Plot(600.0, 180, NUM_MUSCLES, 200);
+    m_plotMuscles = new dmx::Plot(600.0, 180, NUM_MUSCLES, 200);
     if(m_hasMuscles)
     {    
+      m_selectedMuscle = 0;
+      std:string muscleName = ((dmx::ArmMuscled*)m_arm)->getMuscle(m_selectedMuscle)->getName();
+      m_muscleLabel->setText(muscleName);      
       for(int i = 0; i < ((dmx::ArmMuscled*)m_arm)->getNumMuscles(); ++i)
       {
-        m_plot->setLabel(i, ((dmx::ArmMuscled*)m_arm)->getMuscle(i)->getName());
+        m_plotMuscles->setLabel(i, ((dmx::ArmMuscled*)m_arm)->getMuscle(i)->getName());
       }
+      m_plotMuscles->translate(ci::Vec4f(50, 50, 0, 1)); 
+      m_scene2d.m_children.push_back(m_plotMuscles);
+      
+#if HAS_REFLEX    
+      m_plotReflex = new dmx::Plot(600.0, 180, 7, 200);
+      m_plotReflex->setLabel(0, "F1");
+      m_plotReflex->setLabel(1, "F2");
+      m_plotReflex->setLabel(2, "F3");      
+      m_plotReflex->setLabel(3, "E1");
+      m_plotReflex->setLabel(4, "E2");
+      m_plotReflex->setLabel(5, "E3");
+      m_plotReflex->translate(ci::Vec4f(50, 50 + 180 + 20, 0, 1));
+      m_scene2d.m_children.push_back(m_plotReflex);
+#endif          
     }
-    m_plot->translate(ci::Vec4f(50, 50, 0, 1)); 
-    m_scene2d.m_children.push_back(m_plot);
+
+    
+    m_trackMouse = false;
   };
   
   
@@ -71,9 +94,30 @@ public:
   virtual void draw3d()
   {
     //m_app->setFixedTimeStep(1.0f / (float)m_fixedFrameRate);
+    
     //dmx::drawBasis(0.1f);
+    
+    if(m_trackMouse)
+    {
+      m_target = m_armView->toLocalSpace(m_mouseWorld);
+      //m_arm->setTarget(dmx::Pos(m_target));
+    }
+    
+    m_arm->setGravity(m_gravity);
+    
     if(m_hasMuscles)
-    {    
+    {
+      dmx::ArmMuscled* marm = (dmx::ArmMuscled*)m_arm;
+      std:string muscleName = marm->getMuscle(m_selectedMuscle)->getName();
+      if(m_muscleLabel->getText() != muscleName)
+      {
+        m_muscleLabel->setText(muscleName);
+        m_fmaxControl->setControlledVariable(&marm->getMuscle(m_selectedMuscle)->m_maxForce);
+        m_pGainControl->setControlledVariable(&marm->getEPController(m_selectedMuscle)->m_pGain);
+        m_vGainControl->setControlledVariable(&marm->getEPController(m_selectedMuscle)->m_vGain);
+        m_dGainControl->setControlledVariable(&marm->getEPController(m_selectedMuscle)->m_dGain);
+      }
+      
       for(int i = 0; i < ((dmx::ArmMuscled*)m_arm)->getNumMuscles(); ++i)
       {
         ((dmx::ArmMuscled*)m_arm)->getMuscle(i)->setExcitation(m_excitation[i]);
@@ -88,13 +132,43 @@ public:
     //m_plot->addPoint(m_arm->getJointAngle(dmx::JT_shoulder), 1);    
     if(m_hasMuscles)
     {
-      for(int i = 0; i < ((dmx::ArmMuscled*)m_arm)->getNumMuscles(); i++)
+      dmx::ArmMuscled* marm =  (dmx::ArmMuscled*)m_arm;
+      for(int i = 0; i < marm->getNumMuscles(); i++)
       {
-        double val = ((dmx::ArmMuscled*)m_arm)->getMuscle(i)->getNormalisedLength();
-        //double l1 = ((dmx::ArmMuscled*)m_arm)->getMuscle(0).getVelocity();        
-        m_plot->addPoint(val, i);
+        double val = marm->getMuscle(i)->getNormalisedLength();
+        //double val = ((dmx::ArmMuscled*)m_arm)->getMuscle(i)->getUnitLength();
+        //double val = ((dmx::ArmMuscled*)m_arm)->getMuscle(i)->getNormalisedVelocity();
+        m_plotMuscles->addPoint(val, i);
       }
+      
+#if HAS_REFLEX
+      int r = 0;
+      
+      //m_plotReflex->addPoint(marm->getReflex(r)->m_ifv[0], 0);
+      //m_plotReflex->addPoint(marm->getReflex(r)->m_alpha[0], 1);
+      //m_plotReflex->addPoint(marm->getReflex(r)->m_spindlePri[0], 2);
+      
+      m_plotReflex->addPoint(0.5*(marm->getReflex(r)->getAlphaOutput(0)+marm->getReflex(r)->getAlphaOutput(1)), 0);
+      m_plotReflex->addPoint(marm->getReflex(r)->getCoContraction(0), 1);
+      m_plotReflex->addPoint(marm->getReflex(r)->getAlphaOutput(0), 2);
+      m_plotReflex->addPoint(marm->getReflex(r)->getAlphaOutput(1), 3);
+      
+      //m_plotReflex->addPoint(marm->getReflex(r)->m_ifv[1], 3);
+      //m_plotReflex->addPoint(marm->getReflex(r)->m_alpha[1], 4);
+      //m_plotReflex->addPoint(marm->getReflex(r)->m_spindlePri[1], 5);
+      //m_plotReflex->addPoint(marm->getJointVelocity(dmx::JT_shoulder), 4);      
+      
+      //m_plotReflex->addPoint(marm->getReflex(r)->m_desiredLength[0], 2);
+      //m_plotReflex->addPoint(marm->getReflex(r)->m_desiredLength[1], 5);
+      
+      /*
+      m_plotReflex->addPoint(marm->getMuscle(m_selectedMuscle)->getActiveForce(), 0);
+      m_plotReflex->addPoint(marm->getMuscle(m_selectedMuscle)->getPassiveForce(), 1);
+      m_plotReflex->addPoint(marm->getMuscle(m_selectedMuscle)->getVelocityForce(), 2);      
+       */
+#endif      
     }
+    
   };
   
   //---------------------------------------------------------------------------------------------------------------------
@@ -108,6 +182,9 @@ public:
       case '-':
         m_fixedFrameRate--;
         break;
+      case 't':
+        m_trackMouse = !m_trackMouse;
+        break;
     }
     // default behaviour in base class
     View::keyDown(event);
@@ -116,23 +193,60 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   virtual void buildGui() 
   { 
-    m_hud.addParam( "FPS", &m_fixedFrameRate, "min=10 max=300 step=5"); 
-    m_hud.addSeparator("Muscle Controls");
+#if !USE_SIMPLE_GUI
+    m_gui.addParam( "FPS", &m_fixedFrameRate, "min=10 max=300 step=5");     
+    m_gui.addSeparator("Muscle Controls");
+    m_gui.addParam("Gravity", &m_gravity, "min=0.0 max=9.81 step=0.01");
     if(m_hasMuscles)
     {
       for(int i = 0; i < ((dmx::ArmMuscled*)m_arm)->getNumMuscles(); i++)
       {
-        m_hud.addParam( ((dmx::ArmMuscled*)m_arm)->getMuscle(i)->getName(), &m_excitation[i], "min=0.0 max=1.0 step=0.01" );
+        m_gui.addParam( ((dmx::ArmMuscled*)m_arm)->getMuscle(i)->getName(), &m_excitation[i], "min=0.0 max=1.0 step=0.01" );
       }
     }  
   };
+#else
+  m_gui->addParam("FPS", &m_fixedFrameRate, 10, 300, 100);   
+  
+  //m_gui->addColumn();
+  m_gui->addPanel();
+  m_gui->addLabel("Muscle Controls");
+  m_gui->addParam("Gravity", &m_gravity, 0.0, 9.81, m_arm->getGravity());
+  if(m_hasMuscles)
+  {
+    dmx::ArmMuscled* marm = (dmx::ArmMuscled*)m_arm;
+    for(int i = 0; i < marm->getNumMuscles(); i++)
+    {
+      m_gui->addParam( marm->getMuscle(i)->getName(), &m_excitation[i], 0.0, 1.0, 0.0);
+    }
+                             
+    m_gui->addPanel();
+    m_gui->addParam("Muscle", &m_selectedMuscle, 0, 5, m_selectedMuscle);
+    m_muscleLabel = m_gui->addLabel("Selected Muscle");
+    m_fmaxControl = m_gui->addParam("Fmax", &(marm->getMuscle(m_selectedMuscle)->m_maxForce), 0.0, 3000.0, marm->getMuscle(m_selectedMuscle)->m_maxForce);
+    m_pGainControl = m_gui->addParam("P", &(marm->getEPController(m_selectedMuscle)->m_pGain), 0.0, 100.0, marm->getEPController(m_selectedMuscle)->m_pGain);
+    m_vGainControl = m_gui->addParam("V", &(marm->getEPController(m_selectedMuscle)->m_vGain), 0.0, 100.0, marm->getEPController(m_selectedMuscle)->m_vGain);
+    m_dGainControl = m_gui->addParam("D", &(marm->getEPController(m_selectedMuscle)->m_dGain), 0.0, 100.0, marm->getEPController(m_selectedMuscle)->m_dGain);
+  }
+};
+#endif
   
   bool m_hasMuscles;
   dmx::Arm* m_arm; 
   dmx::Arm3dView* m_armView;
-  dmx::Plot* m_plot;  
+  dmx::Plot* m_plotMuscles;
+  dmx::Plot* m_plotReflex;
   int32_t m_fixedFrameRate;
   float m_excitation[NUM_MUSCLES];
+  float m_gravity;
+  int m_selectedMuscle;
+  Vec3f m_target;
+  bool m_trackMouse;
+  mowa::sgui::LabelControl* m_muscleLabel;
+  mowa::sgui::DoubleVarControl* m_fmaxControl;
+  mowa::sgui::FloatVarControl* m_pGainControl;
+  mowa::sgui::FloatVarControl* m_vGainControl;
+  mowa::sgui::FloatVarControl* m_dGainControl;
 };
 
 #endif

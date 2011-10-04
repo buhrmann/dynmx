@@ -36,6 +36,9 @@
 		D64F237712EE14550014F069 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D64F237612EE14550014F069 /* GLUT.framework */; };
 		D64F246D12EE2AF10014F069 /* Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D64F246C12EE2AF10014F069 /* Light.cpp */; };
 		D671C19913D9AC0600B7ACC5 /* Config.xml in Resources */ = {isa = PBXBuildFile; fileRef = D671C19813D9AC0600B7ACC5 /* Config.xml */; };
+		D68AC7DA13E9937F009887A9 /* pf_tempesta_seven.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D68AC79113E9937F009887A9 /* pf_tempesta_seven.ttf */; };
+		D68AC7FD13E9937F009887A9 /* SimpleGUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D68AC7D913E9937F009887A9 /* SimpleGUI.cpp */; };
+		D68CFC961428DAEF003CA32E /* Reflex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D68CFC951428DAEF003CA32E /* Reflex.cpp */; };
 		D69FBB4B13B222C300D5F6F0 /* Simulation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D69FBB4A13B222C300D5F6F0 /* Simulation.cpp */; };
 		D6B7EAF413B791800019114A /* Registry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6B7EAF313B791800019114A /* Registry.cpp */; };
 		D6BA379B13BA249900CFED09 /* Muscle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6BA379A13BA249900CFED09 /* Muscle.cpp */; };
@@ -44,6 +47,7 @@
 		D6BA381813BA32E000CFED09 /* ArmMuscled.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6BA381713BA32E000CFED09 /* ArmMuscled.cpp */; };
 		D6CAA9FF12FDA1CF003BE477 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6CAA9FE12FDA1CF003BE477 /* main.cpp */; };
 		D6DEE86A13B0EF09003FE7D2 /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6DEE86913B0EF09003FE7D2 /* App.cpp */; };
+		D6E94EB51423652300E8D8BD /* GATester.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E94EB41423652300E8D8BD /* GATester.cpp */; };
 		D6F3F47F13D5BD09009715BC /* ArmView2d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6F3F47E13D5BD09009715BC /* ArmView2d.cpp */; };
 		D6F6B6DF13ABDD09005C2E0F /* Dynmx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6F6B6DD13ABDD09005C2E0F /* Dynmx.cpp */; };
 /* End PBXBuildFile section */
@@ -70,6 +74,7 @@
 		D60CB06A13E8362F00AAF10C /* EPController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EPController.h; path = ../include/dynmx/EPController.h; sourceTree = SOURCE_ROOT; };
 		D6108AD213D047F800680AD5 /* Recorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Recorder.h; path = ../include/dynmx/Recorder.h; sourceTree = SOURCE_ROOT; };
 		D6108AD313D0481000680AD5 /* Recorder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Recorder.cpp; sourceTree = "<group>"; };
+		D61BAD9B143A05960007E5A1 /* EvoArmCoCon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EvoArmCoCon.h; path = ../include/dynmx/EvoArmCoCon.h; sourceTree = SOURCE_ROOT; };
 		D628908D13B4D16000653F04 /* SimulationFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SimulationFactory.cpp; sourceTree = "<group>"; };
 		D628908F13B4D18200653F04 /* SimulationFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SimulationFactory.h; path = ../include/dynmx/SimulationFactory.h; sourceTree = SOURCE_ROOT; };
 		D62AB6EF13D73336003020F7 /* MuscleMonoWrap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MuscleMonoWrap.cpp; sourceTree = "<group>"; };
@@ -80,6 +85,7 @@
 		D64236DC131D7D5A0047734B /* GAViz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GAViz.h; path = ../include/dynmx/GAViz.h; sourceTree = SOURCE_ROOT; };
 		D64236E5131D7E5C0047734B /* GAViz.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GAViz.cpp; sourceTree = "<group>"; };
 		D642C5F1131CF0E800994FDD /* TestAppEvolvableCTRNN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestAppEvolvableCTRNN.h; path = ../include/dynmx/Tests/TestAppEvolvableCTRNN.h; sourceTree = SOURCE_ROOT; };
+		D6464E2814276D6A00FB5992 /* Trajectory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Trajectory.h; path = ../include/dynmx/Trajectory.h; sourceTree = SOURCE_ROOT; };
 		D64F209312ECE1640014F069 /* Render.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Render.h; path = ../../include/dynmx/Render.h; sourceTree = "<group>"; };
 		D64F209412ECE1640014F069 /* App.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = App.h; path = ../../include/dynmx/App.h; sourceTree = "<group>"; };
 		D64F209512ECE1640014F069 /* Arm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Arm.h; path = ../../include/dynmx/Arm.h; sourceTree = "<group>"; };
@@ -108,6 +114,13 @@
 		D6754818134262BD00E2DBF0 /* TestAppArm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestAppArm.h; path = ../include/dynmx/Tests/TestAppArm.h; sourceTree = "<group>"; };
 		D6754819134264EA00E2DBF0 /* TestViewArm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestViewArm.h; path = ../include/dynmx/Tests/TestViewArm.h; sourceTree = "<group>"; };
 		D675481A1342657800E2DBF0 /* TestModelArm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestModelArm.h; path = ../include/dynmx/Tests/TestModelArm.h; sourceTree = "<group>"; };
+		D68AC78F13E9937F009887A9 /* SimpleGUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleGUI.h; sourceTree = "<group>"; };
+		D68AC79113E9937F009887A9 /* pf_tempesta_seven.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = pf_tempesta_seven.ttf; sourceTree = "<group>"; };
+		D68AC7D913E9937F009887A9 /* SimpleGUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SimpleGUI.cpp; sourceTree = "<group>"; };
+		D68C028C142CAF7E003CA32E /* EvoArmSimpleReflex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EvoArmSimpleReflex.h; path = ../include/dynmx/EvoArmSimpleReflex.h; sourceTree = SOURCE_ROOT; };
+		D68CFC941428DADD003CA32E /* Reflex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reflex.h; path = ../include/dynmx/Reflex.h; sourceTree = SOURCE_ROOT; };
+		D68CFC951428DAEF003CA32E /* Reflex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Reflex.cpp; sourceTree = "<group>"; };
+		D692C7C8141E0FB100F0E802 /* TestModelEvolvableArm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestModelEvolvableArm.h; path = ../include/dynmx/Tests/TestModelEvolvableArm.h; sourceTree = SOURCE_ROOT; };
 		D69461D213CDD7A000FA12EA /* TestAppCTRNN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestAppCTRNN.h; path = ../include/dynmx/Tests/TestAppCTRNN.h; sourceTree = SOURCE_ROOT; };
 		D69FBB4A13B222C300D5F6F0 /* Simulation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Simulation.cpp; sourceTree = "<group>"; };
 		D69FBB4C13B222DA00D5F6F0 /* Simulation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Simulation.h; path = ../include/dynmx/Simulation.h; sourceTree = SOURCE_ROOT; };
@@ -133,6 +146,8 @@
 		D6D8EC8D13AA647200160C37 /* Dynmx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Dynmx.h; path = ../../include/dynmx/Dynmx.h; sourceTree = "<group>"; };
 		D6D8EC8E13AA647200160C37 /* MathUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MathUtils.h; path = ../../include/dynmx/MathUtils.h; sourceTree = "<group>"; };
 		D6DEE86913B0EF09003FE7D2 /* App.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = App.cpp; sourceTree = "<group>"; };
+		D6E94EB31423650800E8D8BD /* GATester.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GATester.h; path = ../include/dynmx/GATester.h; sourceTree = SOURCE_ROOT; };
+		D6E94EB41423652300E8D8BD /* GATester.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GATester.cpp; sourceTree = "<group>"; };
 		D6F3F47D13D5BCF7009715BC /* ArmView2d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmView2d.h; path = ../include/dynmx/ArmView2d.h; sourceTree = SOURCE_ROOT; };
 		D6F3F47E13D5BD09009715BC /* ArmView2d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ArmView2d.cpp; sourceTree = "<group>"; };
 		D6F6B6DD13ABDD09005C2E0F /* Dynmx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Dynmx.cpp; sourceTree = "<group>"; };
@@ -199,6 +214,7 @@
 		29B97314FDCFA39411CA2CEA /* cinder_dynmx */ = {
 			isa = PBXGroup;
 			children = (
+				D68AC78D13E9937F009887A9 /* SimpleGUI */,
 				D6CAA9D312FD9D5A003BE477 /* tests */,
 				D64F209E12ECE1720014F069 /* dynmx */,
 				D6AE244B12F0D87C0082EAC0 /* src */,
@@ -259,6 +275,8 @@
 				D64F20A412ECE1720014F069 /* GA.cpp */,
 				D64F209A12ECE1640014F069 /* GARunner.h */,
 				D64F20A512ECE1720014F069 /* GARunner.cpp */,
+				D6E94EB31423650800E8D8BD /* GATester.h */,
+				D6E94EB41423652300E8D8BD /* GATester.cpp */,
 				D64236DC131D7D5A0047734B /* GAViz.h */,
 				D64236E5131D7E5C0047734B /* GAViz.cpp */,
 				D64F209712ECE1640014F069 /* CTRNN.h */,
@@ -295,6 +313,50 @@
 			path = osx;
 			sourceTree = "<group>";
 		};
+		D68AC78D13E9937F009887A9 /* SimpleGUI */ = {
+			isa = PBXGroup;
+			children = (
+				D68AC78E13E9937F009887A9 /* include */,
+				D68AC79013E9937F009887A9 /* resources */,
+				D68AC7D813E9937F009887A9 /* src */,
+			);
+			name = SimpleGUI;
+			path = ../../Cinder/blocks/SimpleGUI;
+			sourceTree = SOURCE_ROOT;
+		};
+		D68AC78E13E9937F009887A9 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				D68AC78F13E9937F009887A9 /* SimpleGUI.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		D68AC79013E9937F009887A9 /* resources */ = {
+			isa = PBXGroup;
+			children = (
+				D68AC79113E9937F009887A9 /* pf_tempesta_seven.ttf */,
+			);
+			path = resources;
+			sourceTree = "<group>";
+		};
+		D68AC7D813E9937F009887A9 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				D68AC7D913E9937F009887A9 /* SimpleGUI.cpp */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		D68C028B142CAF53003CA32E /* Evolvables */ = {
+			isa = PBXGroup;
+			children = (
+				D68C028C142CAF7E003CA32E /* EvoArmSimpleReflex.h */,
+				D61BAD9B143A05960007E5A1 /* EvoArmCoCon.h */,
+			);
+			name = Evolvables;
+			sourceTree = "<group>";
+		};
 		D6AE244B12F0D87C0082EAC0 /* src */ = {
 			isa = PBXGroup;
 			children = (
@@ -307,6 +369,7 @@
 		D6BA37DF13BA2DAE00CFED09 /* Arm */ = {
 			isa = PBXGroup;
 			children = (
+				D68C028B142CAF53003CA32E /* Evolvables */,
 				D6BA37D213BA2BAC00CFED09 /* PD.h */,
 				D6BA37D013BA2B9200CFED09 /* PD.cpp */,
 				D64F209512ECE1640014F069 /* Arm.h */,
@@ -327,6 +390,9 @@
 				D62AB6F313D7336A003020F7 /* MuscleBiWrap.cpp */,
 				D60CB06A13E8362F00AAF10C /* EPController.h */,
 				D60CB06813E8361A00AAF10C /* EPController.cpp */,
+				D68CFC941428DADD003CA32E /* Reflex.h */,
+				D68CFC951428DAEF003CA32E /* Reflex.cpp */,
+				D6464E2814276D6A00FB5992 /* Trajectory.h */,
 			);
 			name = Arm;
 			sourceTree = "<group>";
@@ -348,6 +414,7 @@
 				D6754819134264EA00E2DBF0 /* TestViewArm.h */,
 				D675481A1342657800E2DBF0 /* TestModelArm.h */,
 				D6BA382F13BA3C6900CFED09 /* TestModelArmMuscled.h */,
+				D692C7C8141E0FB100F0E802 /* TestModelEvolvableArm.h */,
 			);
 			name = tests;
 			sourceTree = "<group>";
@@ -404,6 +471,7 @@
 			files = (
 				00CCAF15116A9FEE008396D5 /* CinderApp.icns in Resources */,
 				D671C19913D9AC0600B7ACC5 /* Config.xml in Resources */,
+				D68AC7DA13E9937F009887A9 /* pf_tempesta_seven.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -440,6 +508,9 @@
 				D62AB6F013D73336003020F7 /* MuscleMonoWrap.cpp in Sources */,
 				D62AB6F413D7336A003020F7 /* MuscleBiWrap.cpp in Sources */,
 				D60CB06913E8361A00AAF10C /* EPController.cpp in Sources */,
+				D68AC7FD13E9937F009887A9 /* SimpleGUI.cpp in Sources */,
+				D6E94EB51423652300E8D8BD /* GATester.cpp in Sources */,
+				D68CFC961428DAEF003CA32E /* Reflex.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

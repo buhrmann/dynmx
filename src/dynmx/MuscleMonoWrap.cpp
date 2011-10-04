@@ -15,11 +15,11 @@ namespace dmx
 
 //----------------------------------------------------------------------------------------------------------------------  
 MuscleMonoWrap::MuscleMonoWrap(ArmMuscled* arm, float originDist, float insertDist, Joint jointId, bool isFlexor) :
-  m_originJointDist(originDist),
-  m_insertJointDist(insertDist),
   m_joint(jointId)
 {
   m_arm = arm;
+  m_originJointDist = originDist;
+  m_insertJointDist = insertDist;  
   m_isFlexor = isFlexor;
 }
 
@@ -49,6 +49,29 @@ void MuscleMonoWrap::reset()
   Muscle::reset();
 }
   
+//----------------------------------------------------------------------------------------------------------------------    
+void MuscleMonoWrap::calculateMinMaxLength(double& minLength, double& maxLength)
+{
+  double upperLimit = m_arm->getJointLimitUpper(m_joint);
+  double lowerLimit = m_arm->getJointLimitLower(m_joint);
+  double lowerLength, upperLength, midLength;
+  if(m_joint == JT_elbow)
+  {
+    lowerLength = getLengthFromJointAngles(lowerLimit, 0); // Second joint angle is irrelevant
+    upperLength = getLengthFromJointAngles(upperLimit, 0); // Second joint angle is irrelevant
+    midLength = getLengthFromJointAngles(0.0, 0); // Second joint angle is irrelevant
+  }
+  else 
+  {
+    lowerLength = getLengthFromJointAngles(0, lowerLimit); // Second joint angle is irrelevant
+    upperLength = getLengthFromJointAngles(0, upperLimit); // Second joint angle is irrelevant    
+    midLength = getLengthFromJointAngles(0, 0.0); // Second joint angle is irrelevant
+  }
+  
+  minLength = min(upperLength, min(lowerLength, midLength));
+  maxLength = max(upperLength, max(lowerLength, midLength));
+}
+  
 //----------------------------------------------------------------------------------------------------------------------  
 void MuscleMonoWrap::updateLengthAndMomentArm()
 {
@@ -72,6 +95,28 @@ void MuscleMonoWrap::updateLengthAndMomentArm()
     m_length = m_originCapsuleDist + (r * wrapAngle) + m_insertCapsuleDist;
     m_momentArm = r;     
   }    
+}
+
+//----------------------------------------------------------------------------------------------------------------------      
+double MuscleMonoWrap::getLengthFromJointAngles(double elbAngle, double shdAngle)
+{
+  // An extensors length and moment arm are exactly those of an equivalent flexor when the joint angle is mirrored.
+  int sign = m_isFlexor ? 1 : -1;  
+  double jointAngle = (m_joint == JT_elbow) ? elbAngle : shdAngle;
+  jointAngle *= sign;
+  bool muscleWraps = jointAngle < m_wrapAngleThreshold;
+  
+  if(!muscleWraps)
+  {
+    double cosTheta = cos(jointAngle);
+    return sqrt(sqr(m_originJointDist) + sqr(m_insertJointDist) + (2 * m_originJointDist * m_insertJointDist * cosTheta));
+  }    
+  else
+  {
+    const double r = m_arm->getJointRadius(m_joint);
+    double wrapAngle = m_wrapAngleThreshold - jointAngle;
+    return m_originCapsuleDist + (r * wrapAngle) + m_insertCapsuleDist;
+  }  
 }
 
 //----------------------------------------------------------------------------------------------------------------------    

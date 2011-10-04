@@ -30,6 +30,9 @@ public:
   
   void setModel(Arm* model) { m_arm = model; };
   virtual void update();
+
+  // Transforms a given point p from world to local space
+  Vec3f toLocalSpace(Vec3f p);
   
 protected:
   virtual void init();

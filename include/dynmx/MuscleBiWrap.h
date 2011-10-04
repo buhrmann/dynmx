@@ -7,6 +7,9 @@
  *
  */
 
+#ifndef _DMX_MUSCLE_BI_
+#define _DMX_MUSCLE_BI_
+
 #include "Muscle.h"
 #include "ArmMuscled.h"
 
@@ -36,14 +39,15 @@ public:
   bool wrapsElbow() const { return m_elbowWraps; };
   double getWrapAngle(Joint j) const {if(j==JT_elbow) return m_wrapAngleElb; else return m_wrapAngleShd; };
   
+  virtual double getLengthFromJointAngles(double elbAngle, double shdAngle);  
+  
 protected:
   
   virtual void updateLengthAndMomentArm();
+  virtual void calculateMinMaxLength(double& min, double& max);  
   
   // Constant data related to muscle path
   double m_momentArms[2];
-  double m_originJointDist;
-  double m_insertJointDist;
   double m_originCapsuleAngle;
   double m_insertCapsuleAngle;
   double m_gammaAngle;
@@ -61,3 +65,5 @@ protected:
 };
   
 } // namespace dmx
+
+#endif

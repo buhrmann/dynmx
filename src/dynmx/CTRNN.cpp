@@ -52,12 +52,26 @@ double fastsigmoid(double x)
 }
 #endif
 
+
+// Initialize static members
+//----------------------------------------------------------------------------------------------------------------------
+CTRNN::ActivationFunction CTRNN::s_activationFunctions[kAF_NumFunctions] = {0};
+
 // helpers
 //----------------------------------------------------------------------------------------------------------------------
 int CTRNN::getNumRequiredParams(int N, bool numInputs)
 {
   // as many gains as inputs, n*n weights, and n*2 for bias, tau
   return numInputs + (N * N) + (2 * N);
+}
+
+// Populate array of pointers to activation functions
+//----------------------------------------------------------------------------------------------------------------------
+void CTRNN::initActivationFunctionTable()
+{
+  s_activationFunctions[kAF_Sigmoid] = &sigmoid;
+  s_activationFunctions[kAF_Linear] = &linearActivation;
+  s_activationFunctions[kAF_Sine] = &sineActivation;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -68,6 +82,8 @@ CTRNN::CTRNN(int newsize)
 #ifdef FAST_SIGMOID
   initSigmoidTable();
 #endif
+  
+  initActivationFunctionTable();
 
 	size = newsize;
   
@@ -97,7 +113,7 @@ CTRNN::CTRNN(int newsize)
   std::fill(taus, taus + size, 1.0);
   std::fill(Rtaus, Rtaus + size, 1.0);
   
-  m_activationFunction = &sigmoid;
+  setActivationFunction(kAF_Sigmoid);
 }
 
 

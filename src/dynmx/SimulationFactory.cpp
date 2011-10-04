@@ -14,9 +14,15 @@
 
 // Individual models and view used by the factory
 #include "GARunner.h"
+#include "GATester.h"
+
+#include "EvoArmSimpleReflex.h"
+#include "EvoArmCoCon.h"
+
 #include "TestModel.h"
 #include "TestModelArm.h"
 #include "TestModelArmMuscled.h"
+#include "TestModelEvolvableArm.h"
 #include "TestModelCTRNN.h"
 
 #include "TestEvolvable.h"
@@ -46,11 +52,17 @@ Simulation* SimulationFactory::create()
   const std::string modelName = SETTINGS->getChild("Config/Globals/Model").getAttributeValue<std::string>("Value");
   
   // Switch on the chosen kind of model to run.
-  if ("GA" == modelName)
+  if ("GA" == modelName || "GAEval" == modelName)
   {
     Evolvable* evolvable;
-    
     const std::string evolvableName = SETTINGS->getChild("Config/GA/Evolvable").getAttributeValue<std::string>("Name");
+    
+    // Evolve or Evaluate?
+    bool evaluateOnly = true;
+    if(SETTINGS->hasChild("Config/GA/Eval"))
+    {
+      evaluateOnly = SETTINGS->getChild("Config/GA/Eval").getAttributeValue<bool>("Run");
+    }
         
     if ("TestEvolvableCTRNN" == evolvableName)
     {    
@@ -69,13 +81,70 @@ Simulation* SimulationFactory::create()
       evolvable = new TestEvolvable(fitnessFunction);
       model = new GARunner (evolvable);
     }
+    else if ("TestEvolvableArm" == evolvableName)
+    {
+      TestModelEvolvableArm* evoArm = new TestModelEvolvableArm();
+      if(evaluateOnly)
+      {
+        model = new GATester(evoArm);    
+      }
+      else
+      {
+        model = new GARunner(evoArm);
+      }
+      
+      if(visual)
+      {          
+        View* view =  new TestViewArm(evoArm->m_arm, true);
+        app = new App(model, view);
+      }
+    }
+    else if ("EvoArmSimpleReflex" == evolvableName)
+    {
+      EvoArmSimpleReflex* evoArm = new EvoArmSimpleReflex();
+      if(evaluateOnly)
+      {
+        model = new GATester(evoArm);   
+        visual = true; // TODO: Temporarily overwrite to save time editing config file repeatedly
+      }
+      else
+      {
+        model = new GARunner(evoArm);
+      }
+      
+      if(visual)
+      {          
+        View* view =  new TestViewArm(evoArm->m_arm, true);
+        app = new App(model, view);
+      }
+    }  
+    else if ("EvoArmCoCon" == evolvableName)
+    {
+      EvoArmCoCon* evoArm = new EvoArmCoCon();
+      if(evaluateOnly)
+      {
+        model = new GATester(evoArm);   
+        visual = true; // TODO: Temporarily overwrite to save time editing config file repeatedly
+      }
+      else
+      {
+        model = new GARunner(evoArm);
+      }
+      
+      if(visual)
+      {          
+        View* view =  new TestViewArm(evoArm->m_arm, true);
+        app = new App(model, view);
+      }
+    }      
   }
   else if ("TestArm" == modelName)
   {
     model = new TestModelArm();
     if (visual)
     {
-      app = new TestAppArm((TestModelArm*)model);
+      View* view = new TestViewArm(((TestModelArm*)model)->m_arm);
+      app = new App(model, view);
     }
   }
   else if ("TestArmMuscled" == modelName)
@@ -83,8 +152,9 @@ Simulation* SimulationFactory::create()
     model = new TestModelArmMuscled();
     if (visual)
     {
-      app = new TestAppArmMuscled((TestModelArm*)model);
-    }
+      View* view = new TestViewArm(((TestModelArmMuscled*)model)->m_arm, true);
+      app =  new App(model, view);
+    }    
   }
   else if ("TestCTRNN" == modelName)
   {

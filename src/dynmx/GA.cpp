@@ -15,6 +15,7 @@
 
 // TODO: MAX_FLOAT
 #define MAX_NEG_FLOAT -99999999.0f
+#define GA_DONT_REEVALUATE 1 
 
 // --------------------------------------------------------------------------------------------
 GA::GA(int popsize, int genomeLength, int demeWidth) : 
@@ -62,26 +63,31 @@ GA::~GA()
 // --------------------------------------------------------------------------------------------
 // allocate and initialize genome array
 // --------------------------------------------------------------------------------------------
-void GA::reset()
+void GA::reset(bool randomizeGenomes)
 {
-  // initialization
+  // Initialization
   m_tournament = 0;
   m_generation = 0;
   m_idum = (long)-time(0);	// seed random number generator
   m_currentGenome = GA_NONE_SELECTED;
 
-  // random initialization
-  for (int i = 0; i < m_popSize; i++)
+  // Random initialization
+  if(randomizeGenomes)
   {
-    for (int j = 0; j < m_genomeLength; j++)
+    // Genomes
+    for (int i = 0; i < m_popSize; i++)
     {
-      m_genomes[i][j] = ran1(&m_idum);
+      for (int j = 0; j < m_genomeLength; j++)
+      {
+        m_genomes[i][j] = ran1(&m_idum);
+      }
     }
-  }
 
-  for(int i = 0; i < m_popSize; i++)
-  {
-    m_fitnesses[i] = -1.0f;
+    // Fitness
+    for(int i = 0; i < m_popSize; i++)
+    {
+      m_fitnesses[i] = MAX_NEG_FLOAT;
+    }
   }
   
   // select first pair of genomes for tournament
@@ -125,11 +131,16 @@ const double* GA::getBestGenome(float& fitness) const
 float GA::getAvgFitness() const
 {
   float avg = 0.0f;
+  int n = 0;
   for (int i = 0 ; i < m_popSize ; ++i)
   {
-    avg += m_fitnesses[i];
+    if(m_fitnesses[i] != MAX_NEG_FLOAT)
+    {
+      avg += m_fitnesses[i];
+      n++;
+    }
   }
-  return avg / m_popSize;
+  return avg / n;
 }
 
 // --------------------------------------------------------------------------------------------
@@ -174,13 +185,13 @@ void GA::setFitness(float fit)
     // If 1st genome: simply cache fitness    
     m_fitnessA = fit;
     m_currentGenome = GA_SECOND_GENOME;
-    m_fitnesses[m_currentIndA] = fit;
+    //m_fitnesses[m_currentIndA] = fit;
   }
   else if(m_currentGenome == GA_SECOND_GENOME)
   {
     // If 2nd genome, finish tournament also    
     m_fitnessB = fit;
-    m_fitnesses[m_currentIndB] = fit;
+    //m_fitnesses[m_currentIndB] = fit;
     finishThisTournament();
     startNextTournament();
   }
@@ -237,6 +248,20 @@ void GA::startNextTournament()
 {
   getRandomPairInDeme(m_currentIndA, m_currentIndB);
   m_currentGenome = GA_FIRST_GENOME;
+  
+#if GA_DONT_REEVALUATE  
+  // Test of potential speed up by not reevaluating already evaluated genomes
+  if(m_fitnesses[m_currentIndA] != MAX_NEG_FLOAT)
+  {
+    setFitness(m_fitnesses[m_currentIndA]);
+  }
+  // Do same for second genome in tournament
+  if(m_fitnesses[m_currentIndB] != MAX_NEG_FLOAT)
+  {
+    setFitness(m_fitnesses[m_currentIndB]);
+  }
+#endif
+  
 }
 
 // --------------------------------------------------------------------------------------------
@@ -257,19 +282,22 @@ void GA::performTournament(uint16_t indA, float fitA, uint16_t indB, float fitB)
   {
     winner = indA;
     loser = indB;
+    assert(fitA >= m_fitnesses[indA]); // Make sure we're not overwriting a better one    
     m_fitnesses[winner] = fitA;
   }
   else 
   {
     winner = indB;
     loser = indA;
+    assert(fitB >= m_fitnesses[indB]); // Make sure we're not overwriting a better one    
     m_fitnesses[winner] = fitB;
   }
 
   // do mutation
   mutate(winner, loser);
 
-  //m_fitnesses[loser] = -1.0f;
+  // The loser's fitness is now undetermined
+  m_fitnesses[loser] = MAX_NEG_FLOAT;
 
   m_tournament++;
 
@@ -408,19 +436,15 @@ void GA::toXml(ci::XmlTree& parent, bool includeGenomes) const
 // --------------------------------------------------------------------------------------------
 bool GA::fromXml(const ci::XmlTree& parent, bool includeGenomes)
 {
-  assert(parent.hasChild("GA"));
+  assert(parent.hasChild("GAResult/GA"));
   
-  const ci::XmlTree& ga = parent.getChild("GA");
+  const ci::XmlTree& ga = parent.getChild("GAResult/GA");
   int genomeLength = ga.getAttributeValue<int>("GenomeLength");
   int popSize = ga.getAttributeValue<int>("PopulationSize");
   
   // We can only read data from a GA of the same size as the current
   if(genomeLength == m_genomeLength && popSize == m_popSize)
   {
-    m_demeWidth = ga.getAttributeValue<int>("DemeWidth");
-    m_maxMutation = ga.getAttributeValue<float>("MaxMutation");
-    m_recombinationRate = ga.getAttributeValue<float>("RecombinationRate");
-    
     // Read all genomes (children of GA)
     int i, j;
     i = j = 0;

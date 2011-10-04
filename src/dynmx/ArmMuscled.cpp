@@ -10,6 +10,10 @@
 #include "ArmMuscled.h"
 #include "MuscleMonoWrap.h"
 #include "MuscleBiWrap.h"
+#include "EPController.h"
+#include "Reflex.h"
+
+#include "MathUtils.h"
 
 #include "cinder/xml.h"
 
@@ -96,7 +100,19 @@ void ArmMuscled::init()
       m_muscles[i]->init();
     }    
   }
-
+  
+  // Todo: temporary test code
+  for (int i = 0; i < m_muscles.size(); ++i) 
+  {
+    m_epControllers.push_back(new EPController(m_muscles[i], 4.0f, 0.5f, 0.1f, 0));
+    m_epControllers[i]->init();
+  }
+  
+  // Todo: temporary test of reflex control
+  m_reflexes.push_back(new Reflex(m_muscles[0], m_muscles[1]));
+  m_reflexes.push_back(new Reflex(m_muscles[2], m_muscles[3]));
+  m_reflexes[0]->init();
+  m_reflexes[1]->init();
 }
   
 //----------------------------------------------------------------------------------------------------------------------
@@ -108,8 +124,52 @@ void ArmMuscled::reset(float elbAngle, float shdAngle)
   {
     m_muscles[i]->reset();
   }   
+  
+  for(int i = 0; i < m_epControllers.size(); ++i)
+  {  
+    m_epControllers[i]->reset();    
+  }
+  
+  for(int i = 0; i < m_reflexes.size(); ++i)
+  {  
+    m_reflexes[i]->reset();    
+  }
+  
+  m_desiredPos = Pos(0,0);
+  m_desiredAngles[JT_elbow] = m_desiredAngles[JT_shoulder] = 0.0;
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+void ArmMuscled::updatePosition(Pos pos, float dt, int elbPos)
+{
+  // Get desired joint angles from desired position
+  m_desiredPos = pos;
+  inverseKinematics(m_desiredPos, elbPos, m_desiredAngles[JT_elbow], m_desiredAngles[JT_shoulder]);
+  // Clamp joint angles to limits
+  m_desiredAngles[JT_elbow] = clamp(m_desiredAngles[JT_elbow], getJointLimitLower(JT_elbow), getJointLimitUpper(JT_elbow));
+  m_desiredAngles[JT_shoulder] = clamp(m_desiredAngles[JT_shoulder], getJointLimitLower(JT_shoulder), getJointLimitUpper(JT_shoulder));  
+  
+  /*
+  for(size_t i = 0; i <  m_epControllers.size(); ++i)
+  {
+    double desLength = getMuscle(i)->getLengthFromJointAngles(m_desiredAngles[JT_elbow], m_desiredAngles[JT_shoulder]);
+    m_epControllers[i]->setDesiredLength(desLength);
+    m_epControllers[i]->update(dt);
+    const double excitation = m_epControllers[i]->getActivation();
+    getMuscle(i)->setExcitation(excitation);
+  }
+  */
+  
+  // Run reflexes: these will set the muscles' activations  
+  for(int i = 0; i < m_reflexes.size(); i++)
+  {
+    m_reflexes[i]->update(dt);
+  }
+  
+  // Now let the normal update take over, this will also update the muscles
+  update(dt);
+}
+  
 //----------------------------------------------------------------------------------------------------------------------
 void ArmMuscled::update(float dt)
 {

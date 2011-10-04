@@ -531,7 +531,7 @@ void Plot::update()
       for(size_t i = 0; i < numPoints; i++)
       {
         lineVerts[i*2 + 0] = i * widthRec;
-        lineVerts[i*2 + 1] = m_h - m_h * ((m_points[pl][i]   + m_minY) * scaleRec);
+        lineVerts[i*2 + 1] = m_h - m_h * ((m_points[pl][i]   - m_minY) * scaleRec);
       }
       glDrawArrays( GL_LINE_STRIP, 0, numPoints);
       glDisableClientState( GL_VERTEX_ARRAY);       

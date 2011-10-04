@@ -36,18 +36,20 @@ public:
   virtual void update(float dt);
   
   // Setters
+  void setGains(float pGain, float vGain, float dGain) { m_pGain = pGain; m_vGain = vGain; m_dGain = dGain; };
   void setDesiredLength(double length) { m_desiredLengthPrev = m_desiredLength; m_desiredLength = length; };
   
   // Getters
   double getActivation() { return m_activation; };
-  
-protected:  
-  
-  Muscle* m_muscle;
+  Muscle* getMuscle() { return m_muscle; };
   
   float m_pGain;
   float m_vGain;
   float m_dGain;
+  
+protected:  
+  
+  Muscle* m_muscle;
   
   int m_numFramesDelay;
   

@@ -14,33 +14,21 @@
 #include "TestViewArm.h"
 #include "TestModelArm.h"
 #include "TestModelArmMuscled.h"
+#include "GARunner.h"
 
 //----------------------------------------------------------------------------------------------------------------------
-class TestAppArm : public dmx::App
-{
-public:
-  
-  TestAppArm(TestModelArm* armModel)
-  {
-    m_model = armModel;
-    m_view = new TestViewArm(armModel->m_arm);
-  };
-  
-  dmx::Arm* m_arm;
-};
+
 
 //----------------------------------------------------------------------------------------------------------------------
-class TestAppArmMuscled : public dmx::App
-{
-public:
-  
-  TestAppArmMuscled(TestModelArm* armModel)
-  {
-    m_model = armModel;
-    m_view = new TestViewArm(armModel->m_arm, true);
-  };
-  
-  dmx::Arm* m_arm;
-};
+//class TestAppEvaluateArm : public dmx::App
+//{
+//public:
+//  
+//  TestAppEvaluateArm(dmx::Evolvable* model)
+//  {
+//    m_model = model;
+//    m_view = new TestViewArm(((TestModelEvolvableArm*)model->getEvolvable())->m_arm, true);
+//  };
+//};
 
 #endif

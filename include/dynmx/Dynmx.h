@@ -45,6 +45,7 @@ typedef int uint64_t;
 namespace dmx
 {
 
+#define DEFAULT_TIMESTEP 0.03333f  
 #define DATA_BASE_DIR "/Users/thomasbuhrmann/Experiments/"
 #define DATA_DIR Globals::Inst()->getDataDir()
 #define SETTINGS Globals::Inst()->getSettings()

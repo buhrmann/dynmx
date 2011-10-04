@@ -32,10 +32,28 @@ GARunner::GARunner(Evolvable* evolvable) : m_evolvable(evolvable)
 //----------------------------------------------------------------------------------------------------------------------
 void GARunner::init()
 {
+  
+  m_reducedMutationMax = 0.001;
+  m_reduceMutationMaxAt = -1;  // Indicates no automatic reduction of mutation rate
+
+  // For storing data to disk at the end
+  m_progressLog = new ci::XmlTree("GAProgress", ""); 
+  m_resultsLog = new ci::XmlTree("GAResult", "");  
+  
+  // Debug level
+  const ci::XmlTree* settings = SETTINGS;  
+  if(settings->hasChild("Config/Globals"))
+  {
+    m_verbosity = settings->getChild("Config/Globals/DebugLevel").getAttributeValue<int>("Value");
+  }
+  else
+  {
+    m_verbosity = kGAVerbosityNone;
+  }  
+  
   const int numGenes = m_evolvable->getNumGenes();
   
   // Create an instance of the actual GA algorithm
-  const ci::XmlTree* settings = SETTINGS;
   if (settings->hasChild("Config/GA"))
   {
     // Use setting from globals file
@@ -49,7 +67,26 @@ void GARunner::init()
             
     m_numGenerations = ga.getChild("NumGenerations").getAttributeValue<int>("Value");
     m_numTrials = ga.getChild("NumTrials").getAttributeValue<int>("Value");
-    m_trialDuration = ga.getChild("TrialDuration").getAttributeValue<float>("Value");
+    
+    // Parameters for automatic reduction of mutation rate
+    if(ga.hasChild("MutationMaxReduceAt"))
+    {
+      m_reducedMutationMax = ga.getChild("MutationMaxReduced").getAttributeValue<double>("Value");
+      m_reduceMutationMaxAt = ga.getChild("MutationMaxReduceAt").getAttributeValue<int>("Value");      
+    }
+    
+    bool incremental = ga.getChild("Incremental").getAttributeValue<bool>("Value"); 
+    if (incremental)
+    {
+      std::string fnm = ga.getChild("LoadFrom").getAttributeValue<std::string>("Value");
+      ci::XmlTree prevResults(ci::loadFile(fnm));
+      m_ga->fromXml(prevResults);
+      reset(false);
+    }
+    else
+    {
+      reset(true);
+    }
   }
   else
   {
@@ -58,34 +95,24 @@ void GARunner::init()
     m_ga->setRecombinationRate(DEFAULT_GA_RECOMBINATIONRATE);
     m_ga->setMutationMax(DEFAULT_GA_MUTATIONMAX);
     m_numTrials = 1;
-    m_trialDuration = 1.0f;
     m_numGenerations = 10;
+    reset(true);    
   }
 
-  if(settings->hasChild("Config/Globals"))
-  {
-    m_verbosity = settings->getChild("Config/Globals/DebugLevel").getAttributeValue<int>("Value");
-  }
-  else
-  {
-    m_verbosity = kGAVerbosityNone;
-  }
-  
-  reset();
-  
-  m_progressLog = new ci::XmlTree("GAProgress", ""); 
-  m_resultsLog = new ci::XmlTree("GAResult", "");
+  // Saves these out, to make it easier to parse this data by generation etc.
+  m_progressLog->setAttribute("NumGenerations", m_numGenerations);
+  m_progressLog->setAttribute("NumGenes", numGenes);
 }
   
 //----------------------------------------------------------------------------------------------------------------------
-void GARunner::reset()
+void GARunner::reset(bool randomiseGenomes)
 {
   m_time = 0.0f;
   m_accFitness = 0.0f;
   m_trial = 0;
   m_prevGeneration = 0;
   
-  m_ga->reset();
+  m_ga->reset(randomiseGenomes);
   
   // setup simulation model
   m_evolvable->decodeGenome(m_ga->getCurrentGenome());
@@ -97,7 +124,7 @@ void GARunner::update(float dt)
 {
   m_time += dt;
   
-  if(m_time < m_trialDuration)
+  if(!m_evolvable->hasFinished())
   {
     // Update simulation
     //-------------------------------------------------------
@@ -122,14 +149,16 @@ void GARunner::update(float dt)
     {
       m_accFitness /= m_numTrials;
 #if DEBUGGING
-      if( m_verbosity >= kGAVerbosityGenome)
+      if (m_verbosity >= kGAVerbosityGenome)
         std::cout << "Total fitness = " << m_accFitness << std::endl; 
 #endif      
       
       // Set the fitness ...
       m_ga->setFitness(m_accFitness);
+      
       // ... and get a new genome to evaluate
       m_evolvable->decodeGenome(m_ga->getCurrentGenome());
+      
       m_trial = 0;
       m_accFitness = 0.0;
       
@@ -152,6 +181,12 @@ void GARunner::update(float dt)
         }
 #endif     
         m_prevGeneration = currentGen;
+        
+        // Automatic reduction of mutation rate
+        if(m_reduceMutationMaxAt > 0 && currentGen == m_reduceMutationMaxAt)
+        {
+          m_ga->setMutationMax(m_reducedMutationMax);
+        }
         
         // When the maximum number of generations has been reached. 
         //---------------------------------------------------------

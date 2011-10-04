@@ -18,11 +18,13 @@
 #include "cinder/Camera.h"
 #include "cinder/MayaCamUI.h"
 #include "cinder/params/Params.h"
+#include "SimpleGUI.h"
 
 namespace dmx
 {
 // indicated that the view doesn't want to override the app's default frame rate
 #define DEFAULT_FRAME_RATE -1
+#define USE_SIMPLE_GUI 1
   
 // Forward declarations
 class App;
@@ -61,6 +63,9 @@ public:
   void setName(const std::string& name) { m_name = name; };
   
 protected: 
+  
+  ci::Vec3f screenToWorld(const ci::Vec2i& point);
+  ci::Vec3f unproject(const ci::Vec3f& point);
 
   // scene graph stuff
   NodeGroup m_scene3d;
@@ -70,8 +75,16 @@ protected:
   ci::MayaCamUI	m_cam3d;
   ci::CameraOrtho m_cam2d;
 	ci::Vec2i m_mouse; 
+  ci::Vec3f m_mouseWorld;
   ci::Vec4f m_backgroundColor;
-  ci::params::InterfaceGl m_hud;
+  ci::Area m_viewport;
+  ci::Rectf m_windowSize;  
+  
+#if USE_SIMPLE_GUI  
+  mowa::sgui::SimpleGUI* m_gui;
+#else
+  ci::params::InterfaceGl m_gui;
+#endif
   
   struct BackGround
   {

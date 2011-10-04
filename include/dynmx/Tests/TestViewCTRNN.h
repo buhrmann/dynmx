@@ -21,8 +21,8 @@ class TestViewCTRNN : public dmx::View
 public:
 
   //--------------------------------------------------------------------------------------------------------------------
-  TestViewCTRNN() : m_ctrnn(0) {};
-  TestViewCTRNN(CTRNN* ctrnn) : m_ctrnn(ctrnn) {};
+  TestViewCTRNN() : m_ctrnn(0), m_activationFunction(CTRNN::kAF_Sigmoid) {};
+  TestViewCTRNN(CTRNN* ctrnn) : m_ctrnn(ctrnn), m_activationFunction(CTRNN::kAF_Sigmoid) {};
   
   // functions to be implemented by subclasses
   //--------------------------------------------------------------------------------------------------------------------
@@ -39,7 +39,10 @@ public:
   virtual void draw3d(){};
   
   //---------------------------------------------------------------------------------------------------------------------
-  virtual void draw2d(){};
+  virtual void draw2d()
+  {
+    m_ctrnn->setActivationFunction(m_activationFunction);
+  };
   
   //---------------------------------------------------------------------------------------------------------------------
   virtual void keyDown (ci::app::KeyEvent event)
@@ -59,11 +62,17 @@ public:
   }
   
   //--------------------------------------------------------------------------------------------------------------------
-  virtual void buildGui() { /*gui.addPage("Default gui page");*/ };
+  virtual void buildGui()
+  { 
+    m_gui->addPanel();
+    m_gui->addLabel("Muscle Controls");
+    m_gui->addParam("ActivationFunction", &m_activationFunction, 0.0, CTRNN::kAF_NumFunctions, CTRNN::kAF_Sigmoid);
+  };
   
   
   CTRNN* m_ctrnn; 
   dmx::CTRNNViz* m_ctrnnView;
+  int m_activationFunction;
 };
 
 #endif

@@ -41,11 +41,29 @@ inline double sigmoid(double x)
 #endif
 }
 
-//----------------------------------------------------------------------------------------------------------------------
 inline double InverseSigmoid(double y)
 {
   return log(y / (1.0 - y));
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+// Other activation functions
+//----------------------------------------------------------------------------------------------------------------------
+inline double linearActivation(double y)
+{
+  if(y <= -1)
+    return 0.0;
+  else if (y >= 1)
+    return 1.0;
+  else 
+    return 0.5 * (y + 1);
+}
+
+inline double sineActivation(double y)
+{
+  return 0.5 * (sin(y) + 1);
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // The CTRNN class declaration
@@ -54,8 +72,23 @@ class CTRNN
 {
 
 public:
+  
+  // Define a type of pointer to activation function
+  typedef double (*ActivationFunction)(double);
+  
+  // Name the activation functions
+  enum ActFuncNames
+  {
+    kAF_Sigmoid,
+    kAF_Linear,
+    kAF_Sine,
+    kAF_NumFunctions
+  };
+  
+  // An array of activation function pointers
+  static ActivationFunction s_activationFunctions[kAF_NumFunctions];
 
- static int getNumRequiredParams(int numNeurons, bool numInputs);
+  static int getNumRequiredParams(int numNeurons, bool numInputs);
 
   CTRNN(int newsize = 3);
   ~CTRNN();
@@ -81,8 +114,10 @@ public:
   void setTimeConstant(int i, double value) { taus[i] = value; Rtaus[i] = 1 / value; };
   void setExternalInput(int i, double value) { externalinputs[i] = value; };
   void setWeight(int from, int to, double value) { weights[from][to] = value; };  
-  void setCenterCrossing(void);
+  void setCenterCrossing();
+  void setActivationFunction(int actFuncName) { m_activationFunction = s_activationFunctions[actFuncName]; };
   void setActivationFunction(double (*pt2Func)(double)) { m_activationFunction = pt2Func; };
+  void initActivationFunctionTable();
 
   // Input and output
   //friend ostream& operator<<(ostream& os, CTRNN& c);
@@ -99,7 +134,7 @@ public:
   void randomizeTimeConstants(double lb, double ub);
   
   // function pointer for avoiding conditional statements
-  double (*m_activationFunction)(double);
+  ActivationFunction m_activationFunction;
 
   // internal data
   int size;

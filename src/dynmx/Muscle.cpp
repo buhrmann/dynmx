@@ -25,6 +25,7 @@ static const float Ksub = (Klen / Kslope) * ((1 - Kmax) / (1 + Klen));
 // Width (in terms of normalised muscle length) of the parabola describing active force generation.
 // I.e. beyond normalised lengths of 1+width or 1-width, no force will be generated. 
 static const float activeForceWidth = 0.5;
+static const float activeForceK = 1 / sqr(activeForceWidth);
 // Normalised length beyond which the passive elastic element generates force
 static const float passiveForceSlackLength = 1.4;
 // Normalised amount of passive force at the length of activeForceWidth, i.e. where active force becomes 0.
@@ -38,10 +39,13 @@ void Muscle::init()
   
   // Calculate passiveForceGain, such that it is 0.5*F0 at maximum length (where active force is 0)
   // Assumes the passive force is calculated as a scaled parabola, see below.
-  m_passiveForceGain = passiveForceAtWidth / sqr((1+activeForceWidth) - passiveForceSlackLength);
+  m_passiveForceGain = passiveForceAtWidth / sqr((1 + activeForceWidth) - passiveForceSlackLength);
   
   m_tauAct = 0.04;
   m_tauDeact = 0.07;
+  
+  // Get min and max lengths
+  calculateMinMaxLength(m_lengthMin, m_lengthMax);
   
   reset();
 }
@@ -53,6 +57,7 @@ void Muscle::reset()
   
   m_lengthNorm = m_length /  m_lengthOpt;
   m_velocityNorm = m_velocity / m_maxVelocity;
+  m_lengthUnit = lengthToUnitLength(m_length);
   
   m_passiveForceNorm = 0.0;
   m_activeForceNorm = 0.0;
@@ -69,8 +74,7 @@ void Muscle::setParameters(double maxIsoForce, double optimalLength, double maxV
   m_lengthOpt = optimalLength;
   m_maxVelocity = maxVelocity * m_lengthOpt;
   m_maxForce = maxIsoForce;
-}
-
+} 
 
 //----------------------------------------------------------------------------------------------------------------------
 void Muscle::update(float dt)
@@ -78,48 +82,63 @@ void Muscle::update(float dt)
   double prevLength = m_length;
 
   updateLengthAndMomentArm();
-
+  
+  // Todo: Temporary check that the min/max muscle length calculations are correct
+  double delta = 0.001;
+  bool lengthOK = (m_length - m_lengthMin) >= -delta && (m_length - m_lengthMax) < delta ;
+  //bool lengthOK = (m_length >= m_lengthMin) && (m_length <= m_lengthMax);
+  if(!lengthOK)
+  {
+    std::cout << getName() << std::endl;
+    std::cout << "Length: " << m_length << " " << m_lengthMin << " " << m_lengthMax << std::endl;
+  }
+  assert(lengthOK);
+         
   m_velocity = (m_length - prevLength) / dt;
   
   // Dimensionless variables for Hill-model
   m_lengthNorm = m_length /  m_lengthOpt;
   m_velocityNorm = m_velocity / m_maxVelocity;
   
+  // Length scaled to unit interval (0,1)
+  m_lengthUnit = lengthToUnitLength(m_length);
+  assert(m_lengthUnit >= 0.0 && m_lengthUnit <= 1.0);
+  
+  // Muscle activation from neural excitation
+  m_activation = calcActivation(m_activation, m_excitation, dt);
+  
   // Calculate individual constitutive forces
   m_passiveForceNorm = calcPassiveForceNorm(m_lengthNorm);
   m_activeForceNorm = calcActiveForceNorm(m_lengthNorm);
   m_velocityForceNorm = calcVelocityForceNorm(m_velocityNorm);
   
-  // Muscle activation from neural excitation
-   m_activation = calcActivation(m_activation, m_excitation, dt);
   
   // Calculate overall response
   m_force = (m_activation * m_maxForce * m_activeForceNorm * m_velocityForceNorm) + (m_maxForce * m_passiveForceNorm); 
-  
 }
 
 // Parabola centred on optimal length
 //----------------------------------------------------------------------------------------------------------------------
 double Muscle::calcActiveForceNorm(double lengthNorm)
 {
-#define SIMPLE_AFORCE_METHOD 1
-#if SIMPLE_AFORCE_METHOD
-  // Simple parabola. The 0.5-1.5 range roughly determined from Murray,Delp. That paper also suggests that
-  // flexors mostly operate on the ascending leg, while flexors symmetrically on the peak of the parabola.
-  if(lengthNorm >= activeForceWidth && lengthNorm <= (1 + activeForceWidth))
+#define SIMPLE_AFORCE_METHOD 0
+  
+  if(lengthNorm >= (1 - activeForceWidth) && lengthNorm <= (1 + activeForceWidth))
   {
+#if SIMPLE_AFORCE_METHOD    
+    // Simple parabola. The 0.5-1.5 range roughly determined from Murray,Delp. That paper also suggests that
+    // flexors mostly operate on the ascending leg, while flexors symmetrically on the peak of the parabola.
+    // THIS CODE ONLY WORKS IF ACTIVEFORCEWIDTH=0.5! OTHERWISE USE BELOW CODE!!!    
     return 1.0 - sqr(2.0 * (lengthNorm - 1.0));
+#else    
+    // Kistemaker's method
+    return (-activeForceK * sqr(lengthNorm)) + (2 * activeForceK * lengthNorm) - activeForceK + 1.0;
+#endif
   }
   else 
   {
     return 0.0001;
   }
-
-#else
-  // Kistemaker's method
-  const double k = 4.0; // 1 / width^2, with width = 0.5
-  return (-k * sqr(lengthNorm)) + (2 * k * lengthNorm) - k + 1.0;
-#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------  

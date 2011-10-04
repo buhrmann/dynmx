@@ -34,7 +34,7 @@ public:
   virtual bool hasFinished() { return false; };
   
   // Called before application exit
-  virtual void shutDown() {};
+  virtual void finish() {};
   
   // Getter and Setter for name, to be used by Factories e.g.
   const std::string& getName() const { return m_name; };

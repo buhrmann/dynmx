@@ -26,6 +26,8 @@ class App : public cinder::app::AppBasic
 
 public:
 
+  App() : m_model(0), m_view(0) {};
+  App(Model* m, View* v) : m_model(m), m_view(v) {};
   virtual ~App() {};
 
   // Inherited from ci::AppBasic
@@ -33,7 +35,7 @@ public:
   virtual void update();
   virtual void update(float dt);
   
-  virtual void shutDown() { m_model->shutDown(); };
+  virtual void shutDown() { m_model->finish(); };
   
   //--------------------------------------------------------------------------------------------------------------------
   virtual void setup();

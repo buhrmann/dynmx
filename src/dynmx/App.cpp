@@ -16,12 +16,19 @@ namespace dmx
 //--------------------------------------------------------------------------------------------------------------------
 void App::setup()
 { 
-  m_paused = true;
+  m_paused = false;
   m_useFixedTimeStep = true;
-  m_fixedTimeStep = 1.0f / 100.0f;
+
+  // Read global config
+  float dt = DEFAULT_TIMESTEP;
+  if (SETTINGS->hasChild("Config/Globals/FrameRate"))
+  {
+    dt = 1.0f / SETTINGS->getChild("Config/Globals/FrameRate").getAttributeValue<int>("Value");
+  }
+  m_fixedTimeStep = dt;
   
   m_prevTime = getElapsedSeconds();
-  m_model->init(); 
+  //m_model->init(); 
   if(m_view)
   {
     m_view->init(); 
@@ -54,6 +61,11 @@ inline void App::update()
 //--------------------------------------------------------------------------------------------------------------------
 void App::update(float dt) 
 { 
+  if(m_model->hasFinished())
+  {
+    quit();
+  }
+  
   if(!m_paused)
   {
     m_model->update(dt); 
@@ -71,7 +83,7 @@ void App::prepareSettings( Settings *settings )
 //--------------------------------------------------------------------------------------------------------------------
 void App::setFixedTimeStep(float dt)            { m_fixedTimeStep = dt; }
 void App::togglePause()                         { m_paused = !m_paused; }
-void App::draw()                                { if(m_view) m_view->draw(); }
+void App::draw()                                { if(m_view && !m_paused) m_view->draw(); }
 void App::resize(ci::app::ResizeEvent event)    { m_view->resize(event); }
 void App::mouseMove(ci::app::MouseEvent event)  { m_view->mouseMove(event); }
 void App::mouseDrag(ci::app::MouseEvent event)  { m_view->mouseDrag(event); }
@@ -90,7 +102,10 @@ void App::keyUp(ci::app::KeyEvent event)
     case ci::app::KeyEvent::KEY_RETURN:
     {
       if(m_paused)
+      {
         m_model->update(m_fixedTimeStep);
+        m_view->draw();
+      }
       break;
     }
     case ci::app::KeyEvent::KEY_r:

@@ -12,14 +12,17 @@
 
 #include "Dynmx.h"
 #include "Model.h"
+
 #include "cinder/Vector.h"
+
+#include <deque>
 
 namespace dmx
 {
 
 typedef ci::Vec2f Pos;
 
-static const int MaxTrajPoints = 100;
+static const int MaxTrajPoints = 400;
 
 enum Joint
 {
@@ -69,19 +72,29 @@ public:
   void setFriction(float elbF, float shdF) { m_frictions[JT_elbow] = elbF; m_frictions[JT_shoulder] = shdF; };
   void setLimit(Joint jt, float upper, float lower) { assert(jt >=0 && jt < 2); m_limits[jt][0] = upper; m_limits[jt][1] = lower; };
   void setGravity(float g) { m_gravity = g; };
+  void setJointLocked(Joint j, bool l) { m_jointLocked[j] = l; };
   
+  double getGravity() const { return m_gravity; };
   Pos getPointOnUpperArm(float distanceFromJoint) const;
   Pos getPointOnLowerArm(float distanceFromJoint) const;  
   double getJointAngle(Joint joint) { return m_angles[joint]; };
-  float getLength(Joint joint) const { return m_lengths[joint]; } ;
+  double getJointVelocity(Joint joint) { return m_velocities[joint]; };
+  double getLength(Joint joint) const { return m_lengths[joint]; } ;
+  double getTotalLength() const { return m_lengths[0] + m_lengths[1]; };
   const Pos& getEffectorPos() const { return m_effectorPos; };
   Pos& getEffectorPos() { return m_effectorPos; };
   const Pos& getElbowPos() const { return m_elbowPos; };
   Pos& getElbowPos() { return m_elbowPos; };
+  double getJointLimitUpper(Joint j) const { return m_limits[j][0]; };
+  double getJointLimitLower(Joint j) const { return m_limits[j][1]; };
+  
   void forwardKinematics();
   void forwardKinematics(double elbAngle, double shdAngle, Pos& elbPos, Pos& effPos);
   void inverseKinematics(const Pos& pos, float elbDir, double& elbAngle, double& shdAngle);  
-  const std::vector<Pos>& getTrajectory() { return m_trajectory; };
+  const std::deque<Pos>& getTrajectory() { return m_trajectory; };
+  
+  void setTarget(Pos p) { m_target = p; };  
+  Pos getTarget() { return m_target; };
   
 protected:
 
@@ -91,6 +104,8 @@ protected:
   void computeAccelerations(const double* angles, const double* velocities, const double* accel, const double* torques,
                             double* newAccel);
   
+  bool m_jointLocked[2];
+  
   // states
   double 
     m_angles[2],
@@ -99,9 +114,10 @@ protected:
   
   Pos
     m_elbowPos,
-    m_effectorPos;
+    m_effectorPos,
+    m_target;
   
-  std::vector<Pos> m_trajectory;
+  std::deque<Pos> m_trajectory;
   
   // parameters
   double

@@ -7,6 +7,9 @@
  *
  */
 
+#ifndef _DMX_MUSCLE_MONO_
+#define _DMX_MUSCLE_MONO_
+
 #include "Muscle.h"
 #include "ArmMuscled.h"
 
@@ -34,14 +37,15 @@ public:
   double getMomentArm() const { return m_momentArm; };  
   Joint getJoint() { return m_joint; };
   
+  virtual double getLengthFromJointAngles(double elbAngle, double shdAngle);  
+  
 protected:
   
   virtual void updateLengthAndMomentArm();
+  virtual void calculateMinMaxLength(double& min, double& max);
   
   // Constant data related to muscle path
   Joint m_joint;
-  double m_originJointDist;
-  double m_insertJointDist;
   double m_originCapsuleAngle;
   double m_insertCapsuleAngle;
   double m_wrapAngleThreshold;
@@ -53,3 +57,5 @@ protected:
 };
   
 } // namespace dmx
+
+#endif

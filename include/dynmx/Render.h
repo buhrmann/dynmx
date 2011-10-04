@@ -6,7 +6,7 @@
  *  Copyright 2011 __MyCompanyName__. All rights reserved.
  *
  */
- 
+  
 #ifndef __OFX_3d__H_
 #define __OFX_3d__H_
 
@@ -82,7 +82,6 @@ namespace dmx
 		glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, 5.0f);
 	}
 	static void setColorMaterial(const Vec3f& c){ setColorMaterial(c[0], c[1], c[2], c[3]);};
-
 
 	static void drawBasis(float l, bool annotate = false)
 	{
@@ -171,6 +170,19 @@ namespace dmx
 			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, c);
 	}
 
+  // in the y plane
+	static void drawCross(float l)
+	{
+	  l *= 0.5;
+	  glBegin(GL_LINES);
+    glNormal3f (0,1,0);
+    glVertex3f( l, 0, 0.0f);
+    glVertex3f(-l, 0, 0.0f);
+    glVertex3f(0, l, 0.0f);
+    glVertex3f(0, -l, 0.0f);
+	  glEnd();
+	}
+  
   // in the y plane
 	static void drawRectangle(float lx, float ly, GLenum mode = GL_QUADS)
 	{
@@ -395,17 +407,39 @@ namespace dmx
       glVertex3f(-s, 0.0f, s);      
     glEnd();
 	}
-
-  static void drawVectorAt(const Vec3f& p, const Vec3f& v)
+  
+  static void drawLineFromTo(const Vec3f& p1, const Vec3f& p2)
 	{
 	  glBegin(GL_LINES);
-      glVertex3f(p[0], p[1], p[2]);
-      glVertex3f(p[0]+v[0], p[1]+v[1], p[2]+v[2]);
+    glVertex3f(p1[0], p1[1], p1[2]);
+    glVertex3f(p2[0], p2[1], p2[2]);
 	  glEnd();
 	}
 
-	// Draws a point as 3 intersecting lines
+  static void drawLineAt(const Vec3f& p, const Vec3f& v)
+	{
+	  glBegin(GL_LINES);
+    glVertex3f(p[0], p[1], p[2]);
+    glVertex3f(p[0]+v[0], p[1]+v[1], p[2]+v[2]);
+	  glEnd();
+	}
+  
+  static void drawVectorAt(const Vec3f& p, const Vec3f& v)
+	{
+	  drawLineAt(p, v);
+	}
+
+  // Draws a point
 	static void drawPoint(const Vec3f& p, float s)
+  {
+    glPointSize(s);
+    glBegin(GL_POINTS);
+    glVertex3f(p.x, p.y, p.z);
+    glEnd();
+  }
+  
+	// Draws a point as 3 intersecting lines
+	static void drawCross(const Vec3f& p, float s)
 	{
 	  glBegin(GL_LINES);
       glVertex3f(p[0]-s, p[1], p[2]);
@@ -671,9 +705,12 @@ namespace dmx
   {
     assert(fabs(val) <= 1.0);
     
-    static const Vec3f positive (180.0/255.0, 4.0/255.0, 38.0/255.0);
-    static const Vec3f negative (59.0/255.0, 76.0/255.0, 192.0/255.0);
-    static const Vec3f neutral (221.0/255.0, 221.0/255.0, 221.0/255.0);
+    //static const Vec3f positive (180.0/255.0, 4.0/255.0, 38.0/255.0);
+    //static const Vec3f negative (59.0/255.0, 76.0/255.0, 192.0/255.0);
+    //static const Vec3f neutral (221.0/255.0, 221.0/255.0, 221.0/255.0);
+    static const Vec3f positive (255.0/255.0, 0.0/255.0, 0.0/255.0);
+    static const Vec3f negative (0.0/255.0, 0.0/255.0, 255.0/255.0);
+    static const Vec3f neutral (255.0/255.0, 255.0/255.0, 255.0/255.0);
     if(val >= 0)
     {
       return neutral + val * (positive - neutral);

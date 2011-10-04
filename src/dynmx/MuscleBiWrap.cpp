@@ -14,11 +14,11 @@ namespace dmx
 {
 
 //----------------------------------------------------------------------------------------------------------------------  
-MuscleBiWrap::MuscleBiWrap(ArmMuscled* arm, float originDist, float insertDist, bool isFlexor) :
-m_originJointDist(originDist),
-m_insertJointDist(insertDist)
+MuscleBiWrap::MuscleBiWrap(ArmMuscled* arm, float originDist, float insertDist, bool isFlexor)
 {
   m_arm = arm;
+  m_originJointDist = originDist;
+  m_insertJointDist = insertDist;
   m_isFlexor = isFlexor;
 }
 
@@ -52,6 +52,24 @@ void MuscleBiWrap::reset()
   m_wrapAngleElb = m_wrapAngleShd = 0;
   
   Muscle::reset();  
+}
+
+//----------------------------------------------------------------------------------------------------------------------    
+void MuscleBiWrap::calculateMinMaxLength(double& minLength, double& maxLength)
+{
+  const double upperLimitElb = m_arm->getJointLimitUpper(JT_elbow);
+  const double lowerLimitElb = m_arm->getJointLimitLower(JT_elbow);
+  const double upperLimitShd = m_arm->getJointLimitUpper(JT_shoulder);
+  const double lowerLimitShd = m_arm->getJointLimitLower(JT_shoulder);  
+  
+  double lowerLength, upperLength, midLength;
+  lowerLength = getLengthFromJointAngles(lowerLimitElb, lowerLimitShd); // Second joint angle is irrelevant    
+  upperLength = getLengthFromJointAngles(upperLimitElb, upperLimitShd); // Second joint angle is irrelevant    
+  midLength = getLengthFromJointAngles(0.0, 0.0); // Second joint angle is irrelevant
+
+  
+  minLength = min(upperLength, min(lowerLength, midLength));
+  maxLength = max(upperLength, max(lowerLength, midLength));  
 }
 
 //----------------------------------------------------------------------------------------------------------------------  
@@ -136,6 +154,77 @@ void MuscleBiWrap::updateLengthAndMomentArm()
         m_length = sqrt(sqr(xa + m_originJointDist) + sqr(ya));
         m_momentArms[JT_shoulder] = maShd;
         m_momentArms[JT_elbow] = maElb;        
+      } // No wrap
+    } // Elbow wrap
+  } // Single or no wrap
+  
+}
+  
+//----------------------------------------------------------------------------------------------------------------------      
+double MuscleBiWrap::getLengthFromJointAngles(double elbAngle, double shdAngle)
+{
+  const double radShd = m_arm->getJointRadius(JT_shoulder);
+  const double radElb = m_arm->getJointRadius(JT_elbow);  
+  
+  // An extensor's muscle length and moment arm are exactly those of an equivalent flexor,
+  // when joint angles are mirrored.
+  if(!m_isFlexor)
+  {
+    shdAngle *= -1;
+    elbAngle *= -1;
+  }
+  
+  // Check capsule wrapping
+  bool doubleWraps = (shdAngle < m_wrapAngleThresholdShd) && (elbAngle < m_wrapAngleThresholdElb);
+  if(doubleWraps)
+  {
+    // Double wrap condition
+    double wrapAngleShd = PI - m_originCapsuleAngle - shdAngle - m_gammaAngle;
+    double wrapAngleElb = m_gammaAngle - m_insertCapsuleAngle - elbAngle;
+    return m_originCapsuleDist + wrapAngleShd*radShd + m_capsuleCapsuleDist + wrapAngleElb*radElb + m_insertCapsuleDist;
+  }
+  else 
+  {
+    // Single or no wrap condition
+    
+    // These are needed in any case:
+    const double upperArmLength = m_arm->getLength(JT_shoulder);    
+    const double xa = upperArmLength * cos(shdAngle) + m_insertJointDist * cos(shdAngle + elbAngle);
+    const double ya = upperArmLength * sin(shdAngle) + m_insertJointDist * sin(shdAngle + elbAngle);
+    const double wShd = atan2(ya, xa + m_originJointDist);
+    const double maShd = m_originJointDist * sin(wShd);
+    const double wElb = PI_OVER_TWO - shdAngle - elbAngle + wShd;
+    const double maElb = m_insertJointDist * cos(wElb);
+    
+    const bool couldShoulderWrap = ((shdAngle - m_wrapAngleThresholdShd) < (elbAngle - m_wrapAngleThresholdElb));    
+    bool shoulderWraps = couldShoulderWrap && (shdAngle < PI_OVER_TWO) && (maShd < radShd);
+    if(shoulderWraps)
+    {
+      // Shoulder wrapping      
+      const double cosElbAngle = cos(elbAngle);
+      const double b = sqrt( sqr(upperArmLength) + sqr(m_insertJointDist) + 2*upperArmLength*m_insertJointDist*cosElbAngle );
+      const double n = acos(radShd / b);
+      const double mu = acos((upperArmLength + m_insertJointDist*cosElbAngle) / b);
+      double wrapAngleShd = PI - n - mu - m_originCapsuleAngle - shdAngle;
+      return m_originCapsuleDist + (radShd * wrapAngleShd) + (b * sin(n));
+    }
+    else 
+    {
+      bool elbowWraps = (elbAngle < PI_OVER_TWO) && (maElb < radElb);  
+      if(elbowWraps)
+      {
+        // ELbow wrapping
+        const double cosShdAngle = cos(shdAngle);
+        const double b = sqrt( sqr(upperArmLength) + sqr(m_originJointDist) + 2*upperArmLength*m_originJointDist*cosShdAngle );
+        const double xi = asin(radElb / b);
+        const double ro = acos((m_originJointDist + upperArmLength*cosShdAngle) / b);
+        double wrapAngleElb = PI_OVER_TWO - shdAngle - elbAngle - m_insertCapsuleAngle + ro + xi;
+        return sqrt(sqr(b) - sqr(radElb)) + wrapAngleElb*radElb + m_insertCapsuleDist;
+      }
+      else 
+      {
+        // No wrapping
+        return sqrt(sqr(xa + m_originJointDist) + sqr(ya));
       } // No wrap
     } // Elbow wrap
   } // Single or no wrap
