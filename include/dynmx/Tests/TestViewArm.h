@@ -15,6 +15,7 @@
 #include "ArmMuscled.h"
 #include "Scene.h"
 #include "ArmViz.h"
+#include "ArmMuscledViz.h"
 
 #include "cinder/gl/gl.h"
 #include "cinder/Matrix.h"
@@ -47,10 +48,10 @@ public:
     }    
     
     // 3d view
-    m_armView = new dmx::Arm3dView(m_arm, m_hasMuscles);
-    m_armView->rotate(ci::Vec4f(0,0,1,1), -PI_OVER_TWO);
-    m_armView->translate(ci::Vec4f(-0.25, 0, 0, 1));
-    m_scene3d.m_children.push_back(m_armView);
+    m_armViz = m_hasMuscles ? new dmx::ArmMuscledViz((dmx::ArmMuscled*)m_arm) : new dmx::ArmViz(m_arm);
+    m_armViz->rotate(ci::Vec4f(0,0,1,1), -PI_OVER_TWO);
+    m_armViz->translate(ci::Vec4f(-0.25, 0, 0, 1));
+    m_scene3d.m_children.push_back(m_armViz);
     
     // 2d view
     m_plotMuscles = new dmx::Plot(600.0, 180, NUM_MUSCLES, 200);
@@ -102,7 +103,7 @@ public:
     // Tracking cursor position
     if(m_trackMouse)
     {
-      m_target = m_armView->toLocalSpace(m_mouseWorld);
+      m_target = m_armViz->toLocalSpace(m_mouseWorld);
       //m_arm->setTarget(dmx::Pos(m_target));
     }    
     
@@ -264,7 +265,7 @@ public:
   
   bool m_hasMuscles;
   dmx::Arm* m_arm; 
-  dmx::Arm3dView* m_armView;
+  dmx::ArmViz* m_armViz;
   dmx::Plot* m_plotMuscles;
   dmx::Plot* m_plotReflex1;
   dmx::Plot* m_plotReflex2;

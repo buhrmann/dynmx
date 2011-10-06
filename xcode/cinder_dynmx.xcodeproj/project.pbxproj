@@ -23,6 +23,7 @@
 		D628908E13B4D16000653F04 /* SimulationFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D628908D13B4D16000653F04 /* SimulationFactory.cpp */; };
 		D62AB6F013D73336003020F7 /* MuscleMonoWrap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D62AB6EF13D73336003020F7 /* MuscleMonoWrap.cpp */; };
 		D62AB6F413D7336A003020F7 /* MuscleBiWrap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D62AB6F313D7336A003020F7 /* MuscleBiWrap.cpp */; };
+		D6317B04143DB566008E894F /* ArmMuscledViz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6317B03143DB566008E894F /* ArmMuscledViz.cpp */; };
 		D64236E6131D7E5C0047734B /* GAViz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D64236E5131D7E5C0047734B /* GAViz.cpp */; };
 		D64F20AA12ECE1720014F069 /* Arm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D64F20A012ECE1720014F069 /* Arm.cpp */; };
 		D64F20AB12ECE1720014F069 /* ArmViz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D64F20A112ECE1720014F069 /* ArmViz.cpp */; };
@@ -80,6 +81,8 @@
 		D62AB6F113D73354003020F7 /* MuscleMonoWrap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MuscleMonoWrap.h; path = ../include/dynmx/MuscleMonoWrap.h; sourceTree = SOURCE_ROOT; };
 		D62AB6F313D7336A003020F7 /* MuscleBiWrap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MuscleBiWrap.cpp; sourceTree = "<group>"; };
 		D62AB6F513D73389003020F7 /* MuscleBiWrap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MuscleBiWrap.h; path = ../include/dynmx/MuscleBiWrap.h; sourceTree = SOURCE_ROOT; };
+		D6317B02143DB549008E894F /* ArmMuscledViz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmMuscledViz.h; path = ../include/dynmx/ArmMuscledViz.h; sourceTree = SOURCE_ROOT; };
+		D6317B03143DB566008E894F /* ArmMuscledViz.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ArmMuscledViz.cpp; sourceTree = "<group>"; };
 		D6423689131D77520047734B /* TestViewEvolvableCTRNN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestViewEvolvableCTRNN.h; path = ../include/dynmx/Tests/TestViewEvolvableCTRNN.h; sourceTree = SOURCE_ROOT; };
 		D64236DC131D7D5A0047734B /* GAViz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GAViz.h; path = ../include/dynmx/GAViz.h; sourceTree = SOURCE_ROOT; };
 		D64236E5131D7E5C0047734B /* GAViz.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GAViz.cpp; sourceTree = "<group>"; };
@@ -377,6 +380,8 @@
 				D6BA381713BA32E000CFED09 /* ArmMuscled.cpp */,
 				D64F209612ECE1640014F069 /* ArmViz.h */,
 				D64F20A112ECE1720014F069 /* ArmViz.cpp */,
+				D6317B02143DB549008E894F /* ArmMuscledViz.h */,
+				D6317B03143DB566008E894F /* ArmMuscledViz.cpp */,
 				D6BA379C13BA24B000CFED09 /* Muscle.h */,
 				D6BA379A13BA249900CFED09 /* Muscle.cpp */,
 				D62AB6F113D73354003020F7 /* MuscleMonoWrap.h */,
@@ -505,6 +510,7 @@
 				D68AC7FD13E9937F009887A9 /* SimpleGUI.cpp in Sources */,
 				D6E94EB51423652300E8D8BD /* GATester.cpp in Sources */,
 				D68CFC961428DAEF003CA32E /* Reflex.cpp in Sources */,
+				D6317B04143DB566008E894F /* ArmMuscledViz.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

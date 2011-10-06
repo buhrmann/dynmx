@@ -22,7 +22,7 @@ namespace dmx
 class MuscleBiWrap : public Muscle
 {
   
-  friend class Arm3dView;
+friend class ArmMuscledViz;
   
 public:
   
