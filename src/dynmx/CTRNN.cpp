@@ -229,7 +229,6 @@ void CTRNN::update(double stepsize)
   // Update the outputs of all neurons.
   for (int i = 0; i < size; i++)
   {
-    //outputs[i] = sigmoid(states[i] + biases[i]);
     outputs[i] = (*m_activationFunction)(states[i] + biases[i]);
   }
 }

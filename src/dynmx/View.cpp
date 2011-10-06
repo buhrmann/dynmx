@@ -22,6 +22,7 @@ const int View::m_selectBufSize = 128;
 //----------------------------------------------------------------------------------------------------------------------
 void View::init()
 {
+  m_paused = false;
 
   m_backgroundColor = Vec4f(0.3f, 0.3f, 0.3f, 1.0);
   const float g = 0.6f;

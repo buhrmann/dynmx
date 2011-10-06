@@ -90,8 +90,11 @@ int EvoArmSimpleReflex::getNumGenes()
   // Parameters of ifv neurons
   numGenes += (m_arm->getNumMuscles() / 2) * 2;  
   
-  // Parameters for IaIn neurons
-  numGenes += (m_arm->getNumMuscles() / 2) * 3;
+  // Parameters for IaIn neurons (2 weights, bias, time constant)
+  numGenes += (m_arm->getNumMuscles() / 2) * 4;
+  
+  // Input to motor neurons: weight from IaIn
+  numGenes += (m_arm->getNumMuscles() / 2) * 1;
   
   return numGenes;
 };
@@ -150,7 +153,7 @@ void EvoArmSimpleReflex::decodeGenome(const double* genome)
                                             minSpExp + (genome[start + 5] * (1 - minSpExp)), 
                                             minSpExp + (genome[start + 5] * (1 - minSpExp)));  
   
-  // Concontraction values
+  // Cocontraction values
   start += 6;  
   const float maxCoContraction = 0.01f;
   for (int i = 0; i < 12; ++i)
@@ -179,18 +182,23 @@ void EvoArmSimpleReflex::decodeGenome(const double* genome)
   
   // IaIn parameters
   start += 4;
-  const float maxIaExc = 10.0;
-  const float maxIaIn = 10.0;
-  const float maxIaT = 100.0;
-  m_arm->getReflex(0)->setIaInParameters(genome[start+0] * maxIaExc, genome[start+0] * maxIaExc,
-                                         genome[start+1] * maxIaIn, genome[start+1] * maxIaIn,
-                                         genome[start+2] * maxIaT, genome[start+2] * maxIaT);
+  const float maxW = 10.0;
+  const float maxB = 10.0;
+  const float maxT = 100.0;
+  m_arm->getReflex(0)->setIaInParameters(genome[start+0] * maxW, genome[start+0] * maxW,        // spindle->ia
+                                         genome[start+1] * maxW, genome[start+1] * maxW,        // ia->ia
+                                         genome[start+2] * maxT, genome[start+2] * maxT,        // time constants
+                                         genome[start+3] * maxB, genome[start+3] * maxB);       // biases
 
-  m_arm->getReflex(1)->setIaInParameters(genome[start+3] * maxIaExc, genome[start+3] * maxIaExc,
-                                         genome[start+4] * maxIaIn, genome[start+4] * maxIaIn,
-                                         genome[start+5] * maxIaT, genome[start+5] * maxIaT);
+  m_arm->getReflex(1)->setIaInParameters(genome[start+4] * maxW, genome[start+4] * maxW,
+                                         genome[start+5] * maxW, genome[start+5] * maxW,
+                                         genome[start+6] * maxT, genome[start+6] * maxT,
+                                         genome[start+7] * maxB, genome[start+7] * maxB);
   
-  
+  // Alpha MN params
+  start += 8;
+  m_arm->getReflex(0)->setMotoNeuronParameters(genome[start+0] * maxW, genome[start+0] * maxW);
+  m_arm->getReflex(1)->setMotoNeuronParameters(genome[start+1] * maxW, genome[start+1] * maxW);  
                                                                                    
 };
 
@@ -206,26 +214,6 @@ void EvoArmSimpleReflex::init()
 { 
   assert(m_arm); 
   m_arm->init(); 
-  
-  // Starting position: asymmetric
-  /*
-  const float startPosElb = PI_OVER_FOUR;
-  const float startPosShd = 0;
-  Pos startPos, target1Pos, tmp;
-  m_arm->forwardKinematics(startPosElb, startPosShd, tmp, startPos);
-  
-  // Synergistic movement
-  const float target1PosElb = PI_OVER_TWO;
-  const float target1PosShd = 0.0f;
-  m_arm->forwardKinematics(target1PosElb, target1PosShd, tmp, target1Pos);     
-  
-  m_targets.add(startPos, 1.5f);    // time to get to start
-  m_targets.add(startPos, 0.5f);    // time to stay at start
-  m_targets.add(target1Pos, 1.0f);  // time to get to target pos
-  m_targets.add(target1Pos, 0.5f);  // time to stay at target pos
-  m_targets.add(startPos, 1.0);     // time to return to start
-  m_targets.add(startPos, 0.5);     // time to stay at start
-  */
   
   // Starting position: symmetric
   const float startPosElb = 0;
@@ -252,7 +240,7 @@ void EvoArmSimpleReflex::init()
   m_targets.add(startPos, 1.0);     // time to return to start
   m_targets.add(startPos, 1.0);     // time to return to start
   
-  m_targets.setBlend(true);
+  m_targets.setBlend(Trajectory<ci::Vec2f>::kTr_BlendLinear);
   m_targets.setLoop(false);  
   
   reset();    

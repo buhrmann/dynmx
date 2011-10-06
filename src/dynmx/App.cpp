@@ -69,21 +69,29 @@ void App::update(float dt)
   if(!m_paused)
   {
     m_model->update(dt); 
+    m_view->update(dt);
   }
 }
 
 //--------------------------------------------------------------------------------------------------------------------
 void App::prepareSettings( Settings *settings )
 {
-  settings->setWindowSize( 800, 600 );
+  int w = 800;
+  int h = 600;
+  if (SETTINGS->hasChild("Config/Globals/WindowSize"))
+  {
+    w = SETTINGS->getChild("Config/Globals/WindowSize").getAttributeValue<int>("Width");
+    h = SETTINGS->getChild("Config/Globals/WindowSize").getAttributeValue<int>("Height");    
+  }
+  settings->setWindowSize( w, h );
   settings->setFrameRate( 60.0f );
   settings->setFullScreen( false );
 }
 
 //--------------------------------------------------------------------------------------------------------------------
 void App::setFixedTimeStep(float dt)            { m_fixedTimeStep = dt; }
-void App::togglePause()                         { m_paused = !m_paused; }
-void App::draw()                                { if(m_view && !m_paused) m_view->draw(); }
+void App::togglePause()                         { m_paused = !m_paused; m_view->pause(m_paused); }
+void App::draw()                                { m_view->draw(); }
 void App::resize(ci::app::ResizeEvent event)    { m_view->resize(event); }
 void App::mouseMove(ci::app::MouseEvent event)  { m_view->mouseMove(event); }
 void App::mouseDrag(ci::app::MouseEvent event)  { m_view->mouseDrag(event); }
@@ -97,7 +105,7 @@ void App::keyUp(ci::app::KeyEvent event)
   switch(event.getCode())
   {
     case ci::app::KeyEvent::KEY_SPACE:
-      m_paused = !m_paused;  
+      togglePause();  
       break;
     case ci::app::KeyEvent::KEY_RETURN:
     {

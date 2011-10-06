@@ -7,7 +7,7 @@
  *
  */
 
-#include "ArmView3d.h"
+#include "ArmViz.h"
 #include "MathUtils.h"
 
 // Todo: this is nasty!
@@ -191,17 +191,45 @@ void Arm3dView::update()
   drawPartialDisk(r, r+0.01, 16, 1, 90 - limMin, -(limMax - limMin));
   glPopMatrix();
   
-  // Trajectory
-  int numTrajPoints = m_arm->getTrajectory().size();
-  for(int i = 0; i < numTrajPoints - 1; ++i)
+  // Trajectory  
+  const std::deque<Pos>& effTrajectory = m_arm->getTrajectory();
+  const int numPoints =  effTrajectory.size();  
+  float lineVerts[numPoints*2];
+  float colors[numPoints*4];
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_COLOR_ARRAY);
+  glVertexPointer(2, GL_FLOAT, 0, lineVerts); // 2d positions
+  glColorPointer(4, GL_FLOAT, 0, colors);     // 4d colors
+  
+  // Draw actual trajectory
+  for(size_t i = 0; i < numPoints; i++)
   {
-    float c = (float)i / (float)numTrajPoints;
-    glColor4f(c,c,c,c);
-    Vec3f p1 = Vec3f(m_arm->getTrajectory()[i]);
-    Vec3f p2 = Vec3f(m_arm->getTrajectory()[i+1]);
-    ci::gl::drawLine(p1, p2);
+    lineVerts[i*2 + 0] = effTrajectory[i].x;
+    lineVerts[i*2 + 1] = effTrajectory[i].y;
+    float c = (float)i / (float)numPoints;
+    colors[i*4 + 0] = c;
+    colors[i*4 + 1] = c;
+    colors[i*4 + 2] = c;
+    colors[i*4 + 3] = c;
   }
+  glDrawArrays( GL_LINE_STRIP, 0, numPoints);
 
+  // Draw desired trajectory
+  const std::deque<Pos>& desTrajectory = ((ArmMuscled*)m_arm)->getDesiredTrajectory();  
+  for(size_t i = 0; i < numPoints; i++)
+  {
+    lineVerts[i*2 + 0] = desTrajectory[i].x;
+    lineVerts[i*2 + 1] = desTrajectory[i].y;
+    float c = 0.5f * (float)i / (float)numPoints;
+    colors[i*4 + 0] = 1;
+    colors[i*4 + 1] = 0;
+    colors[i*4 + 2] = 0;
+    colors[i*4 + 3] = c;
+  }
+  glDrawArrays( GL_LINE_STRIP, 0, numPoints);
+  glDisableClientState(GL_VERTEX_ARRAY);
+  glDisableClientState(GL_COLOR_ARRAY);
+  
   
   // Todo: this is nasty!
   if(m_hasMuscles)

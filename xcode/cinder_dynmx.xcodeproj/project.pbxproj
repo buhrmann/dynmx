@@ -25,7 +25,7 @@
 		D62AB6F413D7336A003020F7 /* MuscleBiWrap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D62AB6F313D7336A003020F7 /* MuscleBiWrap.cpp */; };
 		D64236E6131D7E5C0047734B /* GAViz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D64236E5131D7E5C0047734B /* GAViz.cpp */; };
 		D64F20AA12ECE1720014F069 /* Arm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D64F20A012ECE1720014F069 /* Arm.cpp */; };
-		D64F20AB12ECE1720014F069 /* ArmView3d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D64F20A112ECE1720014F069 /* ArmView3d.cpp */; };
+		D64F20AB12ECE1720014F069 /* ArmViz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D64F20A112ECE1720014F069 /* ArmViz.cpp */; };
 		D64F20AC12ECE1720014F069 /* CTRNN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D64F20A212ECE1720014F069 /* CTRNN.cpp */; };
 		D64F20AD12ECE1720014F069 /* CTRNNViz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D64F20A312ECE1720014F069 /* CTRNNViz.cpp */; };
 		D64F20AE12ECE1720014F069 /* GA.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D64F20A412ECE1720014F069 /* GA.cpp */; };
@@ -48,7 +48,6 @@
 		D6CAA9FF12FDA1CF003BE477 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6CAA9FE12FDA1CF003BE477 /* main.cpp */; };
 		D6DEE86A13B0EF09003FE7D2 /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6DEE86913B0EF09003FE7D2 /* App.cpp */; };
 		D6E94EB51423652300E8D8BD /* GATester.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E94EB41423652300E8D8BD /* GATester.cpp */; };
-		D6F3F47F13D5BD09009715BC /* ArmView2d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6F3F47E13D5BD09009715BC /* ArmView2d.cpp */; };
 		D6F6B6DF13ABDD09005C2E0F /* Dynmx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6F6B6DD13ABDD09005C2E0F /* Dynmx.cpp */; };
 /* End PBXBuildFile section */
 
@@ -89,7 +88,7 @@
 		D64F209312ECE1640014F069 /* Render.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Render.h; path = ../../include/dynmx/Render.h; sourceTree = "<group>"; };
 		D64F209412ECE1640014F069 /* App.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = App.h; path = ../../include/dynmx/App.h; sourceTree = "<group>"; };
 		D64F209512ECE1640014F069 /* Arm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Arm.h; path = ../../include/dynmx/Arm.h; sourceTree = "<group>"; };
-		D64F209612ECE1640014F069 /* ArmView3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmView3d.h; path = ../../include/dynmx/ArmView3d.h; sourceTree = "<group>"; };
+		D64F209612ECE1640014F069 /* ArmViz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmViz.h; path = ../../include/dynmx/ArmViz.h; sourceTree = "<group>"; };
 		D64F209712ECE1640014F069 /* CTRNN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CTRNN.h; path = ../../include/dynmx/CTRNN.h; sourceTree = "<group>"; };
 		D64F209812ECE1640014F069 /* CTRNNViz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CTRNNViz.h; path = ../../include/dynmx/CTRNNViz.h; sourceTree = "<group>"; };
 		D64F209912ECE1640014F069 /* GA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GA.h; path = ../../include/dynmx/GA.h; sourceTree = "<group>"; };
@@ -98,7 +97,7 @@
 		D64F209C12ECE1640014F069 /* Scene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Scene.h; path = ../../include/dynmx/Scene.h; sourceTree = "<group>"; };
 		D64F209D12ECE1640014F069 /* View.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = View.h; path = ../../include/dynmx/View.h; sourceTree = "<group>"; };
 		D64F20A012ECE1720014F069 /* Arm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Arm.cpp; sourceTree = "<group>"; };
-		D64F20A112ECE1720014F069 /* ArmView3d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ArmView3d.cpp; sourceTree = "<group>"; };
+		D64F20A112ECE1720014F069 /* ArmViz.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ArmViz.cpp; sourceTree = "<group>"; };
 		D64F20A212ECE1720014F069 /* CTRNN.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CTRNN.cpp; sourceTree = "<group>"; };
 		D64F20A312ECE1720014F069 /* CTRNNViz.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CTRNNViz.cpp; sourceTree = "<group>"; };
 		D64F20A412ECE1720014F069 /* GA.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GA.cpp; sourceTree = "<group>"; };
@@ -148,8 +147,6 @@
 		D6DEE86913B0EF09003FE7D2 /* App.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = App.cpp; sourceTree = "<group>"; };
 		D6E94EB31423650800E8D8BD /* GATester.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GATester.h; path = ../include/dynmx/GATester.h; sourceTree = SOURCE_ROOT; };
 		D6E94EB41423652300E8D8BD /* GATester.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GATester.cpp; sourceTree = "<group>"; };
-		D6F3F47D13D5BCF7009715BC /* ArmView2d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmView2d.h; path = ../include/dynmx/ArmView2d.h; sourceTree = SOURCE_ROOT; };
-		D6F3F47E13D5BD09009715BC /* ArmView2d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ArmView2d.cpp; sourceTree = "<group>"; };
 		D6F6B6DD13ABDD09005C2E0F /* Dynmx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Dynmx.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -378,10 +375,8 @@
 				D6BA37E413BA2EC700CFED09 /* ArmPD.cpp */,
 				D6BA381513BA32C200CFED09 /* ArmMuscled.h */,
 				D6BA381713BA32E000CFED09 /* ArmMuscled.cpp */,
-				D6F3F47D13D5BCF7009715BC /* ArmView2d.h */,
-				D6F3F47E13D5BD09009715BC /* ArmView2d.cpp */,
-				D64F209612ECE1640014F069 /* ArmView3d.h */,
-				D64F20A112ECE1720014F069 /* ArmView3d.cpp */,
+				D64F209612ECE1640014F069 /* ArmViz.h */,
+				D64F20A112ECE1720014F069 /* ArmViz.cpp */,
 				D6BA379C13BA24B000CFED09 /* Muscle.h */,
 				D6BA379A13BA249900CFED09 /* Muscle.cpp */,
 				D62AB6F113D73354003020F7 /* MuscleMonoWrap.h */,
@@ -483,7 +478,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D64F20AA12ECE1720014F069 /* Arm.cpp in Sources */,
-				D64F20AB12ECE1720014F069 /* ArmView3d.cpp in Sources */,
+				D64F20AB12ECE1720014F069 /* ArmViz.cpp in Sources */,
 				D64F20AC12ECE1720014F069 /* CTRNN.cpp in Sources */,
 				D64F20AD12ECE1720014F069 /* CTRNNViz.cpp in Sources */,
 				D64F20AE12ECE1720014F069 /* GA.cpp in Sources */,
@@ -504,7 +499,6 @@
 				D6BA37E513BA2EC700CFED09 /* ArmPD.cpp in Sources */,
 				D6BA381813BA32E000CFED09 /* ArmMuscled.cpp in Sources */,
 				D6108AD413D0481000680AD5 /* Recorder.cpp in Sources */,
-				D6F3F47F13D5BD09009715BC /* ArmView2d.cpp in Sources */,
 				D62AB6F013D73336003020F7 /* MuscleMonoWrap.cpp in Sources */,
 				D62AB6F413D7336A003020F7 /* MuscleBiWrap.cpp in Sources */,
 				D60CB06913E8361A00AAF10C /* EPController.cpp in Sources */,

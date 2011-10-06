@@ -168,6 +168,13 @@ void ArmMuscled::updatePosition(Pos pos, float dt, int elbPos)
   
   // Now let the normal update take over, this will also update the muscles
   update(dt);
+  
+  // Store desired trajectory
+  m_desiredTrajectory.push_back(m_desiredPos);
+  if(m_trajectory.size() > MaxTrajPoints)
+  {
+    m_trajectory.pop_front();
+  }  
 }
   
 //----------------------------------------------------------------------------------------------------------------------

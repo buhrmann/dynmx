@@ -544,8 +544,14 @@ void Plot::update()
         sprintf(str, "%s: %2.4f", m_names[pl].c_str(), current);
       else
         sprintf(str, "%2.4f", current);        
-      glColor3f(0,0,0);
-      drawString(Vec3f(lineVerts[numPoints*2-2], lineVerts[numPoints*2-1], 0), str); 
+      
+      const int h = 10;
+      glPushMatrix();
+      glTranslatef(m_w + 2*h, pl*2*h + h/2, 0.0);
+      glColor4f(col.x, col.y, col.z, 1.0);      
+      drawRectangle(h, h);
+      glPopMatrix();
+      drawString(Vec3f(m_w + 3*h, pl*2*h + h, 0), str); 
 #endif
     }
   }
@@ -553,7 +559,8 @@ void Plot::update()
   // box
   glColor4f(0.0, 0.0, 0.0, 1);
   ci::gl::drawLine(Vec3f(0.5, m_h+0.5, 0), Vec3f(m_w+0.5, m_h+0.5, 0)); // xAxis
-  ci::gl::drawLine(Vec3f(0.5, m_h, 0), Vec3f(0.5, 0, 0)); // yAxis
+  ci::gl::drawLine(Vec3f(0.5, m_h, 0), Vec3f(0.5, 0, 0));               // yAxis on left
+  ci::gl::drawLine(Vec3f(m_w + 0.5, m_h, 0), Vec3f(m_w + 0.5, 0, 0));   // yAxis on right
 
   glPopMatrix();
   glPopAttrib();

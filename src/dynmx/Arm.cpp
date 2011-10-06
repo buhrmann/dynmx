@@ -19,29 +19,6 @@ namespace dmx
 #define PI_OVER_FOUR 0.7853981
 #endif
 
-//----------------------------------------------------------------------------------------------------------------------
-// Implementation of MinJerkTrajectory
-//----------------------------------------------------------------------------------------------------------------------
-void MinJerkTrajectory::update(float dt)
-{
-  time += dt;
-  float t = time / duration;
-  t = t > duration ? duration : t;
-  float amplitude = 15*t*t*t*t - 6*t*t*t*t*t - 10*t*t*t;
-  current.x = initial.x + (initial.x - target.x) * amplitude;
-  current.y = initial.y + (initial.y - target.y) * amplitude;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-void MinJerkTrajectory::setNew(const Pos& initPos, const Pos& finalPos, float duration)
-{
-  initial = initPos;
-  target = finalPos;
-  duration = duration;
-  time = 0.0f;
-}
-
-
 
 //----------------------------------------------------------------------------------------------------------------------
 // Typical dimensions from Arnon(1990), referenced in 

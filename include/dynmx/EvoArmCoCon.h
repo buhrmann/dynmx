@@ -59,6 +59,7 @@ protected:
   
   
   Trajectory<ci::Vec2f> m_targets;  
+  MinJerkTrajectory m_minJerkTraj;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -87,7 +88,13 @@ int EvoArmCoCon::getNumGenes()
   numGenes += (m_arm->getNumMuscles() / 2) * 3;
     
   // Parameters for IaIn neurons
-  numGenes += (m_arm->getNumMuscles() / 2) * 3;
+  //numGenes += (m_arm->getNumMuscles() / 2) * 4;
+  
+  // Input to motor neurons: weight from IaIn
+  //numGenes += (m_arm->getNumMuscles() / 2) * 1;  
+  
+  // Parameters of ifv neurons
+  numGenes += (m_arm->getNumMuscles() / 2) * 2;    
   
   return numGenes;
 };
@@ -134,7 +141,7 @@ void EvoArmCoCon::decodeGenome(const double* genome)
   
   // Spindle parameters
   const float maxSpP = 1.0;
-  const float maxSpV = 0.5;
+  const float maxSpV = 1.0;
   const float minSpExp = 0.5;
   m_arm->getReflex(0)->setSpindleParameters(genome[start + 0]*maxSpP, genome[start + 0]*maxSpP, 
                                             genome[start + 1]*maxSpV, genome[start + 1]*maxSpV, 
@@ -145,20 +152,40 @@ void EvoArmCoCon::decodeGenome(const double* genome)
                                             genome[start + 4]*maxSpV, genome[start + 4]*maxSpV, 
                                             minSpExp + (genome[start + 5] * (1 - minSpExp)), 
                                             minSpExp + (genome[start + 5] * (1 - minSpExp)));  
-  
+  start += 6;    
     
   // IaIn parameters
-  start += 6;
-  const float maxIaExc = 10.0;
-  const float maxIaIn = 10.0;
-  const float maxIaT = 100.0;
-  m_arm->getReflex(0)->setIaInParameters(genome[start+0] * maxIaExc, genome[start+0] * maxIaExc,
-                                         genome[start+1] * maxIaIn, genome[start+1] * maxIaIn,
-                                         genome[start+2] * maxIaT, genome[start+2] * maxIaT);
+  /*
+  const float maxW = 10.0;
+  const float maxB = 1.0;
+  const float maxT = 100.0;
+  m_arm->getReflex(0)->setIaInParameters(genome[start+0] * maxW, genome[start+0] * maxW,        // spindle->ia
+                                         genome[start+1] * maxW, genome[start+1] * maxW,        // ia->ia
+                                         10 + genome[start+2] * maxT, 10 + genome[start+2] * maxT,        // time constants
+                                         //-maxB + (genome[start+3] * 2 * maxB), -maxB + (genome[start+3] * 2 * maxB));       // biases
+                                         0.0, 0.0);
   
-  m_arm->getReflex(1)->setIaInParameters(genome[start+3] * maxIaExc, genome[start+3] * maxIaExc,
-                                         genome[start+4] * maxIaIn, genome[start+4] * maxIaIn,
-                                         genome[start+5] * maxIaT, genome[start+5] * maxIaT);
+  m_arm->getReflex(1)->setIaInParameters(genome[start+4] * maxW, genome[start+4] * maxW,
+                                         genome[start+5] * maxW, genome[start+5] * maxW,
+                                         10 + genome[start+6] * maxT, 10 + genome[start+6] * maxT,
+                                         //-maxB + (genome[start+7] * 2 * maxB), -maxB + (genome[start+7] * 2 * maxB));  
+                                         0.0, 0.0);
+  start += 8;
+  
+  // Alpha MN params
+  m_arm->getReflex(0)->setMotoNeuronParameters(genome[start+0] * maxW, genome[start+0] * maxW); // ia->mn
+  m_arm->getReflex(1)->setMotoNeuronParameters(genome[start+1] * maxW, genome[start+1] * maxW);    
+  start += 2;
+   */
+  
+  // IFV gains
+  const float maxIC = 10.0f;
+  const float maxICb = 1.0f;
+  m_arm->getReflex(0)->setInertiaCompensationParameters(genome[start+0] * maxIC, genome[start+0] * maxIC, 
+                                                        genome[start+1] * maxICb, genome[start+1] * maxICb);
+  
+  m_arm->getReflex(1)->setInertiaCompensationParameters(genome[start+2] * maxIC, genome[start+2] * maxIC, 
+                                                        genome[start+3] * maxICb, genome[start+3] * maxICb);  
   
 };
 
@@ -166,9 +193,9 @@ void EvoArmCoCon::decodeGenome(const double* genome)
 float EvoArmCoCon::getFitness() 
 { 
   const double dt = 1.0 / 100.0;
-  float distFit = 1.0 - /*sqrt*/(m_fitness / (m_time / dt));
+  float distFit = 1.0 - sqrt(m_fitness / (m_time / dt));
   float coconFit = m_coconIncrements[0] * m_coconIncrements[1] * m_coconIncrements[2]; 
-  return distFit * coconFit;
+  return distFit;// * coconFit;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -202,7 +229,7 @@ void EvoArmCoCon::init()
   m_targets.add(startPos, 1.0);     // time to return to start
   m_targets.add(startPos, 1.0);     // time to return to start
   
-  m_targets.setBlend(true);
+  m_targets.setBlend(Trajectory<ci::Vec2f>::kTr_BlendMinJerk);
   m_targets.setLoop(false);  
   
   reset();    
@@ -213,6 +240,7 @@ void EvoArmCoCon::reset()
 {
   m_fitness = 0.0f;
   m_time = 0.0f;
+  m_coconStarted = false;
   m_arm->reset();
 }
 
@@ -220,21 +248,19 @@ void EvoArmCoCon::reset()
 void EvoArmCoCon::update(float dt)
 { 
   Target<Pos> desired = m_targets.at(m_time);
-  //desired.id++; // With blending enabled the current target is moving towards the next target
   
   // Control co-contraction
   const float maxCoContraction = 0.5f;
+  m_cocontraction = 0.0;
+  /*
   if (desired.id == 2 || desired.id == 4 || desired.id == 6)
   {
     // Determine how far proportionally we're through with this target
     m_cocontraction = (m_time - desired.start) / (desired.stop - desired.start);
     // Limit range
     m_cocontraction *= maxCoContraction;
-  }  
-  else 
-  {
-    m_cocontraction = 0.0;
-  }
+  } 
+   */
   
   // Apply
   m_arm->getReflex(0)->setCocontraction(m_cocontraction, m_cocontraction);
@@ -285,7 +311,7 @@ void EvoArmCoCon::update(float dt)
   // Fitness evaluation
   Pos diff = m_arm->getEffectorPos() - desired.position;
   float dist = diff.length();
-  m_fitness += /*sqr*/(dist);
+  m_fitness += sqr(dist);
   
   m_time += dt;
 };

@@ -33,23 +33,6 @@ enum Joint
 };
 
 //----------------------------------------------------------------------------------------------------------------------
-/// Smoothest motion over given duration (2d)
-//----------------------------------------------------------------------------------------------------------------------
-struct MinJerkTrajectory
-{
-  MinJerkTrajectory() : duration(1.0f), time(0.0f) {};
-  void setNew(const Pos& initPos, const Pos& finalPos, float duration); 
-  void update(float dt); 
-  
-  Pos 
-    current,
-    initial,
-    target;
-  float duration;
-  float time;
-};
-
-//----------------------------------------------------------------------------------------------------------------------
 /// Implements equations of motion for a planar two-jointed arm
 //----------------------------------------------------------------------------------------------------------------------
 class Arm : public Model

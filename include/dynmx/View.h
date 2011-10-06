@@ -14,7 +14,6 @@
 #include "Scene.h"
 #include "Light.h"
 
-#include "cinder/app/AppBasic.h"
 #include "cinder/Camera.h"
 #include "cinder/MayaCamUI.h"
 #include "cinder/params/Params.h"
@@ -25,9 +24,6 @@ namespace dmx
 // indicated that the view doesn't want to override the app's default frame rate
 #define DEFAULT_FRAME_RATE -1
 #define USE_SIMPLE_GUI 1
-  
-// Forward declarations
-class App;
 
 //----------------------------------------------------------------------------------------------------------------------  
 // Interface for a view 3d+2d view of a simulation
@@ -45,6 +41,7 @@ public:
       
   // core functionality
   virtual void init();
+  virtual void update(float dt){}; // E.g. for updating internal calculated data after a simulation step
   virtual void draw();
   
   virtual int getDesiredFrameRate() { return DEFAULT_FRAME_RATE; } ;
@@ -61,6 +58,8 @@ public:
   // Getter and Setter for name, to be used by Factories e.g.
   const std::string& getName() const { return m_name; };
   void setName(const std::string& name) { m_name = name; };
+  
+  void pause(bool p) { m_paused = p; };
   
 protected: 
   
@@ -111,6 +110,8 @@ protected:
   GLuint m_selectionBuffer[128];
   
   std::string m_name;
+  
+  bool m_paused;
 };
 
 }

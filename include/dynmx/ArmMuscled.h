@@ -50,6 +50,7 @@ public:
   float getJointRadius(int joint) const { return m_jointRadius[joint]; }; 
   const Pos& getDesiredPos() const { return m_desiredPos; };
   double getDesiredJointAngle(Joint j) const { assert(j==JT_elbow || j==JT_shoulder); return m_desiredAngles[j]; };
+  const std::deque<Pos>& getDesiredTrajectory() const { return m_desiredTrajectory; };
 
 protected:
 
@@ -62,6 +63,8 @@ protected:
   
   Pos m_desiredPos;
   double m_desiredAngles[2];
+  
+  std::deque<Pos> m_desiredTrajectory;
  
 }; // class ArmPD
 

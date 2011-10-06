@@ -15,7 +15,68 @@
 
 namespace dmx
 {
+  
+//----------------------------------------------------------------------------------------------------------------------
+// Smoothest motion over given duration (2d)
+//----------------------------------------------------------------------------------------------------------------------
+struct MinJerkTrajectory
+{
+  MinJerkTrajectory() : duration(1.0f), time(0.0f) {};
+  void setNew(const Pos& initPos, const Pos& finalPos, float duration); 
+  void update(float dt); 
+  
+  static Pos getPosition(const Pos& initPos, const Pos& finalPos, float duration, float time);
+  
+  Pos current;
+  Pos initial;
+  Pos target;
+  float duration;
+  float time;
+};
 
+//----------------------------------------------------------------------------------------------------------------------  
+Pos MinJerkTrajectory::getPosition(const Pos& initPos, const Pos& finalPos, float duration, float time)
+{
+  assert(time >= 0.0);
+  if (time > duration)
+  {
+    time = duration;
+  }
+  
+  float t = time / duration;
+  float amplitude = 15*t*t*t*t - 6*t*t*t*t*t - 10*t*t*t;
+  
+  Pos current;
+  current.x = initPos.x + (initPos.x - finalPos.x) * amplitude;
+  current.y = initPos.y + (initPos.y - finalPos.y) * amplitude;  
+  return current;
+}
+  
+//----------------------------------------------------------------------------------------------------------------------
+void MinJerkTrajectory::update(float dt)
+{
+  time += dt;
+  current = getPosition(initial, target, duration, time);
+  /*
+  float t = time / duration;
+  t = t > duration ? duration : t;
+  float amplitude = 15*t*t*t*t - 6*t*t*t*t*t - 10*t*t*t;
+  current.x = initial.x + (initial.x - target.x) * amplitude;
+  current.y = initial.y + (initial.y - target.y) * amplitude;
+  */
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+void MinJerkTrajectory::setNew(const Pos& initPos, const Pos& finalPos, float duration)
+{
+  initial = initPos;
+  target = finalPos;
+  duration = duration;
+  time = 0.0f;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Point in a generic trajectory
 //----------------------------------------------------------------------------------------------------------------------  
 template <class T>
 struct Target
@@ -35,12 +96,19 @@ class Trajectory
   
 public:
   
-  Trajectory() : m_loop(false), m_blend(false) {};
+  enum BlendType
+  {
+    kTr_BlendNone,
+    kTr_BlendLinear,
+    kTr_BlendMinJerk
+  };
+  
+  Trajectory() : m_loop(false), m_blend(kTr_BlendNone) {};
   
   // Setters
   void add(T pos, float duration);  
   void setLoop(bool l) { m_loop = l; };
-  void setBlend(bool b) { m_blend = b; };
+  void setBlend(BlendType b) { m_blend = b; };
   
   // Getters
   T getPositionAt(float time);
@@ -54,7 +122,7 @@ protected:
   std::vector<Target<T> > m_targets;
                                   
   bool m_loop;
-  bool m_blend;
+  BlendType m_blend;
   
 }; // class Trajectory
   
@@ -107,12 +175,22 @@ Target<T> Trajectory<T>::at(float time)
         target = m_targets[i];
         target.id = i;
         
-        // Linearly blend between current and next target
-        if(m_blend && i < m_targets.size() - 1)
+        // Blend between current and next target
+        if((m_blend > kTr_BlendNone) && (i < m_targets.size() - 1))
         {
-          float duration = m_targets[i].stop - m_targets[i].start;
-          float timeProp = (time - m_targets[i].start) / duration;
-          target.position = m_targets[i].position + timeProp * (m_targets[i+1].position - m_targets[i].position);
+          float duration = target.stop - target.start;
+          if(m_blend == kTr_BlendLinear)
+          {
+            // Blend linearly
+            float timeProp = (time - target.start) / duration;
+            target.position = target.position + timeProp * (m_targets[i+1].position - target.position);
+          }
+          else 
+          {
+            // Create minimum jerk trajectory
+            float t = time - m_targets[i].start;
+            target.position = MinJerkTrajectory::getPosition(target.position, m_targets[i+1].position, duration, t);
+          }
         }
         
         // We've found it
