@@ -330,7 +330,7 @@ void EvoArmCoCon::init()
   m_arm->forwardKinematics(target2PosElb, target2PosShd, tmp, target2Pos);     
   
   // Desired trajectory is minimum jerk of given length
-  float desiredOffset = 0.05f;
+  float desiredOffset = 0.1f;
   m_desiredTrajectory.add(startPos, DESIRED_SETTLING_TIME + desiredOffset);   
   m_desiredTrajectory.add(startPos, DESIRED_MOVEMENT_TIME);  
   m_desiredTrajectory.add(target1Pos, DESIRED_SETTLING_TIME); 
@@ -421,10 +421,10 @@ void EvoArmCoCon::update(float dt)
 #if ENABLE_COCON_INCREASE
   m_cocontraction = 0.0;
   
-  if (desired.id == 2 || desired.id == 4 || desired.id == 6)
+  if (command.id == 2 || command.id == 4 || command.id == 6)
   {     
     // Determine how far proportionally we're through with this target
-    m_cocontraction = (m_time - desired.start) / (desired.stop - desired.start);
+    m_cocontraction = (m_time - command.start) / (command.stop - command.start);
     // Limit range
     m_cocontraction *= MAX_COCONTRACTION;
   } 
@@ -435,12 +435,12 @@ void EvoArmCoCon::update(float dt)
 #endif  
 
 #if ENABLE_OPENLOOP
-  if (desired.id == 1 || desired.id == 2)
+  if (command.id == 1 || command.id == 2)
   {
     m_arm->getReflex(0)->setCocontraction(m_openLoop[2], m_openLoop[3]);
     m_arm->getReflex(1)->setCocontraction(m_openLoop[4], m_openLoop[5]);        
   }
-  else if (desired.id == 5 || desired.id == 6)
+  else if (command.id == 5 || command.id == 6)
   {
     m_arm->getReflex(0)->setCocontraction(m_openLoop[3], m_openLoop[2]); // Mirror image of first set
     m_arm->getReflex(1)->setCocontraction(m_openLoop[5], m_openLoop[4]);        
@@ -459,7 +459,7 @@ void EvoArmCoCon::update(float dt)
   
   // Measure real co-contraction increment between beginning and end of commanded increase
   // First target
-  if(desired.id == 2 || desired.id == 4 || desired.id == 6)
+  if(command.id == 2 || command.id == 4 || command.id == 6)
   {
     // At start of increase
     if(!m_coconStarted)
@@ -472,7 +472,7 @@ void EvoArmCoCon::update(float dt)
       m_coconStarted = true;
     }
     // End of increase
-    if((desired.stop - m_time) <= dt)
+    if((command.stop - m_time) <= dt)
     {
       double coconAtEnd [2];
       coconAtEnd[0] = 0.5 * (m_arm->getReflex(0)->getAlphaOutput(0) + m_arm->getReflex(0)->getAlphaOutput(1));

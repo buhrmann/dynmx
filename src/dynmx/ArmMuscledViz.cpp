@@ -95,30 +95,8 @@ void ArmMuscledViz::update()
     colors[i*4 + 3] = c;
   }
   glDrawArrays( GL_LINE_STRIP, 0, numPoints);
-  
-  // Draw desired trajectory: assume it's same size as actual trajectory, which it should be  
-  /*
-  const std::deque<Pos>& desTrajectory = ((ArmMuscled*)m_arm)->getDesiredTrajectory();  
-  numPoints =  desTrajectory.size();    
-  float lineVertsDes[numPoints*2];
-  float colorsDes[numPoints*4];
-  glVertexPointer(2, GL_FLOAT, 0, lineVertsDes); // 2d positions
-  glColorPointer(4, GL_FLOAT, 0, colorsDes);     // 4d colors  
-  for(size_t i = 0; i < numPoints; i++)
-  {
-    lineVertsDes[i*2 + 0] = desTrajectory[i].x;
-    lineVertsDes[i*2 + 1] = desTrajectory[i].y;
-    float c = 0.5f * (float)i / (float)numPoints;
-    colorsDes[i*4 + 0] = 1;
-    colorsDes[i*4 + 1] = 0;
-    colorsDes[i*4 + 2] = 0;
-    colorsDes[i*4 + 3] = c;
-  }
-  glDrawArrays( GL_LINE_STRIP, 0, numPoints);
-  */
   glDisableClientState(GL_VERTEX_ARRAY);
   glDisableClientState(GL_COLOR_ARRAY);
-
   
   
   // Draw muscles

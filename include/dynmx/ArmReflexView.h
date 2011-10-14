@@ -11,6 +11,7 @@
 #define _DMX_ARM_REFLEX_VIEW_
 
 #include "ArmMuscledView.h"
+#include "ArmReflexViz.h"
 #include "ArmReflex.h"
 
 #define MAX_NUM_MUSCLES 6
@@ -46,6 +47,15 @@ protected:
 inline void ArmReflexView::setupScene()
 {
   ArmMuscledView::setupScene();
+  
+  // Todo: This is very ugly!!!
+  delete m_armViz;
+  m_armViz = new ArmReflexViz(m_armRx);
+  m_armViz->rotate(ci::Vec4f(0,0,1,1), -PI_OVER_TWO);
+  m_armViz->translate(ci::Vec4f(-0.25, 0, 0, 1));
+  m_scene3d.m_children[0] = m_armViz;  
+  
+  
   ((ArmMuscledViz*)m_armViz)->setDrawDesired(true);
   
   m_reflexGains[0] = m_armRx->getReflex(m_selectedReflex)->m_Kspp[0];
@@ -62,6 +72,7 @@ inline void ArmReflexView::setupScene()
 inline void ArmReflexView::update(float dt)
 {
   ArmMuscledView::update(dt);
+  
   m_armRx->setTarget(dmx::Pos(m_target));
   
   // Control reflex parameters visually

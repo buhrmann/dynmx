@@ -138,6 +138,7 @@
 		D6C3A1D11448501B00E89616 /* ArmReflex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ArmReflex.cpp; sourceTree = "<group>"; };
 		D6C3A205144855E100E89616 /* TestModelArmReflex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestModelArmReflex.h; sourceTree = "<group>"; };
 		D6C3A2A414485FE600E89616 /* ArmReflexView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmReflexView.h; path = ../include/dynmx/ArmReflexView.h; sourceTree = SOURCE_ROOT; };
+		D6C3A384144873AC00E89616 /* ArmReflexViz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmReflexViz.h; path = ../include/dynmx/ArmReflexViz.h; sourceTree = SOURCE_ROOT; };
 		D6CAA9D412FD9D72003BE477 /* TestEvolvable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestEvolvable.h; path = ../include/dynmx/Tests/TestEvolvable.h; sourceTree = SOURCE_ROOT; };
 		D6CAA9D512FD9D72003BE477 /* TestEvolvableCTRNN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestEvolvableCTRNN.h; path = ../include/dynmx/Tests/TestEvolvableCTRNN.h; sourceTree = SOURCE_ROOT; };
 		D6CAA9D612FD9D72003BE477 /* TestModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestModel.h; path = ../include/dynmx/Tests/TestModel.h; sourceTree = SOURCE_ROOT; };
@@ -401,6 +402,7 @@
 				D64F20A112ECE1720014F069 /* ArmViz.cpp */,
 				D6317B02143DB549008E894F /* ArmMuscledViz.h */,
 				D6317B03143DB566008E894F /* ArmMuscledViz.cpp */,
+				D6C3A384144873AC00E89616 /* ArmReflexViz.h */,
 				D6C39F9814482A5200E89616 /* ArmView.h */,
 				D6C3A0451448349E00E89616 /* ArmPDView.h */,
 				D6C3A1411448488A00E89616 /* ArmMuscledView.h */,

@@ -114,7 +114,6 @@ void ArmReflex::update(double lengthElb0, double lengthElb1, double lengthShd0, 
   
   // Now let the normal update take over, this will also update the reflexes and muscles
   update(dt);
-  
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -137,7 +136,6 @@ void ArmReflex::toXml(ci::XmlTree& xml)
   if(xml.hasChild("Arm"))
   {
     ci::XmlTree& arm = xml.getChild("Arm");
-    
     
     // Write out reflex data
     for(int i = 0; i < m_reflexes.size(); i++)
