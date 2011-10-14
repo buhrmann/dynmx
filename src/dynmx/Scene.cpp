@@ -543,7 +543,7 @@ void Plot::update()
       if(m_names[pl] != "")
         sprintf(str, "%s: %2.4f", m_names[pl].c_str(), current);
       else
-        sprintf(str, "%2.4f", current);        
+        sprintf(str, "%i: %2.4f", pl, current);        
       
       const int h = 10;
       glPushMatrix();
@@ -562,6 +562,13 @@ void Plot::update()
   ci::gl::drawLine(Vec3f(0.5, m_h, 0), Vec3f(0.5, 0, 0));               // yAxis on left
   ci::gl::drawLine(Vec3f(m_w + 0.5, m_h, 0), Vec3f(m_w + 0.5, 0, 0));   // yAxis on right
 
+  // Show min and max on axes
+  char str [32]; 
+  sprintf(str, "%+2.3f", m_minY);
+  drawString(Vec3f(0.5-40, m_h + 2.5, 0), str);  
+  sprintf(str, "%+2.3f", m_maxY);
+  drawString(Vec3f(0.5-40, 2.5, 0), str);    
+  
   glPopMatrix();
   glPopAttrib();
   glPopName();

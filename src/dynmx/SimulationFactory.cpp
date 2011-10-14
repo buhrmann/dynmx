@@ -16,22 +16,25 @@
 #include "GARunner.h"
 #include "GATester.h"
 
-#include "EvoArmSimpleReflex.h"
 #include "EvoArmCoCon.h"
 
 #include "TestModel.h"
-#include "TestModelArm.h"
-#include "TestModelArmMuscled.h"
+#include "TestModelArmPD.h"
+#include "TestModelArmReflex.h"
 #include "TestModelEvolvableArm.h"
 #include "TestModelCTRNN.h"
 
 #include "TestEvolvable.h"
 #include "TestEvolvableCTRNN.h"
-#include "TestApp.h"
-#include "TestAppArm.h"
 #include "TestAppCTRNN.h"
-#include "TestAppEvolvableCTRNN.h"
 
+#include "TestView.h"
+#include "TestViewEvolvableCTRNN.h"
+
+#include "ArmView.h"
+#include "ArmPDView.h"
+#include "ArmMuscledView.h"
+#include "ArmReflexView.h"
 
 namespace dmx
 {
@@ -71,7 +74,8 @@ Simulation* SimulationFactory::create()
       model = new GARunner (evolvable);
       if(visual)
       {
-        app = new TestAppEvolvableCTRNN((GARunner*)model);
+        View* view = new TestViewEvolvableCTRNN((GARunner*)model);
+        app = new App(model, view);
       }
     }
     else if ("TestEvolvable" == evolvableName)
@@ -81,7 +85,7 @@ Simulation* SimulationFactory::create()
       evolvable = new TestEvolvable(fitnessFunction);
       model = new GARunner (evolvable);
     }
-    else if ("TestEvolvableArm" == evolvableName)
+    /*else if ("TestEvolvableArm" == evolvableName)
     {
       TestModelEvolvableArm* evoArm = new TestModelEvolvableArm();
       if(evaluateOnly)
@@ -98,26 +102,7 @@ Simulation* SimulationFactory::create()
         View* view =  new TestViewArm(evoArm->m_arm, true);
         app = new App(model, view);
       }
-    }
-    else if ("EvoArmSimpleReflex" == evolvableName)
-    {
-      EvoArmSimpleReflex* evoArm = new EvoArmSimpleReflex();
-      if(evaluateOnly)
-      {
-        model = new GATester(evoArm);   
-        visual = true; // TODO: Temporarily overwrite to save time editing config file repeatedly
-      }
-      else
-      {
-        model = new GARunner(evoArm);
-      }
-      
-      if(visual)
-      {          
-        View* view =  new TestViewArm(evoArm->m_arm, true);
-        app = new App(model, view);
-      }
-    }  
+    }*/
     else if ("EvoArmCoCon" == evolvableName)
     {
       EvoArmCoCon* evoArm = new EvoArmCoCon();
@@ -133,29 +118,51 @@ Simulation* SimulationFactory::create()
       
       if(visual)
       {          
-        View* view =  new TestViewArm(evoArm->m_arm, true);
+        View* view =  new ArmReflexView(evoArm->m_arm);
         app = new App(model, view);
       }
     }      
   }
   else if ("TestArm" == modelName)
   {
-    model = new TestModelArm();
+    model = new Arm();
+    model->init();
     if (visual)
     {
-      View* view = new TestViewArm(((TestModelArm*)model)->m_arm);
+      View* view = new ArmView((Arm*)model);
       app = new App(model, view);
     }
   }
-  else if ("TestArmMuscled" == modelName)
+  else if ("TestArmPD" == modelName)
   {
-    model = new TestModelArmMuscled();
+    model = new TestModelArmPD();
+    model->init();
     if (visual)
     {
-      View* view = new TestViewArm(((TestModelArmMuscled*)model)->m_arm, true);
+      View* view = new ArmPDView(((TestModelArmPD*)model)->m_arm);
+      app = new App(model, view);
+    }
+  }  
+  else if ("TestArmMuscled" == modelName)
+  {
+    model = new ArmMuscled();
+    model->init();
+    if (visual)
+    {
+      View* view = new ArmMuscledView(((ArmMuscled*)model));
       app =  new App(model, view);
     }    
   }
+  else if ("TestArmReflex" == modelName)
+  {
+    TestModelArmReflex* armR = new TestModelArmReflex();
+    model = armR;
+    if (visual)
+    {
+      View* view = new ArmReflexView(((ArmReflex*)armR->m_arm));
+      app =  new App(model, view);
+    }    
+  }  
   else if ("TestCTRNN" == modelName)
   {
     const int numNeurons = SETTINGS->getChild("Config/CTRNN/NumNeurons").getAttributeValue<int>("Value");
@@ -170,7 +177,8 @@ Simulation* SimulationFactory::create()
     model = new TestModel();
     if(visual)
     {
-      app = new TestApp((TestModel*)model);
+      View* view = new TestView((TestModel*)model);      
+      app = new App(model, view);
     }
   }
   

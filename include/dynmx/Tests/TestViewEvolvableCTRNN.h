@@ -23,7 +23,7 @@ public:
 
   //--------------------------------------------------------------------------------------------------------------------
   TestViewEvolvableCTRNN() : m_gaRunner(0) {};
-  TestViewEvolvableCTRNN(dmx::App* app, dmx::Model* gaRunner) : m_app(app), m_gaRunner((dmx::GARunner*)gaRunner)
+  TestViewEvolvableCTRNN(dmx::Model* gaRunner) : m_gaRunner((dmx::GARunner*)gaRunner)
   {
     m_evoCtrnn = (TestEvolvableCTRNN*) m_gaRunner->getEvolvable();
   };
@@ -61,11 +61,7 @@ public:
   {   
     glColor3f(0,0,0);
     //dmx::drawSquaresVB(750, 300, 300);
-    
-    ci::Vec2f pos (10, 10); 
-    char str[128];
-    sprintf(str, "fps: %f", m_app->getAverageFps());
-    ci::gl::drawString(str, pos, ci::ColorA(0,0,0));
+
   };
   
   //---------------------------------------------------------------------------------------------------------------------
@@ -88,7 +84,6 @@ public:
   dmx::CTRNNViz* m_ctrnnViz;
   dmx::GAViz* m_gaViz;
   dmx::RealMatrixViz* m_matrixViz;
-  dmx::App* m_app;
 };
 
 #endif

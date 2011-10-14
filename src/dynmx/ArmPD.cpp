@@ -36,8 +36,8 @@ void ArmPD::updatePD(float dt, float angle1, float angle2)
 {
   float elbTorque = m_pd[JT_elbow].update(angle1, m_angles[JT_elbow], m_velocities[JT_elbow], dt);
   float shdTorque = m_pd[JT_shoulder].update(angle2, m_angles[JT_shoulder], m_velocities[JT_shoulder], dt);
-  update(dt, elbTorque*dt, shdTorque*dt);
-  update(dt);
+  Arm::update(dt, elbTorque*dt, shdTorque*dt);
+  //update(dt);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -53,6 +53,7 @@ void ArmPD::updatePosition(float timeStep, float x, float y)
     y = y / mag * (reachDist - 0.0001f);
   }
   
+  m_desiredPos = Pos(x,y);
   inverseKinematics(Pos(x, y), 1.0f, m_desiredAngle[JT_elbow], m_desiredAngle[JT_shoulder]);
   updatePD(timeStep, m_desiredAngle[JT_elbow], m_desiredAngle[JT_shoulder]);
 }

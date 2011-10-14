@@ -34,6 +34,8 @@ public:
   virtual void update(float dt) {};
   virtual void init() {};
   virtual void reset() {};
+  
+  virtual void toXml(ci::XmlTree& xml) {};
 };
 
 // Helpers
@@ -100,6 +102,7 @@ protected:
   
   ci::XmlTree* m_progressLog;
   ci::XmlTree* m_resultsLog;
+  bool m_saveBestEachGen;
 };
 
 } // namespace dmx

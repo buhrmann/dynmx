@@ -17,17 +17,9 @@ namespace dmx
 void App::setup()
 { 
   m_paused = false;
-  m_useFixedTimeStep = true;
-
-  // Read global config
-  float dt = DEFAULT_TIMESTEP;
-  if (SETTINGS->hasChild("Config/Globals/FrameRate"))
-  {
-    dt = 1.0f / SETTINGS->getChild("Config/Globals/FrameRate").getAttributeValue<int>("Value");
-  }
-  m_fixedTimeStep = dt;
-  
+  m_useFixedTimeStep = true;  
   m_prevTime = getElapsedSeconds();
+  
   //m_model->init(); 
   if(m_view)
   {
@@ -44,18 +36,21 @@ inline void App::update()
   m_prevTime = currentTime;
   
   const int desFrameRate = m_view->getDesiredFrameRate(); 
+  float dt;
   if(desFrameRate > 0)
   {
-    update(1.0f / desFrameRate);  
+    dt = 1.0f / desFrameRate;  
   }
   else if(m_useFixedTimeStep)
   {
-    update(m_fixedTimeStep);
+    dt = m_fixedTimeStep;
   }
   else
   {
-    update(m_elapsedTime); 
+    dt = m_elapsedTime; 
   }  
+  
+  update(dt);
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -76,6 +71,7 @@ void App::update(float dt)
 //--------------------------------------------------------------------------------------------------------------------
 void App::prepareSettings( Settings *settings )
 {
+  // Window size
   int w = 800;
   int h = 600;
   if (SETTINGS->hasChild("Config/Globals/WindowSize"))
@@ -84,8 +80,20 @@ void App::prepareSettings( Settings *settings )
     h = SETTINGS->getChild("Config/Globals/WindowSize").getAttributeValue<int>("Height");    
   }
   settings->setWindowSize( w, h );
-  settings->setFrameRate( 60.0f );
-  settings->setFullScreen( false );
+  
+  // Frame rate
+  int fps = DEFAULT_FRAMERATE;
+  if (SETTINGS->hasChild("Config/Globals/FrameRate"))
+  {
+    fps = SETTINGS->getChild("Config/Globals/FrameRate").getAttributeValue<int>("Value");
+  }
+  m_fixedTimeStep = 1.0 / (float) fps;  // Simulation integration time step
+  settings->setFrameRate(fps);          // How many FPS the app gets updated with
+  
+  if (SETTINGS->hasChild("Config/Globals/FullScreen"))
+  {
+    settings->setFullScreen(SETTINGS->getChild("Config/Globals/FullScreen").getAttributeValue<bool>("Value"));
+  }
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -112,6 +120,7 @@ void App::keyUp(ci::app::KeyEvent event)
       if(m_paused)
       {
         m_model->update(m_fixedTimeStep);
+        m_view->update(m_fixedTimeStep);
         m_view->draw();
       }
       break;

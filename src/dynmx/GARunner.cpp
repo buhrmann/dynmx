@@ -75,6 +75,7 @@ void GARunner::init()
       m_reduceMutationMaxAt = ga.getChild("MutationMaxReduceAt").getAttributeValue<int>("Value");      
     }
     
+    // Pick up from previous run
     bool incremental = ga.getChild("Incremental").getAttributeValue<bool>("Value"); 
     if (incremental)
     {
@@ -86,6 +87,13 @@ void GARunner::init()
     else
     {
       reset(true);
+    }
+    
+    // What to save out in xml
+    m_saveBestEachGen = false;
+    if(ga.hasChild("SaveBestEachGeneration"))
+    {
+      m_saveBestEachGen = ga.getChild("SaveBestEachGeneration").getAttributeValue<bool>("Value"); 
     }
   }
   else
@@ -171,6 +179,7 @@ void GARunner::update(float dt)
         const double* bestGenome = m_ga->getBestGenome(bestFitness);
         const float avgFitness = m_ga->getAvgFitness();  
         
+        // Store fitness for later analysis and potentially the best genome
         generationToXml(m_progressLog, currentGen, bestGenome, bestFitness, avgFitness);
         
 #if DEBUGGING
@@ -213,21 +222,26 @@ void GARunner::generationToXml(ci::XmlTree* xmlTree, uint32_t gen, const double*
 {
   assert(xmlTree != 0);
   
+  // Ouput Fitness
   ci::XmlTree generation ("Generation", "");
   generation.setAttribute("Index", gen); 
   generation.setAttribute("BestFitness", bestFitness);
   generation.setAttribute("AverageFitness", avgFitness);
-  ci::XmlTree genome ("BestGenome", "");
-  
-  for(size_t i = 0; i < m_ga->getGenomeSize(); ++i)
+
+  // Output best genome
+  if(m_saveBestEachGen)
   {
-    ci::XmlTree gene ("Gene", "");
-    gene.setAttribute("Index", i);
-    gene.setAttribute("Value", bestGenome[i]);
-    genome.push_back(gene);
+    ci::XmlTree genome ("BestGenome", "");  
+    for(size_t i = 0; i < m_ga->getGenomeSize(); ++i)
+    {
+      ci::XmlTree gene ("Gene", "");
+      gene.setAttribute("Index", i);
+      gene.setAttribute("Value", bestGenome[i]);
+      genome.push_back(gene);
+    }
+    generation.push_back(genome);
   }
   
-  generation.push_back(genome);
   xmlTree->push_back(generation);
 }
 

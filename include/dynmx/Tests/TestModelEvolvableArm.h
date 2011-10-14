@@ -25,7 +25,7 @@ class TestModelEvolvableArm : public dmx::Evolvable
 {
 public:
   
-  TestModelEvolvableArm() : m_arm(0), m_time(0) { m_arm = new dmx::ArmMuscled(); init();};
+  TestModelEvolvableArm() : m_arm(0), m_time(0) { m_arm = new dmx::ArmReflex(); init();};
   
   // Implementation of dmx::Evolvable
 
@@ -62,7 +62,7 @@ public:
       double pGain = 30.0 * genome[start + 4];
       double vGain = 20.0 * genome[start + 5];
       double dGain = 10.0 * genome[start + 6];
-      m_arm->getEPController(i)->setGains(pGain, vGain, dGain);
+      //m_arm->getEPController(i)->setGains(pGain, vGain, dGain);
       start += 7;
     }
   };
@@ -104,7 +104,7 @@ public:
     float x = offset + radius * sinf(angle);
     float y = radius * cosf(angle);
     dmx::Pos desPos(x,y);
-    m_arm->updatePosition(desPos, dt);
+    m_arm->update(desPos, dt);
     
     // Fitness evaluation
     dmx::Pos diff = m_arm->getEffectorPos() - desPos;
@@ -144,7 +144,7 @@ public:
   }
   
   
-  dmx::ArmMuscled* m_arm;
+  dmx::ArmReflex* m_arm;
   bool m_saved;
   float m_time;
   float m_fitness;

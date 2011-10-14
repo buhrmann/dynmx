@@ -46,7 +46,10 @@ void Arm::init()
     // Use setting from globals file
     const ci::XmlTree& xml = settings->getChild("Config/Arm");
     
-    m_gravity = xml.getAttributeValue<double>("Gravity");
+    if(xml.hasAttribute("Gravity"))
+    {
+      m_gravity = xml.getAttributeValue<double>("Gravity");
+    }
     
     double upperArmLength = xml.getChild("UpperArm").getAttributeValue<double>("Length");
     double lowerArmLength = xml.getChild("LowerArm").getAttributeValue<double>("Length");
@@ -66,8 +69,17 @@ void Arm::init()
     double elbowLowerLimit = PI * xml.getChild("Elbow").getAttributeValue<double>("LowerLimit");
     setLimit(JT_elbow, elbowUpperLimit, elbowLowerLimit);
     
-    setJointLocked(JT_elbow, xml.getChild("Elbow").getAttributeValue<bool>("Locked"));
-    setJointLocked(JT_shoulder, xml.getChild("Shoulder").getAttributeValue<bool>("Locked"));
+    bool locked[2] = {false, false};
+    if(xml.getChild("Elbow").hasAttribute("Locked"))
+    {
+      locked[JT_elbow] = xml.getChild("Elbow").getAttributeValue<bool>("Locked");
+    }
+    if(xml.getChild("Shoulder").hasAttribute("Locked"))
+    {
+      locked[JT_shoulder] = xml.getChild("Shoulder").getAttributeValue<bool>("Locked");
+    }
+    setJointLocked(JT_elbow, locked[JT_elbow]);
+    setJointLocked(JT_shoulder, locked[JT_shoulder]);
   }
   else
   {
@@ -118,6 +130,8 @@ void Arm::reset(float elbAngle, float shdAngle)
   }
   
   forwardKinematics();
+  
+  m_trajectory.clear();
 }
 
 // takes proportional distance from joint along bone d
@@ -271,9 +285,9 @@ void Arm::update(float timeStep, double torqElb, double torqShd)
   
   // store trajectory
   m_trajectory.push_back(m_effectorPos);
-  if(m_trajectory.size() > MaxTrajPoints)
+  if(m_trajectory.size() >= MaxTrajPoints)
   {
-    m_trajectory.erase(m_trajectory.begin());
+    m_trajectory.pop_front();
   }
   
 #define CHECK_ROUND_TRIP 0
@@ -369,7 +383,7 @@ void Arm::update(float timeStep, double torqElb, double torqShd)
   
   // store trajectory
   m_trajectory.push_back(m_effectorPos);
-  if(m_trajectory.size() > MaxTrajPoints)
+  if(m_trajectory.size() >= MaxTrajPoints)
   {
     m_trajectory.pop_front();
   }
@@ -393,7 +407,7 @@ void Arm::computeAccelerations(const double* angles, const double* velocities, c
   
   // compute elbow acceleration
   double elbAcceleration = 0.0;
-  double gravity = m_gravity * m_masses[JT_elbow] * m_lengths[JT_elbow] * sinElbShd;;
+  double gravity = m_gravity * m_masses[JT_elbow] * m_lengths[JT_elbow] * sinElbShd;
   if(!m_jointLocked[JT_elbow]) 
   {
     double coriolis = m_massElbLLHalf * sqr(velocities[JT_shoulder]) * sinElbAngle;
@@ -428,5 +442,41 @@ void Arm::computeAccelerations(const double* angles, const double* velocities, c
   newAccel[JT_elbow] = elbAcceleration;
   newAccel[JT_shoulder] = shdAcceleration;   
 }
+  
+//----------------------------------------------------------------------------------------------------------------------  
+void Arm::toXml(ci::XmlTree& xml)
+{
+  ci::XmlTree arm ("Arm", "");
+  arm.setAttribute("Gravity", m_gravity);
+  
+  // Skeleton
+  ci::XmlTree upperArm("UpperArm", "");
+  upperArm.setAttribute("Length", m_lengths[JT_shoulder]);
+  upperArm.setAttribute("Mass", m_masses[JT_shoulder]);  
+  arm.push_back(upperArm);
+  
+  ci::XmlTree lowerArm("LowerArm", "");
+  lowerArm.setAttribute("Length", m_lengths[JT_elbow]);
+  lowerArm.setAttribute("Mass", m_masses[JT_elbow]);    
+  arm.push_back(lowerArm);
+  
+  // Joints
+  ci::XmlTree shoulder("Shoulder", "");
+  shoulder.setAttribute("Friction", m_frictions[JT_shoulder]);
+  shoulder.setAttribute("UpperLimit", m_limits[JT_shoulder][0]);
+  shoulder.setAttribute("LowerLimit", m_limits[JT_shoulder][1]);
+  shoulder.setAttribute("Locked", m_jointLocked[JT_shoulder]);
+  arm.push_back(shoulder);
+  
+  ci::XmlTree elbow("Elbow", "");
+  elbow.setAttribute("Friction", m_frictions[JT_shoulder]);
+  elbow.setAttribute("UpperLimit", m_limits[JT_shoulder][0]);
+  elbow.setAttribute("LowerLimit", m_limits[JT_shoulder][1]);
+  elbow.setAttribute("Locked", m_jointLocked[JT_shoulder]);  
+  arm.push_back(elbow);
+  
+  xml.push_back(arm);
+}
+  
   
 } // namespace dmx

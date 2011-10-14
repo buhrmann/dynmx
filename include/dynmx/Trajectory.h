@@ -57,13 +57,6 @@ void MinJerkTrajectory::update(float dt)
 {
   time += dt;
   current = getPosition(initial, target, duration, time);
-  /*
-  float t = time / duration;
-  t = t > duration ? duration : t;
-  float amplitude = 15*t*t*t*t - 6*t*t*t*t*t - 10*t*t*t;
-  current.x = initial.x + (initial.x - target.x) * amplitude;
-  current.y = initial.y + (initial.y - target.y) * amplitude;
-  */
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -88,7 +81,7 @@ struct Target
 };
   
 //----------------------------------------------------------------------------------------------------------------------
-/// A list of targets with option to linearly shift between them
+/// A list of targets with option to blend between them and loop
 //----------------------------------------------------------------------------------------------------------------------
 template <class T>
 class Trajectory
@@ -106,16 +99,19 @@ public:
   Trajectory() : m_loop(false), m_blend(kTr_BlendNone) {};
   
   // Setters
+  void add(Target<T> pos);
   void add(T pos, float duration);  
   void setLoop(bool l) { m_loop = l; };
   void setBlend(BlendType b) { m_blend = b; };
   
   // Getters
-  T getPositionAt(float time);
-  Target<T> at(float time);
-  const Target<T>& getTarget(int id) const { assert(id < m_targets.size()); return m_targets[id]; };
-  float getDuration() { return m_targets.back().stop; };
+  Target<T>& operator[] (const int id) { assert(id < m_targets.size()); return m_targets[id]; };  
+  const Target<T>& operator[] (const int id) const { assert(id < m_targets.size()); return m_targets[id]; };  
   
+  T getPositionAtTime(float time);
+  Target<T> atTime(float time);
+  float getDuration() { return m_targets.back().stop; };
+  float size() const { return m_targets.size(); };
   
 protected:
   
@@ -146,16 +142,23 @@ void Trajectory<T>::add(T pos, float duration)
   
 };  
 
+//----------------------------------------------------------------------------------------------------------------------        
+template <class T>
+void Trajectory<T>::add(Target<T> target)
+{
+  m_targets.push_back(target);  
+};    
+
 //----------------------------------------------------------------------------------------------------------------------      
 template <class T>
-T Trajectory<T>::getPositionAt(float time)
+T Trajectory<T>::getPositionAtTime(float time)
 {
-  return at(time).position;
+  return atTime(time).position;
 };
   
 //----------------------------------------------------------------------------------------------------------------------      
 template <class T>
-Target<T> Trajectory<T>::at(float time)
+Target<T> Trajectory<T>::atTime(float time)
 {  
   Target<T> target;
   

@@ -19,35 +19,41 @@ namespace dmx
 //----------------------------------------------------------------------------------------------------------------------  
 void Reflex::init()
 {
-  // Spindle positional gain  
-  m_Kspp[0] = 1.0;
-  m_Kspp[1] = 1.0;    
+  // Spindle 
+  m_Kspp[0] = m_Kspp[1] = 1.0;  // positional gain
+  m_Kspv[0] = m_Kspv[1] = 0.0;  // velocity gain
+  m_Kspd[0] = m_Kspd[1] = 0.1;  // damping gain
+  m_Espv[0] = m_Espv[1] = 1.0;  // velocity exponent 
   
-  // Spindle velocity gain
-  m_Kspv[0] = 0.2;
-  m_Kspv[1] = 0.2;    
+  // Load compensation
+  m_Ksfv[0] = m_Ksfv[1] = 0.0;
+  m_Ksfi[0] = m_Ksfi[1] = 0.0;     // Reciprocal inhibition
   
-  // Spindle velocity exponent 
-  m_Espv[0] = 1.0;
-  m_Espv[1] = 1.0; 
+  // IaIn inhibitory interneurons
+  m_Wspia[0] = m_Wspia[1] = 0.0;    // Spindle input
+  m_Wiaia[0] = m_Wiaia[1] = 0.0;    // Reciprocal inhibition
+  m_Wrnia[0] = m_Wrnia[1] = 0.0;    // Renshaw input  
+  m_Waia[0]  = m_Waia[1]  = 0.0;    // Desired contraction input
+  m_Biain[0] = m_Biain[1] = 0.0;    // Ia Biases
+  m_Tiain[0] = m_Tiain[1] = 100.0;  // Integration time constant (really 1/t)  
   
-  // Strength and speed of load compensation
-  m_Ksfv[0] = 0.0;
-  m_Ksfv[1] = 0.0;
-  // Reciprocal inhibition of load compensation
-  m_Ksfi[0] = 0.0;
-  m_Ksfi[0] = 0.0;   
+  // Renshaw
+  m_Wmnrn[0] = m_Wmnrn[1] = 0.0f;  
+  m_Wrnrn[0] = m_Wrnrn[1] = 0.0f;  
+  m_Brn[0] = m_Brn[1] = 0.0;
+  m_Trn[0] = m_Trn[1] = 100.0;  
   
-  // IaIn Ia inhibitory interneurons
-  m_Wspia[0] = m_Wspia[1] = 0.0;
-  // Reciprocal inhibition of same
-  m_Wiaia[0] = m_Wiaia[1] = 0.0;
-  // Ia Biases
-  m_Biain[0] = m_Biain[1] = 0.0;  
-  // Integration time constant (really 1/t)  
-  m_Tiain[0] = m_Tiain[1] = 100.0;  // 1 / 0.01
+  // IbIn
+  m_Wglib[0] = m_Wglib[1] = 0.0;   // Golgi inpuit
+  m_Wibib[0] = m_Wibib[1] = 0.0;   // Reciprocal inhibition
+  m_Bib[0] = m_Bib[1] = 0.0;
+  m_Tib[0] = m_Tib[1] = 100.0;  
   
+  // Alpha motor neuron
   m_Wiamn[0] = m_Wiamn[1] = 0.0f;
+  m_Wrnmn[0] = m_Wrnmn[1] = 0.0f;
+  m_Wibmn[0] = m_Wibmn[1] = 0.0f;
+  m_Wspmn[0] = m_Wspmn[1] = 1.0f;
 
   // Inertial force compensation (velocity error)
   m_Kifv[0] = m_Kifv[1] = 0.0;
@@ -61,6 +67,12 @@ void Reflex::reset()
 {
   m_IaIn[0] = m_IaIn[1] = 0.0;
   m_IaInOut[0] = m_IaInOut[1] = 0.0;
+  
+  m_Rn[0] = m_Rn[1] = 0.0;
+  m_RnOut[0] = m_RnOut[1] = 0.0;  
+  
+  m_IbIn[0] = m_IbIn[1] = 0.0;
+  m_IbInOut[0] = m_IbInOut[1] = 0.0;    
   
   m_sfv[0] = m_sfv[1] = 0.0;  
   m_ifv[0] = m_ifv[1] = 0.0;
@@ -94,6 +106,14 @@ void Reflex::reset()
 }
 
 //----------------------------------------------------------------------------------------------------------------------    
+void Reflex::setDesiredAngles(double elbAng, double shdAng)  
+{
+  double desLength0 = m_muscles[0]->getLengthFromJointAngles(elbAng, shdAng);
+  double desLength1 = m_muscles[1]->getLengthFromJointAngles(elbAng, shdAng);
+  setDesiredLength(desLength0, desLength1);     
+}  
+  
+//----------------------------------------------------------------------------------------------------------------------    
 void Reflex::setDesiredLength(double l0, double l1)  
 { 
   // Length coordinates
@@ -113,14 +133,7 @@ void Reflex::setDesiredLength(double l0, double l1)
   
 //----------------------------------------------------------------------------------------------------------------------  
 void Reflex::update(float dt)
-{
-  // Get desired muscle lengths in unit range [0,1] from desired joint angles
-  const double desElbAng = getArm()->getDesiredJointAngle(JT_elbow);
-  const double desShdAng = getArm()->getDesiredJointAngle(JT_shoulder);
-  double desLength0 = m_muscles[0]->getLengthFromJointAngles(desElbAng, desShdAng);
-  double desLength1 = m_muscles[1]->getLengthFromJointAngles(desElbAng, desShdAng);
-  setDesiredLength(desLength0, desLength1);   
-  
+{  
   m_desiredVelocity[0] = (m_desiredLength[0] - m_desiredLengthPrev[0]) / dt;
   m_desiredVelocity[1] = (m_desiredLength[1] - m_desiredLengthPrev[1]) / dt;
   m_desiredContractionVel[0] = (m_desiredContraction[0] - m_desiredContractionPrev[0]) / dt;
@@ -142,6 +155,14 @@ void Reflex::update(float dt)
   m_contractionPrev[0] = m_contraction[0];
   m_contractionPrev[1] = m_contraction[1];    
   
+  // Normalised force sensor
+  double f = m_muscles[0]->getForce();
+  double fmax = m_muscles[0]->getForceMax();  
+  m_golgi[0] =  f / fmax;
+  f = m_muscles[1]->getForce();
+  fmax = m_muscles[1]->getForceMax();  
+  m_golgi[1] =  f / fmax;
+  
 #if REFLEX_USE_CONTRACTION_COORDS  
   updateInContractionCoords(dt);
 #else
@@ -153,7 +174,7 @@ void Reflex::update(float dt)
 void Reflex::updateInLengthCoords(float dt)
 {
   const double gsGain[2] = {1.0, 1.0}; // Static gamma neuron gain (Big Xi)
-  const double gdGain[2] = {1.0, 1.0}; // Dynamic gamma neuron gain (ro  0
+  const double gdGain[2] = {1.0, 1.0}; // Dynamic gamma neuron gain (ro)
   
   double gammaStatic[2];  
   gammaStatic[0] = m_desiredLength[0] * gsGain[0];
@@ -178,18 +199,39 @@ void Reflex::updateInLengthCoords(float dt)
   m_spindleSec[0] = spindleActivation(m_Kspp[0] * m_posErr[0]);
   m_spindleSec[1] = spindleActivation(m_Kspp[1] * m_posErr[1]);
   
-  m_spindlePri[0] = spindleActivation(m_Kspp[0] * m_posErr[0] + m_Kspv[0] * powf(m_velErr[0], m_Espv[0]));
-  m_spindlePri[1] = spindleActivation(m_Kspp[1] * m_posErr[1] + m_Kspv[1] * powf(m_velErr[1], m_Espv[1]));
+  m_spindlePri[0] = spindleActivation((m_Kspp[0] * m_posErr[0]) + 
+                                      (m_Kspv[0] * powf(m_velErr[0], m_Espv[0])) + 
+                                      (m_Kspd[0] * powf(max(m_vel[0], 0.0), m_Espv[0])));
+  
+  m_spindlePri[1] = spindleActivation((m_Kspp[1] * m_posErr[1]) + 
+                                      (m_Kspv[1] * powf(m_velErr[1], m_Espv[1])) + 
+                                      (m_Kspd[1] * powf(max(m_vel[1], 0.0), m_Espv[1])));
   
   // Ia inhibitory interneurons
   double dIaIn [2];
+  double dRn [2];
+  double dIbIn [2];
 #if REFLEX_USE_OWN_IAIN_IMPL
-  dIaIn[0] = -m_IaIn[0] + (m_Wspia[0] * m_spindlePri[0]) - (m_Wiaia[0] * m_IaInOut[1]);
-  dIaIn[1] = -m_IaIn[1] + (m_Wspia[1] * m_spindlePri[1]) - (m_Wiaia[1] * m_IaInOut[0]); 
+  dIaIn[0] = -m_IaIn[0] + (m_Wspia[0] * m_spindlePri[0]) + (m_Waia[0] * (1.0 - m_desiredLength[0])) - (m_Wiaia[0] * m_IaInOut[1]) - (m_Wrnia[0] * m_RnOut[0]);
+  dIaIn[1] = -m_IaIn[1] + (m_Wspia[1] * m_spindlePri[1]) + (m_Waia[1] * (1.0 - m_desiredLength[1])) - (m_Wiaia[1] * m_IaInOut[0]) - (m_Wrnia[1] * m_RnOut[1]);
   m_IaIn[0] += dt * m_Tiain[0] * dIaIn[0];
   m_IaIn[1] += dt * m_Tiain[1] * dIaIn[1];  
-  m_IaInOut[0] = clamp(m_IaIn[0] + m_Biain[0], 0.0, 1.0);
-  m_IaInOut[1] = clamp(m_IaIn[1] + m_Biain[1], 0.0, 1.0);
+  m_IaInOut[0] = neuronActivation(m_IaIn[0] + m_Biain[0]);
+  m_IaInOut[1] = neuronActivation(m_IaIn[1] + m_Biain[1]);
+  
+  dRn[0] = -m_Rn[0] + (m_Wmnrn[0] * m_alpha[0]) - (m_Wrnrn[0] * m_RnOut[1]);
+  dRn[1] = -m_Rn[1] + (m_Wmnrn[1] * m_alpha[1]) - (m_Wrnrn[1] * m_RnOut[0]);
+  m_Rn[0] += dt * m_Trn[0] * dRn[0];
+  m_Rn[1] += dt * m_Trn[1] * dRn[1];
+  m_RnOut[0] = neuronActivation(m_Rn[0] + m_Brn[0]);
+  m_RnOut[1] = neuronActivation(m_Rn[1] + m_Brn[1]);    
+  
+  dIbIn[0] = - m_IbIn[0];
+  dIbIn[1] = - m_IbIn[1];
+  m_IbIn[0] += dt * m_Tib[0] * dIbIn[0];
+  m_IbIn[1] += dt * m_Tib[1] * dIbIn[1];
+  m_IbInOut[0] = neuronActivation(m_IbIn[0] + m_Bib[0]);
+  m_IbInOut[1] = neuronActivation(m_IbIn[1] + m_Bib[1]);  
 #else
   dIaIn[0] = ((m_Kiain[0] - m_IaIn[0]) * ((1-m_desiredLength[0]-m_cocontraction[0]) + m_spindlePri[0])) - ((m_IaIn[0] + m_Kiari[0]) * (m_Kiari[0] + max(0.0, m_IaIn[1])));
   dIaIn[1] = ((m_Kiain[1] - m_IaIn[1]) * ((1-m_desiredLength[1]-m_cocontraction[1]) + m_spindlePri[1])) - ((m_IaIn[1] + m_Kiari[1]) * (m_Kiari[1] + max(0.0, m_IaIn[0])));
@@ -224,8 +266,8 @@ void Reflex::updateInLengthCoords(float dt)
   // Alpha motor neuron
   const double Ksrg = 1.0; // stretch reflex gain
 #if REFLEX_USE_OWN_IAIN_IMPL  
-  m_alpha[0] = m_cocontraction[0] + m_ofpv[0] + Ksrg * m_spindlePri[0] - (m_Wiamn[0] * m_IaInOut[1]);
-  m_alpha[1] = m_cocontraction[1] + m_ofpv[1] + Ksrg * m_spindlePri[1] - (m_Wiamn[1] * m_IaInOut[0]);  
+  m_alpha[0] = m_cocontraction[0] + m_ofpv[0] + Ksrg * m_spindlePri[0] - (m_Wrnmn[1] * m_RnOut[1]) - (m_Wiamn[0] * m_IaInOut[1]) - (m_Wibmn[0] * m_IbInOut[0]);
+  m_alpha[1] = m_cocontraction[1] + m_ofpv[1] + Ksrg * m_spindlePri[1] - (m_Wrnmn[1] * m_RnOut[1]) - (m_Wiamn[1] * m_IaInOut[0]) - (m_Wibmn[1] * m_IbInOut[1]);  
 #else
   m_alpha[0] = m_cocontraction[0] + m_ofpv[0] + Ksrg * m_spindlePri[0] - max(0.0, m_IaIn[1]);
   m_alpha[1] = m_cocontraction[1] + m_ofpv[1] + Ksrg * m_spindlePri[1] - max(0.0, m_IaIn[0]);  
@@ -267,18 +309,41 @@ void Reflex::updateInContractionCoords(float dt)
   m_spindleSec[0] = spindleActivation(m_Kspp[0] * m_posErr[0]);
   m_spindleSec[1] = spindleActivation(m_Kspp[1] * m_posErr[1]);
   
-  m_spindlePri[0] = spindleActivation(m_Kspp[0] * m_posErr[0] + m_Kspv[0] * powf(m_velErr[0], m_Espv[0]));
-  m_spindlePri[1] = spindleActivation(m_Kspp[1] * m_posErr[1] + m_Kspv[1] * powf(m_velErr[1], m_Espv[1]));
+  m_spindlePri[0] = spindleActivation((m_Kspp[0] * m_posErr[0]) + 
+                                      (m_Kspv[0] * powf(m_velErr[0], m_Espv[0])) +
+                                      (m_Kspd[0] * powf(max(-m_contractionVel[0], 0.0), m_Espv[0])) // only negative contraction, i.e. lengthening, leads to damping, as muscle can only contract actively
+                                      );
+  
+  m_spindlePri[1] = spindleActivation((m_Kspp[1] * m_posErr[1]) + 
+                                      (m_Kspv[1] * powf(m_velErr[1], m_Espv[1])) +
+                                      (m_Kspd[1] * powf(max(-m_contractionVel[1], 0.0), m_Espv[1])) // only negative contraction, i.e. lengthening, leads to damping, as muscle can only contract actively
+                                      );
   
   // Ia inhibitory interneurons
   double dIaIn [2];  
+  double dRn [2];  
+  double dIbIn[2];
 #if REFLEX_USE_OWN_IAIN_IMPL
-  dIaIn[0] = -m_IaIn[0] + (m_Wspia[0] * m_spindlePri[0]) - (m_Wiaia[0] * m_IaInOut[1]);
-  dIaIn[1] = -m_IaIn[1] + (m_Wspia[1] * m_spindlePri[1]) - (m_Wiaia[1] * m_IaInOut[0]); 
+  dIaIn[0] = -m_IaIn[0] + (m_Wspia[0] * m_spindlePri[0]) + (m_Waia[0] * m_desiredContraction[0]) - (m_Wiaia[0] * m_IaInOut[1]) - (m_Wrnia[0] * m_RnOut[0]);
+  dIaIn[1] = -m_IaIn[1] + (m_Wspia[1] * m_spindlePri[1]) + (m_Waia[1] * m_desiredContraction[1]) - (m_Wiaia[1] * m_IaInOut[0]) - (m_Wrnia[1] * m_RnOut[1]); 
   m_IaIn[0] += dt * m_Tiain[0] * dIaIn[0];
   m_IaIn[1] += dt * m_Tiain[1] * dIaIn[1];  
-  m_IaInOut[0] = clamp(m_IaIn[0] + m_Biain[0], 0.0, 1.0);
-  m_IaInOut[1] = clamp(m_IaIn[1] + m_Biain[1], 0.0, 1.0);
+  m_IaInOut[0] = neuronActivation(m_IaIn[0] + m_Biain[0]);
+  m_IaInOut[1] = neuronActivation(m_IaIn[1] + m_Biain[1]);
+  
+  dRn[0] = -m_Rn[0] + (m_Wmnrn[0] * m_alpha[0]) - (m_Wrnrn[0] * m_RnOut[1]);
+  dRn[1] = -m_Rn[1] + (m_Wmnrn[1] * m_alpha[1]) - (m_Wrnrn[1] * m_RnOut[0]);
+  m_Rn[0] += dt * m_Trn[0] * dRn[0];
+  m_Rn[1] += dt * m_Trn[1] * dRn[1];
+  m_RnOut[0] = neuronActivation(m_Rn[0] + m_Brn[0]);
+  m_RnOut[1] = neuronActivation(m_Rn[1] + m_Brn[1]);  
+  
+  dIbIn[0] = - m_IbIn[0] + (m_Wglib[0] * m_golgi[0]) - (m_Wibib[0] * m_IbInOut[1]);
+  dIbIn[1] = - m_IbIn[1] + (m_Wglib[1] * m_golgi[1]) - (m_Wibib[1] * m_IbInOut[0]);
+  m_IbIn[0] += dt * m_Tib[0] * dIbIn[0];
+  m_IbIn[1] += dt * m_Tib[1] * dIbIn[1];
+  m_IbInOut[0] = neuronActivation(m_IbIn[0] + m_Bib[0]);
+  m_IbInOut[1] = neuronActivation(m_IbIn[1] + m_Bib[1]);  
 #else
   dIaIn[0] = ((m_Kiain[0] - m_IaIn[0]) * (m_desiredContraction[0] + m_cocontraction[0] + m_spindlePri[0])) - ((m_IaIn[0] + m_Kiari[0]) * (m_Kiari[0] + max(0.0, m_IaIn[1])));
   dIaIn[1] = ((m_Kiain[1] - m_IaIn[1]) * (m_desiredContraction[1] + m_cocontraction[1] + m_spindlePri[1])) - ((m_IaIn[1] + m_Kiari[1]) * (m_Kiari[1] + max(0.0, m_IaIn[0])));
@@ -311,10 +376,9 @@ void Reflex::updateInContractionCoords(float dt)
   
   
   // Alpha motor neuron
-  const double Ksrg = 1.0; // stretch reflex gain
 #if REFLEX_USE_OWN_IAIN_IMPL  
-  m_alpha[0] = m_cocontraction[0] + m_ofpv[0] + Ksrg * m_spindlePri[0] - (m_Wiamn[0] * m_IaInOut[1]);
-  m_alpha[1] = m_cocontraction[1] + m_ofpv[1] + Ksrg * m_spindlePri[1] - (m_Wiamn[1] * m_IaInOut[0]);    
+  m_alpha[0] = m_cocontraction[0] + m_Wspmn[0] * m_spindlePri[0] + m_ofpv[0] - (m_Wrnmn[0] * m_RnOut[0]) - (m_Wiamn[0] * m_IaInOut[1]) - (m_Wibmn[0] * m_IbInOut[0]);
+  m_alpha[1] = m_cocontraction[1] + m_Wspmn[1] * m_spindlePri[1] + m_ofpv[1] - (m_Wrnmn[1] * m_RnOut[1]) - (m_Wiamn[1] * m_IaInOut[0]) - (m_Wibmn[1] * m_IbInOut[1]);    
 #else
   m_alpha[0] = m_cocontraction[0] + m_ofpv[0] + Ksrg * m_spindlePri[0] - max(0.0, m_IaIn[1]);
   m_alpha[1] = m_cocontraction[1] + m_ofpv[1] + Ksrg * m_spindlePri[1] - max(0.0, m_IaIn[0]);  
@@ -324,6 +388,79 @@ void Reflex::updateInContractionCoords(float dt)
   
   m_muscles[0]->setExcitation(m_alpha[0]);
   m_muscles[1]->setExcitation(m_alpha[1]);    
+}
+  
+//----------------------------------------------------------------------------------------------------------------------    
+void Reflex::paramToXml(ci::XmlTree& xml, const std::string& str, double* p)
+{
+  ci::XmlTree params(str, "");
+  params.setAttribute("Ag", p[0]);
+  params.setAttribute("An", p[1]);
+  xml.push_back(params);
+}
+  
+//----------------------------------------------------------------------------------------------------------------------  
+void Reflex::toXml(ci::XmlTree& xml)
+{
+  
+  ci::XmlTree reflex ("Reflex", "");
+  reflex.setAttribute("Agonist", m_muscles[0]->getName());
+  reflex.setAttribute("Antagonist", m_muscles[1]->getName());
+
+  // Spindle
+  ci::XmlTree spindle("Spindle", "");
+  paramToXml(spindle, "PosGain", &m_Kspp[0]);
+  paramToXml(spindle, "VelGain", &m_Kspv[0]);
+  paramToXml(spindle, "VelExp", &m_Espv[0]);  
+  reflex.push_back(spindle);
+
+  // Static load compensation  
+  ci::XmlTree sfv("Sfv", "");
+  paramToXml(sfv, "Gain", &m_Ksfv[0]);
+  paramToXml(sfv, "RecInh", &m_Ksfi[0]); 
+  reflex.push_back(sfv);  
+  
+  // Inertial load compensation  
+  ci::XmlTree ifv("Ifv", "");
+  paramToXml(ifv, "Gain", &m_Kifv[0]);
+  paramToXml(ifv, "Bias", &m_Bifv[0]); 
+  reflex.push_back(ifv);    
+
+  // IaIn
+  ci::XmlTree iain("IaIn", "");
+  paramToXml(iain, "Wiaia", &m_Wiaia[0]);
+  paramToXml(iain, "Wspia", &m_Wspia[0]);
+  paramToXml(iain, "Wrnia", &m_Wrnia[0]);
+  paramToXml(iain, "Waia", &m_Waia[0]);
+  paramToXml(iain, "Bias", &m_Biain[0]);  
+  paramToXml(iain, "Tau", &m_Tiain[0]);
+  reflex.push_back(iain);  
+  
+  // Renshaw
+  ci::XmlTree rn("Renshaw", "");
+  paramToXml(rn, "Wmnrn", &m_Wmnrn[0]);
+  paramToXml(rn, "Wrnrn", &m_Wrnrn[0]);
+  paramToXml(rn, "Bias", &m_Brn[0]);  
+  paramToXml(rn, "Tau", &m_Trn[0]);    
+  reflex.push_back(rn);    
+
+  // Alpha motor neurons
+  ci::XmlTree amn("aMN", "");
+  paramToXml(amn, "Wiamn", &m_Wiamn[0]);
+  paramToXml(amn, "Wiamn", &m_Wiamn[0]);
+  reflex.push_back(amn);  
+  
+#if 0
+  // Template
+  // 
+  ci::XmlTree ("", "");
+  paramToXml(, "", &[0]);
+  paramToXml(, "", &[0]);
+  paramToXml(, "", &[0]);  
+  reflex.push_back();  
+#endif
+                                                 
+  xml.push_back(reflex);
 }
   
 } // namespace dmx

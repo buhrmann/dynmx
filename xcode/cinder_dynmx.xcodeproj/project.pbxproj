@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 44;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -36,7 +36,6 @@
 		D64F20C412ECE4050014F069 /* Random.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D64F20C312ECE4050014F069 /* Random.cpp */; };
 		D64F237712EE14550014F069 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D64F237612EE14550014F069 /* GLUT.framework */; };
 		D64F246D12EE2AF10014F069 /* Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D64F246C12EE2AF10014F069 /* Light.cpp */; };
-		D671C19913D9AC0600B7ACC5 /* Config.xml in Resources */ = {isa = PBXBuildFile; fileRef = D671C19813D9AC0600B7ACC5 /* Config.xml */; };
 		D68AC7DA13E9937F009887A9 /* pf_tempesta_seven.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D68AC79113E9937F009887A9 /* pf_tempesta_seven.ttf */; };
 		D68AC7FD13E9937F009887A9 /* SimpleGUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D68AC7D913E9937F009887A9 /* SimpleGUI.cpp */; };
 		D68CFC961428DAEF003CA32E /* Reflex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D68CFC951428DAEF003CA32E /* Reflex.cpp */; };
@@ -46,6 +45,7 @@
 		D6BA37D113BA2B9200CFED09 /* PD.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6BA37D013BA2B9200CFED09 /* PD.cpp */; };
 		D6BA37E513BA2EC700CFED09 /* ArmPD.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6BA37E413BA2EC700CFED09 /* ArmPD.cpp */; };
 		D6BA381813BA32E000CFED09 /* ArmMuscled.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6BA381713BA32E000CFED09 /* ArmMuscled.cpp */; };
+		D6C3A1D21448501B00E89616 /* ArmReflex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6C3A1D11448501B00E89616 /* ArmReflex.cpp */; };
 		D6CAA9FF12FDA1CF003BE477 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6CAA9FE12FDA1CF003BE477 /* main.cpp */; };
 		D6DEE86A13B0EF09003FE7D2 /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6DEE86913B0EF09003FE7D2 /* App.cpp */; };
 		D6E94EB51423652300E8D8BD /* GATester.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E94EB41423652300E8D8BD /* GATester.cpp */; };
@@ -86,7 +86,6 @@
 		D6423689131D77520047734B /* TestViewEvolvableCTRNN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestViewEvolvableCTRNN.h; path = ../include/dynmx/Tests/TestViewEvolvableCTRNN.h; sourceTree = SOURCE_ROOT; };
 		D64236DC131D7D5A0047734B /* GAViz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GAViz.h; path = ../include/dynmx/GAViz.h; sourceTree = SOURCE_ROOT; };
 		D64236E5131D7E5C0047734B /* GAViz.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GAViz.cpp; sourceTree = "<group>"; };
-		D642C5F1131CF0E800994FDD /* TestAppEvolvableCTRNN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestAppEvolvableCTRNN.h; path = ../include/dynmx/Tests/TestAppEvolvableCTRNN.h; sourceTree = SOURCE_ROOT; };
 		D6464E2814276D6A00FB5992 /* Trajectory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Trajectory.h; path = ../include/dynmx/Trajectory.h; sourceTree = SOURCE_ROOT; };
 		D64F209312ECE1640014F069 /* Render.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Render.h; path = ../../include/dynmx/Render.h; sourceTree = "<group>"; };
 		D64F209412ECE1640014F069 /* App.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = App.h; path = ../../include/dynmx/App.h; sourceTree = "<group>"; };
@@ -112,14 +111,10 @@
 		D64F237612EE14550014F069 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GLUT.framework; sourceTree = "<group>"; };
 		D64F246712EE295E0014F069 /* Light.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Light.h; path = ../include/dynmx/Light.h; sourceTree = SOURCE_ROOT; };
 		D64F246C12EE2AF10014F069 /* Light.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Light.cpp; sourceTree = "<group>"; };
-		D671C19813D9AC0600B7ACC5 /* Config.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Config.xml; sourceTree = "<group>"; };
-		D6754818134262BD00E2DBF0 /* TestAppArm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestAppArm.h; path = ../include/dynmx/Tests/TestAppArm.h; sourceTree = "<group>"; };
-		D6754819134264EA00E2DBF0 /* TestViewArm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestViewArm.h; path = ../include/dynmx/Tests/TestViewArm.h; sourceTree = "<group>"; };
-		D675481A1342657800E2DBF0 /* TestModelArm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestModelArm.h; path = ../include/dynmx/Tests/TestModelArm.h; sourceTree = "<group>"; };
+		D675481A1342657800E2DBF0 /* TestModelArmPD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestModelArmPD.h; path = ../include/dynmx/Tests/TestModelArmPD.h; sourceTree = "<group>"; };
 		D68AC78F13E9937F009887A9 /* SimpleGUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleGUI.h; sourceTree = "<group>"; };
 		D68AC79113E9937F009887A9 /* pf_tempesta_seven.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = pf_tempesta_seven.ttf; sourceTree = "<group>"; };
 		D68AC7D913E9937F009887A9 /* SimpleGUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SimpleGUI.cpp; sourceTree = "<group>"; };
-		D68C028C142CAF7E003CA32E /* EvoArmSimpleReflex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EvoArmSimpleReflex.h; path = ../include/dynmx/EvoArmSimpleReflex.h; sourceTree = SOURCE_ROOT; };
 		D68CFC941428DADD003CA32E /* Reflex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reflex.h; path = ../include/dynmx/Reflex.h; sourceTree = SOURCE_ROOT; };
 		D68CFC951428DAEF003CA32E /* Reflex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Reflex.cpp; sourceTree = "<group>"; };
 		D692C7C8141E0FB100F0E802 /* TestModelEvolvableArm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestModelEvolvableArm.h; path = ../include/dynmx/Tests/TestModelEvolvableArm.h; sourceTree = SOURCE_ROOT; };
@@ -136,14 +131,19 @@
 		D6BA37E613BA2EF200CFED09 /* ArmPD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmPD.h; path = ../include/dynmx/ArmPD.h; sourceTree = SOURCE_ROOT; };
 		D6BA381513BA32C200CFED09 /* ArmMuscled.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmMuscled.h; path = ../include/dynmx/ArmMuscled.h; sourceTree = SOURCE_ROOT; };
 		D6BA381713BA32E000CFED09 /* ArmMuscled.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ArmMuscled.cpp; sourceTree = "<group>"; };
-		D6BA382F13BA3C6900CFED09 /* TestModelArmMuscled.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestModelArmMuscled.h; path = ../include/dynmx/TestModelArmMuscled.h; sourceTree = SOURCE_ROOT; };
+		D6C39F9814482A5200E89616 /* ArmView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmView.h; path = ../include/dynmx/ArmView.h; sourceTree = SOURCE_ROOT; };
+		D6C3A0451448349E00E89616 /* ArmPDView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmPDView.h; path = ../include/dynmx/ArmPDView.h; sourceTree = SOURCE_ROOT; };
+		D6C3A1411448488A00E89616 /* ArmMuscledView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmMuscledView.h; path = ../include/dynmx/ArmMuscledView.h; sourceTree = SOURCE_ROOT; };
+		D6C3A1D01448500700E89616 /* ArmReflex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmReflex.h; path = ../include/dynmx/ArmReflex.h; sourceTree = SOURCE_ROOT; };
+		D6C3A1D11448501B00E89616 /* ArmReflex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ArmReflex.cpp; sourceTree = "<group>"; };
+		D6C3A205144855E100E89616 /* TestModelArmReflex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestModelArmReflex.h; sourceTree = "<group>"; };
+		D6C3A2A414485FE600E89616 /* ArmReflexView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmReflexView.h; path = ../include/dynmx/ArmReflexView.h; sourceTree = SOURCE_ROOT; };
 		D6CAA9D412FD9D72003BE477 /* TestEvolvable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestEvolvable.h; path = ../include/dynmx/Tests/TestEvolvable.h; sourceTree = SOURCE_ROOT; };
 		D6CAA9D512FD9D72003BE477 /* TestEvolvableCTRNN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestEvolvableCTRNN.h; path = ../include/dynmx/Tests/TestEvolvableCTRNN.h; sourceTree = SOURCE_ROOT; };
 		D6CAA9D612FD9D72003BE477 /* TestModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestModel.h; path = ../include/dynmx/Tests/TestModel.h; sourceTree = SOURCE_ROOT; };
 		D6CAA9D712FD9D72003BE477 /* TestModelCTRNN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestModelCTRNN.h; path = ../include/dynmx/Tests/TestModelCTRNN.h; sourceTree = SOURCE_ROOT; };
 		D6CAA9D912FD9D72003BE477 /* TestView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestView.h; path = ../include/dynmx/Tests/TestView.h; sourceTree = SOURCE_ROOT; };
 		D6CAA9DA12FD9D72003BE477 /* TestViewCTRNN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestViewCTRNN.h; path = ../include/dynmx/Tests/TestViewCTRNN.h; sourceTree = SOURCE_ROOT; };
-		D6CAA9EE12FD9F90003BE477 /* TestApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestApp.h; path = ../include/dynmx/Tests/TestApp.h; sourceTree = SOURCE_ROOT; };
 		D6CAA9FE12FDA1CF003BE477 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../src/main.cpp; sourceTree = SOURCE_ROOT; };
 		D6D8EC8D13AA647200160C37 /* Dynmx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Dynmx.h; path = ../../include/dynmx/Dynmx.h; sourceTree = "<group>"; };
 		D6D8EC8E13AA647200160C37 /* MathUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MathUtils.h; path = ../../include/dynmx/MathUtils.h; sourceTree = "<group>"; };
@@ -228,7 +228,6 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				D671C19813D9AC0600B7ACC5 /* Config.xml */,
 				8D1107310486CEB800E47090 /* Info.plist */,
 				00CCAF14116A9FEE008396D5 /* CinderApp.icns */,
 			);
@@ -351,7 +350,6 @@
 		D68C028B142CAF53003CA32E /* Evolvables */ = {
 			isa = PBXGroup;
 			children = (
-				D68C028C142CAF7E003CA32E /* EvoArmSimpleReflex.h */,
 				D61BAD9B143A05960007E5A1 /* EvoArmCoCon.h */,
 			);
 			name = Evolvables;
@@ -370,6 +368,7 @@
 			isa = PBXGroup;
 			children = (
 				D68C028B142CAF53003CA32E /* Evolvables */,
+				D6C39F9714482A1100E89616 /* Views */,
 				D6BA37D213BA2BAC00CFED09 /* PD.h */,
 				D6BA37D013BA2B9200CFED09 /* PD.cpp */,
 				D64F209512ECE1640014F069 /* Arm.h */,
@@ -378,10 +377,8 @@
 				D6BA37E413BA2EC700CFED09 /* ArmPD.cpp */,
 				D6BA381513BA32C200CFED09 /* ArmMuscled.h */,
 				D6BA381713BA32E000CFED09 /* ArmMuscled.cpp */,
-				D64F209612ECE1640014F069 /* ArmViz.h */,
-				D64F20A112ECE1720014F069 /* ArmViz.cpp */,
-				D6317B02143DB549008E894F /* ArmMuscledViz.h */,
-				D6317B03143DB566008E894F /* ArmMuscledViz.cpp */,
+				D6C3A1D01448500700E89616 /* ArmReflex.h */,
+				D6C3A1D11448501B00E89616 /* ArmReflex.cpp */,
 				D6BA379C13BA24B000CFED09 /* Muscle.h */,
 				D6BA379A13BA249900CFED09 /* Muscle.cpp */,
 				D62AB6F113D73354003020F7 /* MuscleMonoWrap.h */,
@@ -397,23 +394,34 @@
 			name = Arm;
 			sourceTree = "<group>";
 		};
+		D6C39F9714482A1100E89616 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				D64F209612ECE1640014F069 /* ArmViz.h */,
+				D64F20A112ECE1720014F069 /* ArmViz.cpp */,
+				D6317B02143DB549008E894F /* ArmMuscledViz.h */,
+				D6317B03143DB566008E894F /* ArmMuscledViz.cpp */,
+				D6C39F9814482A5200E89616 /* ArmView.h */,
+				D6C3A0451448349E00E89616 /* ArmPDView.h */,
+				D6C3A1411448488A00E89616 /* ArmMuscledView.h */,
+				D6C3A2A414485FE600E89616 /* ArmReflexView.h */,
+			);
+			name = Views;
+			sourceTree = "<group>";
+		};
 		D6CAA9D312FD9D5A003BE477 /* tests */ = {
 			isa = PBXGroup;
 			children = (
-				D6CAA9EE12FD9F90003BE477 /* TestApp.h */,
 				D6CAA9D612FD9D72003BE477 /* TestModel.h */,
 				D6CAA9D912FD9D72003BE477 /* TestView.h */,
 				D69461D213CDD7A000FA12EA /* TestAppCTRNN.h */,
 				D6CAA9D712FD9D72003BE477 /* TestModelCTRNN.h */,
 				D6CAA9DA12FD9D72003BE477 /* TestViewCTRNN.h */,
-				D642C5F1131CF0E800994FDD /* TestAppEvolvableCTRNN.h */,
 				D6CAA9D512FD9D72003BE477 /* TestEvolvableCTRNN.h */,
 				D6423689131D77520047734B /* TestViewEvolvableCTRNN.h */,
 				D6CAA9D412FD9D72003BE477 /* TestEvolvable.h */,
-				D6754818134262BD00E2DBF0 /* TestAppArm.h */,
-				D6754819134264EA00E2DBF0 /* TestViewArm.h */,
-				D675481A1342657800E2DBF0 /* TestModelArm.h */,
-				D6BA382F13BA3C6900CFED09 /* TestModelArmMuscled.h */,
+				D675481A1342657800E2DBF0 /* TestModelArmPD.h */,
+				D6C3A205144855E100E89616 /* TestModelArmReflex.h */,
 				D692C7C8141E0FB100F0E802 /* TestModelEvolvableArm.h */,
 			);
 			name = tests;
@@ -446,7 +454,7 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "cinder_dynmx" */;
-			compatibilityVersion = "Xcode 3.0";
+			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
@@ -470,7 +478,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				00CCAF15116A9FEE008396D5 /* CinderApp.icns in Resources */,
-				D671C19913D9AC0600B7ACC5 /* Config.xml in Resources */,
 				D68AC7DA13E9937F009887A9 /* pf_tempesta_seven.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -511,6 +518,7 @@
 				D6E94EB51423652300E8D8BD /* GATester.cpp in Sources */,
 				D68CFC961428DAEF003CA32E /* Reflex.cpp in Sources */,
 				D6317B04143DB566008E894F /* ArmMuscledViz.cpp in Sources */,
+				D6C3A1D21448501B00E89616 /* ArmReflex.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -579,7 +587,7 @@
 				HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/boost\"";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PREBINDING = NO;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
+				SDKROOT = macosx10.6;
 				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\" ../include ../include/dynmx";
 			};
 			name = Debug;
@@ -590,13 +598,22 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = i386;
 				CINDER_PATH = ../../cinder;
+				GCC_AUTO_VECTORIZATION = YES;
+				GCC_ENABLE_CPP_EXCEPTIONS = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
+				GCC_ENABLE_OBJC_EXCEPTIONS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = "";
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_UNROLL_LOOPS = YES;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/boost\"";
+				LLVM_LTO = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PREBINDING = NO;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
+				SDKROOT = macosx10.6;
 				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\" ../include ../include/dynmx";
 			};
 			name = Release;

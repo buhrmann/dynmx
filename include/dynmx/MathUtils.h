@@ -63,13 +63,51 @@ static inline T max(T v1, T v2)
   return (v1 > v2)? v1 : v2;
 }
 
+// Smooth step according to Perlin (http://en.wikipedia.org/wiki/Smoothstep)
+//----------------------------------------------------------------------------------------------------------------------
+static const float smoothStep(float min, float max, float x)
+{
+  // Scale, and clamp x to 0..1 range
+  x = clamp((x - min) / (max - min), 0.0f, 1.0f);
+  // Evaluate polynomial
+  return x*x*x*(x*(x*6 - 15) + 10);
+}
+
+static const float smoothStepUnitInterval(float x)
+{
+  return x*x*x*(x*(x*6 - 15) + 10);
+}
+
+static const double smoothStep(double min, double max, double x)
+{
+  // Scale, and clamp x to 0..1 range
+  x = clamp((x - min) / (max - min), 0.0, 1.0);
+  // Evaluate polynomial
+  return x*x*x*(x*(x*6 - 15) + 10);
+}
+
+static const double smoothStepUnitInterval(double x)
+{
+  return x*x*x*(x*(x*6 - 15) + 10);
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 template <class T>
-static inline std::string toString (const T& t)
+static inline std::string toString (T& t)
 {
   std::stringstream ss;
   ss << t;
   return ss.str();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+static const void secondsToTime(int time, int& hours, int& min, int& sec)
+{
+  hours = time / 3600;
+  time = time % 3600;
+  min = time / 60;
+  time = time % 60;
+  sec = time;  
 }
 
 //----------------------------------------------------------------------------------------------------------------------

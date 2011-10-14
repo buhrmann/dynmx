@@ -39,6 +39,9 @@ public:
   
   virtual double getLengthFromJointAngles(double elbAngle, double shdAngle);  
   
+  // Store output in human readable format
+  virtual void toXml(ci::XmlTree& xml);    
+  
 protected:
   
   virtual void updateLengthAndMomentArm();

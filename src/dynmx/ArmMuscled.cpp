@@ -11,7 +11,7 @@
 #include "MuscleMonoWrap.h"
 #include "MuscleBiWrap.h"
 #include "EPController.h"
-#include "Reflex.h"
+//#include "Reflex.h"
 
 #include "MathUtils.h"
 
@@ -25,6 +25,9 @@ void ArmMuscled::init()
 {
   // First let base of arm init
   Arm::init();
+  
+  // Allocate memory only once for the maximum size to avoid resizing at runtime
+  //m_trajectory.resize(MaxTrajPoints);
   
   ci::XmlTree* settings = SETTINGS;
   if (settings->hasChild("Config/Arm"))
@@ -101,18 +104,11 @@ void ArmMuscled::init()
     }    
   }
   
-  // Todo: temporary test code
-  for (int i = 0; i < m_muscles.size(); ++i) 
-  {
-    m_epControllers.push_back(new EPController(m_muscles[i], 4.0f, 0.5f, 0.1f, 0));
-    m_epControllers[i]->init();
-  }
-  
   // Todo: temporary test of reflex control
-  m_reflexes.push_back(new Reflex(m_muscles[0], m_muscles[1]));
-  m_reflexes.push_back(new Reflex(m_muscles[2], m_muscles[3]));
-  m_reflexes[0]->init();
-  m_reflexes[1]->init();
+//  m_reflexes.push_back(new Reflex(m_muscles[0], m_muscles[1]));
+//  m_reflexes.push_back(new Reflex(m_muscles[2], m_muscles[3]));
+//  m_reflexes[0]->init();
+//  m_reflexes[1]->init();
 }
   
 //----------------------------------------------------------------------------------------------------------------------
@@ -125,65 +121,91 @@ void ArmMuscled::reset(float elbAngle, float shdAngle)
     m_muscles[i]->reset();
   }   
   
-  for(int i = 0; i < m_epControllers.size(); ++i)
-  {  
-    m_epControllers[i]->reset();    
-  }
+//  for(int i = 0; i < m_reflexes.size(); ++i)
+//  {  
+//    m_reflexes[i]->reset();    
+//  }
   
-  for(int i = 0; i < m_reflexes.size(); ++i)
-  {  
-    m_reflexes[i]->reset();    
-  }
-  
-  m_desiredPos = Pos(0,0);
-  m_desiredAngles[JT_elbow] = m_desiredAngles[JT_shoulder] = 0.0;
+//  m_desiredPos = Pos(0,0);
+//  m_desiredAngles[JT_elbow] = m_desiredAngles[JT_shoulder] = 0.0;
+//  
+//  m_desiredTrajectory.empty();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void ArmMuscled::updatePosition(Pos pos, float dt, int elbPos)
+/*void ArmMuscled::update(Pos pos, float dt, int elbPos)
 {
   // Get desired joint angles from desired position
   m_desiredPos = pos;
   inverseKinematics(m_desiredPos, elbPos, m_desiredAngles[JT_elbow], m_desiredAngles[JT_shoulder]);
-  // Clamp joint angles to limits
-  m_desiredAngles[JT_elbow] = clamp(m_desiredAngles[JT_elbow], getJointLimitLower(JT_elbow), getJointLimitUpper(JT_elbow));
+  m_desiredAngles[JT_elbow] = clamp(m_desiredAngles[JT_elbow], getJointLimitLower(JT_elbow), getJointLimitUpper(JT_elbow));  
   m_desiredAngles[JT_shoulder] = clamp(m_desiredAngles[JT_shoulder], getJointLimitLower(JT_shoulder), getJointLimitUpper(JT_shoulder));  
   
-  /*
-  for(size_t i = 0; i <  m_epControllers.size(); ++i)
-  {
-    double desLength = getMuscle(i)->getLengthFromJointAngles(m_desiredAngles[JT_elbow], m_desiredAngles[JT_shoulder]);
-    m_epControllers[i]->setDesiredLength(desLength);
-    m_epControllers[i]->update(dt);
-    const double excitation = m_epControllers[i]->getActivation();
-    getMuscle(i)->setExcitation(excitation);
-  }
-  */
-  
-  // Run reflexes: these will set the muscles' activations  
+  // Set reflex desired state  
   for(int i = 0; i < m_reflexes.size(); i++)
   {
-    m_reflexes[i]->update(dt);
+    m_reflexes[i]->setDesiredAngles(m_desiredAngles[JT_elbow], m_desiredAngles[JT_shoulder]);
   }
   
-  // Now let the normal update take over, this will also update the muscles
+  // Now let the normal update take over, this will also update the reflexes and muscles  
   update(dt);
   
   // Store desired trajectory
   m_desiredTrajectory.push_back(m_desiredPos);
-  if(m_trajectory.size() > MaxTrajPoints)
+  if(m_desiredTrajectory.size() >= MaxTrajPoints)
   {
-    m_trajectory.pop_front();
-  }  
-}
+    m_desiredTrajectory.pop_front();
+  }   
+}*/
+  
+//----------------------------------------------------------------------------------------------------------------------  
+/*void ArmMuscled::update(double desElbAngle, double desShdAngle, float dt)
+{
+  setDesiredJointAngle(JT_elbow, desElbAngle);
+  setDesiredJointAngle(JT_shoulder, desShdAngle);
+  
+  // Set reflex desired state
+  for(int i = 0; i < m_reflexes.size(); i++)
+  {
+    m_reflexes[i]->setDesiredAngles(m_desiredAngles[JT_elbow], m_desiredAngles[JT_shoulder]);
+  }
+  
+  // Now let the normal update take over, this will also update the reflexes and muscles
+  update(dt);
+  
+  // Store desired trajectory (forward kinematics)
+  Pos p1, desPos;    
+  forwardKinematics(m_desiredAngles[JT_elbow], m_desiredAngles[JT_shoulder], p1, desPos);  
+  m_desiredTrajectory.push_back(desPos);
+  if(m_desiredTrajectory.size() >= MaxTrajPoints)
+  {
+    m_desiredTrajectory.pop_front();
+  }     
+}*/
+  
+//----------------------------------------------------------------------------------------------------------------------  
+/*void ArmMuscled::update(double lengthElb0, double lengthElb1, double lengthShd0, double lengthShd1, float dt)
+{
+  // Set reflex desired state
+  m_reflexes[0]->setDesiredLength(lengthElb0, lengthElb1);
+  m_reflexes[1]->setDesiredLength(lengthShd0, lengthShd1);
+  
+  // Now let the normal update take over, this will also update the reflexes and muscles
+  update(dt);
+  
+}*/
   
 //----------------------------------------------------------------------------------------------------------------------
 void ArmMuscled::update(float dt)
 {
-  float elbTorque = 0, shdTorque = 0;
+  // Run reflexes: these will set the muscles' activations  
+//  for(int i = 0; i < m_reflexes.size(); i++)
+//  {
+//    m_reflexes[i]->update(dt);
+//  }
   
-  // Test frame order: 
-  //update(elbTorque, shdTorque, dt);
+  // Accumulate joint torques
+  float elbTorque = 0, shdTorque = 0;
   
   // Muscles return torques to apply to joints they span.
   for(size_t i = 0; i < m_muscles.size(); ++i)
@@ -211,10 +233,32 @@ void ArmMuscled::update(float dt)
       elbTorque += sign * m->getMomentArm(JT_elbow) * m->getForce();
       shdTorque += sign * m->getMomentArm(JT_shoulder) * m->getForce();      
     }
-
   }
   
   Arm::update(dt, elbTorque, shdTorque);
+}
+  
+//----------------------------------------------------------------------------------------------------------------------  
+void ArmMuscled::toXml(ci::XmlTree& xml)
+{
+  Arm::toXml(xml);
+  
+  if(xml.hasChild("Arm"))
+  {
+    ci::XmlTree& arm = xml.getChild("Arm");
+    
+    // Write out muscle data
+    for(int i = 0; i < m_muscles.size(); i++)
+    {
+      m_muscles[i]->toXml(arm);
+    }
+    
+    // Write out reflex data
+//    for(int i = 0; i < m_reflexes.size(); i++)
+//    {
+//      m_reflexes[i]->toXml(arm);      
+//    }
+  }
 }
 
 } // namespace dmx

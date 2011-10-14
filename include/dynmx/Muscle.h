@@ -54,19 +54,25 @@ public:
   double getLengthMax() const { return m_lengthMax; };
   double getNormalisedLength() const { return m_lengthNorm; };
   double getUnitLength() const { return m_lengthUnit; };
+  double getOptimalLength() const { return m_lengthOpt; };
+  
   double getVelocity() const { return m_velocity; };
+  double getVelocityMax() const { return m_maxVelocity; };
   double getNormalisedVelocity() const { return m_velocityNorm; };
+  
   double getForce() const { return m_force; };
+  double getForceMax() const { return m_maxForce; };
   double getActiveForce() const { return m_activeForceNorm; };
   double getPassiveForce() const { return m_passiveForceNorm; };
   double getVelocityForce() const { return m_velocityForceNorm; };
+  
   double getExcitation() const { return m_excitation; };
   double getActivation() const { return m_activation; };
+  
   bool isMonoArticulate() const { return m_isMonoArticulate; };
   bool isFlexor() const { return m_isFlexor; };
   double getOrigin() const { return m_originJointDist; };
   double getInsertion() const { return m_insertJointDist; };
-  double getOptimalLength() const { return m_lengthOpt; };
   virtual Pos getOriginWorld() = 0;
   virtual Pos getInsertionWorld() = 0;
   
@@ -78,6 +84,9 @@ public:
   virtual double getLengthFromJointAngles(double elbAngle, double shdAngle) = 0;
   
   const ArmMuscled* getArm() const { return m_arm; };
+  
+  // Store output in human readable format
+  virtual void toXml(ci::XmlTree& xml);  
   
   // Parameters different per muscle
   double m_maxForce; 

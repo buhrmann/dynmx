@@ -25,6 +25,10 @@ GATester::GATester(Evolvable* evolvable) : m_evolvable(evolvable)
 //----------------------------------------------------------------------------------------------------------------------
 void GATester::init()
 {
+  
+  // For storing evolvable to disk at the end
+  m_modelXml = new ci::XmlTree("Evolvable", ""); 
+  
   // Debug level
   const ci::XmlTree* settings = SETTINGS;  
   if(settings->hasChild("Config/Globals"))
@@ -117,6 +121,13 @@ void GATester::update(float dt)
       if( m_verbosity >= GARunner::kGAVerbosityGenome)
         std::cout << "Total fitness = " << m_accFitness << std::endl; 
 #endif      
+    }
+    
+    // Write model data to xml
+    if(hasFinished())
+    {
+      m_evolvable->toXml(*m_modelXml);
+      m_modelXml->write(ci::writeFile(dmx::DATA_DIR + "Evolvable.xml"));  
     }
     
     // Reset simulation for new trial

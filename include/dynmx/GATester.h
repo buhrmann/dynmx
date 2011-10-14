@@ -51,6 +51,8 @@ protected:
   uint16_t m_numTrials;
   
   int m_verbosity;
+  
+  ci::XmlTree* m_modelXml;  
 };
 
 } // namespace dmx

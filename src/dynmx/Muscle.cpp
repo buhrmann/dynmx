@@ -72,7 +72,7 @@ void Muscle::reset()
 void Muscle::setParameters(double maxIsoForce, double optimalLength, double maxVelocity)
 {
   m_lengthOpt = optimalLength;
-  m_maxVelocity = maxVelocity * m_lengthOpt;
+  m_maxVelocity = maxVelocity;// * m_lengthOpt; // Why, is it really specified in l0/s?
   m_maxForce = maxIsoForce;
 } 
 
@@ -86,7 +86,6 @@ void Muscle::update(float dt)
   // Todo: Temporary check that the min/max muscle length calculations are correct
   double delta = 0.001;
   bool lengthOK = (m_length - m_lengthMin) >= -delta && (m_length - m_lengthMax) < delta ;
-  //bool lengthOK = (m_length >= m_lengthMin) && (m_length <= m_lengthMax);
   if(!lengthOK)
   {
     std::cout << getName() << std::endl;
@@ -181,6 +180,32 @@ double Muscle::calcActivation(double activation, double excitation, float dt)
   return activation + ((excitation - activation) / tau) * dt;	// else if activity decreasing
 }
   
+// Will be called from subclasses, as is virtual function
+//----------------------------------------------------------------------------------------------------------------------  
+void Muscle::toXml(ci::XmlTree& muscle)
+{
+  // XMLTree muscle provided by subclass   //ci::XmlTree muscle("Muscle", "");
+  muscle.setAttribute("Name", getName());
+  muscle.setAttribute("IsFlexor", isFlexor());
+  muscle.setAttribute("IsMono", isMonoArticulate());
+    
+  ci::XmlTree origin("Origin",""); origin.setAttribute("Value", getOrigin()); 
+  muscle.push_back(origin);
+  
+  ci::XmlTree insertion("Insertion",""); insertion.setAttribute("Value", getInsertion()); 
+  muscle.push_back(insertion);
+  
+  ci::XmlTree maxForce("MaxIsoForce",""); maxForce.setAttribute("Value", getForceMax()); 
+  muscle.push_back(maxForce);
+  
+  ci::XmlTree optLength("OptimalLength",""); optLength.setAttribute("Value", getOptimalLength()); 
+  muscle.push_back(optLength);
+  
+  ci::XmlTree maxVel("MaxVelocity",""); maxVel.setAttribute("Value", getVelocityMax()); 
+  muscle.push_back(maxVel);
+  
+  //xml.push_back(muscle);
+}
   
 } // namespace dmx
 

@@ -33,6 +33,7 @@ public:
 
   // Transforms a given point p from world to local space
   Vec3f toLocalSpace(Vec3f p);
+  Vec3f toWorldSpace(Vec3f p);
   
 protected:
   virtual void init();

@@ -37,6 +37,7 @@ public:
 
   // Per-joint proportional-derivative controllers.
   PD m_pd[2];
+  Pos m_desiredPos;  
   
 protected:
   

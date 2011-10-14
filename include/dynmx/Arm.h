@@ -51,12 +51,15 @@ public:
   void reset(float elbAngle, float shdAngle);  
   void update(float dt, double torque1, double torque2);
   
+  // Setters
   void setParameters(float mass1, float mass2, float length1, float length2);
   void setFriction(float elbF, float shdF) { m_frictions[JT_elbow] = elbF; m_frictions[JT_shoulder] = shdF; };
   void setLimit(Joint jt, float upper, float lower) { assert(jt >=0 && jt < 2); m_limits[jt][0] = upper; m_limits[jt][1] = lower; };
   void setGravity(float g) { m_gravity = g; };
   void setJointLocked(Joint j, bool l) { m_jointLocked[j] = l; };
+  void setTarget(Pos p) { m_target = p; };    
   
+  // Getters
   double getGravity() const { return m_gravity; };
   Pos getPointOnUpperArm(float distanceFromJoint) const;
   Pos getPointOnLowerArm(float distanceFromJoint) const;  
@@ -70,14 +73,16 @@ public:
   Pos& getElbowPos() { return m_elbowPos; };
   double getJointLimitUpper(Joint j) const { return m_limits[j][0]; };
   double getJointLimitLower(Joint j) const { return m_limits[j][1]; };
+  Pos getTarget() { return m_target; };
+  const std::deque<Pos>& getTrajectory() { return m_trajectory; };
   
+  // Helpers
   void forwardKinematics();
   void forwardKinematics(double elbAngle, double shdAngle, Pos& elbPos, Pos& effPos);
   void inverseKinematics(const Pos& pos, float elbDir, double& elbAngle, double& shdAngle);  
-  const std::deque<Pos>& getTrajectory() { return m_trajectory; };
-  
-  void setTarget(Pos p) { m_target = p; };  
-  Pos getTarget() { return m_target; };
+
+  // Store output in human readable format
+  virtual void toXml(ci::XmlTree& xml);
   
 protected:
 

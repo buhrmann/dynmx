@@ -27,6 +27,12 @@ Vec3f ArmViz::toLocalSpace(Vec3f p)
   return m_TM.preMultiply(p);
 }
   
+Vec3f ArmViz::toWorldSpace(Vec3f p)
+{
+  p = m_TM.postMultiply(p);
+  return p + m_TM.getTranslate().xyz();
+}
+  
 //----------------------------------------------------------------------------------------------------------------------
 void ArmViz::init()
 {

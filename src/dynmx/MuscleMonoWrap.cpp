@@ -145,5 +145,21 @@ Pos MuscleMonoWrap::getInsertionWorld()
   }  
 }
   
+//----------------------------------------------------------------------------------------------------------------------  
+void MuscleMonoWrap::toXml(ci::XmlTree& xml)
+{
+  ci::XmlTree muscle("Muscle", "");
+
+  // First let Muscle write generic parameters
+  Muscle::toXml(muscle);
+  
+  // Then add our own
+  ci::XmlTree joint("Joint",""); 
+  joint.setAttribute("Value", getJoint() == JT_elbow ? "Elbow" : "Shoulder"); 
+  muscle.push_back(joint);
+  
+  xml.push_back(muscle);
+}
+  
 } // namespace dmx
 

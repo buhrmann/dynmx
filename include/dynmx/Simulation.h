@@ -10,6 +10,8 @@
 #ifndef _DNM_SIMULATION_
 #define _DNM_SIMULATION_
 
+#include "cinder/Timer.h"
+
 namespace dmx
 {
 
@@ -35,6 +37,8 @@ protected:
     
   Model* m_model;
   App* m_app;
+  
+  cinder::Timer m_timer;
 };
 
 } // namespace dmx

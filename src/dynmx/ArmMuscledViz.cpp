@@ -24,8 +24,6 @@ void ArmMuscledViz::init()
   // Let parent class initialize first
   ArmViz::init();
   
-  Vec4f col (0.5f, 0.5f, 0.5f, 0.95f);
-  
   // Modify the joint render size
   m_elbow.m_radius1 = m_arm->getJointRadius(JT_elbow);
   m_elbow.m_radius2 = m_elbow.m_radius1;
@@ -34,6 +32,8 @@ void ArmMuscledViz::init()
   m_shoulder.m_radius1 =  m_arm->getJointRadius(JT_shoulder);
   m_shoulder.m_radius2 = m_shoulder.m_radius1;
   m_shoulder.createGeometry();
+  
+  m_drawDesiredState = false;
 }
 
 // Overwrite base class update
@@ -49,38 +49,37 @@ void ArmMuscledViz::update()
   glMultMatrixf(*m_pTM);
   
   // Desired kinematic state
-  const bool drawDesired = true;
-  if(drawDesired)
+  if(m_drawDesiredState)
   {
+    Pos p1, p2;    
     double desElbAngle = m_arm->getDesiredJointAngle(JT_elbow); 
     double desShdAngle = m_arm->getDesiredJointAngle(JT_shoulder); 
-    Pos p1, p2;
     m_arm->forwardKinematics(desElbAngle, desShdAngle, p1, p2);
-    glColor4f(1.0, 0.25, 0.25, 0.5);
     
     Vec3f desShdPos(0,0,0);
     Vec3f desElbPos(p1);
     Vec3f desEffPos(p2);
+    glColor4f(1.0, 0.25, 0.25, 0.5);    
+    // Draw bones
     ci::gl::drawLine(desShdPos, desElbPos);
     ci::gl::drawLine(desElbPos, desEffPos);
-#if 1 
+
     // Points indicating joints
     glPointSize(4.0);
     glBegin(GL_POINTS);
-    glVertex3f(desShdPos.x, desShdPos.y, 0.0);
-    glVertex3f(desElbPos.x, desElbPos.y, 0.0);
-    glVertex3f(desEffPos.x, desEffPos.y, 0.0);
+      glVertex3f(desShdPos.x, desShdPos.y, 0.0);
+      glVertex3f(desElbPos.x, desElbPos.y, 0.0);
+      glVertex3f(desEffPos.x, desEffPos.y, 0.0);
     glEnd();
-#endif    
   }  
   
   // Trajectory  
-  const std::deque<Pos>& effTrajectory = m_arm->getTrajectory();
-  const int numPoints =  effTrajectory.size();  
-  float lineVerts[numPoints*2];
-  float colors[numPoints*4];
   glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_COLOR_ARRAY);
+  const std::deque<Pos>& effTrajectory = m_arm->getTrajectory();
+  int numPoints =  effTrajectory.size();  
+  float lineVerts[numPoints*2];
+  float colors[numPoints*4];
   glVertexPointer(2, GL_FLOAT, 0, lineVerts); // 2d positions
   glColorPointer(4, GL_FLOAT, 0, colors);     // 4d colors
   
@@ -97,21 +96,29 @@ void ArmMuscledViz::update()
   }
   glDrawArrays( GL_LINE_STRIP, 0, numPoints);
   
-  // Draw desired trajectory
+  // Draw desired trajectory: assume it's same size as actual trajectory, which it should be  
+  /*
   const std::deque<Pos>& desTrajectory = ((ArmMuscled*)m_arm)->getDesiredTrajectory();  
+  numPoints =  desTrajectory.size();    
+  float lineVertsDes[numPoints*2];
+  float colorsDes[numPoints*4];
+  glVertexPointer(2, GL_FLOAT, 0, lineVertsDes); // 2d positions
+  glColorPointer(4, GL_FLOAT, 0, colorsDes);     // 4d colors  
   for(size_t i = 0; i < numPoints; i++)
   {
-    lineVerts[i*2 + 0] = desTrajectory[i].x;
-    lineVerts[i*2 + 1] = desTrajectory[i].y;
+    lineVertsDes[i*2 + 0] = desTrajectory[i].x;
+    lineVertsDes[i*2 + 1] = desTrajectory[i].y;
     float c = 0.5f * (float)i / (float)numPoints;
-    colors[i*4 + 0] = 1;
-    colors[i*4 + 1] = 0;
-    colors[i*4 + 2] = 0;
-    colors[i*4 + 3] = c;
+    colorsDes[i*4 + 0] = 1;
+    colorsDes[i*4 + 1] = 0;
+    colorsDes[i*4 + 2] = 0;
+    colorsDes[i*4 + 3] = c;
   }
   glDrawArrays( GL_LINE_STRIP, 0, numPoints);
+  */
   glDisableClientState(GL_VERTEX_ARRAY);
   glDisableClientState(GL_COLOR_ARRAY);
+
   
   
   // Draw muscles

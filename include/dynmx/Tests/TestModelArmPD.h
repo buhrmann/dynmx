@@ -11,15 +11,16 @@
 
 #include "Dynmx.h"
 #include "Model.h"
+#include "Arm.h"
 #include "ArmPD.h"
 #include "Random.h"
 
 //----------------------------------------------------------------------------------------------------------------------
-class TestModelArm : public dmx::Model
+class TestModelArmPD : public dmx::Model
 {
 public:
 
-  TestModelArm() : m_arm(0), m_time(0) { m_arm = new dmx::ArmPD(); };
+  TestModelArmPD() : m_arm(0), m_time(0) { m_arm = new dmx::ArmPD(); init(); };
   
   virtual void init() 
   { 
@@ -35,7 +36,10 @@ public:
     m_arm->m_pd[1].m_D = -0.1f;    
   };
   
-  virtual void reset() { m_arm->reset(); };
+  virtual void reset() 
+  { 
+    ((dmx::Arm*)m_arm)->reset(0.5f*PI, 0.5f*PI); 
+  };
   
   virtual void update(float dt)
   { 

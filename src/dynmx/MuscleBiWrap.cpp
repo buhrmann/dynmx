@@ -242,6 +242,18 @@ Pos MuscleBiWrap::getInsertionWorld()
 {
   return m_arm->getPointOnLowerArm(m_insertJointDist / m_arm->getLength(JT_elbow));
 }
+  
+//----------------------------------------------------------------------------------------------------------------------  
+void MuscleBiWrap::toXml(ci::XmlTree& xml)
+{
+  ci::XmlTree muscle("Muscle", "");
+  
+  // First let Muscle write generic parameters
+  Muscle::toXml(muscle);
+
+  xml.push_back(muscle);
+}
+
 
 } // namespace dmx
 

@@ -31,11 +31,15 @@ public:
   void setModel(ArmMuscled* model) { m_arm = model; };
   virtual void update();
   
+  void setDrawDesired(bool b) { m_drawDesiredState = b; };
+  
 protected:
   virtual void init();
   
   // Pointer to model to retrieve updated coordinates from
   ArmMuscled* m_arm;
+  
+  bool m_drawDesiredState;
     
 };
    

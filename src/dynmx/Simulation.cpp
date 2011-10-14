@@ -13,6 +13,7 @@
 #include "Simulation.h"
 #include "App.h"
 #include "Model.h"
+#include "MathUtils.h"
 
 namespace dmx
 {
@@ -23,6 +24,9 @@ void Simulation::start()
   // Cinder++ needs to set itself up (sets up memory on Mac, does nothing on windoze)
   ci::app::AppBasic::prepareLaunch();
   
+  // Running time
+  m_timer.start();
+  
   if(m_app)
   {
     runVisual();  
@@ -31,6 +35,13 @@ void Simulation::start()
   {
     runNonVisual(); 
   } 
+  
+  // Output running time
+  m_timer.stop();
+  double runningTime = m_timer.getSeconds();
+  int h, m, s;
+  secondsToTime(runningTime, h, m, s);
+  std::cout << "Total running time:" << h << ":" << m << ":" << s << std::endl;
   
   // Cinder++ wants to clean up after itself
   ci::app::AppBasic::cleanupLaunch();  
@@ -49,10 +60,10 @@ void Simulation::runVisual()
 void Simulation::runNonVisual()
 {
   // Read global config
-  float dt = DEFAULT_TIMESTEP;
+  float dt = 1.0 / (float) DEFAULT_FRAMERATE;
   if (SETTINGS->hasChild("Config/Globals/FrameRate"))
   {
-    dt = 1.0f / SETTINGS->getChild("Config/Globals/FrameRate").getAttributeValue<int>("Value");
+    dt = 1.0 / (float) SETTINGS->getChild("Config/Globals/FrameRate").getAttributeValue<int>("Value");
   }
   
   while(!m_model->hasFinished())

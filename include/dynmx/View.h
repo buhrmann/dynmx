@@ -22,7 +22,7 @@
 namespace dmx
 {
 // indicated that the view doesn't want to override the app's default frame rate
-#define DEFAULT_FRAME_RATE -1
+#define DEFAULT_VIEW_FRAME_RATE -1
 #define USE_SIMPLE_GUI 1
 
 //----------------------------------------------------------------------------------------------------------------------  
@@ -44,7 +44,7 @@ public:
   virtual void update(float dt){}; // E.g. for updating internal calculated data after a simulation step
   virtual void draw();
   
-  virtual int getDesiredFrameRate() { return DEFAULT_FRAME_RATE; } ;
+  virtual int getDesiredFrameRate() { return DEFAULT_VIEW_FRAME_RATE; } ;
 
   virtual void mouseMove(ci::app::MouseEvent event);
   virtual void mouseDrag(ci::app::MouseEvent event);

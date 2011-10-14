@@ -39,13 +39,13 @@ typedef int uint64_t;
 // GLobal defines
 //----------------------------------------------------------------------------------------------------------------------
 #define DEBUGGING 1
-
 #define DEPLOYING 0
 
 namespace dmx
 {
 
-#define DEFAULT_TIMESTEP 0.03333f  
+#define DEFAULT_FRAMERATE 100
+  
 #define DATA_BASE_DIR "/Users/thomasbuhrmann/Experiments/"
 #define DATA_DIR Globals::Inst()->getDataDir()
 #define SETTINGS Globals::Inst()->getSettings()
