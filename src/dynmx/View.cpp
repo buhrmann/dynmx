@@ -44,8 +44,8 @@ void View::init()
   RenderState::g_shadingMode = GL_SMOOTH;
 
   m_drawWireframe = false;
-  m_drawOutlines = true;
-  m_drawShadows = true;
+  m_drawOutlines = false;
+  m_drawShadows = false;
   m_draw3d = true;
   m_draw2d = false;
   m_showMenu = false;
@@ -173,11 +173,13 @@ void View::draw()
       // custom 3d drawing
       draw3d();
       
+#if 0      
       // draw projected mouse position
-//      glPushMatrix();
-//      glTranslatef(m_mouseWorld);
-//      drawFrame(0.1, 0.1);
-//      glPopMatrix();
+      glPushMatrix();
+      glTranslatef(m_mouseWorld);
+      drawFrame(0.1, 0.1);
+      glPopMatrix();
+#endif
     }
 
     // 2D stuff

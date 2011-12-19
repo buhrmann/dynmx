@@ -36,6 +36,9 @@
 #include "ArmMuscledView.h"
 #include "ArmReflexView.h"
 
+#include "SMCAgent.h"
+#include "SMCView.h"
+
 namespace dmx
 {
 
@@ -172,6 +175,15 @@ Simulation* SimulationFactory::create()
       app = new TestAppCTRNN((TestModelCTRNN*)model);
     }    
   }
+  else if ("SMCAgent" == modelName)
+  {
+    model = new SMCAgent();
+    if(visual)
+    {
+      View* view = new SMCView((SMCAgent*)model);      
+      app = new App(model, view);
+    }
+  }  
   else if ("Test" == modelName)
   {
     model = new TestModel();

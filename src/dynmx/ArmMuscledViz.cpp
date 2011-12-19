@@ -15,6 +15,8 @@
 #include "MuscleMonoWrap.h"
 #include "MuscleBiWrap.h"
 
+#include "CollisionDetection.h"
+
 namespace dmx
 {
 

@@ -63,7 +63,7 @@ inline void ArmView::setupScene()
   // 3d view
   m_armViz = new dmx::ArmViz(m_arm);
   m_armViz->rotate(ci::Vec4f(0,0,1,1), -PI_OVER_TWO);
-  m_armViz->translate(ci::Vec4f(-0.25, 0, 0, 1));
+  m_armViz->translate(ci::Vec4f(0.25, 0, 0, 1));
   m_scene3d.m_children.push_back(m_armViz);
   
   m_trackMouse = false;

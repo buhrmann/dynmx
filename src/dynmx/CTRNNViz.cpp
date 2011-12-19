@@ -100,7 +100,7 @@ void CTRNNViz::update()
     for(int i = 0; i < m_ctrnn->size; i++)
     {
       // draw only the selected neuron's connections
-      if(i == m_selected)
+      if(i == m_selected || m_selected == -1)
       {
         float angle = -((float)i + 0.5f) * segmentSizeRad + PI_OVER_TWO; 
         Vec3f midPoint ((r1+5) * cosf(angle), (r1+5) * sinf(angle), 0.0f);
@@ -231,6 +231,7 @@ void CTRNNViz::update()
 //----------------------------------------------------------------------------------------------------------------------
 void CTRNNViz::onMouseMove(const Vec4f& mPos)
 {
+  m_selected = -1;
   const float r3 = m_width / 2;
   const float r2 = r3 - 5;
   const float r1 = r2 - 10;

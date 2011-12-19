@@ -52,7 +52,7 @@ inline void ArmMuscledView::setupScene()
   // 3d view
   m_armViz = new ArmMuscledViz(m_armMd);
   m_armViz->rotate(ci::Vec4f(0,0,1,1), -PI_OVER_TWO);
-  m_armViz->translate(ci::Vec4f(-0.25, 0, 0, 1));
+  m_armViz->translate(ci::Vec4f(-0.35, -0.3, 0, 1));
   m_scene3d.m_children.push_back(m_armViz);
   
   m_trackMouse = false;
@@ -60,8 +60,14 @@ inline void ArmMuscledView::setupScene()
   std::fill(m_excitation, m_excitation + MAX_NUM_MUSCLES, 0.0);  
   
   // Create a plot for muscle data
-  m_musclePlot = new dmx::Plot(600.0, 180, MAX_NUM_MUSCLES, 200);
-  m_musclePlot->translate(ci::Vec4f(75, 50, 0, 1)); 
+  m_musclePlot = new dmx::Plot(400.0, 180, MAX_NUM_MUSCLES, 200);
+  m_musclePlot->translate(ci::Vec4f(550, 50, 0, 1)); 
+  for(int i = 0; i < m_armMd->getNumMuscles(); i++)
+  {
+    char str[32];
+    sprintf(str, "%s: ", m_armMd->getMuscle(i)->getName().c_str());
+    m_musclePlot->setLabel(i, str);
+  }
   m_scene2d.m_children.push_back(m_musclePlot);
   
 }

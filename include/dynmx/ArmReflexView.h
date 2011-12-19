@@ -55,7 +55,6 @@ inline void ArmReflexView::setupScene()
   m_armViz->translate(ci::Vec4f(-0.25, 0, 0, 1));
   m_scene3d.m_children[0] = m_armViz;  
   
-  
   ((ArmMuscledViz*)m_armViz)->setDrawDesired(true);
   
   m_reflexGains[0] = m_armRx->getReflex(m_selectedReflex)->m_Kspp[0];

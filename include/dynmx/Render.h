@@ -389,14 +389,14 @@ namespace dmx
 //    glEnd ();
 //	}
 //
-//	static void drawTriangle(const Vec3f& a, const Vec3f& b, const Vec3f& c)
-//	{
-//	  glBegin(GL_TRIANGLES);
-//      glVertex3fv(a.data);
-//      glVertex3fv(b.data);
-//      glVertex3fv(c.data);
-//    glEnd();
-//	}
+	static void drawTriangle(const Vec3f& a, const Vec3f& b, const Vec3f& c)
+	{
+	  glBegin(GL_TRIANGLES);
+      glVertex3fv(a);
+      glVertex3fv(b);
+      glVertex3fv(c);
+    glEnd();
+	};
 
 	// equilateral in z-plane
 	static void drawTriangle(float s)
