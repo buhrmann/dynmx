@@ -23,7 +23,7 @@ void SMCEnvironmentViz::update()
   for(int i = 0; i < m_environment->getCircles().size(); i++)
   {
     const Circle& circle = m_environment->getCircles()[i];
-    ci::gl::drawSolidCircle(circle.position, circle.radius, 32);
+    ci::gl::drawSolidCircle(circle.getPosition(), circle.getRadius(), 32);
   }
 
   for(int i = 0; i < m_environment->getTriangles().size(); i++)

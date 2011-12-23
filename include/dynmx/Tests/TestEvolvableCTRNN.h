@@ -33,6 +33,7 @@ public:
   virtual float getFitness();
   virtual void update(float dt);
   virtual void reset();
+  virtual bool hasFinished() { return m_numSteps >= 100; };
   
   CTRNN* m_ctrnn;
   float m_fitness;

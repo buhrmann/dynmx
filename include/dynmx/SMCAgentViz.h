@@ -23,15 +23,16 @@ class SMCAgentViz : public NodeGroup
 {
 public:
   
-  SMCAgentViz(SMCAgent* agent) : m_agent(agent) {};
+  SMCAgentViz(SMCAgent* agent) : m_agent(agent) { init(); };
   
   virtual void update();
   
 protected:
   
-  virtual void init() { NodeGroup::init(); };
+  virtual void init();
   
   SMCAgent* m_agent;
+  Disk* m_agentDisk;
   
 }; // class
   

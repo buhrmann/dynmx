@@ -12,9 +12,10 @@
 
 #include <time.h>
 #include "assert.h"
+#include "float.h"
 
 // TODO: MAX_FLOAT
-#define MAX_NEG_FLOAT -99999999.0f
+#define MAX_NEG_FLOAT -FLT_MAX
 #define GA_DONT_REEVALUATE 1 
 
 // --------------------------------------------------------------------------------------------
@@ -82,12 +83,12 @@ void GA::reset(bool randomizeGenomes)
         m_genomes[i][j] = ran1(&m_idum);
       }
     }
-
-    // Fitness
-    for(int i = 0; i < m_popSize; i++)
-    {
-      m_fitnesses[i] = MAX_NEG_FLOAT;
-    }
+  }
+  
+  // Fitness
+  for(int i = 0; i < m_popSize; i++)
+  {
+    m_fitnesses[i] = MAX_NEG_FLOAT;
   }
   
   // select first pair of genomes for tournament
@@ -134,7 +135,7 @@ float GA::getAvgFitness() const
   int n = 0;
   for (int i = 0 ; i < m_popSize ; ++i)
   {
-    if(m_fitnesses[i] != MAX_NEG_FLOAT)
+    if(fabs(m_fitnesses[i] - MAX_NEG_FLOAT) > 10.0 )
     {
       avg += m_fitnesses[i];
       n++;
@@ -364,7 +365,8 @@ void GA::mutate(uint16_t winner, uint16_t loser)
     }
 
     // gaussian mutation
-    m_genomes[loser][i] += (float) (gasdev(&m_idum) * m_maxMutation);
+    const float mutation = (float) (gasdev(&m_idum) * m_maxMutation);
+    m_genomes[loser][i] += mutation;
 
     // ensure values stay in [0,1] range
     if (m_genomes[loser][i] > 1)

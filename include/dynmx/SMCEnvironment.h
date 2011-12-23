@@ -18,22 +18,59 @@ namespace dmx
 {
  
 //----------------------------------------------------------------------------------------------------------------------
-// A triangle
+// A positionable
 //----------------------------------------------------------------------------------------------------------------------
-struct Triangle
+class Positionable
 {
-  Triangle(const ci::Vec2f& v1, const ci::Vec2f& v2, const ci::Vec2f& v3) : p1(v1), p2(v2), p3(v3) {};
+public:
+  Positionable(const ci::Vec2f& pos = ci::Vec2f(0,0)) : m_position(pos) {};
+  
+  virtual const ci::Vec2f& getPosition() const { return m_position; };
+  virtual ci::Vec2f getPosition() { return m_position; };
+  virtual void setPosition(const ci::Vec2f& pos) { m_position = pos; };
+
+protected:  
+  ci::Vec2f m_position;
+};
+  
+  
+//----------------------------------------------------------------------------------------------------------------------
+// A triangle with position in its centre
+//----------------------------------------------------------------------------------------------------------------------
+class Triangle : public Positionable
+{
+public:  
+  Triangle(const ci::Vec2f& pos, float size) : Positionable(pos), m_size(size)
+  {
+    setPosition(pos);
+  };
+  
+  virtual void setPosition(const ci::Vec2f& pos)
+  {
+    Positionable::setPosition(pos);
+    p1 = pos + ci::Vec2f(-m_size/2, 0); 
+    p3 = pos + ci::Vec2f(m_size/2, m_size/2); 
+    p2 = pos + ci::Vec2f(m_size/2, -m_size/2);
+  }
+  
   ci::Vec2f p1, p2, p3;
+
+protected:  
+  float m_size;
 };
   
 //----------------------------------------------------------------------------------------------------------------------
 // A circle
 //----------------------------------------------------------------------------------------------------------------------  
-struct Circle
+class Circle : public Positionable
 {
-  Circle(const ci::Vec2f& p, float r) : position(p), radius(r) {};
-  ci::Vec2f position;
-  float radius;
+public:
+  Circle(const ci::Vec2f& pos, float r) : Positionable(pos), m_radius(r) {};
+  float getRadius() const { return m_radius; };
+  void setRadius(float r) { m_radius = r; };
+  
+protected:
+  float m_radius;
 };
   
 //----------------------------------------------------------------------------------------------------------------------

@@ -326,6 +326,8 @@ void View::mouseDrag(MouseEvent event)
     // let the camera handle the interaction
     m_cam3d.mouseDrag( event.getPos(), event.isLeftDown(), event.isMiddleDown(), event.isRightDown() ); 
   }
+  
+  m_scene2d.onMouseDrag(event);  
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -354,6 +356,7 @@ void View::mouseDown(MouseEvent event)
 //----------------------------------------------------------------------------------------------------------------------
 void View::mouseUp(MouseEvent event)
 {
+  m_scene2d.onMousePress(Vec3f(event.getX(), event.getY(), 0));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -366,6 +369,9 @@ void View::resize(ResizeEvent event)
   
   // Update window size
   m_windowSize = Rectf(0.0f, 0.0f, (float)event.getWidth(), (float)event.getHeight());  
+
+  // let ui interface adjust
+  m_scene2d.onResize(event);  
 }
 
 //----------------------------------------------------------------------------------------------------------------------  

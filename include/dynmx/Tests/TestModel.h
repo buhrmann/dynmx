@@ -21,7 +21,7 @@ public:
   virtual void init() { reset(); };
   virtual void reset() { m_time = 0.0; m_val = 0.0; };
   virtual void update(float dt) { m_time += dt; m_val = sin(0.5f * m_time); };
-  virtual bool hasFinished() { return m_time > 10.0f; };
+  virtual bool hasFinished() { return false; /*m_time > 10.0f;*/ };
   
   float m_val;
   float m_time;

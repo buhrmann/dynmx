@@ -44,6 +44,7 @@
 		D68AC7DA13E9937F009887A9 /* pf_tempesta_seven.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D68AC79113E9937F009887A9 /* pf_tempesta_seven.ttf */; };
 		D68AC7FD13E9937F009887A9 /* SimpleGUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D68AC7D913E9937F009887A9 /* SimpleGUI.cpp */; };
 		D68CFC961428DAEF003CA32E /* Reflex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D68CFC951428DAEF003CA32E /* Reflex.cpp */; };
+		D696B7B214A3685F00580D3C /* SMCAgentEvo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D696B7B114A3685F00580D3C /* SMCAgentEvo.cpp */; };
 		D69FBB4B13B222C300D5F6F0 /* Simulation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D69FBB4A13B222C300D5F6F0 /* Simulation.cpp */; };
 		D6B7EAF413B791800019114A /* Registry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6B7EAF313B791800019114A /* Registry.cpp */; };
 		D6BA379B13BA249900CFED09 /* Muscle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6BA379A13BA249900CFED09 /* Muscle.cpp */; };
@@ -137,6 +138,8 @@
 		D68CFC951428DAEF003CA32E /* Reflex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Reflex.cpp; sourceTree = "<group>"; };
 		D692C7C8141E0FB100F0E802 /* TestModelEvolvableArm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestModelEvolvableArm.h; path = ../include/dynmx/Tests/TestModelEvolvableArm.h; sourceTree = SOURCE_ROOT; };
 		D69461D213CDD7A000FA12EA /* TestAppCTRNN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestAppCTRNN.h; path = ../include/dynmx/Tests/TestAppCTRNN.h; sourceTree = SOURCE_ROOT; };
+		D696B7AF14A3684C00580D3C /* SMCAgentEvo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCAgentEvo.h; path = ../include/dynmx/SMCAgentEvo.h; sourceTree = SOURCE_ROOT; };
+		D696B7B114A3685F00580D3C /* SMCAgentEvo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SMCAgentEvo.cpp; sourceTree = "<group>"; };
 		D69FBB4A13B222C300D5F6F0 /* Simulation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Simulation.cpp; sourceTree = "<group>"; };
 		D69FBB4C13B222DA00D5F6F0 /* Simulation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Simulation.h; path = ../include/dynmx/Simulation.h; sourceTree = SOURCE_ROOT; };
 		D6B7EAF313B791800019114A /* Registry.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Registry.cpp; sourceTree = "<group>"; };
@@ -339,6 +342,8 @@
 				D67710C8149B799A0031DC48 /* CollisionDetection.h */,
 				D67358D7149E6C8B008C7541 /* SMCAgent.h */,
 				D67358D9149E6D2F008C7541 /* SMCAgent.cpp */,
+				D696B7AF14A3684C00580D3C /* SMCAgentEvo.h */,
+				D696B7B114A3685F00580D3C /* SMCAgentEvo.cpp */,
 				D67358F4149E73E4008C7541 /* SMCAgentViz.h */,
 				D67358F5149E73F7008C7541 /* SMCAgentViz.cpp */,
 				D6735901149E751A008C7541 /* SMCEnvironment.h */,
@@ -563,6 +568,7 @@
 				D67358F6149E73F7008C7541 /* SMCAgentViz.cpp in Sources */,
 				D6735903149E752F008C7541 /* SMCEnvironment.cpp in Sources */,
 				D673591E149E791C008C7541 /* SMCEnvironmentViz.cpp in Sources */,
+				D696B7B214A3685F00580D3C /* SMCAgentEvo.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

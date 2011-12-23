@@ -120,7 +120,10 @@ public:
   virtual Node* getNode(int pickID) { return 0; };
   
   virtual void onMouseMove(const cinder::Vec4f& mousePos) {};
+  virtual void onMouseDrag(ci::app::MouseEvent event) {}; 
+  virtual void onMousePress(const cinder::Vec4f& mousePos) {};  
   virtual void onKeyPress(cinder::app::KeyEvent e) {};
+  virtual void onResize(ci::app::ResizeEvent event) {};
 
   virtual void print();
 
@@ -147,15 +150,23 @@ public:
   NodeGroup();
   virtual void update();
 
+  void setRightAligned(bool align) { m_isRightAligned = align; };
+  
   // recursively descend into tree to look for picked node
   virtual Node* getNode(int pickID);
   virtual void onMouseMove(const cinder::Vec4f& mousePos);
+  virtual void onMouseDrag(ci::app::MouseEvent event);   
+  virtual void onMousePress(const cinder::Vec4f& mousePos);    
   virtual void onKeyPress(ci::app::KeyEvent e);
+  virtual void onResize(ci::app::ResizeEvent event);  
   
   std::vector<Node*> m_children;
 
 protected:
   virtual void init();
+  ci::Vec4f toLocalPos(const ci::Vec4f pos);
+  
+  bool m_isRightAligned;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -350,6 +361,8 @@ public:
   virtual void update();
   void addPoint(float p, int pID = 0);
   void setLabel(int pId, const std::string& name);
+  void setTitle(const std::string& title) { m_title = title; };
+  
   virtual Node* getNode(int pickID) { if (m_uniqueID == pickID) return this; else return 0; };  
 
 protected:
@@ -363,6 +376,8 @@ protected:
   float m_h;
   float m_maxY;
   float m_minY;
+  ci::Font m_font;  
+  std::string m_title;
 };
 
 

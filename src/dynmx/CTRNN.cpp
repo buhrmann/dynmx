@@ -132,7 +132,7 @@ void CTRNN::decodeGenome(const double* params, int numInputs)
   for(int i = 0; i < size; i++)
   {
     if(i < numInputs)
-      gains[i] = 10.0 * params[i];
+      gains[i] = -10.0 + 20.0 * params[i];
     else
       gains[i] = 1.0;
   }
@@ -208,6 +208,13 @@ void CTRNN::randomizeWeights(double lb, double ub, RandomState &rs)
 	for (int i = 0; i < size; i++)
 		for (int j = 0; j < size; j++)
         setWeight(i, j, rs.UniformRandom(lb, ub));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+void CTRNN::zeroStates()
+{
+	for (int i = 0; i < size; i++)
+    setState(i, 0.0);
 }
 
 

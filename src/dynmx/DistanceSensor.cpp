@@ -21,7 +21,7 @@ float DistanceSensor::senseEnvironment(SMCEnvironment& environment)
   for(int i = 0; i < environment.getCircles().size(); i++)
   {
     const Circle& circle = environment.getCircles()[i];
-    float distance = lineSegmentCircleClosestIntersect(collision, m_position, end, circle.position, circle.radius);
+    float distance = lineSegmentCircleClosestIntersect(collision, m_position, end, circle.getPosition(), circle.getRadius());
     if(distance > 0 && distance < m_distance)
     {
       m_distance = distance;

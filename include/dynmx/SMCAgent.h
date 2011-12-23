@@ -28,7 +28,7 @@ class SMCAgent : public Model
   
 public:
   
-  SMCAgent();
+  SMCAgent(int numNeurons = 3);
   ~SMCAgent() {};
   
   // Inherited from class Model
@@ -37,25 +37,29 @@ public:
   virtual void update(float dt);
   
   SMCEnvironment* getEnvironment() { return &m_environment; };
-  CTRNN* getCTRNN() { return &m_ctrnn; };  
+  CTRNN* getCTRNN() { return m_ctrnn; };  
   DistanceSensor& getDistanceSensor() { return m_distanceSensor; };
   const ci::Vec2f& getPosition() { return m_position; };
   float getAngle() { return m_angle; };
   float getRadius() { return m_radius; };
   float getSensedValue() { return m_sensedValue; };
+  float getTime() { return m_time; };
+  
+  float getAngleWithHeading(ci::Vec2f pos);
   
 protected:
   
   void updateSensor(float dt);
   
   SMCEnvironment m_environment;
-  CTRNN m_ctrnn;
+  CTRNN* m_ctrnn;
   DistanceSensor m_distanceSensor;
   ci::Vec2f m_position;
   float m_angle;
   float m_maxSpeed;
   float m_radius;
   float m_sensedValue;
+  float m_time;
 }; // class
   
 } // namespace

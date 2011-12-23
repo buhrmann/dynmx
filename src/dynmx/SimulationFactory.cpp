@@ -37,6 +37,7 @@
 #include "ArmReflexView.h"
 
 #include "SMCAgent.h"
+#include "SMCAgentEvo.h"
 #include "SMCView.h"
 
 namespace dmx
@@ -69,6 +70,10 @@ Simulation* SimulationFactory::create()
     {
       evaluateOnly = SETTINGS->getChild("Config/GA/Eval").getAttributeValue<bool>("Run");
     }
+    if(evaluateOnly)
+    {
+      visual = true;
+    }
         
     if ("TestEvolvableCTRNN" == evolvableName)
     {    
@@ -78,6 +83,17 @@ Simulation* SimulationFactory::create()
       if(visual)
       {
         View* view = new TestViewEvolvableCTRNN((GARunner*)model);
+        app = new App(model, view);
+      }
+    }
+    else if ("SMCAgentEvo" == evolvableName)
+    {    
+      const int numNeurons = SETTINGS->getChild("Config/GA/Evolvable/NumNeurons").getAttributeValue<int>("Value");      
+      evolvable = new SMCAgentEvo(numNeurons);
+      model = evaluateOnly ? (Model*) new GATester(evolvable) : (Model*) new GARunner (evolvable);
+      if(visual)
+      {
+        View* view = new SMCView(((SMCAgentEvo*)evolvable)->getAgent());
         app = new App(model, view);
       }
     }
@@ -112,7 +128,6 @@ Simulation* SimulationFactory::create()
       if(evaluateOnly)
       {
         model = new GATester(evoArm);   
-        visual = true; // TODO: Temporarily overwrite to save time editing config file repeatedly
       }
       else
       {
@@ -125,6 +140,11 @@ Simulation* SimulationFactory::create()
         app = new App(model, view);
       }
     }      
+    
+    if(evaluateOnly)
+    {
+      ((GARunner*)model)->setVerbosity(GARunner::kGAVerbosityTrial);
+    }
   }
   else if ("TestArm" == modelName)
   {

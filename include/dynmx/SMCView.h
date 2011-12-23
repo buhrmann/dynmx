@@ -53,7 +53,9 @@ protected:
   int32_t m_fixedFrameRate;
   float m_gravity;
   
-  dmx::Plot* m_plot;
+  Plot* m_plot;
+  Plot* m_ctrnnPlot; 
+  Plot* m_fitnessPlot;
   
 }; // class
 
@@ -65,17 +67,23 @@ inline void SMCView::setupScene()
 {
   assert(m_agent);
   
+  // Background
   m_backgroundColor = ci::Vec4f(0.9, 0.9, 0.9, 1.0);
+  const float g = 0.1f;
+  m_background.topLeft = ci::ColorA(g, g, g, 0.5f);
+  m_background.topRight= ci::ColorA(g, g, g, 0.5f);
+  m_background.bottomLeft = ci::ColorA(1,1,1,0.0);
+  m_background.bottomRight = ci::ColorA(1,1,1,0.0);
   
   // 3d view
-#if 0  
+#if 1
   // Coordinate axes
   Axes* axes = new Axes(0.1);
   axes->createGeometry();
   m_scene3d.m_children.push_back(axes);
 #endif
   
-#if 0  
+#if 1
   // Background grid
   Grid* grid = new Grid(0.5, 0.5, 10, 10);
   grid->createGeometry();
@@ -91,25 +99,55 @@ inline void SMCView::setupScene()
   m_scene3d.m_children.push_back(m_agentViz);
   m_scene3d.m_children.push_back(m_environViz);
   
+  //m_scene3d.translate(ci::Vec4f(0.0,-0.0,0,1));
+  
   // 2d viz
-  m_ctrnnViz = new CTRNNViz(m_agent->getCTRNN(), 150);  
-  m_ctrnnViz->translate(ci::Vec4f(100, 350, 0, 1));
-  m_scene2d.m_children.push_back(m_ctrnnViz);
+  float columnWidth = 300;
+  float columnMargin = 5;
+  float left = columnWidth + columnMargin;
+  NodeGroup* column = new NodeGroup();
+  column->setRightAligned(true);
+  column->translate(ci::Vec4f(left, columnMargin, 0, 1));
+
+  // Add ctrnnViz to column
+  m_ctrnnViz = new CTRNNViz(m_agent->getCTRNN(), 200);  
+  column->m_children.push_back(m_ctrnnViz);
+
+  // Add plots to column
+  m_ctrnnPlot = new Plot(300.0, 150, m_agent->getCTRNN()->getSize(), 200);
+  m_ctrnnPlot->translate(Vec4f(0, m_ctrnnViz->getHeight() + 16, 0, 1));  
+  m_ctrnnPlot->setTitle("Neural outputs");
+  column->m_children.push_back(m_ctrnnPlot);    
   
-  // Data plots
-  m_plot = new dmx::Plot(400.0, 180, 2, 200);
-  m_plot->translate(ci::Vec4f(100, 50, 0, 1)); 
-  m_scene2d.m_children.push_back(m_plot);
+  m_plot = new dmx::Plot(300.0, 150, 2, 200);
+  m_plot->translate(ci::Vec4f(0, m_ctrnnViz->getHeight() + 16 + 150 + 32, 0, 1));
+  m_plot->setTitle("Sensor Data");
+  column->m_children.push_back(m_plot);
+
+  m_fitnessPlot = new dmx::Plot(300.0, 150, 2, 200);
+  m_fitnessPlot->translate(ci::Vec4f(0, m_ctrnnViz->getHeight() + 16 + 150 + 32 + 150 + 32, 0, 1));
+  m_fitnessPlot->setTitle("Fitness");
+  column->m_children.push_back(m_fitnessPlot);
   
+  m_scene2d.m_children.push_back(column);  
 }
 
 //--------------------------------------------------------------------------------------------------------------------  
 inline void SMCView::update(float dt)
 {
+  // update data in graph
+  for(int i = 0; i < m_agent->getCTRNN()->getSize(); i++)
+  {
+    m_ctrnnPlot->addPoint(m_agent->getCTRNN()->getOutput(i), i);
+  }   
   
   // Add data to plot
   double val = m_agent->getSensedValue();
   m_plot->addPoint(val, 0);
+  
+  // Update fitness-related data
+  m_fitnessPlot->addPoint(m_agent->getAngle(), 0);
+  m_fitnessPlot->addPoint(m_agent->getAngleWithHeading(m_agent->getEnvironment()->getCircles()[0].getPosition()), 1);
 }
 
 //---------------------------------------------------------------------------------------------------------------------

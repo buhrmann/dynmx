@@ -30,7 +30,7 @@ public:
   {
     assert(m_ctrnn);
     
-    m_ctrnnView = new dmx::CTRNNViz(m_ctrnn, 175);
+    m_ctrnnView = new dmx::CTRNNViz(m_ctrnn, 200);
     m_ctrnnView->translate(ci::Vec4f(50, 50, 0, 1));
     m_scene2d.m_children.push_back(m_ctrnnView);
   };

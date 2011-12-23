@@ -6,6 +6,7 @@
 //  12/98 Optimized integration
 //  1/08 Added table-based fast sigmoid w/ linear interpolation
 // ************************************************************
+
 #ifndef CTRNN_H
 #define CTRNN_H
 
@@ -90,7 +91,7 @@ public:
 
   static int getNumRequiredParams(int numNeurons, bool numInputs);
 
-  CTRNN(int newsize = 3);
+  CTRNN(int newsize = 4);
   ~CTRNN();
   
   void update(double stepsize);
@@ -132,6 +133,8 @@ public:
   void randomizeWeights(double lb, double ub, RandomState &rs);  
   void randomizeBiases(double lb, double ub);
   void randomizeTimeConstants(double lb, double ub);
+  
+  void zeroStates();
   
   // function pointer for avoiding conditional statements
   ActivationFunction m_activationFunction;

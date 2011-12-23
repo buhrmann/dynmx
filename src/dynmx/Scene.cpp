@@ -110,6 +110,7 @@ NodeGroup::NodeGroup()
 void NodeGroup::init()
 {
   m_type = NODE_GROUP;
+  m_isRightAligned = false;
 #ifdef _DEBUG
   print();
 #endif
@@ -118,8 +119,18 @@ void NodeGroup::init()
 //----------------------------------------------------------------------------------------------------------------------
 void NodeGroup::update()
 {
+  // Make right-aligned if so desired
+  cinder::Matrix44f m = *m_pTM;
+  if(m_isRightAligned)
+  {
+    ci::Vec4f pos = m.getTranslate();      
+    float x = ci::app::getWindowSize().x - pos.x;
+    pos.x = x;
+    m.setTranslate(pos);
+  }
+  
   glPushMatrix();
-  glMultMatrixf(*m_pTM);
+  glMultMatrixf(m);
   for(size_t i = 0; i < m_children.size(); i++)
   {
     m_children[i]->update();
@@ -128,17 +139,47 @@ void NodeGroup::update()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+ci::Vec4f NodeGroup::toLocalPos(const ci::Vec4f pos)
+{
+  // Transform position into local space
+  Vec4f currentPos = m_pTM->getTranslate(); 
+  if(m_isRightAligned)
+  {
+    currentPos.x = ci::app::getWindowSize().x - currentPos.x;
+  }
+  
+  return pos - currentPos;
+}
+  
+//----------------------------------------------------------------------------------------------------------------------
 void NodeGroup::onMouseMove(const Vec4f& mPos)
 {
-  // update mouse info: transform mouse position into local space
-  Vec4f mPosLocal = m_pTM->getTranslate();
-  mPosLocal = mPos - mPosLocal;
+  Vec4f mPosLocal = toLocalPos(mPos);
   for(size_t i = 0; i < m_children.size(); i++)
   {
     m_children[i]->onMouseMove(mPosLocal);
   }
 }
+  
+//----------------------------------------------------------------------------------------------------------------------
+void NodeGroup::onMouseDrag(ci::app::MouseEvent e)
+{
+  for(size_t i = 0; i < m_children.size(); i++)
+  {
+    m_children[i]->onMouseDrag(e);
+  }
+}  
 
+//----------------------------------------------------------------------------------------------------------------------
+void NodeGroup::onMousePress(const cinder::Vec4f& mPos)
+{
+  Vec4f mPosLocal = toLocalPos(mPos);
+  for(size_t i = 0; i < m_children.size(); i++)
+  {
+    m_children[i]->onMousePress(mPosLocal);
+  }
+}    
+  
 //----------------------------------------------------------------------------------------------------------------------
 void NodeGroup::onKeyPress(ci::app::KeyEvent e)
 {
@@ -147,6 +188,15 @@ void NodeGroup::onKeyPress(ci::app::KeyEvent e)
     m_children[i]->onKeyPress(e);
   }  
 }
+  
+//----------------------------------------------------------------------------------------------------------------------
+void NodeGroup::onResize(ci::app::ResizeEvent e)
+{
+  for(size_t i = 0; i < m_children.size(); i++)
+  {
+    m_children[i]->onResize(e);
+  }  
+}  
 
 //----------------------------------------------------------------------------------------------------------------------
 Node* NodeGroup::getNode(int pickID)
@@ -513,7 +563,18 @@ void Plot::update()
 
   glPushMatrix();
   glMultMatrixf(*m_pTM);
-
+  
+  // outputs label    
+  const float labelHeight = 16;
+  ci::ColorA labelColor (0.0f, 0.0f, 0.0f, 0.5f);
+  ci::gl::color(labelColor);
+  ci::gl::drawSolidRect(ci::Rectf(0, 0, m_w, labelHeight));         
+  ci::gl::drawString("Graph: " + m_title, ci::Vec2f(3,3), ci::Color(1,1,1), m_font);    
+  
+  glPushMatrix();
+  glTranslatef(0, labelHeight,0);
+  
+  // Now draw graphs
   float widthRec = 1.0 / (float)m_N * m_w;
   float scale = m_maxY - m_minY;
   float scaleRec = scale > 0 ? 1.0 / scale : 0.0;
@@ -546,12 +607,14 @@ void Plot::update()
         sprintf(str, "%i: %2.4f", pl, current);        
       
       const int h = 10;
+      const bool legendInside = true;
+      const float xoffset = legendInside ? 0 : m_w;
       glPushMatrix();
-      glTranslatef(m_w + 2*h, pl*2*h + h/2, 0.0);
+      glTranslatef(xoffset + 2*h, pl*2*h + h, 0.0);
       glColor4f(col.x, col.y, col.z, 1.0);      
       drawRectangle(h, h);
       glPopMatrix();
-      drawString(Vec3f(m_w + 3*h, pl*2*h + h, 0), str); 
+      drawString(Vec3f(xoffset + 3*h, pl*2*h + h + h/2, 0), str); 
 #endif
     }
   }
@@ -560,14 +623,18 @@ void Plot::update()
   glColor4f(0.0, 0.0, 0.0, 1);
   ci::gl::drawLine(Vec3f(0.5, m_h+0.5, 0), Vec3f(m_w+0.5, m_h+0.5, 0)); // xAxis
   ci::gl::drawLine(Vec3f(0.5, m_h, 0), Vec3f(0.5, 0, 0));               // yAxis on left
-  ci::gl::drawLine(Vec3f(m_w + 0.5, m_h, 0), Vec3f(m_w + 0.5, 0, 0));   // yAxis on right
+  ci::gl::drawLine(Vec3f(m_w - 0.5, m_h, 0), Vec3f(m_w - 0.5, 0, 0));   // yAxis on right
 
   // Show min and max on axes
+#if 0
   char str [32]; 
   sprintf(str, "%+2.3f", m_minY);
   drawString(Vec3f(0.5-40, m_h + 2.5, 0), str);  
   sprintf(str, "%+2.3f", m_maxY);
   drawString(Vec3f(0.5-40, 2.5, 0), str);    
+#endif
+  
+  glPopMatrix();
   
   glPopMatrix();
   glPopAttrib();
@@ -601,6 +668,7 @@ void Plot::setLabel(int pId, const std::string& name)
 void Plot::init()
 {
   m_type = NODE_PLOT;
+  m_font = ci::Font(ci::app::loadResource("pf_tempesta_seven.ttf"), 8);  
 #ifdef _DEBUG
   print();
 #endif
