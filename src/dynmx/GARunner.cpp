@@ -204,7 +204,16 @@ void GARunner::update(float dt)
           // Write results to file
           getGA()->toXml(*m_resultsLog, true);
           m_resultsLog->write(ci::writeFile(dmx::DATA_DIR + "GA_Result.xml"));
-          m_progressLog->write(ci::writeFile(dmx::DATA_DIR + "GA_Progress.xml"));  
+          m_progressLog->write(ci::writeFile(dmx::DATA_DIR + "GA_Progress.xml"));
+
+#if DEBUGGING
+          // Output number of evaluations performed (handy for calculating speed of simulation; divide overall time by)
+          const int numEvaluations = currentGen * m_ga->getPopulationSize() * m_numTrials;
+          if (m_verbosity >= kGAVerbosityPopulation)
+          {
+            std::cout << "GA finished. Evaluated " <<  numEvaluations << " trials" << std::endl;
+          }
+#endif             
         }
       }
     }

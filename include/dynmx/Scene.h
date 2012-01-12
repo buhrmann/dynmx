@@ -364,6 +364,7 @@ public:
   void setTitle(const std::string& title) { m_title = title; };
   
   virtual Node* getNode(int pickID) { if (m_uniqueID == pickID) return this; else return 0; };  
+  std::vector<float>& getData(int i) { assert(i < m_points.size()); return m_points[i]; };
 
 protected:
   virtual void init();

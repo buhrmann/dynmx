@@ -548,7 +548,7 @@ Plot::Plot(float w, float h, int nr, int N) :
   m_points(nr, std::vector<float>()), 
   m_names(nr, std::string()), 
   m_nr(nr), m_N(N), 
-  m_w(w), m_h(h), m_maxY(1), m_minY(0)
+  m_w(w), m_h(h), m_maxY(-1), m_minY(1)
 { 
 
   init(); 

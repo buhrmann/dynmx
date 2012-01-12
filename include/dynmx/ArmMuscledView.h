@@ -59,16 +59,25 @@ inline void ArmMuscledView::setupScene()
   
   std::fill(m_excitation, m_excitation + MAX_NUM_MUSCLES, 0.0);  
   
+  // 2d viz
+  float columnWidth = 300;
+  float columnMargin = 5;
+  float left = columnWidth + columnMargin;
+  m_uiColumn = new NodeGroup();
+  m_uiColumn->setRightAligned(true);
+  m_uiColumn->translate(ci::Vec4f(left, columnMargin, 0, 1));
+  m_scene2d.m_children.push_back(m_uiColumn);  
+  
   // Create a plot for muscle data
-  m_musclePlot = new dmx::Plot(400.0, 180, MAX_NUM_MUSCLES, 200);
-  m_musclePlot->translate(ci::Vec4f(550, 50, 0, 1)); 
+  m_musclePlot = new dmx::Plot(columnWidth, 180, MAX_NUM_MUSCLES*2, 200);
+  m_musclePlot->setTitle("Muscle lengths");
   for(int i = 0; i < m_armMd->getNumMuscles(); i++)
   {
     char str[32];
     sprintf(str, "%s: ", m_armMd->getMuscle(i)->getName().c_str());
     m_musclePlot->setLabel(i, str);
   }
-  m_scene2d.m_children.push_back(m_musclePlot);
+  m_uiColumn->m_children.push_back(m_musclePlot);
   
 }
 
@@ -94,7 +103,7 @@ inline void ArmMuscledView::update(float dt)
   // Add data to plot
   for(int i = 0; i < m_armMd->getNumMuscles(); i++)
   {
-    double val = m_armMd->getMuscle(i)->getNormalisedLength();
+    double val = m_armMd->getMuscle(i)->getUnitLength();
     m_musclePlot->addPoint(val, i);
   }  
   

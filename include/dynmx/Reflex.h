@@ -25,8 +25,8 @@ class Reflex : public Model
 
 public:
   
-  Reflex() { m_muscles[0] = m_muscles[1] = 0; init(); };
-  Reflex(Muscle* ag, Muscle* an) { m_muscles[0] = ag; m_muscles[1] = an; init(); };
+  Reflex();
+  Reflex(Muscle* ag, Muscle* an);
   
   virtual void init();
   virtual void reset();
@@ -54,6 +54,9 @@ public:
   double getLength(int i) { return m_length[i]; };
   double getDesiredLength(int i) { return m_desiredLength[i]; };
   double getDesiredVelocity(int i) { return m_desiredVelocity[i]; };
+  double getPositionError(int i) { return m_posErr[i]; }
+  double getVelocityError(int i) { return m_velErr[i]; }
+  double getContractionVelocity(int i) { return m_contractionVel[i]; };
   Muscle* getMuscle(int i) { assert(i==0 || i==1); return m_muscles[i];};
   const ArmMuscled* getArm() const { return m_muscles[0]->getArm(); };
   
@@ -166,7 +169,7 @@ protected:
   
 //----------------------------------------------------------------------------------------------------------------------
 /// Inline implementations
-//----------------------------------------------------------------------------------------------------------------------  
+//----------------------------------------------------------------------------------------------------------------------    
 inline void Reflex::setCocontraction(double c0, double c1) 
 { 
   m_cocontraction[0] = c0; 
@@ -256,11 +259,11 @@ inline void Reflex::setIbInParameters(double Wglib0, double Wglib1, double Wibib
   m_Wibmn[0] = Wibmn0;
   m_Wibmn[1] = Wibmn1;
   
-  m_Trn[0] = t0;
-  m_Trn[1] = t1;
+  m_Tib[0] = t0;
+  m_Tib[1] = t1;
   
-  m_Brn[0] = b0;
-  m_Brn[1] = b1;
+  m_Bib[0] = b0;
+  m_Bib[1] = b1;
 }  
 
 //----------------------------------------------------------------------------------------------------------------------          

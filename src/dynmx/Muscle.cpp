@@ -16,30 +16,42 @@ namespace dmx
 
 // Parameters describing the Hill curve
 //----------------------------------------------------------------------------------------------------------------------
-static const float Ksh = 0.25f;  // shape parameter for shortening = a/F0 = b/vmax
-static const float Klen = 0.25f; // shape parameter for lengthening
-static const float Kmax = 1.5f;  // lenghthening asymptote
-static const float Kslope = 2.0f; // multiple of shortening slope at v=0
-static const float Ksub = (Klen / Kslope) * ((1 - Kmax) / (1 + Klen));
+static const float s_hillShDefault = 0.25f;   // shape parameter for shortening = a/F0 = b/vmax
+static const float s_hillLnDefault = 0.25f;   // shape parameter for lengthening
+static const float s_hillMaxDefault = 1.5f;   // lenghthening asymptote
+static const float s_hillSlopeDefault = 2.0f; // multiple of shortening slope at v=0
   
 // Width (in terms of normalised muscle length) of the parabola describing active force generation.
 // I.e. beyond normalised lengths of 1+width or 1-width, no force will be generated. 
-static const float activeForceWidth = 0.5;
-static const float activeForceK = 1 / sqr(activeForceWidth);
+static const float s_activeForceWidth = 0.5;
+static const float s_activeForceK = 1 / sqr(s_activeForceWidth);
 // Normalised length beyond which the passive elastic element generates force
-static const float passiveForceSlackLength = 1.4;
+static const float s_passiveForceSlackLength = 1.4;
 // Normalised amount of passive force at the length of activeForceWidth, i.e. where active force becomes 0.
-static const float passiveForceAtWidth = 0.5;
+static const float s_passiveForceAtWidth = 0.5;
+
+//----------------------------------------------------------------------------------------------------------------------    
+void Muscle::setHillParameters(double hSh, double hLn, double hMax, double hSlope)
+{
+  m_hillSh = hSh;
+  m_hillLn = hLn;
+  m_hillMax = hMax;
+  m_hillSlope = hSlope;
+  m_hillSub = (m_hillLn / m_hillSlope) * ((1 - m_hillMax) / (1 + m_hillLn));
+}
 
 //----------------------------------------------------------------------------------------------------------------------  
 void Muscle::init()
 {
-  // assume initial setup represents rest configuration
+  // Assume initial setup represents rest configuration
   //m_lengthOpt = m_length;
   
   // Calculate passiveForceGain, such that it is 0.5*F0 at maximum length (where active force is 0)
   // Assumes the passive force is calculated as a scaled parabola, see below.
-  m_passiveForceGain = passiveForceAtWidth / sqr((1 + activeForceWidth) - passiveForceSlackLength);
+  m_passiveForceGain = s_passiveForceAtWidth / sqr((1 + s_activeForceWidth) - s_passiveForceSlackLength);
+  
+  // Set default hill parameters
+  setHillParameters(s_hillShDefault, s_hillLnDefault, s_hillMaxDefault, s_hillSlopeDefault);
   
   m_tauAct = 0.04;
   m_tauDeact = 0.07;
@@ -122,7 +134,7 @@ double Muscle::calcActiveForceNorm(double lengthNorm)
 {
 #define SIMPLE_AFORCE_METHOD 0
   
-  if(lengthNorm >= (1 - activeForceWidth) && lengthNorm <= (1 + activeForceWidth))
+  if(lengthNorm >= (1 - s_activeForceWidth) && lengthNorm <= (1 + s_activeForceWidth))
   {
 #if SIMPLE_AFORCE_METHOD    
     // Simple parabola. The 0.5-1.5 range roughly determined from Murray,Delp. That paper also suggests that
@@ -131,7 +143,7 @@ double Muscle::calcActiveForceNorm(double lengthNorm)
     return 1.0 - sqr(2.0 * (lengthNorm - 1.0));
 #else    
     // Kistemaker's method
-    return (-activeForceK * sqr(lengthNorm)) + (2 * activeForceK * lengthNorm) - activeForceK + 1.0;
+    return (-s_activeForceK * sqr(lengthNorm)) + (2 * s_activeForceK * lengthNorm) - s_activeForceK + 1.0;
 #endif
   }
   else 
@@ -143,7 +155,7 @@ double Muscle::calcActiveForceNorm(double lengthNorm)
 //----------------------------------------------------------------------------------------------------------------------  
 double Muscle::calcPassiveForceNorm(double lengthNorm)
 {
-  double slackDist = lengthNorm - passiveForceSlackLength;
+  double slackDist = lengthNorm - s_passiveForceSlackLength;
   if(slackDist > 0)
   {
     return m_passiveForceGain * sqr(slackDist);
@@ -164,11 +176,11 @@ double Muscle::calcVelocityForceNorm(double velocityNorm)
   }
 	else if(v > 0)
   {
-    return (Ksub - (Kmax * v)) / (-v + Ksub);
+    return (m_hillSub - (m_hillMax * v)) / (-v + m_hillSub);
   }
   else 
   {
-    return (1 + v) / (1 - v / Ksh); // From MacMahon
+    return (1 + v) / (1 - v / m_hillSh); // From MacMahon
   }
 }
 

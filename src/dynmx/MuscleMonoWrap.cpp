@@ -68,8 +68,8 @@ void MuscleMonoWrap::calculateMinMaxLength(double& minLength, double& maxLength)
     midLength = getLengthFromJointAngles(0, 0.0); // Second joint angle is irrelevant
   }
   
-  minLength = min(upperLength, min(lowerLength, midLength));
-  maxLength = max(upperLength, max(lowerLength, midLength));
+  minLength = std::min(upperLength, std::min(lowerLength, midLength));
+  maxLength = std::max(upperLength, std::max(lowerLength, midLength));
 }
   
 //----------------------------------------------------------------------------------------------------------------------  

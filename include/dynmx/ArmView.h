@@ -44,8 +44,10 @@ public:
   virtual void buildGui();
 
 
-  dmx::Arm* m_arm; 
-  dmx::ArmViz* m_armViz;
+  Arm* m_arm; 
+  ArmViz* m_armViz;
+  NodeGroup* m_uiColumn;
+  
   Vec3f m_target;  
   int32_t m_fixedFrameRate;
   float m_gravity;
@@ -67,6 +69,15 @@ inline void ArmView::setupScene()
   m_scene3d.m_children.push_back(m_armViz);
   
   m_trackMouse = false;
+  
+  // 2d viz
+  float columnWidth = 300;
+  float columnMargin = 5;
+  float left = columnWidth + columnMargin;
+  m_uiColumn = new NodeGroup();
+  m_uiColumn->setRightAligned(true);
+  m_uiColumn->translate(ci::Vec4f(left, columnMargin, 0, 1));
+  m_scene2d.m_children.push_back(m_uiColumn);
 }
   
 //--------------------------------------------------------------------------------------------------------------------  

@@ -16,6 +16,24 @@ namespace dmx
 
 #define REFLEX_USE_CONTRACTION_COORDS 1
 #define REFLEX_USE_OWN_IAIN_IMPL 1
+
+//----------------------------------------------------------------------------------------------------------------------      
+Reflex::Reflex() 
+{ 
+  m_muscles[0] = m_muscles[1] = 0; 
+  init(); 
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------    
+Reflex::Reflex(Muscle* ag, Muscle* an) 
+{ 
+  m_muscles[0] = ag; 
+  m_muscles[1] = an; 
+  init(); 
+};  
+  
+  
 //----------------------------------------------------------------------------------------------------------------------  
 void Reflex::init()
 {
@@ -187,25 +205,25 @@ void Reflex::updateInLengthCoords(float dt)
   // Spindle-calculated errors in length and velocity
   m_posErr[0] = m_length[0] - gammaStatic[0];
   m_posErr[1] = m_length[1] - gammaStatic[1];
-  m_posErr[0] = max(m_posErr[0], 0.0);    
-  m_posErr[1] = max(m_posErr[1], 0.0);
+  m_posErr[0] = std::max(m_posErr[0], 0.0);    
+  m_posErr[1] = std::max(m_posErr[1], 0.0);
   
   // TODO: Temporary, until the desired velocity always changes smoothly
   m_velErr[0] = m_vel[0] - gammaDyn[0];
   m_velErr[1] = m_vel[1] - gammaDyn[1];
-  m_velErr[0] = max(m_velErr[0], 0.0);  
-  m_velErr[1] = max(m_velErr[1], 0.0);
+  m_velErr[0] = std::max(m_velErr[0], 0.0);  
+  m_velErr[1] = std::max(m_velErr[1], 0.0);
   
   m_spindleSec[0] = spindleActivation(m_Kspp[0] * m_posErr[0]);
   m_spindleSec[1] = spindleActivation(m_Kspp[1] * m_posErr[1]);
   
   m_spindlePri[0] = spindleActivation((m_Kspp[0] * m_posErr[0]) + 
                                       (m_Kspv[0] * powf(m_velErr[0], m_Espv[0])) + 
-                                      (m_Kspd[0] * powf(max(m_vel[0], 0.0), m_Espv[0])));
+                                      (m_Kspd[0] * powf(std::max(m_vel[0], 0.0), m_Espv[0])));
   
   m_spindlePri[1] = spindleActivation((m_Kspp[1] * m_posErr[1]) + 
                                       (m_Kspv[1] * powf(m_velErr[1], m_Espv[1])) + 
-                                      (m_Kspd[1] * powf(max(m_vel[1], 0.0), m_Espv[1])));
+                                      (m_Kspd[1] * powf(std::max(m_vel[1], 0.0), m_Espv[1])));
   
   // Ia inhibitory interneurons
   double dIaIn [2];
@@ -246,8 +264,8 @@ void Reflex::updateInLengthCoords(float dt)
   // (mostly at beginning and end of trajectory)
   m_ifv[0] = - m_Bifv[0] + spindleActivation(m_Kspv[0] * powf(m_velErr[0], m_Espv[0])); // or k * (spindlePri - spindleSec) ?
   m_ifv[1] = - m_Bifv[1] + spindleActivation(m_Kspv[1] * powf(m_velErr[1], m_Espv[1])); // or k * (spindlePri - spindleSec) ?
-  m_ifv[0] = max(m_ifv[0], 0.0) * m_Kifv[0];  
-  m_ifv[1] = max(m_ifv[1], 0.0) * m_Kifv[1];
+  m_ifv[0] = std::max(m_ifv[0], 0.0) * m_Kifv[0];  
+  m_ifv[1] = std::max(m_ifv[1], 0.0) * m_Kifv[1];
   
   
   // Static force vector: adds force to overcome gravity based on integration of position error
@@ -297,26 +315,26 @@ void Reflex::updateInContractionCoords(float dt)
   // Spindle-calculated errors in length and velocity
   m_posErr[0] = gammaStatic[0] - m_contraction[0];
   m_posErr[1] = gammaStatic[1] - m_contraction[1];
-  m_posErr[0] = max(m_posErr[0], 0.0);    
-  m_posErr[1] = max(m_posErr[1], 0.0);
+  m_posErr[0] = std::max(m_posErr[0], 0.0);    
+  m_posErr[1] = std::max(m_posErr[1], 0.0);
   
   // TODO: Temporary, until the desired velocity always changes smoothly
   m_velErr[0] = gammaDyn[0] - m_contractionVel[0];
   m_velErr[1] = gammaDyn[1] - m_contractionVel[1];
-  m_velErr[0] = max(m_velErr[0], 0.0);  
-  m_velErr[1] = max(m_velErr[1], 0.0);
+  m_velErr[0] = std::max(m_velErr[0], 0.0);  
+  m_velErr[1] = std::max(m_velErr[1], 0.0);
   
   m_spindleSec[0] = spindleActivation(m_Kspp[0] * m_posErr[0]);
   m_spindleSec[1] = spindleActivation(m_Kspp[1] * m_posErr[1]);
   
   m_spindlePri[0] = spindleActivation((m_Kspp[0] * m_posErr[0]) + 
                                       (m_Kspv[0] * powf(m_velErr[0], m_Espv[0])) +
-                                      (m_Kspd[0] * powf(max(-m_contractionVel[0], 0.0), m_Espv[0])) // only negative contraction, i.e. lengthening, leads to damping, as muscle can only contract actively
+                                      (m_Kspd[0] * powf(std::max(-m_contractionVel[0], 0.0), m_Espv[0])) // only negative contraction, i.e. lengthening, leads to damping, as muscle can only contract actively
                                       );
   
   m_spindlePri[1] = spindleActivation((m_Kspp[1] * m_posErr[1]) + 
                                       (m_Kspv[1] * powf(m_velErr[1], m_Espv[1])) +
-                                      (m_Kspd[1] * powf(max(-m_contractionVel[1], 0.0), m_Espv[1])) // only negative contraction, i.e. lengthening, leads to damping, as muscle can only contract actively
+                                      (m_Kspd[1] * powf(std::max(-m_contractionVel[1], 0.0), m_Espv[1])) // only negative contraction, i.e. lengthening, leads to damping, as muscle can only contract actively
                                       );
   
   // Ia inhibitory interneurons
@@ -358,8 +376,8 @@ void Reflex::updateInContractionCoords(float dt)
   // (mostly at beginning and end of trajectory)
   m_ifv[0] = - m_Bifv[0] + spindleActivation(m_Kspv[0] * powf(m_velErr[0], m_Espv[0])); // or k * (spindlePri - spindleSec) ?
   m_ifv[1] = - m_Bifv[1] + spindleActivation(m_Kspv[1] * powf(m_velErr[1], m_Espv[1])); // or k * (spindlePri - spindleSec) ?
-  m_ifv[0] = max(m_ifv[0], 0.0) * m_Kifv[0];  
-  m_ifv[1] = max(m_ifv[1], 0.0) * m_Kifv[1];
+  m_ifv[0] = std::max(m_ifv[0], 0.0) * m_Kifv[0];  
+  m_ifv[1] = std::max(m_ifv[1], 0.0) * m_Kifv[1];
   
   
   // Static force vector: adds force to overcome gravity based on integration of position error
@@ -411,7 +429,9 @@ void Reflex::toXml(ci::XmlTree& xml)
   ci::XmlTree spindle("Spindle", "");
   paramToXml(spindle, "PosGain", &m_Kspp[0]);
   paramToXml(spindle, "VelGain", &m_Kspv[0]);
+  paramToXml(spindle, "DmpGain", &m_Kspd[0]);  
   paramToXml(spindle, "VelExp", &m_Espv[0]);  
+  paramToXml(spindle, "Wspmn", &m_Wspmn[0]);  
   reflex.push_back(spindle);
 
   // Static load compensation  
@@ -432,6 +452,7 @@ void Reflex::toXml(ci::XmlTree& xml)
   paramToXml(iain, "Wspia", &m_Wspia[0]);
   paramToXml(iain, "Wrnia", &m_Wrnia[0]);
   paramToXml(iain, "Waia", &m_Waia[0]);
+  paramToXml(iain, "Wiamn", &m_Wiamn[0]);  
   paramToXml(iain, "Bias", &m_Biain[0]);  
   paramToXml(iain, "Tau", &m_Tiain[0]);
   reflex.push_back(iain);  
@@ -440,15 +461,26 @@ void Reflex::toXml(ci::XmlTree& xml)
   ci::XmlTree rn("Renshaw", "");
   paramToXml(rn, "Wmnrn", &m_Wmnrn[0]);
   paramToXml(rn, "Wrnrn", &m_Wrnrn[0]);
+  paramToXml(rn, "Wrnmn", &m_Wrnmn[0]);  
   paramToXml(rn, "Bias", &m_Brn[0]);  
   paramToXml(rn, "Tau", &m_Trn[0]);    
   reflex.push_back(rn);    
+  
+  // IbIn
+  ci::XmlTree ibin("IbIn", "");
+  paramToXml(ibin, "Wibib", &m_Wibib[0]);
+  paramToXml(ibin, "Wglib", &m_Wglib[0]);
+  paramToXml(ibin, "Wibmn", &m_Wibmn[0]);
+  paramToXml(ibin, "Bias", &m_Bib[0]);  
+  paramToXml(ibin, "Tau", &m_Tib[0]);
+  reflex.push_back(ibin);    
 
   // Alpha motor neurons
+#if 0 // all relevant params output above already
   ci::XmlTree amn("aMN", "");
   paramToXml(amn, "Wiamn", &m_Wiamn[0]);
-  paramToXml(amn, "Wiamn", &m_Wiamn[0]);
   reflex.push_back(amn);  
+#endif
   
 #if 0
   // Template

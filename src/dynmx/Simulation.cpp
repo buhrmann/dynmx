@@ -43,6 +43,8 @@ void Simulation::start()
   secondsToTime(runningTime, h, m, s);
   std::cout << "Total running time:" << h << ":" << m << ":" << s << std::endl;
   
+  std::cout << "Output in " << DATA_DIR << std::endl;
+  
   // Cinder++ wants to clean up after itself
   ci::app::AppBasic::cleanupLaunch();  
 }

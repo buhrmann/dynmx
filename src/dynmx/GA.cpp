@@ -412,6 +412,10 @@ void GA::toXml(ci::XmlTree& parent, bool includeGenomes) const
   ga.setAttribute("DemeWidth", m_demeWidth);
   ga.setAttribute("MaxMutation", m_maxMutation);
   ga.setAttribute("RecombinationRate", m_recombinationRate);
+  float bestFit;
+  getBestGenome(bestFit);
+  ga.setAttribute("BestFitness", bestFit);
+  ga.setAttribute("AvgFitness", getAvgFitness());  
   
   // Population
   if(includeGenomes)

@@ -103,10 +103,12 @@ public:
   void add(T pos, float duration);  
   void setLoop(bool l) { m_loop = l; };
   void setBlend(BlendType b) { m_blend = b; };
+  void clear() { m_targets.clear(); };
   
   // Getters
   Target<T>& operator[] (const int id) { assert(id < m_targets.size()); return m_targets[id]; };  
   const Target<T>& operator[] (const int id) const { assert(id < m_targets.size()); return m_targets[id]; };  
+  std::vector<Target<T> >& getTargets() { return m_targets; };
   
   T getPositionAtTime(float time);
   Target<T> atTime(float time);

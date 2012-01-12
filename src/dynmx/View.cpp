@@ -187,10 +187,8 @@ void View::draw()
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
     glEnable(GL_BLEND);
-    //glBlendFunc(GL_SRC_COLOR, GL_ONE);
     glDisable(GL_CULL_FACE);
 
-    //gl::setMatrices(m_cam2d);
     gl::setMatricesWindow(getWindowWidth(), getWindowHeight(), true);
     
     // custom 2d drawing

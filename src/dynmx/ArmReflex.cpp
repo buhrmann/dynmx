@@ -33,8 +33,6 @@ void ArmReflex::init()
   // Todo: temporary test of reflex control
   m_reflexes.push_back(new Reflex(m_muscles[0], m_muscles[1]));
   m_reflexes.push_back(new Reflex(m_muscles[2], m_muscles[3]));
-  m_reflexes[0]->init();
-  m_reflexes[1]->init();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

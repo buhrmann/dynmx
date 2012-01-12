@@ -46,6 +46,7 @@ public:
   };
   
   void setParameters(double maxIsoForce, double optimalLength, double maxVelocity);
+  void setHillParameters(double hSh, double hLn, double hMax, double hSlope);
   void setOriginInsertion(double origin, double insertion) { m_originJointDist = origin; m_insertJointDist = insertion; };
   
   // Getters
@@ -107,7 +108,12 @@ protected:
   // Parameters different per muscle
   double m_maxVelocity; 
   double m_originJointDist;
-  double m_insertJointDist;  
+  double m_insertJointDist;
+  double m_hillSh;
+  double m_hillLn;
+  double m_hillMax;
+  double m_hillSlope;
+  double m_hillSub;
   
   bool m_isMonoArticulate;
   bool m_isFlexor;  
