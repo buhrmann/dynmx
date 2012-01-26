@@ -24,7 +24,7 @@ void Recorder::saveTo(const std::string& fnm)
   std::map<std::string, std::vector<double> >::iterator iter = m_data.begin();
   
   // Print column headers
-  for (iter; iter != m_data.end(); ++iter)
+  for (; iter != m_data.end(); ++iter)
   {
     const std::string& name = iter->first;
     file << name << " ";
@@ -38,7 +38,7 @@ void Recorder::saveTo(const std::string& fnm)
   {
     hadValue = false;
     iter = m_data.begin();
-    for (iter; iter != m_data.end(); ++iter)
+    for (; iter != m_data.end(); ++iter)
     {
       const std::vector<double>& values = iter->second;
       if(i < values.size())

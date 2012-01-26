@@ -19,14 +19,16 @@ namespace dmx
 //----------------------------------------------------------------------------------------------------------------------
 // Smoothest motion over given duration (2d)
 //----------------------------------------------------------------------------------------------------------------------
-struct MinJerkTrajectory
+class MinJerkTrajectory
 {
+public:
   MinJerkTrajectory() : duration(1.0f), time(0.0f) {};
   void setNew(const Pos& initPos, const Pos& finalPos, float duration); 
   void update(float dt); 
   
   static Pos getPosition(const Pos& initPos, const Pos& finalPos, float duration, float time);
   
+protected:  
   Pos current;
   Pos initial;
   Pos target;
@@ -35,7 +37,7 @@ struct MinJerkTrajectory
 };
 
 //----------------------------------------------------------------------------------------------------------------------  
-Pos MinJerkTrajectory::getPosition(const Pos& initPos, const Pos& finalPos, float duration, float time)
+inline Pos MinJerkTrajectory::getPosition(const Pos& initPos, const Pos& finalPos, float duration, float time)
 {
   assert(time >= 0.0);
   if (time > duration)
@@ -53,14 +55,14 @@ Pos MinJerkTrajectory::getPosition(const Pos& initPos, const Pos& finalPos, floa
 }
   
 //----------------------------------------------------------------------------------------------------------------------
-void MinJerkTrajectory::update(float dt)
+inline void MinJerkTrajectory::update(float dt)
 {
   time += dt;
   current = getPosition(initial, target, duration, time);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void MinJerkTrajectory::setNew(const Pos& initPos, const Pos& finalPos, float duration)
+inline void MinJerkTrajectory::setNew(const Pos& initPos, const Pos& finalPos, float duration)
 {
   initial = initPos;
   target = finalPos;
@@ -78,6 +80,8 @@ struct Target
   float start;
   float stop;
   int id;
+  
+  float getDuration() { return stop-start; };
 };
   
 //----------------------------------------------------------------------------------------------------------------------
@@ -109,6 +113,7 @@ public:
   Target<T>& operator[] (const int id) { assert(id < m_targets.size()); return m_targets[id]; };  
   const Target<T>& operator[] (const int id) const { assert(id < m_targets.size()); return m_targets[id]; };  
   std::vector<Target<T> >& getTargets() { return m_targets; };
+  
   
   T getPositionAtTime(float time);
   Target<T> atTime(float time);

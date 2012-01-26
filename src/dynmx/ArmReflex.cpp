@@ -129,7 +129,7 @@ void ArmReflex::update(float dt)
 //----------------------------------------------------------------------------------------------------------------------  
 void ArmReflex::toXml(ci::XmlTree& xml)
 {
-  Arm::toXml(xml);
+  ArmMuscled::toXml(xml);
   
   if(xml.hasChild("Arm"))
   {

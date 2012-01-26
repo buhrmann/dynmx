@@ -65,20 +65,41 @@ inline void ArmReflexView::setupScene()
   m_reflexGains[1] = m_armRx->getReflex(m_selectedReflex)->m_Kspv[0];
   m_reflexGains[2] = m_armRx->getReflex(m_selectedReflex)->m_Kspd[0];
   
+  int pointsPerPlot = SETTINGS->getChild("Config/Globals/PlotDuration").getAttributeValue<float>("Value") * 
+                      SETTINGS->getChild("Config/Globals/FrameRate").getAttributeValue<int>("Value");
+  
   // Create a plot for reflex data
-  m_reflexPlot1 = new dmx::Plot(300.0, 180, 6, 200);
+  m_reflexPlot1 = new dmx::Plot(300.0, 180, 6, pointsPerPlot);
   m_reflexPlot1->translate(ci::Vec4f(0, 180 + 20, 0, 1));   
   m_reflexPlot1->setTitle("Reflex Elbow");
+  m_reflexPlot1->setLabel(0, "aMN");
+  m_reflexPlot1->setLabel(1, "pErr");
+  m_reflexPlot1->setLabel(2, "vErr");
+  m_reflexPlot1->setLabel(3, "aMN");
+  m_reflexPlot1->setLabel(4, "pErr");
+  m_reflexPlot1->setLabel(5, "vErr");  
   m_uiColumn->m_children.push_back(m_reflexPlot1);
   
-  m_reflexPlot2 = new dmx::Plot(300.0, 180, 6, 200);
+  m_reflexPlot2 = new dmx::Plot(300.0, 180, 6, pointsPerPlot);
   m_reflexPlot2->translate(ci::Vec4f(0, 400, 0, 1));   
   m_reflexPlot2->setTitle("Reflex Shoulder");
+  m_reflexPlot2->setLabel(0, "aMN");
+  m_reflexPlot2->setLabel(1, "pErr");
+  m_reflexPlot2->setLabel(2, "vErr");
+  m_reflexPlot2->setLabel(3, "aMN");
+  m_reflexPlot2->setLabel(4, "pErr");
+  m_reflexPlot2->setLabel(5, "vErr");    
   m_uiColumn->m_children.push_back(m_reflexPlot2);  
   
-  m_jointTrajPlot = new dmx::Plot(300.0, 180, 6, 200);
+  m_jointTrajPlot = new dmx::Plot(300.0, 180, 6, pointsPerPlot);
   m_jointTrajPlot->translate(ci::Vec4f(0, 600, 0, 1));   
   m_jointTrajPlot->setTitle("Joint Trajectory");
+  m_jointTrajPlot->setLabel(0, "Des");
+  m_jointTrajPlot->setLabel(1, "Com");
+  m_jointTrajPlot->setLabel(2, "Act");
+  m_jointTrajPlot->setLabel(3, "Des");
+  m_jointTrajPlot->setLabel(4, "Com");
+  m_jointTrajPlot->setLabel(5, "Act");
   m_uiColumn->m_children.push_back(m_jointTrajPlot);    
 }
   
@@ -112,20 +133,20 @@ inline void ArmReflexView::update(float dt)
   
   // Add data to plot
   m_reflexPlot1->addPoint(m_armRx->getReflex(0)->getAlphaOutput(0), 0);
-  m_reflexPlot1->addPoint(m_armRx->getReflex(0)->getPositionError(0), 1);
-  m_reflexPlot1->addPoint(max(-m_armRx->getReflex(0)->getContractionVelocity(0), 0.0), 2);  
-  //m_reflexPlot1->addPoint(m_armRx->getReflex(0)->getVelocityError(0), 2);
+  m_reflexPlot1->addPoint(m_armRx->getReflex(0)->m_Kspp[0] * m_armRx->getReflex(0)->getPositionError(0), 1);  
+  m_reflexPlot1->addPoint(m_armRx->getReflex(0)->m_Kspd[0] * std::max(-m_armRx->getReflex(0)->getContractionVelocity(0), 0.0), 2);
   
-  //m_reflexPlot1->addPoint(m_armRx->getReflex(0)->getAlphaOutput(1), 3);
-  //m_reflexPlot1->addPoint(m_armRx->getReflex(0)->getPositionError(1), 4);
-  //m_reflexPlot1->addPoint(m_armRx->getReflex(0)->getVelocityError(1), 5);
+  m_reflexPlot1->addPoint(m_armRx->getReflex(0)->getAlphaOutput(1), 3);
+  m_reflexPlot1->addPoint(m_armRx->getReflex(0)->m_Kspp[1] * m_armRx->getReflex(0)->getPositionError(1), 4);
+  m_reflexPlot1->addPoint(m_armRx->getReflex(0)->m_Kspd[1] * std::max(-m_armRx->getReflex(0)->getContractionVelocity(1), 0.0), 5);
   
   m_reflexPlot2->addPoint(m_armRx->getReflex(1)->getAlphaOutput(0), 0);
-  m_reflexPlot2->addPoint(m_armRx->getReflex(1)->getPositionError(0), 1);
-  //m_reflexPlot2->addPoint(m_armRx->getReflex(1)->getVelocityError(0), 2);
+  m_reflexPlot2->addPoint(m_armRx->getReflex(1)->m_Kspp[0] * m_armRx->getReflex(1)->getPositionError(0), 1);  
+  m_reflexPlot2->addPoint(m_armRx->getReflex(1)->m_Kspd[0] * std::max(-m_armRx->getReflex(1)->getContractionVelocity(0), 0.0), 2);
+
   m_reflexPlot2->addPoint(m_armRx->getReflex(1)->getAlphaOutput(1), 3);
-  m_reflexPlot2->addPoint(m_armRx->getReflex(1)->getPositionError(1), 4);
-  //m_reflexPlot2->addPoint(m_armRx->getReflex(1)->getVelocityError(1), 5);
+  m_reflexPlot2->addPoint(m_armRx->getReflex(1)->m_Kspp[1] * m_armRx->getReflex(1)->getPositionError(1), 4);
+  m_reflexPlot2->addPoint(m_armRx->getReflex(1)->m_Kspd[1] * std::max(-m_armRx->getReflex(1)->getContractionVelocity(1), 0.0), 5);
   
   
   // Add desired muscle length to existing plot of actual length 
@@ -134,37 +155,27 @@ inline void ArmReflexView::update(float dt)
   m_musclePlot->addPoint(m_armRx->getReflex(1)->getDesiredLength(0), 6);
   m_musclePlot->addPoint(m_armRx->getReflex(1)->getDesiredLength(1), 7);
   
-  // HACK
+  // Todo: HACK
   // Retrieve desired trajectory
   EvoArmCoCon* evoArmCC =  (EvoArmCoCon*) ((GATester*) ((dmx::App*)ci::app::App::get())->m_model)->getEvolvable();
-  ci::Vec2f desiredPos = evoArmCC->m_currentDesiredPos;
   ci::Vec2f desiredAng = evoArmCC->m_currentDesiredAngles;
 
-  // Desired angles
-  m_jointTrajPlot->addPoint(desiredAng.x, 0);
-  m_jointTrajPlot->addPoint(desiredAng.y, 1);
-  // Commanded angles
-  m_jointTrajPlot->addPoint(m_armRx->getDesiredJointAngle(JT_elbow), 2);
-  m_jointTrajPlot->addPoint(m_armRx->getDesiredJointAngle(JT_shoulder), 3);
-  // Actual angles
-  m_jointTrajPlot->addPoint(m_armRx->getJointAngle(JT_elbow), 4);
+  // Desired angle, Commanded angle, Actual angle
+  m_jointTrajPlot->addPoint(desiredAng.x, 0); 
+  m_jointTrajPlot->addPoint(m_armRx->getDesiredJointAngle(JT_elbow), 1);
+  m_jointTrajPlot->addPoint(m_armRx->getJointAngle(JT_elbow), 2);
+  
+  m_jointTrajPlot->addPoint(desiredAng.y, 3);  
+  m_jointTrajPlot->addPoint(m_armRx->getDesiredJointAngle(JT_shoulder), 4);
   m_jointTrajPlot->addPoint(m_armRx->getJointAngle(JT_shoulder), 5);
   
-#if 0
-  // TODO: remove test code
-  if(evoArmCC->getTime() > 1.2)
-  {
-    std::vector<float>& d1 = m_musclePlot->getData(0); // actual muscle length
-    std::vector<float>& d2 = m_musclePlot->getData(4); // desired muscle length
-    int minDelay = -100;
-    int maxDelay = 100;
-    std::vector<double> cc = crossCorrelation(d1, d2, MySqrDist(), minDelay, maxDelay);
-    std::vector<double>::iterator optElem = min_element(cc.begin(), cc.end());
-    double optVal = *optElem;
-    int optId = std::distance(cc.begin(), optElem);
-    int bestDelay = minDelay + optId;
-  }
-#endif
+  // Add desired cartesian position to existing plot of actual position
+  ci::Vec2f desiredPos = evoArmCC->m_currentDesiredPos;
+  ci::Vec2f commandPos = evoArmCC->m_currentCommandPos;
+  m_armEffPlot->addPoint(desiredPos.x, 2);
+  m_armEffPlot->addPoint(desiredPos.y, 3);
+  m_armEffPlot->addPoint(commandPos.x, 4);
+  m_armEffPlot->addPoint(commandPos.y, 5);  
 }
 
 //----------------------------------------------------------------------------------------------------------------------      

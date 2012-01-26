@@ -372,7 +372,7 @@ protected:
   std::vector<std::vector<float> > m_points;
   std::vector<std::string> m_names;
   int m_nr;
-  uint8_t m_N;
+  int m_N;
   float m_w;
   float m_h;
   float m_maxY;

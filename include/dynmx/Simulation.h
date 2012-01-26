@@ -19,26 +19,28 @@ class Model;
 class App;
 
 //----------------------------------------------------------------------------------------------------------------------
-// Base class for simulations that can run both visually and non-visually
+// Singleton base class for simulations that can run both visually and non-visually
 //----------------------------------------------------------------------------------------------------------------------
 class Simulation
 {
 public:
-  Simulation(Model* model, App* app = 0) : m_model(model), m_app(app) {};
-  
-  void setApp(App* app) { m_app = app; };
-  
+
+  static Simulation* getInstance() { return s_instance; };
+  static Simulation* create(Model* model, App* app);
   virtual void start();
   
 protected:
+  
+  Simulation(Model* model, App* app = 0) : m_model(model), m_app(app) {};
 
   virtual void runVisual();
   virtual void runNonVisual();
     
   Model* m_model;
   App* m_app;
-  
   cinder::Timer m_timer;
+
+  static Simulation* s_instance;
 };
 
 } // namespace dmx

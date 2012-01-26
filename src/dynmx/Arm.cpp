@@ -21,8 +21,9 @@ namespace dmx
 
 
 //----------------------------------------------------------------------------------------------------------------------
-// Typical dimensions from Arnon(1990), referenced in 
-// Karniel and Inbar (1997), "A model for learning human reaching movements", and (1996).
+// Equations from Hollerbach and Flash 1981. Also see Shadmehr 1990 or Uno et al 1989.
+// Typical dimensions from Arnon(1990), referenced in Karniel and Inbar (1997), 
+// "A model for learning human reaching movements", and (1996).
 // Also see Gribble (1998), or Uno and Kawato (1989).
 //----------------------------------------------------------------------------------------------------------------------
 Arm::Arm()
@@ -38,6 +39,8 @@ Arm::~Arm()
 //----------------------------------------------------------------------------------------------------------------------  
 void Arm::init()
 {  
+  m_integrator = kInteg_heun; 
+  
   m_gravity = 9.81;
   
   const ci::XmlTree* settings = SETTINGS;
@@ -50,6 +53,19 @@ void Arm::init()
     {
       m_gravity = xml.getAttributeValue<double>("Gravity");
     }
+    
+    if(xml.hasAttribute("Integrator"))
+    {
+      const std::string& integratorName = xml.getAttributeValue<std::string>("Integrator");
+      if(integratorName == "heun")
+      {
+        m_integrator = kInteg_heun;
+      }
+      else if (integratorName == "euler")
+      {
+        m_integrator = kInteg_euler;
+      }
+    }    
     
     double upperArmLength = xml.getChild("UpperArm").getAttributeValue<double>("Length");
     double lowerArmLength = xml.getChild("LowerArm").getAttributeValue<double>("Length");
@@ -127,6 +143,12 @@ void Arm::reset(float elbAngle, float shdAngle)
   {
     m_velocities[i] = 0.0;
     m_accelerations[i] = 0.0;
+    m_coriolisAcc[i] = 0.0;
+    m_gravityAcc[i] = 0.0;
+    m_inertiaAcc[i] = 0.0;
+    m_interactionAcc[i] = 0.0;
+    m_dampingAcc[i] = 0.0;
+    m_torques[i] = 0.0;
   }
   
   forwardKinematics();
@@ -206,99 +228,6 @@ void Arm::setParameters(float mass1, float mass2, float length1, float length2)
   preCompute();
 }
 
-// Equations from Hollerbach and Flash 1981.   
-//----------------------------------------------------------------------------------------------------------------------
-#if 0
-void Arm::update(float timeStep, double torqElb, double torqShd)
-{
-  // calculate these only once:
-  double cosElbAngle = cosf(m_angles[JT_elbow]);
-  double sinElbAngle = sinf(m_angles[JT_elbow]);
-  double sinElbShd = sinf(m_angles[JT_elbow] + m_angles[JT_shoulder]);
-  
-  // compute elbow acceleration
-  double coriolis = m_massElbLLHalf * sqr(m_velocities[JT_shoulder]) * sinElbAngle;
-  double normalInertia = /*m_acceleration[JT_elbow] **/ (m_inertias[JT_elbow] + m_massElbLSq4);
-  double interInertia = m_accelerations[JT_shoulder] * (m_inertias[JT_elbow] + m_massElbLLHalf * cosElbAngle + m_massElbLSq4); 
-  double gravity = m_gravity * m_masses[JT_elbow] * m_lengths[JT_elbow] * sinElbShd;
-  double damping = m_frictions[JT_elbow] * m_velocities[JT_elbow];
-  double elbAcceleration = (torqElb - interInertia - coriolis - gravity - damping) / normalInertia;
-  
-  // compute shoulder acceleration
-  coriolis = - m_massElbLLHalf * sqr(m_velocities[JT_elbow]) * sinElbAngle
-              - m_massElbLL * m_velocities[JT_elbow] * m_velocities[JT_shoulder] * sinElbAngle;
-  
-  normalInertia = /*m_accelerations[JT_shoulder] **/ (m_inertias[JT_elbow] + m_inertias[JT_shoulder] 
-                   + m_massElbLL * cosElbAngle 
-                   + (m_masses[JT_shoulder] * m_lengthsSq[JT_shoulder]) / 4.0f
-                   + m_massElbLSq4 
-                   + (m_masses[JT_elbow] * m_lengthsSq[JT_shoulder]) );
-  
-  interInertia = m_accelerations[JT_elbow] * (m_inertias[JT_elbow] + m_massElbLSq4 + (m_massElbLLHalf * cosElbAngle));
-  
-  // shoulder gravity is elbow gravity + shoulder
-  gravity += m_gravity * (m_masses[JT_elbow] + m_masses[JT_shoulder]) * m_lengths[JT_shoulder] * sinf(m_angles[JT_shoulder]);
-  damping = m_frictions[JT_shoulder] * m_velocities[JT_shoulder];
-  double shdAcceleration = (torqShd - interInertia - coriolis - gravity - damping) / normalInertia;
-  
-  // synchronous update
-  m_accelerations[JT_elbow] = elbAcceleration;
-  m_accelerations[JT_shoulder] = shdAcceleration; 
-  
-  // integrate to get velocities and positions
-  m_velocities[JT_elbow] += m_accelerations[JT_elbow] * timeStep;
-  m_angles[JT_elbow] += m_velocities[JT_elbow] * timeStep;
-  
-  m_velocities[JT_shoulder] += m_accelerations[JT_shoulder] * timeStep;
-  m_angles[ JT_shoulder] += m_velocities[JT_shoulder] * timeStep;
-  
-  // limit clamping
-  if(m_angles[JT_elbow] > m_limits[JT_elbow][0])
-  {
-    m_angles[JT_elbow] = m_limits[JT_elbow][0];
-    m_velocities[JT_elbow] = 0.0;
-    m_accelerations[JT_elbow] = 0.0;    
-  }
-  else if (m_angles[JT_elbow] < m_limits[JT_elbow][1])
-  {
-    m_angles[JT_elbow] = m_limits[JT_elbow][1];
-    m_velocities[JT_elbow] = 0.0;
-    m_accelerations[JT_elbow] = 0.0;    
-  }
-  
-  if(m_angles[JT_shoulder] > m_limits[JT_shoulder][0])
-  {
-    m_angles[JT_shoulder] = m_limits[JT_shoulder][0];
-    m_velocities[JT_shoulder] = 0.0;
-    m_accelerations[JT_shoulder] = 0.0;    
-  }
-  else if (m_angles[JT_shoulder] < m_limits[JT_shoulder][1])
-  {
-    m_angles[JT_shoulder] = m_limits[JT_shoulder][1];
-    m_velocities[JT_shoulder] = 0.0;
-    m_accelerations[JT_shoulder] = 0.0;    
-  }
-      
-
-  // get new end effector position
-  forwardKinematics();
-  
-  // store trajectory
-  m_trajectory.push_back(m_effectorPos);
-  if(m_trajectory.size() >= MaxTrajPoints)
-  {
-    m_trajectory.pop_front();
-  }
-  
-#define CHECK_ROUND_TRIP 0
-#if CHECK_ROUND_TRIP
-  float elbAngle, shdAngle;
-  float elbDir = m_angles[JT_elbow] > 0 ? 1 : -1;
-  inverseKinematics(m_effectorPos[0], m_effectorPos[1], elbDir, elbAngle, shdAngle);
-#endif
-}
-#endif
-  
 //----------------------------------------------------------------------------------------------------------------------  
 void Arm::solveEuler(const double* torques, float timeStep)
 {
@@ -312,6 +241,7 @@ void Arm::solveEuler(const double* torques, float timeStep)
   m_angles[ JT_shoulder] += m_velocities[JT_shoulder] * timeStep;  
 }
 
+// With predictive correction of Euler error
 //----------------------------------------------------------------------------------------------------------------------  
 void Arm::solveImprovedEuler(const double* torques, float timeStep)
 {
@@ -319,37 +249,41 @@ void Arm::solveImprovedEuler(const double* torques, float timeStep)
   double predAng[2], predVel[2], accel[2];
   computeAccelerations(m_angles, m_velocities, m_accelerations, torques, accel);
   
-  // integrate to get velocities and positions
-  predVel[JT_elbow] = m_velocities[JT_elbow] + accel[JT_elbow] * timeStep;
+  // Integrate to get predicted velocities and positions
   predAng[JT_elbow] = m_angles[JT_elbow] + m_velocities[JT_elbow] * timeStep;  
+  predVel[JT_elbow] = m_velocities[JT_elbow] + accel[JT_elbow] * timeStep;
+
+  predAng[JT_shoulder] = m_angles[JT_shoulder] + m_velocities[JT_shoulder] * timeStep;    
   predVel[JT_shoulder] = m_velocities[JT_shoulder] + accel[JT_shoulder] * timeStep;
-  predAng[JT_shoulder] = m_angles[JT_shoulder] + m_velocities[JT_shoulder] * timeStep;  
   
-  // 2. Compute predicted acceleration
+  // 2. Compute predicted acceleration at the next time step
   double predAccel[2];
   computeAccelerations(predAng, predVel, accel, torques, predAccel);
   
   // 3. Update using average of current and predicted acceleration
+  m_angles[JT_elbow]     += 0.5 * (m_velocities[JT_elbow] + predVel[JT_elbow]) * timeStep;
   m_velocities[JT_elbow] += 0.5 * (accel[JT_elbow] + predAccel[JT_elbow]) * timeStep;
-  m_angles[JT_elbow] += m_velocities[JT_elbow] * timeStep;
-  
+      
+  m_angles[JT_shoulder]     += 0.5 * (m_velocities[JT_shoulder] + predVel[JT_shoulder]) * timeStep;      
   m_velocities[JT_shoulder] += 0.5 * (accel[JT_shoulder] + predAccel[JT_shoulder]) * timeStep;
-  m_angles[ JT_shoulder] += m_velocities[JT_shoulder] * timeStep;    
+
 }
   
 //----------------------------------------------------------------------------------------------------------------------
 void Arm::update(float timeStep, double torqElb, double torqShd)  
 {
-  double torques[2];
-  torques[JT_elbow] = torqElb;
-  torques[JT_shoulder] = torqShd;  
+  //double torques[2];
+  m_torques[JT_elbow] = torqElb;
+  m_torques[JT_shoulder] = torqShd;  
   
-#define USE_IMPROVED_EULER 1
-#if USE_IMPROVED_EULER  
-  solveImprovedEuler(torques, timeStep);
-#else
-  solveEuler(torques, timeStep);
-#endif
+  if(m_integrator == kInteg_heun)
+  {
+    solveImprovedEuler(m_torques, timeStep);
+  }
+  else
+  {
+    solveEuler(m_torques, timeStep);
+  }
   
   // limit clamping
   if(m_angles[JT_elbow] > m_limits[JT_elbow][0])
@@ -396,6 +330,7 @@ void Arm::update(float timeStep, double torqElb, double torqShd)
 #endif
 }
 
+// Equations from Hollerbach and Flash 1981.     
 //----------------------------------------------------------------------------------------------------------------------
 void Arm::computeAccelerations(const double* angles, const double* velocities, const double* accelerations, const double* torques,
                                double* newAccel)
@@ -407,35 +342,36 @@ void Arm::computeAccelerations(const double* angles, const double* velocities, c
   
   // compute elbow acceleration
   double elbAcceleration = 0.0;
-  double gravity = m_gravity * m_masses[JT_elbow] * m_lengths[JT_elbow] * sinElbShd;
+  m_gravityAcc[JT_elbow] = m_gravity * m_masses[JT_elbow] * m_lengths[JT_elbow] * sinElbShd;
   if(!m_jointLocked[JT_elbow]) 
   {
-    double coriolis = m_massElbLLHalf * sqr(velocities[JT_shoulder]) * sinElbAngle;
-    double normalInertia = m_inertias[JT_elbow] + m_massElbLSq4;
-    double interInertia = accelerations[JT_shoulder] * (m_inertias[JT_elbow] + m_massElbLLHalf * cosElbAngle + m_massElbLSq4);     
-    double damping = m_frictions[JT_elbow] * velocities[JT_elbow];
-    elbAcceleration = (torques[JT_elbow] - interInertia - coriolis - gravity - damping) / normalInertia;
+    m_coriolisAcc[JT_elbow] = m_massElbLLHalf * sqr(velocities[JT_shoulder]) * sinElbAngle;
+    m_inertiaAcc[JT_elbow] = m_inertias[JT_elbow] + m_massElbLSq4;
+    m_interactionAcc[JT_elbow] = accelerations[JT_shoulder] * (m_inertias[JT_elbow] + m_massElbLSq4 + (m_massElbLLHalf * cosElbAngle));     
+    m_dampingAcc[JT_elbow] = m_frictions[JT_elbow] * velocities[JT_elbow];
+    elbAcceleration = (torques[JT_elbow] - m_interactionAcc[JT_elbow] - m_coriolisAcc[JT_elbow] - m_gravityAcc[JT_elbow] - m_dampingAcc[JT_elbow]) / m_inertiaAcc[JT_elbow];
   }
   
   // compute shoulder acceleration
   double shdAcceleration = 0.0;
   if(!m_jointLocked[JT_shoulder])
   { 
-    double coriolis = - m_massElbLLHalf * sqr(velocities[JT_elbow]) * sinElbAngle
+    m_coriolisAcc[JT_shoulder] = - m_massElbLLHalf * sqr(velocities[JT_elbow]) * sinElbAngle
       - m_massElbLL * velocities[JT_elbow] * velocities[JT_shoulder] * sinElbAngle;
   
-    double normalInertia = (m_inertias[JT_elbow] + m_inertias[JT_shoulder] 
+    m_inertiaAcc[JT_shoulder] = (m_inertias[JT_elbow] + m_inertias[JT_shoulder] 
                     + m_massElbLL * cosElbAngle 
                     + (m_masses[JT_shoulder] * m_lengthsSq[JT_shoulder]) / 4.0f
                     + m_massElbLSq4 
                     + (m_masses[JT_elbow] * m_lengthsSq[JT_shoulder]) );
   
-    double interInertia = accelerations[JT_elbow] * (m_inertias[JT_elbow] + m_massElbLSq4 + (m_massElbLLHalf * cosElbAngle));
+    m_interactionAcc[JT_shoulder] = accelerations[JT_elbow] * (m_inertias[JT_elbow] + m_massElbLSq4 + (m_massElbLLHalf * cosElbAngle));
   
     // shoulder gravity is elbow gravity + shoulder
-    gravity += m_gravity * (m_masses[JT_elbow] + m_masses[JT_shoulder]) * m_lengths[JT_shoulder] * sinf(angles[JT_shoulder]);
-    double damping = m_frictions[JT_shoulder] * velocities[JT_shoulder];
-    shdAcceleration = (torques[JT_shoulder] - interInertia - coriolis - gravity - damping) / normalInertia;
+    m_gravityAcc[JT_shoulder] = m_gravityAcc[JT_elbow];
+    m_gravityAcc[JT_shoulder] += m_gravity * (m_masses[JT_elbow] + m_masses[JT_shoulder]) * m_lengths[JT_shoulder] * sinf(angles[JT_shoulder]);
+    m_dampingAcc[JT_shoulder] = m_frictions[JT_shoulder] * velocities[JT_shoulder];
+    shdAcceleration = (torques[JT_shoulder] - m_interactionAcc[JT_shoulder] - m_coriolisAcc[JT_shoulder] - m_gravityAcc[JT_shoulder] - m_dampingAcc[JT_shoulder]) / m_inertiaAcc[JT_shoulder];
   }
 
   // synchronous update
@@ -469,10 +405,10 @@ void Arm::toXml(ci::XmlTree& xml)
   arm.push_back(shoulder);
   
   ci::XmlTree elbow("Elbow", "");
-  elbow.setAttribute("Friction", m_frictions[JT_shoulder]);
-  elbow.setAttribute("UpperLimit", m_limits[JT_shoulder][0]);
-  elbow.setAttribute("LowerLimit", m_limits[JT_shoulder][1]);
-  elbow.setAttribute("Locked", m_jointLocked[JT_shoulder]);  
+  elbow.setAttribute("Friction", m_frictions[JT_elbow]);
+  elbow.setAttribute("UpperLimit", m_limits[JT_elbow][0]);
+  elbow.setAttribute("LowerLimit", m_limits[JT_elbow][1]);
+  elbow.setAttribute("Locked", m_jointLocked[JT_elbow]);  
   arm.push_back(elbow);
   
   xml.push_back(arm);

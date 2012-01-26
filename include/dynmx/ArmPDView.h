@@ -91,8 +91,7 @@ inline void ArmPDView::draw3d()
   glVertex3f(desEffPos.x, desEffPos.y, 0.0);
   glEnd();
   
-  
-  glPopMatrix;
+  glPopMatrix();
 }
   
 } // namespace

@@ -10,11 +10,15 @@
 #include "Simulation.h"
 #include "SimulationFactory.h"
 
-//#include <mach-o/dyld.h>
+#include "cinder/cocoa/CinderCocoa.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 int main( int argc, char * const argv[] )
 {
+#if defined( CINDER_COCOA )
+  ci::cocoa::SafeNsAutoreleasePool pool;
+#endif
+  
   // Createa a simulation, using the global config file as input
   dmx::Simulation* sim = dmx::SimulationFactory::create();
   

@@ -18,6 +18,17 @@
 namespace dmx
 {
 
+Simulation* Simulation::s_instance = NULL;  
+
+//----------------------------------------------------------------------------------------------------------------------  
+Simulation* Simulation::create(Model* model, App* app) 
+{ 
+  if(!s_instance) 
+    s_instance = new Simulation(model, app); 
+  
+  return s_instance; 
+}  
+  
 //----------------------------------------------------------------------------------------------------------------------
 void Simulation::start()
 {

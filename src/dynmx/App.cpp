@@ -28,7 +28,7 @@ void App::setup()
 } 
 
 //----------------------------------------------------------------------------------------------------------------------
-inline void App::update() 
+void App::update() 
 {
   // Calculate duration of frame
   double currentTime = getElapsedSeconds();

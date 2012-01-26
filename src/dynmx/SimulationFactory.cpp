@@ -217,8 +217,7 @@ Simulation* SimulationFactory::create()
   // If a model could be created given the information in the config file, return it, otherwise indicate failure.
   if(model != 0)
   {
-    Simulation* sim = new Simulation (model, app);
-    return sim;
+    return Simulation::create(model, app);
   }
   else
   {

@@ -60,6 +60,7 @@ public:
   void initialise();
   std::string getDataDir() { return m_dataDir; };
   ci::XmlTree* getSettings() { return m_settings; };
+  void saveToDataDir();
   
 protected:
   Globals();
@@ -67,6 +68,7 @@ protected:
 private:
   static Globals* pInstance;
   std::string m_dataDir; 
+  std::string m_fnm;
   ci::XmlTree* m_settings;
 };
   

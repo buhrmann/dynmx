@@ -35,7 +35,7 @@ void ArmMuscled::init()
     m_jointRadius[JT_shoulder] = xml.getChild("Shoulder").getAttributeValue<double>("Radius");    
     
     ci::XmlTree::Iter muscle = settings->begin("Config/Arm/Muscle");
-    for (muscle; muscle != settings->end(); ++muscle)
+    for (; muscle != settings->end(); ++muscle)
     {
       // Parameters common to mono- and biarticulate muscles
       bool isFlexor = muscle->getAttributeValue<bool>("IsFlexor");      

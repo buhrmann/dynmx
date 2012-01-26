@@ -54,7 +54,7 @@ void GATester::init()
     ci::XmlTree gaProgress(ci::loadFile(fnm));
     assert(gaProgress.hasChild("GAProgress"));
     
-    // Iterate to last generation (the best individual)
+    // Todo: Find better way to do this. Nasty! Iterate to last generation (the best individual)
     ci::XmlTree::ConstIter lastGeneration = gaProgress.begin("GAProgress/Generation");
     for (ci::XmlTree::ConstIter generation = gaProgress.begin("GAProgress/Generation"); generation != gaProgress.end(); ++generation)
     {
@@ -77,6 +77,18 @@ void GATester::init()
     
     // Decode
     m_evolvable->decodeGenome(&genes[0]);  
+    
+    // Store genome in xml file
+//    ci::XmlTree genome ("Genome", "");  
+//    for(size_t i = 0; i < numGenes; ++i)
+//    {
+//      ci::XmlTree gene ("Gene", "");
+//      gene.setAttribute("Index", i);
+//      gene.setAttribute("Value", genes[i]);
+//      genome.push_back(gene);
+//    }
+    m_modelXml->push_back(ci::XmlTree(genome));
+    
   }
   
   reset();

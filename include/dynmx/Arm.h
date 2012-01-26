@@ -29,7 +29,14 @@ enum Joint
   JT_invalid = -1,
   JT_elbow = 0,
   JT_shoulder = 1,
-  Jt_maxNumber
+  JT_maxNumber
+};
+  
+enum Integrator
+{
+  kInteg_euler = 0,
+  kInteg_heun,
+  kInteg_maxNumber
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -67,6 +74,12 @@ public:
   double getJointVelocity(Joint joint) { return m_velocities[joint]; };
   double getLength(Joint joint) const { return m_lengths[joint]; } ;
   double getTotalLength() const { return m_lengths[0] + m_lengths[1]; };
+  double getGravityAcc(Joint j) { return m_gravityAcc[j]; };
+  double getCoriolisAcc(Joint j) { return m_coriolisAcc[j]; };
+  double getInertiaAcc(Joint j) { return m_inertiaAcc[j]; };
+  double getInteractionAcc(Joint j) { return m_interactionAcc[j]; };
+  double getDampingAcc(Joint j) { return m_dampingAcc[j]; };
+  double getTorque(Joint j) { return m_torques[j]; }; 
   const Pos& getEffectorPos() const { return m_effectorPos; };
   Pos& getEffectorPos() { return m_effectorPos; };
   const Pos& getElbowPos() const { return m_elbowPos; };
@@ -98,7 +111,13 @@ protected:
   double 
     m_angles[2],
     m_velocities[2],
-    m_accelerations[2];
+    m_accelerations[2],
+    m_coriolisAcc[2],
+    m_gravityAcc[2],
+    m_inertiaAcc[2],
+    m_interactionAcc[2],
+    m_dampingAcc[2],
+    m_torques[2];
   
   Pos
     m_elbowPos,
@@ -122,6 +141,8 @@ protected:
     m_massElbLSq4,
     m_massElbLLHalf,
     m_massElbLL;
+  
+  int m_integrator;
 };
 
 } // namespace dmx

@@ -23,6 +23,7 @@ Globals* Globals::Inst()
   if(pInstance == NULL)
   {
     pInstance = new Globals();
+    pInstance->saveToDataDir();
   }
   return pInstance;
 }
@@ -31,6 +32,12 @@ Globals* Globals::Inst()
 Globals::Globals()
 { 
   initialise();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+void Globals::saveToDataDir()
+{  
+  m_settings->write(ci::writeFile(m_dataDir + m_fnm));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -64,19 +71,22 @@ void Globals::initialise()
   
   // Now load the xml file
   m_settings = 0;
+  
   // Iterator over base directory's contents
   boost::filesystem::directory_iterator end_itr;
+  
   for (boost::filesystem::directory_iterator itr(baseDir); itr != end_itr; ++itr)
   {
     // If it's not a directory ...
     if (!is_directory(itr->status()))
     {
       // ... and the filename contains the xml ending      
-      std::string fnm = itr->path().filename().string();
-      if(fnm.find(".xml") != std::string::npos)
+      m_fnm = itr->path().filename().string();
+      if(m_fnm.find(".xml") != std::string::npos)
       {
         // ... then load the file
-        m_settings = new ci::XmlTree(ci::loadFile(baseDir + fnm));
+        m_settings = new ci::XmlTree(ci::loadFile(baseDir + m_fnm));
+        break;
       }               
     }
   }

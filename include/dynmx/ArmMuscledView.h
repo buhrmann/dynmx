@@ -63,13 +63,21 @@ inline void ArmMuscledView::setupScene()
   float columnWidth = 300;
   float columnMargin = 5;
   float left = columnWidth + columnMargin;
+  int pointsPerPlot = SETTINGS->getChild("Config/Globals/PlotDuration").getAttributeValue<float>("Value") * 
+                      SETTINGS->getChild("Config/Globals/FrameRate").getAttributeValue<int>("Value");
+  
   m_uiColumn = new NodeGroup();
   m_uiColumn->setRightAligned(true);
   m_uiColumn->translate(ci::Vec4f(left, columnMargin, 0, 1));
-  m_scene2d.m_children.push_back(m_uiColumn);  
+  m_scene2d.m_children.push_back(m_uiColumn);
+
+  m_uiColumn2 = new NodeGroup();
+  m_uiColumn2->setRightAligned(true);
+  m_uiColumn2->translate(ci::Vec4f(left+left, columnMargin, 0, 1));
+  m_scene2d.m_children.push_back(m_uiColumn2);  
   
   // Create a plot for muscle data
-  m_musclePlot = new dmx::Plot(columnWidth, 180, MAX_NUM_MUSCLES*2, 200);
+  m_musclePlot = new dmx::Plot(columnWidth, 180, MAX_NUM_MUSCLES*2, pointsPerPlot);
   m_musclePlot->setTitle("Muscle lengths");
   for(int i = 0; i < m_armMd->getNumMuscles(); i++)
   {
@@ -78,7 +86,35 @@ inline void ArmMuscledView::setupScene()
     m_musclePlot->setLabel(i, str);
   }
   m_uiColumn->m_children.push_back(m_musclePlot);
+
+  // Create a plot for effector movement
+  m_armEffPlot = new dmx::Plot(columnWidth, 180, 6, pointsPerPlot);
+  m_armEffPlot->setTitle("Effector kinematics");
+  m_armEffPlot->setLabel(0, "x");
+  m_armEffPlot->setLabel(1, "y");
   
+  // Create a plot for arm data (different forces acting on arm e.g.)
+  m_armElbPlot = new dmx::Plot(columnWidth, 180, 6, pointsPerPlot);
+  m_armElbPlot->translate(ci::Vec4f(0, 180 + 20, 0, 1));  
+  m_armElbPlot->setTitle("Elbow forces");
+  m_armElbPlot->setLabel(0, "applied");
+  m_armElbPlot->setLabel(1, "inertia");
+  m_armElbPlot->setLabel(2, "interaction");
+  m_armElbPlot->setLabel(3, "damping"); 
+  m_armElbPlot->setLabel(4, "total");   
+  
+  m_armShdPlot = new dmx::Plot(columnWidth, 180, 6, pointsPerPlot);
+  m_armShdPlot->translate(ci::Vec4f(0, 400, 0, 1));
+  m_armShdPlot->setTitle("Shoulder forces");
+  m_armShdPlot->setLabel(0, "applied");  
+  m_armShdPlot->setLabel(1, "inertia");
+  m_armShdPlot->setLabel(2, "interaction");
+  m_armShdPlot->setLabel(3, "damping");
+  m_armShdPlot->setLabel(4, "total");   
+  
+  m_uiColumn2->m_children.push_back(m_armEffPlot);  
+  m_uiColumn2->m_children.push_back(m_armElbPlot);
+  m_uiColumn2->m_children.push_back(m_armShdPlot);  
 }
 
 //----------------------------------------------------------------------------------------------------------------------  
