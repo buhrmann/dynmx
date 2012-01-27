@@ -138,27 +138,35 @@ inline void ArmView::update(float dt)
   m_armEffPlot->addPoint(effPos.x, 0);
   m_armEffPlot->addPoint(effPos.y, 1);
   
-  float applied = m_arm->getTorque(JT_elbow);
-  float inertia = m_arm->getInertiaAcc(JT_elbow);
-  float interaction = m_arm->getInteractionAcc(JT_elbow) + m_arm->getCoriolisAcc(JT_elbow);
-  float damping = m_arm->getDampingAcc(JT_elbow);
+  // The component forces are displayed negative because that's how they contribute to acceleration
+  // in the computation of arm dynamics
+  const Arm::State& state = m_arm->getState();
+  float applied = state.torques[JT_elbow];
+  float inertia = state.inertiaAcc[JT_elbow];
+  float interaction = -state.interactionAcc[JT_elbow] - state.coriolisAcc[JT_elbow];
+  float damping = -state.dampingAcc[JT_elbow];
   float total = applied + interaction + damping; // + gravity
+  float acc = state.accelerations[JT_elbow] * inertia; // scaling so all plots roughly in same range
   m_armElbPlot->addPoint(applied, 0);
   m_armElbPlot->addPoint(inertia, 1);
   m_armElbPlot->addPoint(interaction, 2);
   m_armElbPlot->addPoint(damping, 3);
   m_armElbPlot->addPoint(total, 4);
+  m_armElbPlot->addPoint(acc, 5);
 
-  applied = m_arm->getTorque(JT_shoulder);
-  inertia = m_arm->getInertiaAcc(JT_shoulder);
-  interaction = m_arm->getInteractionAcc(JT_shoulder) + m_arm->getCoriolisAcc(JT_shoulder);
-  damping = m_arm->getDampingAcc(JT_shoulder);
-  total = applied + interaction + damping; // + gravity  
+
+  applied = state.torques[JT_shoulder];
+  inertia = state.inertiaAcc[JT_shoulder];
+  interaction = -state.interactionAcc[JT_shoulder] - state.coriolisAcc[JT_shoulder];
+  damping = -state.dampingAcc[JT_shoulder];
+  total = applied + interaction + damping; // + gravity
+  acc = state.accelerations[JT_shoulder] * inertia; // scaling so all plots roughly in same range
   m_armShdPlot->addPoint(applied, 0);  
   m_armShdPlot->addPoint(inertia, 1);
   m_armShdPlot->addPoint(interaction, 2);
   m_armShdPlot->addPoint(damping, 3);  
   m_armShdPlot->addPoint(total, 4);  
+  m_armShdPlot->addPoint(acc, 5);  
 }
 
 //---------------------------------------------------------------------------------------------------------------------

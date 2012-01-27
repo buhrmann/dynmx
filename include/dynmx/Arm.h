@@ -44,8 +44,23 @@ enum Integrator
 //----------------------------------------------------------------------------------------------------------------------
 class Arm : public Model
 {
-  
+    
 public:
+  
+  struct State
+  {
+    double angles[2];
+    double velocities[2];
+    double accelerations[2];
+    double coriolisAcc[2];
+    double gravityAcc[2];
+    double inertiaAcc[2];
+    double interactionAcc[2];
+    double dampingAcc[2];
+    double torques[2]; 
+  };  
+  
+public:  
   
   Arm();
   ~Arm();
@@ -70,16 +85,10 @@ public:
   double getGravity() const { return m_gravity; };
   Pos getPointOnUpperArm(float distanceFromJoint) const;
   Pos getPointOnLowerArm(float distanceFromJoint) const;  
-  double getJointAngle(Joint joint) { return m_angles[joint]; };
-  double getJointVelocity(Joint joint) { return m_velocities[joint]; };
-  double getLength(Joint joint) const { return m_lengths[joint]; } ;
+  const State& getState() const { return m_state; };
+  double getJointAngle(Joint joint) { return m_state.angles[joint]; };
+  double getLength(Joint joint) const { return m_lengths[joint]; } ;  
   double getTotalLength() const { return m_lengths[0] + m_lengths[1]; };
-  double getGravityAcc(Joint j) { return m_gravityAcc[j]; };
-  double getCoriolisAcc(Joint j) { return m_coriolisAcc[j]; };
-  double getInertiaAcc(Joint j) { return m_inertiaAcc[j]; };
-  double getInteractionAcc(Joint j) { return m_interactionAcc[j]; };
-  double getDampingAcc(Joint j) { return m_dampingAcc[j]; };
-  double getTorque(Joint j) { return m_torques[j]; }; 
   const Pos& getEffectorPos() const { return m_effectorPos; };
   Pos& getEffectorPos() { return m_effectorPos; };
   const Pos& getElbowPos() const { return m_elbowPos; };
@@ -98,26 +107,16 @@ public:
   virtual void toXml(ci::XmlTree& xml);
   
 protected:
-
+  
   void preCompute();
   void solveEuler(const double* torques, float dt);
-  void solveImprovedEuler(const double* torques, float dt);
-  void computeAccelerations(const double* angles, const double* velocities, const double* accel, const double* torques,
-                            double* newAccel);
+  void solveImprovedEuler(float dt); 
+  void computeAccelerations(State& state);  
   
   bool m_jointLocked[2];
   
   // states
-  double 
-    m_angles[2],
-    m_velocities[2],
-    m_accelerations[2],
-    m_coriolisAcc[2],
-    m_gravityAcc[2],
-    m_inertiaAcc[2],
-    m_interactionAcc[2],
-    m_dampingAcc[2],
-    m_torques[2];
+  State m_state;  
   
   Pos
     m_elbowPos,
