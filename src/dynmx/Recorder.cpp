@@ -11,6 +11,8 @@
 
 #include <fstream>
 
+#define RECORDER_PRECISION 6
+
 namespace dmx
 {
 
@@ -18,27 +20,40 @@ namespace dmx
 //----------------------------------------------------------------------------------------------------------------------    
 void Recorder::saveTo(const std::string& fnm)
 {
+  if(m_data->empty())
+  {
+    return;
+  }
+     
   std::ofstream file;
   file.open(fnm.c_str(), std::ios_base::app);
-  
-  std::map<std::string, std::vector<double> >::iterator iter = m_data.begin();
+  if(file.fail())
+  {
+    return;
+  }
   
   // Print column headers
-  for (; iter != m_data.end(); ++iter)
+  std::map<std::string, std::vector<double> >::const_iterator iter;  
+  if(m_printVarNames)
   {
-    const std::string& name = iter->first;
-    file << name << " ";
+    for (iter = m_data->begin(); iter != m_data->end(); ++iter)
+    {
+      std::string name = iter->first;
+      file << name << " ";
+    }
+    file << "\r\n"; // Don't flush yet
   }
-  file << "\r\n"; // Don't flush yet
-  
+    
   // Print data, but not all vectors might be of same length
   bool hadValue = true;
   int i = 0;
+  file.setf(std::ios_base::fixed);
+  file.precision(RECORDER_PRECISION);
   while(hadValue)
   {
     hadValue = false;
-    iter = m_data.begin();
-    for (; iter != m_data.end(); ++iter)
+    iter = m_data->begin();
+    for (; iter != m_data->end(); ++iter)
     {
       const std::vector<double>& values = iter->second;
       if(i < values.size())

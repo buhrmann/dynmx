@@ -70,10 +70,13 @@ Simulation* SimulationFactory::create()
     {
       evaluateOnly = SETTINGS->getChild("Config/GA/Eval").getAttributeValue<bool>("Run");
     }
+    
+#if 0    
     if(evaluateOnly)
     {
       visual = true;
     }
+#endif
         
     if ("TestEvolvableCTRNN" == evolvableName)
     {    

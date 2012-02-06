@@ -422,6 +422,26 @@ void Arm::toXml(ci::XmlTree& xml)
   
   xml.push_back(arm);
 }
+ 
+//----------------------------------------------------------------------------------------------------------------------    
+void Arm::record(Recorder& recorder)
+{
+  const std::string jointNames [2] = { "Elbow", "Shoulder" };
+  for(int i = 0; i < 2; i++)
+  {
+    recorder.push_back("angle" + jointNames[i], m_state.angles[i]);
+    recorder.push_back("velocity" + jointNames[i], m_state.velocities[i]);
+    recorder.push_back("acceleration" + jointNames[i], m_state.accelerations[i]);
+    recorder.push_back("coriolis" + jointNames[i], m_state.coriolisAcc[i]);
+    recorder.push_back("gravity" + jointNames[i], m_state.gravityAcc[i]);
+    recorder.push_back("inertia" + jointNames[i], m_state.inertiaAcc[i]);
+    recorder.push_back("interaction" + jointNames[i], m_state.interactionAcc[i]);
+    recorder.push_back("damping" + jointNames[i], m_state.dampingAcc[i]);    
+    recorder.push_back("torque" + jointNames[i], m_state.torques[i]); 
+  }
+  recorder.push_back("x", m_effectorPos.x); 
+  recorder.push_back("y", m_effectorPos.y); 
+}
   
   
 } // namespace dmx

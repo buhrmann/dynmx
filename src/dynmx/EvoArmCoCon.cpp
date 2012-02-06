@@ -675,4 +675,22 @@ void EvoArmCoCon::toXml(ci::XmlTree& xml)
   xml.push_back(evolvable);
 }
   
+//----------------------------------------------------------------------------------------------------------------------     
+void EvoArmCoCon::record(Recorder& recorder) 
+{ 
+  // General arm and reflex state
+  m_arm->record(recorder); 
+  
+  // Desired state (different from commanded state in ArmReflex)
+  recorder.push_back("desX", m_currentDesiredPos.x);
+  recorder.push_back("desY", m_currentDesiredPos.y);
+  recorder.push_back("desElbow", m_currentDesiredAngles.x);
+  recorder.push_back("desShoulder", m_currentDesiredAngles.y);
+  recorder.push_back("desElbowM1", m_currentDesiredElbLenghts.x);
+  recorder.push_back("desElbowM2", m_currentDesiredElbLenghts.y);
+  recorder.push_back("desShoulderM1", m_currentDesiredShdLenghts.x);
+  recorder.push_back("desShoulderM2", m_currentDesiredShdLenghts.y);
+}
+  
+  
 } // namespace

@@ -48,6 +48,7 @@ public:
   
   // toXML
   void toXml(ci::XmlTree& xml);
+  void record(Recorder& recorder);
   
   
   ArmReflex* m_arm;

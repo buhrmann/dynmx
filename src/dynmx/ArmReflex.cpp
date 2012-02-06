@@ -94,9 +94,9 @@ void ArmReflex::update(double desElbAngle, double desShdAngle, float dt)
   update(dt);
   
   // Store desired trajectory (forward kinematics)
-  Pos p1, desPos;    
-  forwardKinematics(m_desiredAngles[JT_elbow], m_desiredAngles[JT_shoulder], p1, desPos);  
-  m_desiredTrajectory.push_back(desPos);
+  Pos tmp;    
+  forwardKinematics(m_desiredAngles[JT_elbow], m_desiredAngles[JT_shoulder], tmp, m_desiredPos);  
+  m_desiredTrajectory.push_back(m_desiredPos);
   if(m_desiredTrajectory.size() >= MaxTrajPoints)
   {
     m_desiredTrajectory.pop_front();
@@ -141,6 +141,18 @@ void ArmReflex::toXml(ci::XmlTree& xml)
       m_reflexes[i]->toXml(arm);      
     }
   }
+}
+  
+//----------------------------------------------------------------------------------------------------------------------     
+void ArmReflex::record(Recorder& recorder) 
+{ 
+  // Let muscles record themselves
+  ArmMuscled::record(recorder); 
+
+  recorder.push_back("comX", m_desiredPos.x);
+  recorder.push_back("comY", m_desiredPos.y);
+  recorder.push_back("comElbow", m_desiredAngles[JT_elbow]);
+  recorder.push_back("comShoulder", m_desiredAngles[JT_shoulder]);
 }
 
 } // namespace dmx

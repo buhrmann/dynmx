@@ -45,7 +45,18 @@ void GATester::init()
   {
     const ci::XmlTree& ga = settings->getChild("Config/GA/Eval");
     m_numTrials = ga.getChild("NumTrials").getAttributeValue<int>("Value");
-  }   
+    
+    // Flag whether to record state durin run
+    if (SETTINGS->hasChild("Config/GA/Eval/RecordState"))
+    {
+      m_record = SETTINGS->getChild("Config/GA/Eval/RecordState").getAttributeValue<bool>("Value");
+    }
+    else 
+    {
+      m_record = false;
+    }
+  }
+
   
   // Load best genome from prev GA run
   if(SETTINGS->hasChild("Config/GA/Eval/LoadFrom"))
@@ -79,16 +90,7 @@ void GATester::init()
     m_evolvable->decodeGenome(&genes[0]);  
     
     // Store genome in xml file
-//    ci::XmlTree genome ("Genome", "");  
-//    for(size_t i = 0; i < numGenes; ++i)
-//    {
-//      ci::XmlTree gene ("Gene", "");
-//      gene.setAttribute("Index", i);
-//      gene.setAttribute("Value", genes[i]);
-//      genome.push_back(gene);
-//    }
     m_modelXml->push_back(ci::XmlTree(genome));
-    
   }
   
   reset();
@@ -112,6 +114,9 @@ void GATester::update(float dt)
   {
     // Update simulation
     m_evolvable->update(dt);
+    
+    // Record state
+    m_evolvable->record(m_recorder);
   }
   else
   {
@@ -138,8 +143,15 @@ void GATester::update(float dt)
     // Write model data to xml
     if(hasFinished())
     {
+      // Store description of evolvable
       m_evolvable->toXml(*m_modelXml);
       m_modelXml->write(ci::writeFile(dmx::DATA_DIR + "Evolvable.xml"));  
+      
+      // Store state data
+      if(m_record)
+      {
+        m_recorder.saveTo(dmx::DATA_DIR + "State.dat");
+      }
     }
     
     // Reset simulation for new trial

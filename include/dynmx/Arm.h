@@ -12,6 +12,7 @@
 
 #include "Dynmx.h"
 #include "Model.h"
+#include "Recorder.h"
 
 #include "cinder/Vector.h"
 
@@ -103,8 +104,12 @@ public:
   void forwardKinematics(double elbAngle, double shdAngle, Pos& elbPos, Pos& effPos);
   void inverseKinematics(const Pos& pos, float elbDir, double& elbAngle, double& shdAngle);  
 
-  // Store output in human readable format
+  // Store description in human readable format
   virtual void toXml(ci::XmlTree& xml);
+  
+  // Store output in recorder
+  virtual void record(Recorder& recorder);  
+  
   
 protected:
   

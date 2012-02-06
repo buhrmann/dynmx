@@ -12,6 +12,7 @@
 
 #include "Dynmx.h"
 
+#include <string>
 #include <map>
 
 
@@ -26,21 +27,24 @@ class Recorder
 {
 public:
   
+  Recorder() : m_printVarNames(true) { m_data = new std::map<std::string, std::vector<double> >; m_data->clear(); };
+  
   // Adds a new data point to the end of the corresponding variable's cache (vector)
-  void push_back(const std::string& name, double value) { m_data[name].push_back(value); };
+  void push_back(std::string name, double value) { (*m_data)[name].push_back(value); };
   
   // Remove all data
-  void clear() { m_data.clear(); };
+  void clear() { m_data->clear(); };
   
   // Return the data vector for the named variable
-  std::vector<double>& operator[] (std::string name) { return m_data[name]; };
+  std::vector<double>& operator[] (std::string name) { return (*m_data)[name]; };
   
   // Save data to file
   void saveTo(const std::string& fnm);
   
 protected:
   
-  std::map<std::string, std::vector<double> > m_data;
+  std::map<std::string, std::vector<double> >* m_data;
+  bool m_printVarNames;
 };
   
 }; // namespace dmx

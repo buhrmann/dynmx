@@ -47,6 +47,8 @@ public:
   // Store output in human readable format
   virtual void toXml(ci::XmlTree& xml);
   
+  void record(Recorder& recorder);
+  
 protected:
   
   std::vector<Reflex*> m_reflexes;

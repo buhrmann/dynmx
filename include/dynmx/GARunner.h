@@ -12,6 +12,7 @@
 
 #include "Model.h"
 #include "GA.h"
+#include "Recorder.h"
 
 #include "cinder/xml.h"
 
@@ -36,6 +37,7 @@ public:
   virtual void reset() {};
   
   virtual void toXml(ci::XmlTree& xml) {};
+  virtual void record(Recorder& recorder) {};
 };
 
 // Helpers

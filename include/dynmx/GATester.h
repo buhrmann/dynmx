@@ -12,6 +12,7 @@
 #include "Dynmx.h"
 #include "Model.h"
 #include "GARunner.h"
+#include "Recorder.h"
 
 #include "cinder/xml.h"
 
@@ -51,8 +52,10 @@ protected:
   uint16_t m_numTrials;
   
   int m_verbosity;
+  bool m_record;
   
   ci::XmlTree* m_modelXml;  
+  Recorder m_recorder;
 };
 
 } // namespace dmx
