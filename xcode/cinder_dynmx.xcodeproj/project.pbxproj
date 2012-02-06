@@ -54,6 +54,7 @@
 		D6BA381813BA32E000CFED09 /* ArmMuscled.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6BA381713BA32E000CFED09 /* ArmMuscled.cpp */; };
 		D6C3A1D21448501B00E89616 /* ArmReflex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6C3A1D11448501B00E89616 /* ArmReflex.cpp */; };
 		D6CAA9FF12FDA1CF003BE477 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6CAA9FE12FDA1CF003BE477 /* main.cpp */; };
+		D6D7FB9D14DED8C9005FC21D /* Spin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D7FB9C14DED8C9005FC21D /* Spin.cpp */; };
 		D6DEE86A13B0EF09003FE7D2 /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6DEE86913B0EF09003FE7D2 /* App.cpp */; };
 		D6E94EB51423652300E8D8BD /* GATester.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E94EB41423652300E8D8BD /* GATester.cpp */; };
 		D6F6B6DF13ABDD09005C2E0F /* Dynmx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6F6B6DD13ABDD09005C2E0F /* Dynmx.cpp */; };
@@ -168,6 +169,8 @@
 		D6CAA9D912FD9D72003BE477 /* TestView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestView.h; path = ../include/dynmx/Tests/TestView.h; sourceTree = SOURCE_ROOT; };
 		D6CAA9DA12FD9D72003BE477 /* TestViewCTRNN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestViewCTRNN.h; path = ../include/dynmx/Tests/TestViewCTRNN.h; sourceTree = SOURCE_ROOT; };
 		D6CAA9FE12FDA1CF003BE477 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../src/main.cpp; sourceTree = SOURCE_ROOT; };
+		D6D7FB9B14DED8BB005FC21D /* Spin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Spin.h; path = ../include/dynmx/Spin.h; sourceTree = SOURCE_ROOT; };
+		D6D7FB9C14DED8C9005FC21D /* Spin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Spin.cpp; sourceTree = "<group>"; };
 		D6D8EC8D13AA647200160C37 /* Dynmx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Dynmx.h; path = ../../include/dynmx/Dynmx.h; sourceTree = "<group>"; };
 		D6D8EC8E13AA647200160C37 /* MathUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MathUtils.h; path = ../../include/dynmx/MathUtils.h; sourceTree = "<group>"; };
 		D6DEE86913B0EF09003FE7D2 /* App.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = App.cpp; sourceTree = "<group>"; };
@@ -269,6 +272,7 @@
 		D64F209E12ECE1720014F069 /* dynmx */ = {
 			isa = PBXGroup;
 			children = (
+				D6D7FB9A14DED840005FC21D /* Spin */,
 				D67710B8149B77850031DC48 /* SMC */,
 				D6BA37DF13BA2DAE00CFED09 /* Arm */,
 				D6D8EC8D13AA647200160C37 /* Dynmx.h */,
@@ -474,6 +478,15 @@
 			name = tests;
 			sourceTree = "<group>";
 		};
+		D6D7FB9A14DED840005FC21D /* Spin */ = {
+			isa = PBXGroup;
+			children = (
+				D6D7FB9B14DED8BB005FC21D /* Spin.h */,
+				D6D7FB9C14DED8C9005FC21D /* Spin.cpp */,
+			);
+			name = Spin;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -573,6 +586,7 @@
 				D673591E149E791C008C7541 /* SMCEnvironmentViz.cpp in Sources */,
 				D696B7B214A3685F00580D3C /* SMCAgentEvo.cpp in Sources */,
 				D68CF04B14C6DF4300493D39 /* EvoArmCoCon.cpp in Sources */,
+				D6D7FB9D14DED8C9005FC21D /* Spin.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
