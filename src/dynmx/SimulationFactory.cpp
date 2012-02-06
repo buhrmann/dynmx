@@ -40,6 +40,8 @@
 #include "SMCAgentEvo.h"
 #include "SMCView.h"
 
+#include "Spin.h"
+
 namespace dmx
 {
 
@@ -213,6 +215,15 @@ Simulation* SimulationFactory::create()
       app = new App(model, view);
     }
   }
+  else if ("Spin" == modelName)
+  {
+    model = new SpinningWheel();
+    if(visual)
+    {
+      View* view = new SpinningWheelView((SpinningWheel*)model);      
+      app = new App(model, view);
+    }
+  }  
   
   // If a model could be created given the information in the config file, return it, otherwise indicate failure.
   if(model != 0)
