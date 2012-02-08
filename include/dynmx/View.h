@@ -61,6 +61,8 @@ public:
   
   void pause(bool p) { m_paused = p; };
   
+  void setVSync(bool vsync) { if(vsync) ci::gl::enableVerticalSync(); else ci::gl::disableVerticalSync(); };
+  
 protected: 
   
   ci::Vec3f screenToWorld(const ci::Vec2i& point);

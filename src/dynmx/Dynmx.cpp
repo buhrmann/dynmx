@@ -66,7 +66,7 @@ void Globals::initialise()
 #endif
   
   // Actually create the data directory
-  m_dataDir = baseDir + dateTime + "/";
+  m_dataDir = baseDir + "Output/" + dateTime + "/";
   boost::filesystem::create_directory(boost::filesystem::path(m_dataDir));
   
   // Now load the xml file

@@ -57,13 +57,13 @@ class Globals
 {
 public:
   static Globals* Inst();
-  void initialise();
   std::string getDataDir() { return m_dataDir; };
   ci::XmlTree* getSettings() { return m_settings; };
-  void saveToDataDir();
   
 protected:
   Globals();
+  void initialise();
+  void saveToDataDir();  
   
 private:
   static Globals* pInstance;

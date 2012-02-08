@@ -1,0 +1,733 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 44;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0091D8F90E81B9330029341E /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0091D8F80E81B9330029341E /* OpenGL.framework */; };
+		0097E3E50F3E9819005A4392 /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0097E3E40F3E9819005A4392 /* QuickTime.framework */; };
+		00B784B30FF439BC000DE1D7 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B784AF0FF439BC000DE1D7 /* Accelerate.framework */; };
+		00B784B40FF439BC000DE1D7 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B784B00FF439BC000DE1D7 /* AudioToolbox.framework */; };
+		00B784B50FF439BC000DE1D7 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B784B10FF439BC000DE1D7 /* AudioUnit.framework */; };
+		00B784B60FF439BC000DE1D7 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B784B20FF439BC000DE1D7 /* CoreAudio.framework */; };
+		00CCAF15116A9FEE008396D5 /* CinderApp.icns in Resources */ = {isa = PBXBuildFile; fileRef = 00CCAF14116A9FEE008396D5 /* CinderApp.icns */; };
+		5323E6B20EAFCA74003A9687 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5323E6B10EAFCA74003A9687 /* CoreVideo.framework */; };
+		5323E6B60EAFCA7E003A9687 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5323E6B50EAFCA7E003A9687 /* QTKit.framework */; };
+		53E3CDFC0E86099300238D2B /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53E3CDFB0E86099300238D2B /* Carbon.framework */; };
+		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		D6D9F12314DC62D6009C0C95 /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10014DC62D6009C0C95 /* App.cpp */; };
+		D6D9F12414DC62D6009C0C95 /* Arm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10114DC62D6009C0C95 /* Arm.cpp */; };
+		D6D9F12514DC62D6009C0C95 /* ArmMuscled.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10214DC62D6009C0C95 /* ArmMuscled.cpp */; };
+		D6D9F12614DC62D6009C0C95 /* ArmMuscledViz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10314DC62D6009C0C95 /* ArmMuscledViz.cpp */; };
+		D6D9F12714DC62D6009C0C95 /* ArmPD.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10414DC62D6009C0C95 /* ArmPD.cpp */; };
+		D6D9F12814DC62D6009C0C95 /* ArmReflex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10514DC62D6009C0C95 /* ArmReflex.cpp */; };
+		D6D9F12914DC62D6009C0C95 /* ArmViz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10614DC62D6009C0C95 /* ArmViz.cpp */; };
+		D6D9F12A14DC62D6009C0C95 /* CTRNN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10714DC62D6009C0C95 /* CTRNN.cpp */; };
+		D6D9F12B14DC62D6009C0C95 /* CTRNNViz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10814DC62D6009C0C95 /* CTRNNViz.cpp */; };
+		D6D9F12C14DC62D6009C0C95 /* DistanceSensor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10914DC62D6009C0C95 /* DistanceSensor.cpp */; };
+		D6D9F12D14DC62D6009C0C95 /* Dynmx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10A14DC62D6009C0C95 /* Dynmx.cpp */; };
+		D6D9F12E14DC62D6009C0C95 /* EPController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10B14DC62D6009C0C95 /* EPController.cpp */; };
+		D6D9F12F14DC62D6009C0C95 /* EvoArmCoCon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10C14DC62D6009C0C95 /* EvoArmCoCon.cpp */; };
+		D6D9F13014DC62D6009C0C95 /* GA.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10D14DC62D6009C0C95 /* GA.cpp */; };
+		D6D9F13114DC62D6009C0C95 /* GARunner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10E14DC62D6009C0C95 /* GARunner.cpp */; };
+		D6D9F13214DC62D6009C0C95 /* GATester.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10F14DC62D6009C0C95 /* GATester.cpp */; };
+		D6D9F13314DC62D6009C0C95 /* GAViz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F11014DC62D6009C0C95 /* GAViz.cpp */; };
+		D6D9F13414DC62D6009C0C95 /* Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F11114DC62D6009C0C95 /* Light.cpp */; };
+		D6D9F13514DC62D6009C0C95 /* Muscle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F11214DC62D6009C0C95 /* Muscle.cpp */; };
+		D6D9F13614DC62D6009C0C95 /* MuscleBiWrap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F11314DC62D6009C0C95 /* MuscleBiWrap.cpp */; };
+		D6D9F13714DC62D6009C0C95 /* MuscleMonoWrap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F11414DC62D6009C0C95 /* MuscleMonoWrap.cpp */; };
+		D6D9F13814DC62D6009C0C95 /* PD.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F11514DC62D6009C0C95 /* PD.cpp */; };
+		D6D9F13914DC62D6009C0C95 /* Random.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F11614DC62D6009C0C95 /* Random.cpp */; };
+		D6D9F13A14DC62D6009C0C95 /* Recorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F11714DC62D6009C0C95 /* Recorder.cpp */; };
+		D6D9F13B14DC62D6009C0C95 /* Reflex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F11814DC62D6009C0C95 /* Reflex.cpp */; };
+		D6D9F13C14DC62D6009C0C95 /* Registry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F11914DC62D6009C0C95 /* Registry.cpp */; };
+		D6D9F13D14DC62D6009C0C95 /* Scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F11A14DC62D6009C0C95 /* Scene.cpp */; };
+		D6D9F13E14DC62D6009C0C95 /* Simulation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F11B14DC62D6009C0C95 /* Simulation.cpp */; };
+		D6D9F13F14DC62D6009C0C95 /* SimulationFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F11C14DC62D6009C0C95 /* SimulationFactory.cpp */; };
+		D6D9F14014DC62D6009C0C95 /* SMCAgent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F11D14DC62D6009C0C95 /* SMCAgent.cpp */; };
+		D6D9F14114DC62D6009C0C95 /* SMCAgentEvo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F11E14DC62D6009C0C95 /* SMCAgentEvo.cpp */; };
+		D6D9F14214DC62D6009C0C95 /* SMCAgentViz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F11F14DC62D6009C0C95 /* SMCAgentViz.cpp */; };
+		D6D9F14314DC62D6009C0C95 /* SMCEnvironment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F12014DC62D6009C0C95 /* SMCEnvironment.cpp */; };
+		D6D9F14414DC62D6009C0C95 /* SMCEnvironmentViz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F12114DC62D6009C0C95 /* SMCEnvironmentViz.cpp */; };
+		D6D9F14514DC62D6009C0C95 /* View.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F12214DC62D6009C0C95 /* View.cpp */; };
+		D6D9F14714DC62E9009C0C95 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F14614DC62E9009C0C95 /* main.cpp */; };
+		D6D9F1C114DC64A9009C0C95 /* pf_tempesta_seven.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D6D9F14D14DC64A9009C0C95 /* pf_tempesta_seven.ttf */; };
+		D6D9F1FB14DC64A9009C0C95 /* SimpleGUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F1B514DC64A9009C0C95 /* SimpleGUI.cpp */; };
+		D6D9F20E14DC6A93009C0C95 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D6D9F20A14DC6A93009C0C95 /* GLUT.framework */; };
+		D6D9F20F14DC6A93009C0C95 /* glut32.dll in Resources */ = {isa = PBXBuildFile; fileRef = D6D9F20C14DC6A93009C0C95 /* glut32.dll */; };
+		D6D9F21014DC6A93009C0C95 /* glut32.lib in Frameworks */ = {isa = PBXBuildFile; fileRef = D6D9F20D14DC6A93009C0C95 /* glut32.lib */; };
+		D6E6E57014E15C2E00FE6B07 /* Spin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E6E56F14E15C2E00FE6B07 /* Spin.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0091D8F80E81B9330029341E /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
+		0097E3E40F3E9819005A4392 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
+		00B784AF0FF439BC000DE1D7 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		00B784B00FF439BC000DE1D7 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		00B784B10FF439BC000DE1D7 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = System/Library/Frameworks/AudioUnit.framework; sourceTree = SDKROOT; };
+		00B784B20FF439BC000DE1D7 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
+		00CCAF14116A9FEE008396D5 /* CinderApp.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = CinderApp.icns; path = ../resources/CinderApp.icns; sourceTree = SOURCE_ROOT; };
+		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
+		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		32CA4F630368D1EE00C91783 /* dynmx_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dynmx_Prefix.pch; sourceTree = "<group>"; };
+		5323E6B10EAFCA74003A9687 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = /System/Library/Frameworks/CoreVideo.framework; sourceTree = "<absolute>"; };
+		5323E6B50EAFCA7E003A9687 /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
+		53E3CDFB0E86099300238D2B /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
+		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8D1107320486CEB800E47090 /* dynmx.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dynmx.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D6D9F0C614DC62A4009C0C95 /* App.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = App.h; path = ../include/dynmx/App.h; sourceTree = "<group>"; };
+		D6D9F0C714DC62A4009C0C95 /* Arm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Arm.h; path = ../include/dynmx/Arm.h; sourceTree = "<group>"; };
+		D6D9F0C814DC62A4009C0C95 /* ArmMuscled.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmMuscled.h; path = ../include/dynmx/ArmMuscled.h; sourceTree = "<group>"; };
+		D6D9F0C914DC62A4009C0C95 /* ArmMuscledView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmMuscledView.h; path = ../include/dynmx/ArmMuscledView.h; sourceTree = "<group>"; };
+		D6D9F0CA14DC62A4009C0C95 /* ArmMuscledViz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmMuscledViz.h; path = ../include/dynmx/ArmMuscledViz.h; sourceTree = "<group>"; };
+		D6D9F0CB14DC62A4009C0C95 /* ArmPD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmPD.h; path = ../include/dynmx/ArmPD.h; sourceTree = "<group>"; };
+		D6D9F0CC14DC62A4009C0C95 /* ArmPDView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmPDView.h; path = ../include/dynmx/ArmPDView.h; sourceTree = "<group>"; };
+		D6D9F0CD14DC62A4009C0C95 /* ArmReflex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmReflex.h; path = ../include/dynmx/ArmReflex.h; sourceTree = "<group>"; };
+		D6D9F0CE14DC62A4009C0C95 /* ArmReflexView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmReflexView.h; path = ../include/dynmx/ArmReflexView.h; sourceTree = "<group>"; };
+		D6D9F0CF14DC62A4009C0C95 /* ArmReflexViz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmReflexViz.h; path = ../include/dynmx/ArmReflexViz.h; sourceTree = "<group>"; };
+		D6D9F0D014DC62A4009C0C95 /* ArmView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmView.h; path = ../include/dynmx/ArmView.h; sourceTree = "<group>"; };
+		D6D9F0D114DC62A4009C0C95 /* ArmViz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmViz.h; path = ../include/dynmx/ArmViz.h; sourceTree = "<group>"; };
+		D6D9F0D214DC62A4009C0C95 /* CollisionDetection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CollisionDetection.h; path = ../include/dynmx/CollisionDetection.h; sourceTree = "<group>"; };
+		D6D9F0D314DC62A4009C0C95 /* CTRNN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CTRNN.h; path = ../include/dynmx/CTRNN.h; sourceTree = "<group>"; };
+		D6D9F0D414DC62A4009C0C95 /* CTRNNViz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CTRNNViz.h; path = ../include/dynmx/CTRNNViz.h; sourceTree = "<group>"; };
+		D6D9F0D514DC62A4009C0C95 /* DistanceSensor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DistanceSensor.h; path = ../include/dynmx/DistanceSensor.h; sourceTree = "<group>"; };
+		D6D9F0D614DC62A4009C0C95 /* Dynmx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Dynmx.h; path = ../include/dynmx/Dynmx.h; sourceTree = "<group>"; };
+		D6D9F0D714DC62A4009C0C95 /* EPController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EPController.h; path = ../include/dynmx/EPController.h; sourceTree = "<group>"; };
+		D6D9F0D814DC62A4009C0C95 /* EvoArmCoCon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EvoArmCoCon.h; path = ../include/dynmx/EvoArmCoCon.h; sourceTree = "<group>"; };
+		D6D9F0D914DC62A4009C0C95 /* GA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GA.h; path = ../include/dynmx/GA.h; sourceTree = "<group>"; };
+		D6D9F0DA14DC62A4009C0C95 /* GARunner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GARunner.h; path = ../include/dynmx/GARunner.h; sourceTree = "<group>"; };
+		D6D9F0DB14DC62A4009C0C95 /* GATester.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GATester.h; path = ../include/dynmx/GATester.h; sourceTree = "<group>"; };
+		D6D9F0DC14DC62A4009C0C95 /* GAViz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GAViz.h; path = ../include/dynmx/GAViz.h; sourceTree = "<group>"; };
+		D6D9F0DD14DC62A4009C0C95 /* Light.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Light.h; path = ../include/dynmx/Light.h; sourceTree = "<group>"; };
+		D6D9F0DE14DC62A4009C0C95 /* MathUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MathUtils.h; path = ../include/dynmx/MathUtils.h; sourceTree = "<group>"; };
+		D6D9F0DF14DC62A4009C0C95 /* Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Model.h; path = ../include/dynmx/Model.h; sourceTree = "<group>"; };
+		D6D9F0E014DC62A4009C0C95 /* Muscle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Muscle.h; path = ../include/dynmx/Muscle.h; sourceTree = "<group>"; };
+		D6D9F0E114DC62A4009C0C95 /* MuscleBiWrap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MuscleBiWrap.h; path = ../include/dynmx/MuscleBiWrap.h; sourceTree = "<group>"; };
+		D6D9F0E214DC62A4009C0C95 /* MuscleMonoWrap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MuscleMonoWrap.h; path = ../include/dynmx/MuscleMonoWrap.h; sourceTree = "<group>"; };
+		D6D9F0E314DC62A4009C0C95 /* PD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PD.h; path = ../include/dynmx/PD.h; sourceTree = "<group>"; };
+		D6D9F0E414DC62A4009C0C95 /* Random.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Random.h; path = ../include/dynmx/Random.h; sourceTree = "<group>"; };
+		D6D9F0E514DC62A4009C0C95 /* Recorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Recorder.h; path = ../include/dynmx/Recorder.h; sourceTree = "<group>"; };
+		D6D9F0E614DC62A4009C0C95 /* Reflex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reflex.h; path = ../include/dynmx/Reflex.h; sourceTree = "<group>"; };
+		D6D9F0E714DC62A4009C0C95 /* Registry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Registry.h; path = ../include/dynmx/Registry.h; sourceTree = "<group>"; };
+		D6D9F0E814DC62A4009C0C95 /* Render.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Render.h; path = ../include/dynmx/Render.h; sourceTree = "<group>"; };
+		D6D9F0E914DC62A4009C0C95 /* Scene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Scene.h; path = ../include/dynmx/Scene.h; sourceTree = "<group>"; };
+		D6D9F0EA14DC62A4009C0C95 /* Simulation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Simulation.h; path = ../include/dynmx/Simulation.h; sourceTree = "<group>"; };
+		D6D9F0EB14DC62A4009C0C95 /* SimulationFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SimulationFactory.h; path = ../include/dynmx/SimulationFactory.h; sourceTree = "<group>"; };
+		D6D9F0EC14DC62A4009C0C95 /* SMCAgent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCAgent.h; path = ../include/dynmx/SMCAgent.h; sourceTree = "<group>"; };
+		D6D9F0ED14DC62A4009C0C95 /* SMCAgentEvo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCAgentEvo.h; path = ../include/dynmx/SMCAgentEvo.h; sourceTree = "<group>"; };
+		D6D9F0EE14DC62A4009C0C95 /* SMCAgentViz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCAgentViz.h; path = ../include/dynmx/SMCAgentViz.h; sourceTree = "<group>"; };
+		D6D9F0EF14DC62A4009C0C95 /* SMCEnvironment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCEnvironment.h; path = ../include/dynmx/SMCEnvironment.h; sourceTree = "<group>"; };
+		D6D9F0F014DC62A4009C0C95 /* SMCEnvironmentViz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCEnvironmentViz.h; path = ../include/dynmx/SMCEnvironmentViz.h; sourceTree = "<group>"; };
+		D6D9F0F114DC62A4009C0C95 /* SMCView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCView.h; path = ../include/dynmx/SMCView.h; sourceTree = "<group>"; };
+		D6D9F0F214DC62A4009C0C95 /* Trajectory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Trajectory.h; path = ../include/dynmx/Trajectory.h; sourceTree = "<group>"; };
+		D6D9F0F314DC62A4009C0C95 /* View.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = View.h; path = ../include/dynmx/View.h; sourceTree = "<group>"; };
+		D6D9F0F514DC62BD009C0C95 /* TestAppCTRNN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestAppCTRNN.h; sourceTree = "<group>"; };
+		D6D9F0F614DC62BD009C0C95 /* TestEvolvable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestEvolvable.h; sourceTree = "<group>"; };
+		D6D9F0F714DC62BD009C0C95 /* TestEvolvableCTRNN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestEvolvableCTRNN.h; sourceTree = "<group>"; };
+		D6D9F0F814DC62BD009C0C95 /* TestModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestModel.h; sourceTree = "<group>"; };
+		D6D9F0F914DC62BD009C0C95 /* TestModelArmPD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestModelArmPD.h; sourceTree = "<group>"; };
+		D6D9F0FA14DC62BD009C0C95 /* TestModelArmReflex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestModelArmReflex.h; sourceTree = "<group>"; };
+		D6D9F0FB14DC62BD009C0C95 /* TestModelCTRNN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestModelCTRNN.h; sourceTree = "<group>"; };
+		D6D9F0FC14DC62BD009C0C95 /* TestModelEvolvableArm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestModelEvolvableArm.h; sourceTree = "<group>"; };
+		D6D9F0FD14DC62BD009C0C95 /* TestView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestView.h; sourceTree = "<group>"; };
+		D6D9F0FE14DC62BD009C0C95 /* TestViewCTRNN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestViewCTRNN.h; sourceTree = "<group>"; };
+		D6D9F0FF14DC62BD009C0C95 /* TestViewEvolvableCTRNN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestViewEvolvableCTRNN.h; sourceTree = "<group>"; };
+		D6D9F10014DC62D6009C0C95 /* App.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = App.cpp; path = ../src/dynmx/App.cpp; sourceTree = "<group>"; };
+		D6D9F10114DC62D6009C0C95 /* Arm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Arm.cpp; path = ../src/dynmx/Arm.cpp; sourceTree = "<group>"; };
+		D6D9F10214DC62D6009C0C95 /* ArmMuscled.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ArmMuscled.cpp; path = ../src/dynmx/ArmMuscled.cpp; sourceTree = "<group>"; };
+		D6D9F10314DC62D6009C0C95 /* ArmMuscledViz.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ArmMuscledViz.cpp; path = ../src/dynmx/ArmMuscledViz.cpp; sourceTree = "<group>"; };
+		D6D9F10414DC62D6009C0C95 /* ArmPD.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ArmPD.cpp; path = ../src/dynmx/ArmPD.cpp; sourceTree = "<group>"; };
+		D6D9F10514DC62D6009C0C95 /* ArmReflex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ArmReflex.cpp; path = ../src/dynmx/ArmReflex.cpp; sourceTree = "<group>"; };
+		D6D9F10614DC62D6009C0C95 /* ArmViz.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ArmViz.cpp; path = ../src/dynmx/ArmViz.cpp; sourceTree = "<group>"; };
+		D6D9F10714DC62D6009C0C95 /* CTRNN.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CTRNN.cpp; path = ../src/dynmx/CTRNN.cpp; sourceTree = "<group>"; };
+		D6D9F10814DC62D6009C0C95 /* CTRNNViz.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CTRNNViz.cpp; path = ../src/dynmx/CTRNNViz.cpp; sourceTree = "<group>"; };
+		D6D9F10914DC62D6009C0C95 /* DistanceSensor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DistanceSensor.cpp; path = ../src/dynmx/DistanceSensor.cpp; sourceTree = "<group>"; };
+		D6D9F10A14DC62D6009C0C95 /* Dynmx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Dynmx.cpp; path = ../src/dynmx/Dynmx.cpp; sourceTree = "<group>"; };
+		D6D9F10B14DC62D6009C0C95 /* EPController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EPController.cpp; path = ../src/dynmx/EPController.cpp; sourceTree = "<group>"; };
+		D6D9F10C14DC62D6009C0C95 /* EvoArmCoCon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EvoArmCoCon.cpp; path = ../src/dynmx/EvoArmCoCon.cpp; sourceTree = "<group>"; };
+		D6D9F10D14DC62D6009C0C95 /* GA.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GA.cpp; path = ../src/dynmx/GA.cpp; sourceTree = "<group>"; };
+		D6D9F10E14DC62D6009C0C95 /* GARunner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GARunner.cpp; path = ../src/dynmx/GARunner.cpp; sourceTree = "<group>"; };
+		D6D9F10F14DC62D6009C0C95 /* GATester.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GATester.cpp; path = ../src/dynmx/GATester.cpp; sourceTree = "<group>"; };
+		D6D9F11014DC62D6009C0C95 /* GAViz.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GAViz.cpp; path = ../src/dynmx/GAViz.cpp; sourceTree = "<group>"; };
+		D6D9F11114DC62D6009C0C95 /* Light.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Light.cpp; path = ../src/dynmx/Light.cpp; sourceTree = "<group>"; };
+		D6D9F11214DC62D6009C0C95 /* Muscle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Muscle.cpp; path = ../src/dynmx/Muscle.cpp; sourceTree = "<group>"; };
+		D6D9F11314DC62D6009C0C95 /* MuscleBiWrap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MuscleBiWrap.cpp; path = ../src/dynmx/MuscleBiWrap.cpp; sourceTree = "<group>"; };
+		D6D9F11414DC62D6009C0C95 /* MuscleMonoWrap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MuscleMonoWrap.cpp; path = ../src/dynmx/MuscleMonoWrap.cpp; sourceTree = "<group>"; };
+		D6D9F11514DC62D6009C0C95 /* PD.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PD.cpp; path = ../src/dynmx/PD.cpp; sourceTree = "<group>"; };
+		D6D9F11614DC62D6009C0C95 /* Random.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Random.cpp; path = ../src/dynmx/Random.cpp; sourceTree = "<group>"; };
+		D6D9F11714DC62D6009C0C95 /* Recorder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Recorder.cpp; path = ../src/dynmx/Recorder.cpp; sourceTree = "<group>"; };
+		D6D9F11814DC62D6009C0C95 /* Reflex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Reflex.cpp; path = ../src/dynmx/Reflex.cpp; sourceTree = "<group>"; };
+		D6D9F11914DC62D6009C0C95 /* Registry.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Registry.cpp; path = ../src/dynmx/Registry.cpp; sourceTree = "<group>"; };
+		D6D9F11A14DC62D6009C0C95 /* Scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Scene.cpp; path = ../src/dynmx/Scene.cpp; sourceTree = "<group>"; };
+		D6D9F11B14DC62D6009C0C95 /* Simulation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Simulation.cpp; path = ../src/dynmx/Simulation.cpp; sourceTree = "<group>"; };
+		D6D9F11C14DC62D6009C0C95 /* SimulationFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SimulationFactory.cpp; path = ../src/dynmx/SimulationFactory.cpp; sourceTree = "<group>"; };
+		D6D9F11D14DC62D6009C0C95 /* SMCAgent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SMCAgent.cpp; path = ../src/dynmx/SMCAgent.cpp; sourceTree = "<group>"; };
+		D6D9F11E14DC62D6009C0C95 /* SMCAgentEvo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SMCAgentEvo.cpp; path = ../src/dynmx/SMCAgentEvo.cpp; sourceTree = "<group>"; };
+		D6D9F11F14DC62D6009C0C95 /* SMCAgentViz.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SMCAgentViz.cpp; path = ../src/dynmx/SMCAgentViz.cpp; sourceTree = "<group>"; };
+		D6D9F12014DC62D6009C0C95 /* SMCEnvironment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SMCEnvironment.cpp; path = ../src/dynmx/SMCEnvironment.cpp; sourceTree = "<group>"; };
+		D6D9F12114DC62D6009C0C95 /* SMCEnvironmentViz.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SMCEnvironmentViz.cpp; path = ../src/dynmx/SMCEnvironmentViz.cpp; sourceTree = "<group>"; };
+		D6D9F12214DC62D6009C0C95 /* View.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = View.cpp; path = ../src/dynmx/View.cpp; sourceTree = "<group>"; };
+		D6D9F14614DC62E9009C0C95 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../src/main.cpp; sourceTree = "<group>"; };
+		D6D9F14B14DC64A9009C0C95 /* SimpleGUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleGUI.h; sourceTree = "<group>"; };
+		D6D9F14D14DC64A9009C0C95 /* pf_tempesta_seven.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = pf_tempesta_seven.ttf; sourceTree = "<group>"; };
+		D6D9F1B514DC64A9009C0C95 /* SimpleGUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SimpleGUI.cpp; sourceTree = "<group>"; };
+		D6D9F20714DC6A93009C0C95 /* glut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glut.h; sourceTree = "<group>"; };
+		D6D9F20A14DC6A93009C0C95 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GLUT.framework; sourceTree = "<group>"; };
+		D6D9F20C14DC6A93009C0C95 /* glut32.dll */ = {isa = PBXFileReference; lastKnownFileType = file; path = glut32.dll; sourceTree = "<group>"; };
+		D6D9F20D14DC6A93009C0C95 /* glut32.lib */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = glut32.lib; sourceTree = "<group>"; };
+		D6E6E56D14E15C1300FE6B07 /* Spin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Spin.h; path = ../include/dynmx/Spin.h; sourceTree = "<group>"; };
+		D6E6E56F14E15C2E00FE6B07 /* Spin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Spin.cpp; path = ../src/dynmx/Spin.cpp; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8D11072E0486CEB800E47090 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
+				0091D8F90E81B9330029341E /* OpenGL.framework in Frameworks */,
+				53E3CDFC0E86099300238D2B /* Carbon.framework in Frameworks */,
+				5323E6B20EAFCA74003A9687 /* CoreVideo.framework in Frameworks */,
+				5323E6B60EAFCA7E003A9687 /* QTKit.framework in Frameworks */,
+				0097E3E50F3E9819005A4392 /* QuickTime.framework in Frameworks */,
+				00B784B30FF439BC000DE1D7 /* Accelerate.framework in Frameworks */,
+				00B784B40FF439BC000DE1D7 /* AudioToolbox.framework in Frameworks */,
+				00B784B50FF439BC000DE1D7 /* AudioUnit.framework in Frameworks */,
+				00B784B60FF439BC000DE1D7 /* CoreAudio.framework in Frameworks */,
+				D6D9F20E14DC6A93009C0C95 /* GLUT.framework in Frameworks */,
+				D6D9F21014DC6A93009C0C95 /* glut32.lib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		080E96DDFE201D6D7F000001 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				D6D9F0F414DC62BD009C0C95 /* Tests */,
+				D6E6E57214E15DC100FE6B07 /* SMC */,
+				D6E6E57314E15E6E00FE6B07 /* Spin */,
+				D6E6E57114E15D6F00FE6B07 /* Arm */,
+				D6D9F10014DC62D6009C0C95 /* App.cpp */,
+				D6D9F0C614DC62A4009C0C95 /* App.h */,
+				D6D9F0D214DC62A4009C0C95 /* CollisionDetection.h */,
+				D6D9F10714DC62D6009C0C95 /* CTRNN.cpp */,
+				D6D9F0D314DC62A4009C0C95 /* CTRNN.h */,
+				D6D9F10814DC62D6009C0C95 /* CTRNNViz.cpp */,
+				D6D9F0D414DC62A4009C0C95 /* CTRNNViz.h */,
+				D6D9F10914DC62D6009C0C95 /* DistanceSensor.cpp */,
+				D6D9F0D514DC62A4009C0C95 /* DistanceSensor.h */,
+				D6D9F10A14DC62D6009C0C95 /* Dynmx.cpp */,
+				D6D9F0D614DC62A4009C0C95 /* Dynmx.h */,
+				32CA4F630368D1EE00C91783 /* dynmx_Prefix.pch */,
+				D6D9F10D14DC62D6009C0C95 /* GA.cpp */,
+				D6D9F0D914DC62A4009C0C95 /* GA.h */,
+				D6D9F10E14DC62D6009C0C95 /* GARunner.cpp */,
+				D6D9F0DA14DC62A4009C0C95 /* GARunner.h */,
+				D6D9F10F14DC62D6009C0C95 /* GATester.cpp */,
+				D6D9F0DB14DC62A4009C0C95 /* GATester.h */,
+				D6D9F11014DC62D6009C0C95 /* GAViz.cpp */,
+				D6D9F0DC14DC62A4009C0C95 /* GAViz.h */,
+				D6D9F11114DC62D6009C0C95 /* Light.cpp */,
+				D6D9F0DD14DC62A4009C0C95 /* Light.h */,
+				D6D9F14614DC62E9009C0C95 /* main.cpp */,
+				D6D9F0DE14DC62A4009C0C95 /* MathUtils.h */,
+				D6D9F0DF14DC62A4009C0C95 /* Model.h */,
+				D6D9F11614DC62D6009C0C95 /* Random.cpp */,
+				D6D9F0E414DC62A4009C0C95 /* Random.h */,
+				D6D9F11714DC62D6009C0C95 /* Recorder.cpp */,
+				D6D9F0E514DC62A4009C0C95 /* Recorder.h */,
+				D6D9F11914DC62D6009C0C95 /* Registry.cpp */,
+				D6D9F0E714DC62A4009C0C95 /* Registry.h */,
+				D6D9F0E814DC62A4009C0C95 /* Render.h */,
+				D6D9F11A14DC62D6009C0C95 /* Scene.cpp */,
+				D6D9F0E914DC62A4009C0C95 /* Scene.h */,
+				D6D9F11B14DC62D6009C0C95 /* Simulation.cpp */,
+				D6D9F0EA14DC62A4009C0C95 /* Simulation.h */,
+				D6D9F11C14DC62D6009C0C95 /* SimulationFactory.cpp */,
+				D6D9F0EB14DC62A4009C0C95 /* SimulationFactory.h */,
+				D6D9F12214DC62D6009C0C95 /* View.cpp */,
+				D6D9F0F314DC62A4009C0C95 /* View.h */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				00B784AF0FF439BC000DE1D7 /* Accelerate.framework */,
+				00B784B00FF439BC000DE1D7 /* AudioToolbox.framework */,
+				00B784B10FF439BC000DE1D7 /* AudioUnit.framework */,
+				00B784B20FF439BC000DE1D7 /* CoreAudio.framework */,
+				0097E3E40F3E9819005A4392 /* QuickTime.framework */,
+				5323E6B50EAFCA7E003A9687 /* QTKit.framework */,
+				5323E6B10EAFCA74003A9687 /* CoreVideo.framework */,
+				53E3CDFB0E86099300238D2B /* Carbon.framework */,
+				0091D8F80E81B9330029341E /* OpenGL.framework */,
+				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
+			);
+			name = "Linked Frameworks";
+			sourceTree = "<group>";
+		};
+		1058C7A2FEA54F0111CA2CBB /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D6D9F20514DC6A93009C0C95 /* glut */,
+				29B97324FDCFA39411CA2CEA /* AppKit.framework */,
+				13E42FB307B3F0F600E4EEF1 /* CoreData.framework */,
+				29B97325FDCFA39411CA2CEA /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		19C28FACFE9D520D11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8D1107320486CEB800E47090 /* dynmx.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		29B97314FDCFA39411CA2CEA /* dynmx */ = {
+			isa = PBXGroup;
+			children = (
+				D6D9F14914DC64A9009C0C95 /* SimpleGUI */,
+				080E96DDFE201D6D7F000001 /* Source */,
+				29B97317FDCFA39411CA2CEA /* Resources */,
+				29B97323FDCFA39411CA2CEA /* Frameworks */,
+				19C28FACFE9D520D11CA2CBB /* Products */,
+			);
+			name = dynmx;
+			sourceTree = "<group>";
+		};
+		29B97317FDCFA39411CA2CEA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				8D1107310486CEB800E47090 /* Info.plist */,
+				00CCAF14116A9FEE008396D5 /* CinderApp.icns */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
+				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D6D9F0F414DC62BD009C0C95 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				D6D9F0F514DC62BD009C0C95 /* TestAppCTRNN.h */,
+				D6D9F0F614DC62BD009C0C95 /* TestEvolvable.h */,
+				D6D9F0F714DC62BD009C0C95 /* TestEvolvableCTRNN.h */,
+				D6D9F0F814DC62BD009C0C95 /* TestModel.h */,
+				D6D9F0F914DC62BD009C0C95 /* TestModelArmPD.h */,
+				D6D9F0FA14DC62BD009C0C95 /* TestModelArmReflex.h */,
+				D6D9F0FB14DC62BD009C0C95 /* TestModelCTRNN.h */,
+				D6D9F0FC14DC62BD009C0C95 /* TestModelEvolvableArm.h */,
+				D6D9F0FD14DC62BD009C0C95 /* TestView.h */,
+				D6D9F0FE14DC62BD009C0C95 /* TestViewCTRNN.h */,
+				D6D9F0FF14DC62BD009C0C95 /* TestViewEvolvableCTRNN.h */,
+			);
+			name = Tests;
+			path = ../include/dynmx/Tests;
+			sourceTree = "<group>";
+		};
+		D6D9F14914DC64A9009C0C95 /* SimpleGUI */ = {
+			isa = PBXGroup;
+			children = (
+				D6D9F14A14DC64A9009C0C95 /* include */,
+				D6D9F14C14DC64A9009C0C95 /* resources */,
+				D6D9F1B414DC64A9009C0C95 /* src */,
+			);
+			name = SimpleGUI;
+			path = ../../Cinder/blocks/SimpleGUI;
+			sourceTree = "<group>";
+		};
+		D6D9F14A14DC64A9009C0C95 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				D6D9F14B14DC64A9009C0C95 /* SimpleGUI.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		D6D9F14C14DC64A9009C0C95 /* resources */ = {
+			isa = PBXGroup;
+			children = (
+				D6D9F14D14DC64A9009C0C95 /* pf_tempesta_seven.ttf */,
+			);
+			path = resources;
+			sourceTree = "<group>";
+		};
+		D6D9F1B414DC64A9009C0C95 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				D6D9F1B514DC64A9009C0C95 /* SimpleGUI.cpp */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		D6D9F20514DC6A93009C0C95 /* glut */ = {
+			isa = PBXGroup;
+			children = (
+				D6D9F20614DC6A93009C0C95 /* include */,
+				D6D9F20814DC6A93009C0C95 /* lib */,
+			);
+			name = glut;
+			path = ../glut;
+			sourceTree = "<group>";
+		};
+		D6D9F20614DC6A93009C0C95 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				D6D9F20714DC6A93009C0C95 /* glut.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		D6D9F20814DC6A93009C0C95 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				D6D9F20914DC6A93009C0C95 /* osx */,
+				D6D9F20B14DC6A93009C0C95 /* win */,
+			);
+			path = lib;
+			sourceTree = "<group>";
+		};
+		D6D9F20914DC6A93009C0C95 /* osx */ = {
+			isa = PBXGroup;
+			children = (
+				D6D9F20A14DC6A93009C0C95 /* GLUT.framework */,
+			);
+			path = osx;
+			sourceTree = "<group>";
+		};
+		D6D9F20B14DC6A93009C0C95 /* win */ = {
+			isa = PBXGroup;
+			children = (
+				D6D9F20C14DC6A93009C0C95 /* glut32.dll */,
+				D6D9F20D14DC6A93009C0C95 /* glut32.lib */,
+			);
+			path = win;
+			sourceTree = "<group>";
+		};
+		D6E6E57114E15D6F00FE6B07 /* Arm */ = {
+			isa = PBXGroup;
+			children = (
+				D6E6E57414E15EAD00FE6B07 /* Views */,
+				D6E6E57514E164DD00FE6B07 /* Evolvables */,
+				D6D9F10114DC62D6009C0C95 /* Arm.cpp */,
+				D6D9F0C714DC62A4009C0C95 /* Arm.h */,
+				D6D9F10214DC62D6009C0C95 /* ArmMuscled.cpp */,
+				D6D9F0C814DC62A4009C0C95 /* ArmMuscled.h */,
+				D6D9F10414DC62D6009C0C95 /* ArmPD.cpp */,
+				D6D9F0CB14DC62A4009C0C95 /* ArmPD.h */,
+				D6D9F10514DC62D6009C0C95 /* ArmReflex.cpp */,
+				D6D9F0CD14DC62A4009C0C95 /* ArmReflex.h */,
+				D6D9F10B14DC62D6009C0C95 /* EPController.cpp */,
+				D6D9F0D714DC62A4009C0C95 /* EPController.h */,
+				D6D9F11214DC62D6009C0C95 /* Muscle.cpp */,
+				D6D9F0E014DC62A4009C0C95 /* Muscle.h */,
+				D6D9F11314DC62D6009C0C95 /* MuscleBiWrap.cpp */,
+				D6D9F0E114DC62A4009C0C95 /* MuscleBiWrap.h */,
+				D6D9F11414DC62D6009C0C95 /* MuscleMonoWrap.cpp */,
+				D6D9F0E214DC62A4009C0C95 /* MuscleMonoWrap.h */,
+				D6D9F11514DC62D6009C0C95 /* PD.cpp */,
+				D6D9F0E314DC62A4009C0C95 /* PD.h */,
+				D6D9F11814DC62D6009C0C95 /* Reflex.cpp */,
+				D6D9F0E614DC62A4009C0C95 /* Reflex.h */,
+				D6D9F0F214DC62A4009C0C95 /* Trajectory.h */,
+			);
+			name = Arm;
+			sourceTree = "<group>";
+		};
+		D6E6E57214E15DC100FE6B07 /* SMC */ = {
+			isa = PBXGroup;
+			children = (
+				D6D9F11D14DC62D6009C0C95 /* SMCAgent.cpp */,
+				D6D9F0EC14DC62A4009C0C95 /* SMCAgent.h */,
+				D6D9F11E14DC62D6009C0C95 /* SMCAgentEvo.cpp */,
+				D6D9F0ED14DC62A4009C0C95 /* SMCAgentEvo.h */,
+				D6D9F11F14DC62D6009C0C95 /* SMCAgentViz.cpp */,
+				D6D9F0EE14DC62A4009C0C95 /* SMCAgentViz.h */,
+				D6D9F12014DC62D6009C0C95 /* SMCEnvironment.cpp */,
+				D6D9F0EF14DC62A4009C0C95 /* SMCEnvironment.h */,
+				D6D9F12114DC62D6009C0C95 /* SMCEnvironmentViz.cpp */,
+				D6D9F0F014DC62A4009C0C95 /* SMCEnvironmentViz.h */,
+				D6D9F0F114DC62A4009C0C95 /* SMCView.h */,
+			);
+			name = SMC;
+			sourceTree = "<group>";
+		};
+		D6E6E57314E15E6E00FE6B07 /* Spin */ = {
+			isa = PBXGroup;
+			children = (
+				D6E6E56F14E15C2E00FE6B07 /* Spin.cpp */,
+				D6E6E56D14E15C1300FE6B07 /* Spin.h */,
+			);
+			name = Spin;
+			sourceTree = "<group>";
+		};
+		D6E6E57414E15EAD00FE6B07 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				D6D9F0C914DC62A4009C0C95 /* ArmMuscledView.h */,
+				D6D9F10314DC62D6009C0C95 /* ArmMuscledViz.cpp */,
+				D6D9F0CA14DC62A4009C0C95 /* ArmMuscledViz.h */,
+				D6D9F0CC14DC62A4009C0C95 /* ArmPDView.h */,
+				D6D9F0CE14DC62A4009C0C95 /* ArmReflexView.h */,
+				D6D9F0CF14DC62A4009C0C95 /* ArmReflexViz.h */,
+				D6D9F0D014DC62A4009C0C95 /* ArmView.h */,
+				D6D9F10614DC62D6009C0C95 /* ArmViz.cpp */,
+				D6D9F0D114DC62A4009C0C95 /* ArmViz.h */,
+			);
+			name = Views;
+			sourceTree = "<group>";
+		};
+		D6E6E57514E164DD00FE6B07 /* Evolvables */ = {
+			isa = PBXGroup;
+			children = (
+				D6D9F10C14DC62D6009C0C95 /* EvoArmCoCon.cpp */,
+				D6D9F0D814DC62A4009C0C95 /* EvoArmCoCon.h */,
+			);
+			name = Evolvables;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8D1107260486CEB800E47090 /* dynmx */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "dynmx" */;
+			buildPhases = (
+				8D1107290486CEB800E47090 /* Resources */,
+				8D11072C0486CEB800E47090 /* Sources */,
+				8D11072E0486CEB800E47090 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = dynmx;
+			productInstallPath = "$(HOME)/Applications";
+			productName = dynmx;
+			productReference = 8D1107320486CEB800E47090 /* dynmx.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		29B97313FDCFA39411CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "dynmx" */;
+			compatibilityVersion = "Xcode 3.0";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 29B97314FDCFA39411CA2CEA /* dynmx */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8D1107260486CEB800E47090 /* dynmx */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8D1107290486CEB800E47090 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				00CCAF15116A9FEE008396D5 /* CinderApp.icns in Resources */,
+				D6D9F1C114DC64A9009C0C95 /* pf_tempesta_seven.ttf in Resources */,
+				D6D9F20F14DC6A93009C0C95 /* glut32.dll in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8D11072C0486CEB800E47090 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D6D9F12314DC62D6009C0C95 /* App.cpp in Sources */,
+				D6D9F12414DC62D6009C0C95 /* Arm.cpp in Sources */,
+				D6D9F12514DC62D6009C0C95 /* ArmMuscled.cpp in Sources */,
+				D6D9F12614DC62D6009C0C95 /* ArmMuscledViz.cpp in Sources */,
+				D6D9F12714DC62D6009C0C95 /* ArmPD.cpp in Sources */,
+				D6D9F12814DC62D6009C0C95 /* ArmReflex.cpp in Sources */,
+				D6D9F12914DC62D6009C0C95 /* ArmViz.cpp in Sources */,
+				D6D9F12A14DC62D6009C0C95 /* CTRNN.cpp in Sources */,
+				D6D9F12B14DC62D6009C0C95 /* CTRNNViz.cpp in Sources */,
+				D6D9F12C14DC62D6009C0C95 /* DistanceSensor.cpp in Sources */,
+				D6D9F12D14DC62D6009C0C95 /* Dynmx.cpp in Sources */,
+				D6D9F12E14DC62D6009C0C95 /* EPController.cpp in Sources */,
+				D6D9F12F14DC62D6009C0C95 /* EvoArmCoCon.cpp in Sources */,
+				D6D9F13014DC62D6009C0C95 /* GA.cpp in Sources */,
+				D6D9F13114DC62D6009C0C95 /* GARunner.cpp in Sources */,
+				D6D9F13214DC62D6009C0C95 /* GATester.cpp in Sources */,
+				D6D9F13314DC62D6009C0C95 /* GAViz.cpp in Sources */,
+				D6D9F13414DC62D6009C0C95 /* Light.cpp in Sources */,
+				D6D9F13514DC62D6009C0C95 /* Muscle.cpp in Sources */,
+				D6D9F13614DC62D6009C0C95 /* MuscleBiWrap.cpp in Sources */,
+				D6D9F13714DC62D6009C0C95 /* MuscleMonoWrap.cpp in Sources */,
+				D6D9F13814DC62D6009C0C95 /* PD.cpp in Sources */,
+				D6D9F13914DC62D6009C0C95 /* Random.cpp in Sources */,
+				D6D9F13A14DC62D6009C0C95 /* Recorder.cpp in Sources */,
+				D6D9F13B14DC62D6009C0C95 /* Reflex.cpp in Sources */,
+				D6D9F13C14DC62D6009C0C95 /* Registry.cpp in Sources */,
+				D6D9F13D14DC62D6009C0C95 /* Scene.cpp in Sources */,
+				D6D9F13E14DC62D6009C0C95 /* Simulation.cpp in Sources */,
+				D6D9F13F14DC62D6009C0C95 /* SimulationFactory.cpp in Sources */,
+				D6D9F14014DC62D6009C0C95 /* SMCAgent.cpp in Sources */,
+				D6D9F14114DC62D6009C0C95 /* SMCAgentEvo.cpp in Sources */,
+				D6D9F14214DC62D6009C0C95 /* SMCAgentViz.cpp in Sources */,
+				D6D9F14314DC62D6009C0C95 /* SMCEnvironment.cpp in Sources */,
+				D6D9F14414DC62D6009C0C95 /* SMCEnvironmentViz.cpp in Sources */,
+				D6D9F14514DC62D6009C0C95 /* View.cpp in Sources */,
+				D6D9F14714DC62E9009C0C95 /* main.cpp in Sources */,
+				D6D9F1FB14DC64A9009C0C95 /* SimpleGUI.cpp in Sources */,
+				D6E6E57014E15C2E00FE6B07 /* Spin.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		C01FCF4B08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CINDER_PATH = ../../Cinder;
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../glut/lib/osx\"",
+				);
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = dynmx_Prefix.pch;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../glut/lib/win\"",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				OTHER_LDFLAGS = "\"$(CINDER_PATH)/lib/libcinder_d.a\"";
+				PREBINDING = ../../Cinder;
+				PRODUCT_NAME = dynmx;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		C01FCF4C08A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CINDER_PATH = ../../Cinder;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../glut/lib/osx\"",
+				);
+				GCC_FAST_MATH = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = dynmx_Prefix.pch;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../glut/lib/win\"",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				OTHER_LDFLAGS = "\"$(CINDER_PATH)/lib/libcinder.a\"";
+				PREBINDING = ../../Cinder;
+				PRODUCT_NAME = dynmx;
+				STRIP_INSTALLED_PRODUCT = YES;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		C01FCF4F08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = i386;
+				CINDER_PATH = ../../../Cinder;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/boost\"";
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				PREBINDING = NO;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
+				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\" ../include";
+			};
+			name = Debug;
+		};
+		C01FCF5008A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = i386;
+				CINDER_PATH = ../../../Cinder;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/boost\"";
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				PREBINDING = NO;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
+				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\" ../include";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "dynmx" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01FCF4B08A954540054247B /* Debug */,
+				C01FCF4C08A954540054247B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "dynmx" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01FCF4F08A954540054247B /* Debug */,
+				C01FCF5008A954540054247B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 29B97313FDCFA39411CA2CEA /* Project object */;
+}

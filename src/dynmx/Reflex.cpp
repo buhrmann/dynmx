@@ -77,6 +77,9 @@ void Reflex::init()
   m_Kifv[0] = m_Kifv[1] = 0.0;
   m_Bifv[0] = m_Bifv[1] = 0.0;
   
+  m_Wismn[0] = m_Wismn[1] = 0.0;
+  m_Wisia[0] = m_Wisia[1] = 0.0;
+  
   reset();
 }
 
@@ -121,6 +124,7 @@ void Reflex::reset()
   
   // Input state
   m_cocontraction[0] = m_cocontraction[1] = 0.0;
+  m_interSegmentInput[0] = m_interSegmentInput[1] = 0.0;
 }
 
 //----------------------------------------------------------------------------------------------------------------------    
@@ -282,13 +286,21 @@ void Reflex::updateInLengthCoords(float dt)
   
   
   // Alpha motor neuron
-  const double Ksrg = 1.0; // stretch reflex gain
 #if REFLEX_USE_OWN_IAIN_IMPL  
-  m_alpha[0] = m_cocontraction[0] + m_ofpv[0] + Ksrg * m_spindlePri[0] - (m_Wrnmn[1] * m_RnOut[1]) - (m_Wiamn[0] * m_IaInOut[1]) - (m_Wibmn[0] * m_IbInOut[0]);
-  m_alpha[1] = m_cocontraction[1] + m_ofpv[1] + Ksrg * m_spindlePri[1] - (m_Wrnmn[1] * m_RnOut[1]) - (m_Wiamn[1] * m_IaInOut[0]) - (m_Wibmn[1] * m_IbInOut[1]);  
+  m_alpha[0] = m_cocontraction[0] + m_ofpv[0] + m_Wspmn[0] * m_spindlePri[0] 
+  - (m_Wrnmn[0] * m_RnOut[0]) 
+  - (m_Wiamn[0] * m_IaInOut[1]) 
+  - (m_Wibmn[0] * m_IbInOut[0])
+  + (m_Wismn[0] * m_interSegmentInput[0]);
+  
+  m_alpha[1] = m_cocontraction[1] + m_ofpv[1] + m_Wspmn[1] * m_spindlePri[1] 
+  - (m_Wrnmn[1] * m_RnOut[1]) 
+  - (m_Wiamn[1] * m_IaInOut[0]) 
+  - (m_Wibmn[1] * m_IbInOut[1])
+  + (m_Wismn[1] * m_interSegmentInput[1]);  
 #else
-  m_alpha[0] = m_cocontraction[0] + m_ofpv[0] + Ksrg * m_spindlePri[0] - max(0.0, m_IaIn[1]);
-  m_alpha[1] = m_cocontraction[1] + m_ofpv[1] + Ksrg * m_spindlePri[1] - max(0.0, m_IaIn[0]);  
+  m_alpha[0] = m_cocontraction[0] + m_ofpv[0] + m_Wspmn[0] * m_spindlePri[0] - max(0.0, m_IaIn[1]);
+  m_alpha[1] = m_cocontraction[1] + m_ofpv[1] + m_Wspmn[1] * m_spindlePri[1] - max(0.0, m_IaIn[0]);  
 #endif  
   m_alpha[0] = clamp(m_alpha[0], 0.0, 1.0);
   m_alpha[1] = clamp(m_alpha[1], 0.0, 1.0);
@@ -395,11 +407,21 @@ void Reflex::updateInContractionCoords(float dt)
   
   // Alpha motor neuron
 #if REFLEX_USE_OWN_IAIN_IMPL  
-  m_alpha[0] = m_cocontraction[0] + m_Wspmn[0] * m_spindlePri[0] + m_ofpv[0] - (m_Wrnmn[0] * m_RnOut[0]) - (m_Wiamn[0] * m_IaInOut[1]) - (m_Wibmn[0] * m_IbInOut[0]);
-  m_alpha[1] = m_cocontraction[1] + m_Wspmn[1] * m_spindlePri[1] + m_ofpv[1] - (m_Wrnmn[1] * m_RnOut[1]) - (m_Wiamn[1] * m_IaInOut[0]) - (m_Wibmn[1] * m_IbInOut[1]);    
+  m_alpha[0] = m_cocontraction[0] + m_Wspmn[0] * m_spindlePri[0] + m_ofpv[0] 
+  - (m_Wrnmn[0] * m_RnOut[0]) 
+  - (m_Wiamn[0] * m_IaInOut[1]) 
+  - (m_Wibmn[0] * m_IbInOut[0])
+  + (m_Wismn[0] * m_interSegmentInput[0]);
+  
+  m_alpha[1] = m_cocontraction[1] + m_Wspmn[1] * m_spindlePri[1] + m_ofpv[1] 
+  - (m_Wrnmn[1] * m_RnOut[1]) 
+  - (m_Wiamn[1] * m_IaInOut[0]) 
+  - (m_Wibmn[1] * m_IbInOut[1])
+  + (m_Wismn[1] * m_interSegmentInput[1]);    
+  
 #else
-  m_alpha[0] = m_cocontraction[0] + m_ofpv[0] + Ksrg * m_spindlePri[0] - max(0.0, m_IaIn[1]);
-  m_alpha[1] = m_cocontraction[1] + m_ofpv[1] + Ksrg * m_spindlePri[1] - max(0.0, m_IaIn[0]);  
+  m_alpha[0] = m_cocontraction[0] + m_ofpv[0] + m_Wspmn[0] * m_spindlePri[0] - max(0.0, m_IaIn[1]);
+  m_alpha[1] = m_cocontraction[1] + m_ofpv[1] + m_Wspmn[1] * m_spindlePri[1] - max(0.0, m_IaIn[0]);  
 #endif
   m_alpha[0] = clamp(m_alpha[0], 0.0, 1.0);
   m_alpha[1] = clamp(m_alpha[1], 0.0, 1.0);
@@ -475,22 +497,12 @@ void Reflex::toXml(ci::XmlTree& xml)
   paramToXml(ibin, "Tau", &m_Tib[0]);
   reflex.push_back(ibin);    
 
-  // Alpha motor neurons
-#if 0 // all relevant params output above already
-  ci::XmlTree amn("aMN", "");
-  paramToXml(amn, "Wiamn", &m_Wiamn[0]);
-  reflex.push_back(amn);  
-#endif
-  
-#if 0
-  // Template
-  // 
-  ci::XmlTree ("", "");
-  paramToXml(, "", &[0]);
-  paramToXml(, "", &[0]);
-  paramToXml(, "", &[0]);  
-  reflex.push_back();  
-#endif
+  // Intersegmental inputs
+  ci::XmlTree isin("IsIn", "");
+  paramToXml(isin, "Wismn", &m_Wismn[0]);
+  paramToXml(isin, "Wisia", &m_Wisia[0]);
+  reflex.push_back(isin);
+
                                                  
   xml.push_back(reflex);
 }

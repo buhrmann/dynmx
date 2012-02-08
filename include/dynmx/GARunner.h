@@ -55,6 +55,7 @@ static double mapUnitIntervalToRange(double val, double min, double max)
 //----------------------------------------------------------------------------------------------------------------------
 class GARunner : public Model
 {
+  
 public:
   
   enum GAVerbosity
@@ -82,6 +83,8 @@ public:
 protected:  
   
   void generationToXml(ci::XmlTree* xml, uint32_t gen, const double* genome, float bestFit, float avgFit);
+  void genomeToXml(ci::XmlTree& xml, const double* genome, float bestFit);
+  void test(const double* evolvable, float fitness, float dt);
   
   // An instance of the model to evolve
   Evolvable* m_evolvable;
@@ -101,6 +104,8 @@ protected:
   int m_reduceMutationMaxAt;
   
   int m_verbosity;
+  
+  bool m_autoEval;
   
   ci::XmlTree* m_progressLog;
   ci::XmlTree* m_resultsLog;

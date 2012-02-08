@@ -36,6 +36,9 @@ void GA::init()
   for(int i = 0; i < m_popSize; i++)
   {
     m_genomes[i] = new double[m_genomeLength];
+    
+    // For safety, initialise to 0
+    std::fill(m_genomes[i], m_genomes[i] + m_genomeLength, 0.0);
   }
 
   m_fitnesses = new float[m_popSize];     
@@ -449,7 +452,9 @@ bool GA::fromXml(const ci::XmlTree& parent, bool includeGenomes)
   int popSize = ga.getAttributeValue<int>("PopulationSize");
   
   // We can only read data from a GA of the same size as the current
-  if(genomeLength == m_genomeLength && popSize == m_popSize)
+  // But we allow reading from a saved GA that has used fewer genes, this allows for incremental adding of genes
+  // Genes not copied from previous GA will have been initialised to 0.
+  if(genomeLength <= m_genomeLength && popSize == m_popSize)
   {
     // Read all genomes (children of GA)
     int i, j;

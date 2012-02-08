@@ -95,6 +95,7 @@ void Muscle::update(float dt)
 
   updateLengthAndMomentArm();
   
+#if DEBUGGING  
   // Todo: Temporary check that the min/max muscle length calculations are correct
   double delta = 0.001;
   bool lengthOK = (m_length - m_lengthMin) >= -delta && (m_length - m_lengthMax) < delta ;
@@ -104,6 +105,7 @@ void Muscle::update(float dt)
     std::cout << "Length: " << m_length << " " << m_lengthMin << " " << m_lengthMax << std::endl;
   }
   assert(lengthOK);
+#endif
          
   m_velocity = (m_length - prevLength) / dt;
   
@@ -210,12 +212,22 @@ void Muscle::toXml(ci::XmlTree& muscle)
   ci::XmlTree maxForce("MaxIsoForce",""); maxForce.setAttribute("Value", getForceMax()); 
   muscle.push_back(maxForce);
   
-  ci::XmlTree optLength("OptimalLength",""); optLength.setAttribute("Value", getOptimalLength()); 
-  muscle.push_back(optLength);
-  
   ci::XmlTree maxVel("MaxVelocity",""); maxVel.setAttribute("Value", getVelocityMax()); 
-  muscle.push_back(maxVel);
+  muscle.push_back(maxVel);  
   
+  ci::XmlTree length("Length",""); 
+  length.setAttribute("Optimal", getOptimalLength()); 
+  length.setAttribute("Min", m_lengthMin); 
+  length.setAttribute("Max", m_lengthMax); 
+  muscle.push_back(length);
+  
+  ci::XmlTree hillParams("HillParameters",""); 
+  hillParams.setAttribute("Shortening", m_hillSh); 
+  hillParams.setAttribute("Lengthening", m_hillLn); 
+  hillParams.setAttribute("Asymptote", m_hillMax); 
+  hillParams.setAttribute("Slope", m_hillSlope); 
+  muscle.push_back(hillParams);
+    
   //xml.push_back(muscle);
 }
   

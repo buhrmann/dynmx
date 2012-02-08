@@ -72,13 +72,6 @@ Simulation* SimulationFactory::create()
     {
       evaluateOnly = SETTINGS->getChild("Config/GA/Eval").getAttributeValue<bool>("Run");
     }
-    
-#if 0    
-    if(evaluateOnly)
-    {
-      visual = true;
-    }
-#endif
         
     if ("TestEvolvableCTRNN" == evolvableName)
     {    
@@ -130,18 +123,10 @@ Simulation* SimulationFactory::create()
     else if ("EvoArmCoCon" == evolvableName)
     {
       EvoArmCoCon* evoArm = new EvoArmCoCon();
-      if(evaluateOnly)
-      {
-        model = new GATester(evoArm);   
-      }
-      else
-      {
-        model = new GARunner(evoArm);
-      }
-      
+      model = evaluateOnly ? new GATester(evoArm) : model = new GARunner(evoArm);
       if(visual)
       {          
-        View* view =  new ArmReflexView(evoArm->m_arm);
+        View* view = new ArmReflexView(evoArm->m_arm);
         app = new App(model, view);
       }
     }      

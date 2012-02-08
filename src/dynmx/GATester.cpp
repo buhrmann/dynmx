@@ -41,56 +41,58 @@ void GATester::init()
   }  
 
   // Load info about trials etc
-  if (SETTINGS->hasChild("Config/GA/Eval"))
+  if (settings->hasChild("Config/GA/Eval"))
   {
-    const ci::XmlTree& ga = settings->getChild("Config/GA/Eval");
-    m_numTrials = ga.getChild("NumTrials").getAttributeValue<int>("Value");
+    const ci::XmlTree& eval = settings->getChild("Config/GA/EVAL");
     
-    // Flag whether to record state durin run
-    if (SETTINGS->hasChild("Config/GA/Eval/RecordState"))
+    m_numTrials = (eval / "NumTrials")["Value"].as<int>();
+    
+    // Flag whether to record state during run
+    if (eval.hasChild("RecordState"))
     {
-      m_record = SETTINGS->getChild("Config/GA/Eval/RecordState").getAttributeValue<bool>("Value");
+      m_record = (eval / "RecordState")["Value"].as<bool>();
     }
     else 
     {
       m_record = false;
     }
-  }
 
   
-  // Load best genome from prev GA run
-  if(SETTINGS->hasChild("Config/GA/Eval/LoadFrom"))
-  {
-    std::string fnm = SETTINGS->getChild("Config/GA/Eval/LoadFrom").getAttributeValue<std::string>("Value");
-    ci::XmlTree gaProgress(ci::loadFile(fnm));
-    assert(gaProgress.hasChild("GAProgress"));
-    
-    // Todo: Find better way to do this. Nasty! Iterate to last generation (the best individual)
-    ci::XmlTree::ConstIter lastGeneration = gaProgress.begin("GAProgress/Generation");
-    for (ci::XmlTree::ConstIter generation = gaProgress.begin("GAProgress/Generation"); generation != gaProgress.end(); ++generation)
+    // Load best genome from prev GA run, but only if this is a "Run" (not e.g. in GARunner automatic testing)
+    bool decodeSaved = eval["Run"].as<bool>();    
+    if(decodeSaved && eval.hasChild("LoadFrom"))
     {
-      lastGeneration = generation;
-    }
+      std::string fnm = eval.getChild("LoadFrom").getAttributeValue<std::string>("Value");
+      ci::XmlTree gaProgress(ci::loadFile(fnm));
+      assert(gaProgress.hasChild("GAProgress"));
+      
+      // Todo: Find better way to do this. Nasty! Iterate to last generation (the best individual)
+      ci::XmlTree::ConstIter lastGeneration = gaProgress.begin("GAProgress/Generation");
+      for (ci::XmlTree::ConstIter generation = gaProgress.begin("GAProgress/Generation"); generation != gaProgress.end(); ++generation)
+      {
+        lastGeneration = generation;
+      }
 
-    // Extract the genome
-    const ci::XmlTree& genome = lastGeneration->getChild("BestGenome");
-    
-    // Convert to double array
-    int numGenes = gaProgress.getChild("GAProgress").getAttributeValue<int>("NumGenes");  
-    double genes[numGenes];
-    int i = 0;
-    for (ci::XmlTree::ConstIter gene = genome.begin(); gene != genome.end(); ++gene)
-    {
-      const double d = gene->getAttributeValue<float>("Value");
-      genes[i] = d;
-      i++;
+      // Extract the genome
+      const ci::XmlTree& genome = lastGeneration->getChild("Genome");
+      
+      // Convert to double array
+      int numGenes = gaProgress.getChild("GAProgress").getAttributeValue<int>("NumGenes");  
+      double genes[numGenes];
+      int i = 0;
+      for (ci::XmlTree::ConstIter gene = genome.begin(); gene != genome.end(); ++gene)
+      {
+        const double d = gene->getAttributeValue<float>("Value");
+        genes[i] = d;
+        i++;
+      }
+      
+      // Decode
+      m_evolvable->decodeGenome(&genes[0]);  
+      
+      // Store genome in xml file, even if not read here. It could have been decoded pre
+      m_modelXml->push_back(ci::XmlTree(genome));
     }
-    
-    // Decode
-    m_evolvable->decodeGenome(&genes[0]);  
-    
-    // Store genome in xml file
-    m_modelXml->push_back(ci::XmlTree(genome));
   }
   
   reset();
@@ -116,7 +118,10 @@ void GATester::update(float dt)
     m_evolvable->update(dt);
     
     // Record state
-    m_evolvable->record(m_recorder);
+    if(m_record)
+    {
+      m_evolvable->record(m_recorder);
+    }
   }
   else
   {

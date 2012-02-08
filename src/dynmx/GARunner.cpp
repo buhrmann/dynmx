@@ -8,6 +8,7 @@
  */
 
 #include "GARunner.h"
+#include "GATester.h"
 
 #if DEBUGGING
 #include <iostream>
@@ -95,6 +96,10 @@ void GARunner::init()
     {
       m_saveBestEachGen = ga.getChild("SaveBestEachGeneration").getAttributeValue<bool>("Value"); 
     }
+
+    // Run evaluation of best individual at end of evolution
+    m_autoEval = ga.hasChild("AutoEval") ? (ga / "AutoEval")["Run"].as<bool>() : false; 
+
   }
   else
   {
@@ -143,6 +148,7 @@ void GARunner::update(float dt)
     // End of trial: update GA
     //-------------------------------------------------------
     const float fitness = m_evolvable->getFitness();
+    
 #if DEBUGGING
     if( m_verbosity >= kGAVerbosityTrial)
       std::cout << "Trial " << m_trial << ": fitness = " << fitness << std::endl; 
@@ -156,6 +162,7 @@ void GARunner::update(float dt)
     if (m_trial == m_numTrials)
     {
       m_accFitness /= m_numTrials;
+      
 #if DEBUGGING
       if (m_verbosity >= kGAVerbosityGenome)
         std::cout << "Total fitness = " << m_accFitness << std::endl; 
@@ -205,6 +212,12 @@ void GARunner::update(float dt)
           getGA()->toXml(*m_resultsLog, true);
           m_resultsLog->write(ci::writeFile(dmx::DATA_DIR + "GA_Result.xml"));
           m_progressLog->write(ci::writeFile(dmx::DATA_DIR + "GA_Progress.xml"));
+          
+          // Evaluate best evolved individual
+          if(m_autoEval)
+          {
+            test(bestGenome, bestFitness, dt);
+          }
 
 #if DEBUGGING
           // Output number of evaluations performed (handy for calculating speed of simulation; divide overall time by)
@@ -225,6 +238,35 @@ void GARunner::update(float dt)
   }
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+void GARunner::test(const double* genome, float fitness, float dt)
+{
+  m_evolvable->reset();
+  m_evolvable->decodeGenome(genome);
+  GATester tester (m_evolvable);
+  genomeToXml(tester.getXml(), genome, fitness);
+  while(!tester.hasFinished())
+  {
+    tester.update(dt);
+  }
+}
+
+//----------------------------------------------------------------------------------------------------------------------  
+void GARunner::genomeToXml(ci::XmlTree& xml, const double* genome, float fitness)
+{
+  ci::XmlTree genXml ("Genome","");
+  genXml.setAttribute("Fitness", fitness);
+  for(size_t i = 0; i < m_ga->getGenomeSize(); ++i)
+  {
+    ci::XmlTree gene ("Gene", "");
+    gene.setAttribute("Index", i);
+    gene.setAttribute("Value", genome[i]);
+    genXml.push_back(gene);
+  }
+  xml.push_back(genXml);
+}
+  
 // Write a generation's best individual to xml 
 //----------------------------------------------------------------------------------------------------------------------
 void GARunner::generationToXml(ci::XmlTree* xmlTree, uint32_t gen, const double* bestGenome, float bestFitness, float avgFitness)
@@ -240,15 +282,7 @@ void GARunner::generationToXml(ci::XmlTree* xmlTree, uint32_t gen, const double*
   // Output best genome
   if(m_saveBestEachGen)
   {
-    ci::XmlTree genome ("BestGenome", "");  
-    for(size_t i = 0; i < m_ga->getGenomeSize(); ++i)
-    {
-      ci::XmlTree gene ("Gene", "");
-      gene.setAttribute("Index", i);
-      gene.setAttribute("Value", bestGenome[i]);
-      genome.push_back(gene);
-    }
-    generation.push_back(genome);
+    genomeToXml(generation, bestGenome, bestFitness);
   }
   
   xmlTree->push_back(generation);

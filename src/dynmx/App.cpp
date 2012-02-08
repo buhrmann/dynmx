@@ -76,8 +76,8 @@ void App::prepareSettings( Settings *settings )
   int h = 600;
   if (SETTINGS->hasChild("Config/Globals/WindowSize"))
   {
-    w = SETTINGS->getChild("Config/Globals/WindowSize").getAttributeValue<int>("Width");
-    h = SETTINGS->getChild("Config/Globals/WindowSize").getAttributeValue<int>("Height");    
+    w = SETTINGS->getChild("Config/Globals/WindowSize")["Width"].as<int>();
+    h = SETTINGS->getChild("Config/Globals/WindowSize")["Height"].as<int>();    
   }
   settings->setWindowSize( w, h );
   
@@ -85,14 +85,23 @@ void App::prepareSettings( Settings *settings )
   int fps = DEFAULT_FRAMERATE;
   if (SETTINGS->hasChild("Config/Globals/FrameRate"))
   {
-    fps = SETTINGS->getChild("Config/Globals/FrameRate").getAttributeValue<int>("Value");
+    fps = SETTINGS->getChild("Config/Globals/FrameRate")["Value"].as<int>();
   }
   m_fixedTimeStep = 1.0 / (float) fps;  // Simulation integration time step
   settings->setFrameRate(fps);          // How many FPS the app gets updated with
   
+  // Fullscreen
   if (SETTINGS->hasChild("Config/Globals/FullScreen"))
   {
-    settings->setFullScreen(SETTINGS->getChild("Config/Globals/FullScreen").getAttributeValue<bool>("Value"));
+    settings->setFullScreen(SETTINGS->getChild("Config/Globals/FullScreen")["Value"].as<bool>());
+  }
+  
+  // VSync
+  if (SETTINGS->hasChild("Config/Globals/VSync"))
+  {
+    //bool vsync = SETTINGS->getChild("Config/Globals/VSync").getAttributeValue<bool>("Value");
+    bool vsync = SETTINGS->getChild("Config/Globals/VSync")["Value"].as<bool>();
+    m_view->setVSync(vsync);
   }
 }
 

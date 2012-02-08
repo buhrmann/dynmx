@@ -47,6 +47,7 @@ public:
   void setIbInParameters(double Wglib0, double Wglib1, double Wibib0, double Wibib1, double Wibmn0, double Wibmn1,
                          double t1, double t2, double b1, double b2);  
   void setMotoNeuronParameters(double Wspmn0, double Wspmn1);
+  void setIntersegmentalParameters(double Wismn0, double Wismn1, double Wisia0, double Wisia1);
   
   // Getters
   double getAlphaOutput(int i) { return m_alpha[i]; };
@@ -63,7 +64,7 @@ public:
   // Store output in human readable format
   virtual void toXml(ci::XmlTree& xml);  
   
-  // Parameters
+  // Public parameters
   //-------------------------------------------------
   // Spindle
   double m_Kspp [2];   // Spindle positional gain  
@@ -121,9 +122,14 @@ protected:
   double m_Wibmn [2];   // IbIn to alpha MN
   double m_Wspmn [2];   // Stretch reflex (monosynaptic spindle input)
   
+  // Intersegmental force feedback
+  double m_Wismn [2];  // intersegmental input to alpha MN
+  double m_Wisia [2];  // intersegmental input to IaIn
+  
   // Inputs
   //-------------------------------------------------  
   double m_cocontraction[2];
+  double m_interSegmentInput[2]; 
   
   // State
   //-------------------------------------------------  
@@ -139,7 +145,7 @@ protected:
   double m_IaInOut [2];
   double m_Rn [2];                // Renshaw interneurons  
   double m_RnOut [2];  
-  double m_IbIn [2];
+  double m_IbIn [2];              // Ib force feedback inhibitory interneurons
   double m_IbInOut [2];
   
   double m_ifv [2];               // Inertial force compensation
@@ -272,6 +278,16 @@ inline void Reflex::setMotoNeuronParameters(double Wspmn0, double Wspmn1)
   m_Wspmn[0] = Wspmn0;
   m_Wspmn[1] = Wspmn1;
 }
+  
+//----------------------------------------------------------------------------------------------------------------------            
+inline void Reflex::setIntersegmentalParameters(double Wismn0, double Wismn1, double Wisia0, double Wisia1)
+{
+  m_Wismn[0] = Wismn0;
+  m_Wismn[1] = Wismn1;
+  m_Wisia[0] = Wisia0;
+  m_Wisia[1] = Wisia1;
+}
+
   
 } // namespace dmx
 

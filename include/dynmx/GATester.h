@@ -41,6 +41,8 @@ public:
   
   void setVerbosity(GARunner::GAVerbosity v) { m_verbosity = v; };
   
+  ci::XmlTree& getXml() { return *m_modelXml; };
+  
 protected:  
   
   // An instance of the model to evaluate

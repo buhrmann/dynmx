@@ -93,6 +93,7 @@ protected:
   bool m_evolveIFV;
   bool m_evolveSFV;
   bool m_evolveOpenLoop;
+  bool m_evolveIntersegmentInputs;
   bool m_evolveUniformSpindles;
   bool m_evolveHillParams;
   bool m_evolveMinJerkDelay;

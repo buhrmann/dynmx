@@ -82,6 +82,10 @@ int EvoArmCoCon::getNumGenes()
   if(m_evolveOpenLoop)
     numGenes += 2 * 3;  
   
+  // Intersegmental inputs (weights to mn and iain)
+  if(m_evolveIntersegmentInputs)
+    numGenes += 2 * 4;
+  
   return numGenes;
 };
 
@@ -176,6 +180,7 @@ void EvoArmCoCon::decodeGenome(const double* genome)
   m_arm->getReflex(1)->setMotoNeuronParameters(genome[start+1] * maxW, genome[start+1] * maxW);
   start += 2;
   
+  // Range for neural parameters
   maxW = 10.0;
   float maxB = 10.0;
   float maxT = 100.0;  
@@ -270,10 +275,25 @@ void EvoArmCoCon::decodeGenome(const double* genome)
   m_rampDurationFactor = 0.4 + 0.6 * genome[start];
   start += 1;
   
+  // Minimum co-contraction
   if(m_enableCoconIncrease)
   {
     m_minCocontraction = 0.05 + 0.15 * genome[start];
     start += 1;
+  }
+  
+  // Intersegmental inputs
+  if(m_evolveIntersegmentInputs)
+  { 
+    float Wismn = -maxW + 2 * maxW * genome[start+0];
+    float Wisia = -maxW + 2 * maxW * genome[start+1];
+    m_arm->getReflex(0)->setIntersegmentalParameters(Wismn, Wismn, Wisia, Wisia);
+    
+    Wismn = -maxW + 2 * maxW * genome[start+2];
+    Wisia = -maxW + 2 * maxW * genome[start+3];
+    m_arm->getReflex(1)->setIntersegmentalParameters(Wismn, Wismn, Wisia, Wisia);    
+    
+    start += 4;
   }
   
   createTrajectories();
@@ -341,6 +361,7 @@ void EvoArmCoCon::init()
     m_evolveUniformSpindles = xml.getChild("uniformSpindles").getValue<bool>();
     m_evolveHillParams = xml.getChild("hillParams").getValue<bool>();
     m_evolveMinJerkDelay = xml.getChild("minJerkDelay").getValue<bool>();
+    m_evolveIntersegmentInputs = xml.getChild("interSegmentInput").getValue<bool>();
     
     xml = SETTINGS->getChild("Config/GA/Evolvable/");
     m_enableCoconIncrease = xml.getChild("enableCoconInc").getValue<bool>();
@@ -609,8 +630,6 @@ void EvoArmCoCon::update(float dt)
     }
   }
   
-  //std::cout << "C: " << command.id << " D: " << desired.id << " CoCon: " << m_cocontraction << std::endl;
-  
   // Fitness evaluation
   ci::Vec2f actualPosition = m_arm->getEffectorPos();
   const float distSq = (actualPosition - desired.position).lengthSquared();
@@ -631,7 +650,7 @@ void EvoArmCoCon::updateCurrentCommand(Target<Pos>& command, Target<Pos>& desire
   
   // Transform desired position to joint angles (IK) and muscle lengths
   double currentDesiredAngles[2];
-  m_arm->inverseKinematics(desired.position, command.id < 8 ? 1.0f : -1.0f, currentDesiredAngles[0], currentDesiredAngles[1]);
+  m_arm->inverseKinematics(desired.position, desired.id < 8 ? 1.0f : -1.0f, currentDesiredAngles[0], currentDesiredAngles[1]);
   m_currentDesiredAngles.x = clamp(currentDesiredAngles[0], m_arm->getJointLimitLower(JT_elbow), m_arm->getJointLimitUpper(JT_elbow));  
   m_currentDesiredAngles.y = clamp(currentDesiredAngles[1], m_arm->getJointLimitLower(JT_shoulder), m_arm->getJointLimitUpper(JT_shoulder));    
   
@@ -660,7 +679,9 @@ bool EvoArmCoCon::hasFinished()
 //----------------------------------------------------------------------------------------------------------------------  
 void EvoArmCoCon::finish()
 {
+#if DEBUGGING
   std::cout << "Fitness: " << getFitness() << std::endl;
+#endif
 }  
 
 //----------------------------------------------------------------------------------------------------------------------    

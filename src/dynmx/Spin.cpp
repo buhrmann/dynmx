@@ -31,7 +31,7 @@ void SpinningWheel::reset()
   {
     float size = UniformRandom(min, max);
     m_segmentSizes.push_back(size);
-    ci::Color col (UniformRandom(0, 1), UniformRandom(0, 1), UniformRandom(0, 1));
+    ci::Color col (UniformRandom(0.0, 1.0), UniformRandom(0.0, 1.0), UniformRandom(0.0, 1.0));
     m_segmentColors.push_back(col);
     total += size;
   }
