@@ -107,8 +107,9 @@ protected:
   
   bool m_autoEval;
   
-  ci::XmlTree* m_progressLog;
-  ci::XmlTree* m_resultsLog;
+  ci::XmlTree* m_progressLog; // Saves fitness progress each generation and best individual
+  ci::XmlTree* m_resultsLog;  // Saves whole population at end of evolution for later incremental pickup
+  ci::XmlTree* m_finalGenomeLog; // Stores only best genome at the end of evolution
   bool m_saveBestEachGen;
 };
 

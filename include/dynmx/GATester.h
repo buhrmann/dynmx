@@ -36,12 +36,12 @@ public:
   virtual void reset();
 
   virtual bool hasFinished() { return m_trial >= m_numTrials; };
-  
   Evolvable* getEvolvable() { return m_evolvable; };
+  ci::XmlTree& getXml() { return *m_modelXml; };
   
   void setVerbosity(GARunner::GAVerbosity v) { m_verbosity = v; };
   
-  ci::XmlTree& getXml() { return *m_modelXml; };
+  void enableRecording(bool record) { m_record = record; };
   
 protected:  
   

@@ -27,6 +27,7 @@ public:
   
   Reflex();
   Reflex(Muscle* ag, Muscle* an);
+  virtual ~Reflex(){};
   
   virtual void init();
   virtual void reset();

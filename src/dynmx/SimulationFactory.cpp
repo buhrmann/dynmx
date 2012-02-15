@@ -102,38 +102,21 @@ Simulation* SimulationFactory::create()
       evolvable = new TestEvolvable(fitnessFunction);
       model = new GARunner (evolvable);
     }
-    /*else if ("TestEvolvableArm" == evolvableName)
-    {
-      TestModelEvolvableArm* evoArm = new TestModelEvolvableArm();
-      if(evaluateOnly)
-      {
-        model = new GATester(evoArm);    
-      }
-      else
-      {
-        model = new GARunner(evoArm);
-      }
-      
-      if(visual)
-      {          
-        View* view =  new TestViewArm(evoArm->m_arm, true);
-        app = new App(model, view);
-      }
-    }*/
     else if ("EvoArmCoCon" == evolvableName)
     {
       EvoArmCoCon* evoArm = new EvoArmCoCon();
       model = evaluateOnly ? new GATester(evoArm) : model = new GARunner(evoArm);
       if(visual)
-      {          
+      {         
         View* view = new ArmReflexView(evoArm->m_arm);
         app = new App(model, view);
       }
     }      
     
+    // Enable highest level of logging
     if(evaluateOnly)
     {
-      ((GARunner*)model)->setVerbosity(GARunner::kGAVerbosityTrial);
+      ((GATester*)model)->setVerbosity(GARunner::kGAVerbosityTrial);
     }
   }
   else if ("TestArm" == modelName)

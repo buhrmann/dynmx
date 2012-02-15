@@ -64,28 +64,28 @@ public:
 public:  
   
   Arm();
-  ~Arm();
+  virtual ~Arm();
   
   // Inherited from class Model
   virtual void init();
-  virtual void reset() { reset(0.0, 0.0); };
+  virtual inline void reset() { resetTo(0.0f, 0.0f); };
   virtual void update(float dt) { update(dt, 0.0, 0.0); };
   
-  void reset(float elbAngle, float shdAngle);  
+  void resetTo(double elbAngle, double shdAngle);  
   void update(float dt, double torque1, double torque2);
   
   // Setters
-  void setParameters(float mass1, float mass2, float length1, float length2);
-  void setFriction(float elbF, float shdF) { m_frictions[JT_elbow] = elbF; m_frictions[JT_shoulder] = shdF; };
-  void setLimit(Joint jt, float upper, float lower) { assert(jt >=0 && jt < 2); m_limits[jt][0] = upper; m_limits[jt][1] = lower; };
-  void setGravity(float g) { m_gravity = g; };
+  void setParameters(double mass1, double mass2, double length1, double length2);
+  void setFriction(double elbF, double shdF) { m_frictions[JT_elbow] = elbF; m_frictions[JT_shoulder] = shdF; };
+  void setLimit(Joint jt, double upper, double lower) { assert(jt >=0 && jt < 2); m_limits[jt][0] = upper; m_limits[jt][1] = lower; };
+  void setGravity(double g) { m_gravity = g; };
   void setJointLocked(Joint j, bool l) { m_jointLocked[j] = l; };
   void setTarget(Pos p) { m_target = p; };    
   
   // Getters
   double getGravity() const { return m_gravity; };
-  Pos getPointOnUpperArm(float distanceFromJoint) const;
-  Pos getPointOnLowerArm(float distanceFromJoint) const;  
+  Pos getPointOnUpperArm(double distanceFromJoint) const;
+  Pos getPointOnLowerArm(double distanceFromJoint) const;  
   const State& getState() const { return m_state; };
   double getJointAngle(Joint joint) { return m_state.angles[joint]; };
   double getLength(Joint joint) const { return m_lengths[joint]; } ;  
@@ -114,8 +114,8 @@ public:
 protected:
   
   void preCompute();
-  void solveEuler(const double* torques, float dt);
-  void solveImprovedEuler(float dt); 
+  void solveEuler(double dt);
+  void solveImprovedEuler(double dt); 
   void computeAccelerations(State& state);  
   
   bool m_jointLocked[2];

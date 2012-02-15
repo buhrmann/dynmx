@@ -34,6 +34,8 @@ public:
   
   typedef ci::Vec2f Pos;   
   
+  virtual ~Muscle(){};
+  
   // Inherited from class Model
   virtual void init();
   virtual void reset();  

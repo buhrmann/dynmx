@@ -11,7 +11,7 @@
 #define _MATH_UTILS_
 
 #include "Dynmx.h"
-#include <math.h>
+#include <cmath>
 #include <numeric>
 #include <sstream>
 
@@ -39,9 +39,11 @@ static const double sqr(double v) { return v * v; };
 
 //----------------------------------------------------------------------------------------------------------------------
 static const float degreesToRadians(float deg) { return deg * DEG_TO_RAD; };
+static const double degreesToRadians(double deg) { return deg * DEG_TO_RAD; };
 
 //----------------------------------------------------------------------------------------------------------------------
 static const float radiansToDegrees(float rad) { return rad * RAD_TO_DEG; };
+static const double radiansToDegrees(double rad) { return rad * RAD_TO_DEG; };
 
 //----------------------------------------------------------------------------------------------------------------------
 template<class T>
@@ -70,11 +72,32 @@ static inline T mean(std::vector<T>& vec)
 // Element-wise sum of two vectors
 //----------------------------------------------------------------------------------------------------------------------
 template<class T>
-static inline T elemWiseSum(std::vector<T>& vec1, std::vector<T>& vec2)
+static inline void elemWiseSum(const std::vector<T>& vec1, const std::vector<T>& vec2, std::vector<T>& res)
 {
-  std::vector<T> res;
   res.resize(vec1.size()); 
-  return std::transform(vec1.begin(), vec1.end(), vec2.begin(), res.begin(), std::plus<T>());
+  std::transform(vec1.begin(), vec1.end(), vec2.begin(), res.begin(), std::plus<T>());
+}
+
+// Returns vector of successive differences, after transformation by operator
+//----------------------------------------------------------------------------------------------------------------------
+template<class T, class Operator>
+static inline void differences(const std::vector<T>& v1, std::vector<double>& res, Operator operate, bool padRight = true)
+{
+  assert(v1.size() > 1);
+
+  // res will hold same amount of data as v1
+  int N = v1.size();
+  res.resize(N);
+  res.clear();
+  
+  for (int i = 0; i < N-1; i++) 
+  {
+    T diff = v1[i+1] - v1[i];
+    res.push_back(operate(diff));
+  }
+  
+  // Ensure same length by duplicating last element
+  res.push_back(*res.end());
 }
 
 // Cross-correlation of two vectors

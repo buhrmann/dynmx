@@ -22,7 +22,8 @@
 
 namespace dmx
 {
-
+  
+#define UI_COLUMN_WIDTH 300.0
 // ---------------------------------------------------------------------------------------------------------------------
 class ArmView : public dmx::View
 {
@@ -42,8 +43,11 @@ public:
   virtual void keyDown (ci::app::KeyEvent event);
   
   virtual void buildGui();
-
-
+  
+protected:
+  
+  virtual void createArmViz();
+  
   Arm* m_arm; 
   ArmViz* m_armViz;
   NodeGroup* m_uiColumn;
@@ -54,6 +58,7 @@ public:
   
   Vec3f m_target;  
   int32_t m_fixedFrameRate;
+  int32_t m_numPointsPerPlot;
   float m_gravity;
   bool m_trackMouse;
 }; // class
@@ -62,23 +67,30 @@ public:
 //----------------------------------------------------------------------------------------------------------------------
 // Inline implementations
 //----------------------------------------------------------------------------------------------------------------------
+inline void ArmView::createArmViz()
+{
+  m_armViz = new dmx::ArmViz(m_arm);
+}
+  
+//----------------------------------------------------------------------------------------------------------------------
 inline void ArmView::setupScene()
 {
   assert(m_arm);
   
   // 3d view
-  m_armViz = new dmx::ArmViz(m_arm);
+  createArmViz(); // Virtual! Will call derived class' create function.
+  
   m_armViz->rotate(ci::Vec4f(0,0,1,1), -PI_OVER_TWO);
-  m_armViz->translate(ci::Vec4f(0.25, 0, 0, 1));
+  m_armViz->translate(ci::Vec4f(-0.25f, 0.0f, 0.0f, 1.0f));
   m_scene3d.m_children.push_back(m_armViz);
   
   m_trackMouse = false;
   
   // 2d viz
-  float columnWidth = 300;
+  float columnWidth = UI_COLUMN_WIDTH;
   float columnMargin = 5;
   float left = columnWidth + columnMargin;
-  int pointsPerPlot = SETTINGS->getChild("Config/Globals/PlotDuration").getAttributeValue<float>("Value") * 
+  m_numPointsPerPlot = SETTINGS->getChild("Config/Globals/PlotDuration").getAttributeValue<float>("Value") * 
                       SETTINGS->getChild("Config/Globals/FrameRate").getAttributeValue<int>("Value");
   
   m_uiColumn = new NodeGroup();
@@ -92,13 +104,13 @@ inline void ArmView::setupScene()
   m_scene2d.m_children.push_back(m_uiColumn2);  
 
   // Create a plot for effector movement
-  m_armEffPlot = new dmx::Plot(columnWidth, 180, 6, pointsPerPlot);
+  m_armEffPlot = new dmx::Plot(columnWidth, 180, 6, m_numPointsPerPlot);
   m_armEffPlot->setTitle("Effector kinematics");
   m_armEffPlot->setLabel(0, "x");
   m_armEffPlot->setLabel(1, "y");
   
   // Create a plot for arm data (different forces acting on arm e.g.)
-  m_armElbPlot = new dmx::Plot(columnWidth, 180, 6, pointsPerPlot);
+  m_armElbPlot = new dmx::Plot(columnWidth, 180, 6, m_numPointsPerPlot);
   m_armElbPlot->translate(ci::Vec4f(0, 180 + 20, 0, 1));  
   m_armElbPlot->setTitle("Elbow forces");
   m_armElbPlot->setLabel(0, "applied");
@@ -107,7 +119,7 @@ inline void ArmView::setupScene()
   m_armElbPlot->setLabel(3, "damping"); 
   m_armElbPlot->setLabel(4, "total"); 
   
-  m_armShdPlot = new dmx::Plot(columnWidth, 180, 6, pointsPerPlot);
+  m_armShdPlot = new dmx::Plot(columnWidth, 180, 6, m_numPointsPerPlot);
   m_armShdPlot->translate(ci::Vec4f(0, 400, 0, 1));
   m_armShdPlot->setTitle("Shoulder forces");
   m_armShdPlot->setLabel(0, "applied");  

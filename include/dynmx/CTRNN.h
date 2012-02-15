@@ -47,6 +47,8 @@ inline double InverseSigmoid(double y)
   return log(y / (1.0 - y));
 }
 
+void initSigmoidTable(void);
+
 //----------------------------------------------------------------------------------------------------------------------
 // Other activation functions
 //----------------------------------------------------------------------------------------------------------------------
@@ -121,8 +123,8 @@ public:
   void initActivationFunctionTable();
 
   // Input and output
-  //friend ostream& operator<<(ostream& os, CTRNN& c);
-  //friend istream& operator>>(istream& is, CTRNN& c);
+  friend ostream& operator<<(ostream& os, CTRNN& c);
+  friend istream& operator>>(istream& is, CTRNN& c);
                       
   // Control
   void randomizeState(double lb, double ub);

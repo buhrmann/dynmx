@@ -16,19 +16,19 @@ namespace dmx
 
 // Parameters describing the Hill curve
 //----------------------------------------------------------------------------------------------------------------------
-static const float s_hillShDefault = 0.25f;   // shape parameter for shortening = a/F0 = b/vmax
-static const float s_hillLnDefault = 0.25f;   // shape parameter for lengthening
-static const float s_hillMaxDefault = 1.5f;   // lenghthening asymptote
-static const float s_hillSlopeDefault = 2.0f; // multiple of shortening slope at v=0
+static const double s_hillShDefault = 0.25;   // shape parameter for shortening = a/F0 = b/vmax
+static const double s_hillLnDefault = 0.25;   // shape parameter for lengthening
+static const double s_hillMaxDefault = 1.5;   // lenghthening asymptote
+static const double s_hillSlopeDefault = 2.0; // multiple of shortening slope at v=0
   
 // Width (in terms of normalised muscle length) of the parabola describing active force generation.
 // I.e. beyond normalised lengths of 1+width or 1-width, no force will be generated. 
-static const float s_activeForceWidth = 0.5;
-static const float s_activeForceK = 1 / sqr(s_activeForceWidth);
+static const double s_activeForceWidth = 0.5;
+static const double s_activeForceK = 1 / sqr(s_activeForceWidth);
 // Normalised length beyond which the passive elastic element generates force
-static const float s_passiveForceSlackLength = 1.4;
+static const double s_passiveForceSlackLength = 1.4;
 // Normalised amount of passive force at the length of activeForceWidth, i.e. where active force becomes 0.
-static const float s_passiveForceAtWidth = 0.5;
+static const double s_passiveForceAtWidth = 0.5;
 
 //----------------------------------------------------------------------------------------------------------------------    
 void Muscle::setHillParameters(double hSh, double hLn, double hMax, double hSlope)

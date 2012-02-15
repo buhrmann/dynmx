@@ -72,7 +72,9 @@ void GA::reset(bool randomizeGenomes)
   // Initialization
   m_tournament = 0;
   m_generation = 0;
-  m_idum = (long)-time(0);	// seed random number generator
+  
+  m_idum = (long)-time(0);	// "randomly" seed random number generator !
+  
   m_currentGenome = GA_NONE_SELECTED;
 
   // Random initialization

@@ -35,7 +35,7 @@ public:
   virtual void update();
   virtual void update(float dt);
   
-  virtual void shutDown() { m_model->finish(); };
+  virtual void shutDown() { std::cout << "App: Shutting down now." << std::endl; m_model->finish(); };
   
   //--------------------------------------------------------------------------------------------------------------------
   virtual void setup();

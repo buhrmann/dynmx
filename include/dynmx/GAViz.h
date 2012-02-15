@@ -26,7 +26,7 @@ public:
   
   void setGARunner(GARunner* gaRunner) { m_gaRunner = gaRunner; };
   virtual void update();
-  virtual void onMouseMove(const Vec3f& mPos);
+  virtual void onMouseMove(const ci::Vec4f& mPos);
   virtual void onKeyPress(ci::app::KeyEvent e);
   
 protected:

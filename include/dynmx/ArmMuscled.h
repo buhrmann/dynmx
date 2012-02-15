@@ -26,11 +26,15 @@ class ArmMuscled : public Arm
 {
 
 public:
+  
+  virtual ~ArmMuscled();
 
   // Functions inherited from class Model
   virtual void init();
-  virtual void reset(float elbAngle = 0.0f, float shdAngle = 0.0f);
+  virtual void reset() { resetTo(0.0f, 0.0f); };
   virtual void update(float timeStep); 
+  
+  void resetTo(double elbAngle, double shdAngle);  
   
   // Setters
   void setJointRadii(float elbRad, float shdRad) { m_jointRadius[JT_elbow] = elbRad; m_jointRadius[JT_shoulder] = shdRad; };

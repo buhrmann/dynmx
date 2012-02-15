@@ -23,6 +23,7 @@ namespace dmx
 class Positionable
 {
 public:
+  virtual ~Positionable(){};
   Positionable(const ci::Vec2f& pos = ci::Vec2f(0,0)) : m_position(pos) {};
   
   virtual const ci::Vec2f& getPosition() const { return m_position; };
@@ -40,6 +41,7 @@ protected:
 class Triangle : public Positionable
 {
 public:  
+  virtual ~Triangle(){};
   Triangle(const ci::Vec2f& pos, float size) : Positionable(pos), m_size(size)
   {
     setPosition(pos);
@@ -65,6 +67,7 @@ protected:
 class Circle : public Positionable
 {
 public:
+  virtual ~Circle(){};
   Circle(const ci::Vec2f& pos, float r) : Positionable(pos), m_radius(r) {};
   float getRadius() const { return m_radius; };
   void setRadius(float r) { m_radius = r; };

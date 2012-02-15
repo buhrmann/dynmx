@@ -22,6 +22,9 @@ class Model
 {
 
 public:
+  
+  virtual ~Model() {};
+  
   // Needs to be able to run as new after this function has been called.
   virtual void init() = 0;
   

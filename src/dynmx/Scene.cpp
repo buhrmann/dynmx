@@ -152,7 +152,7 @@ ci::Vec4f NodeGroup::toLocalPos(const ci::Vec4f pos)
 }
   
 //----------------------------------------------------------------------------------------------------------------------
-void NodeGroup::onMouseMove(const Vec4f& mPos)
+  void NodeGroup::onMouseMove(const cinder::Vec4f& mPos)
 {
   Vec4f mPosLocal = toLocalPos(mPos);
   for(size_t i = 0; i < m_children.size(); i++)

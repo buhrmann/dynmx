@@ -18,6 +18,16 @@
 namespace dmx
 {
 
+  //----------------------------------------------------------------------------------------------------------------------  
+ArmReflex::~ArmReflex()
+{
+  for (int i = 0; i < m_reflexes.size(); i++)
+  {
+    delete m_reflexes[i];
+  }
+  m_reflexes.clear();
+}
+  
 //----------------------------------------------------------------------------------------------------------------------  
 void ArmReflex::init()
 {
@@ -36,10 +46,10 @@ void ArmReflex::init()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void ArmReflex::reset(float elbAngle, float shdAngle)
+void ArmReflex::resetTo(double elbAngle, double shdAngle)
 {
   // Let base class do its reset first.
-  ArmMuscled::reset(elbAngle, shdAngle);  
+  ArmMuscled::resetTo(elbAngle, shdAngle);  
   
   for(int i = 0; i < m_reflexes.size(); ++i)
   {  

@@ -62,22 +62,15 @@ void GATester::init()
     bool decodeSaved = eval["Run"].as<bool>();    
     if(decodeSaved && eval.hasChild("LoadFrom"))
     {
-      std::string fnm = eval.getChild("LoadFrom").getAttributeValue<std::string>("Value");
-      ci::XmlTree gaProgress(ci::loadFile(fnm));
-      assert(gaProgress.hasChild("GAProgress"));
+      std::string fnm = (eval / "LoadFrom")["Value"];
+      ci::XmlTree bestGenomeXml(ci::loadFile(fnm));
+      assert(bestGenomeXml.hasChild("GABestGenome"));
       
-      // Todo: Find better way to do this. Nasty! Iterate to last generation (the best individual)
-      ci::XmlTree::ConstIter lastGeneration = gaProgress.begin("GAProgress/Generation");
-      for (ci::XmlTree::ConstIter generation = gaProgress.begin("GAProgress/Generation"); generation != gaProgress.end(); ++generation)
-      {
-        lastGeneration = generation;
-      }
-
       // Extract the genome
-      const ci::XmlTree& genome = lastGeneration->getChild("Genome");
+      const ci::XmlTree& genome = bestGenomeXml / "GABestGenome/Genome";
       
       // Convert to double array
-      int numGenes = gaProgress.getChild("GAProgress").getAttributeValue<int>("NumGenes");  
+      int numGenes = genome["NumGenes"].as<int>();  
       double genes[numGenes];
       int i = 0;
       for (ci::XmlTree::ConstIter gene = genome.begin(); gene != genome.end(); ++gene)
@@ -155,7 +148,7 @@ void GATester::update(float dt)
       // Store state data
       if(m_record)
       {
-        m_recorder.saveTo(dmx::DATA_DIR + "State.dat");
+        m_recorder.saveTo(dmx::DATA_DIR + "State.txt");
       }
     }
     

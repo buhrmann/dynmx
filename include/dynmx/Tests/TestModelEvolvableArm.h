@@ -59,10 +59,12 @@ public:
       }
 
       // Reflex parameters
+#if 0
       double pGain = 30.0 * genome[start + 4];
       double vGain = 20.0 * genome[start + 5];
       double dGain = 10.0 * genome[start + 6];
-      //m_arm->getEPController(i)->setGains(pGain, vGain, dGain);
+      m_arm->getEPController(i)->setGains(pGain, vGain, dGain);
+#endif
       start += 7;
     }
   };
@@ -87,7 +89,7 @@ public:
     double initialElbowAngle = 0.0f * PI;
     double initialShoulderAngle = 0.0f * PI;    
     m_arm->inverseKinematics(start, 1, initialElbowAngle, initialShoulderAngle);
-    m_arm->reset(initialElbowAngle, initialShoulderAngle);
+    m_arm->resetTo(initialElbowAngle, initialShoulderAngle);
     m_fitness = 0.0f;
     m_time = 0.0f;
   }

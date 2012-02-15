@@ -14,13 +14,13 @@ namespace dmx
 {
 
 //----------------------------------------------------------------------------------------------------------------------  
-MuscleMonoWrap::MuscleMonoWrap(ArmMuscled* arm, float originDist, float insertDist, Joint jointId, bool isFlexor) :
+MuscleMonoWrap::MuscleMonoWrap(ArmMuscled* arm, float originDist, float insertDist, Joint jointId, bool isFlex) :
   m_joint(jointId)
 {
   m_arm = arm;
   m_originJointDist = originDist;
   m_insertJointDist = insertDist;  
-  m_isFlexor = isFlexor;
+  m_isFlexor = isFlex;
 }
 
 //----------------------------------------------------------------------------------------------------------------------    

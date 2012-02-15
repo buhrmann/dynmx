@@ -14,12 +14,12 @@ namespace dmx
 {
 
 //----------------------------------------------------------------------------------------------------------------------  
-MuscleBiWrap::MuscleBiWrap(ArmMuscled* arm, float originDist, float insertDist, bool isFlexor)
+MuscleBiWrap::MuscleBiWrap(ArmMuscled* arm, float originDist, float insertDist, bool isFlex)
 {
   m_arm = arm;
   m_originJointDist = originDist;
   m_insertJointDist = insertDist;
-  m_isFlexor = isFlexor;
+  m_isFlexor = isFlex;
 }
 
 //----------------------------------------------------------------------------------------------------------------------    

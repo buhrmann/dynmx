@@ -23,7 +23,7 @@ class ArmPD : public Arm
 {
 
 public:
-  
+  virtual ~ArmPD(){}; 
   virtual void init();
   virtual void reset();
 

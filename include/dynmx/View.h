@@ -32,6 +32,8 @@ class View
 {
 
 public:
+  
+  virtual ~View();
 
   // functions to be implemented by subclasses
   virtual void setupScene() = 0; 

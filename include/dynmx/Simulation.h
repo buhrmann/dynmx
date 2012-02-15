@@ -27,14 +27,14 @@ public:
 
   static Simulation* getInstance() { return s_instance; };
   static Simulation* create(Model* model, App* app);
-  virtual void start();
+  void start();
   
 protected:
   
   Simulation(Model* model, App* app = 0) : m_model(model), m_app(app) {};
 
-  virtual void runVisual();
-  virtual void runNonVisual();
+  void runVisual();
+  void runNonVisual();
     
   Model* m_model;
   App* m_app;

@@ -20,6 +20,17 @@ namespace dmx
 {
 
 //----------------------------------------------------------------------------------------------------------------------  
+ArmMuscled::~ArmMuscled()
+{
+  for(int i = 0; i < m_muscles.size(); i++)
+  {
+    delete m_muscles[i];
+  }
+  
+  m_muscles.clear();
+}
+  
+//----------------------------------------------------------------------------------------------------------------------  
 void ArmMuscled::init()
 {
   // First let base of arm init
@@ -103,10 +114,10 @@ void ArmMuscled::init()
 }
   
 //----------------------------------------------------------------------------------------------------------------------
-void ArmMuscled::reset(float elbAngle, float shdAngle)
+void ArmMuscled::resetTo(double elbAngle, double shdAngle)
 {
   // Let base class do its reset first.
-  Arm::reset(elbAngle, shdAngle);  
+  Arm::resetTo(elbAngle, shdAngle);  
   for(int i = 0; i < m_muscles.size(); ++i)
   {
     m_muscles[i]->reset();
@@ -118,7 +129,7 @@ void ArmMuscled::update(float dt)
 {
   
   // Accumulate joint torques
-  float elbTorque = 0, shdTorque = 0;
+  double elbTorque = 0, shdTorque = 0;
   
   // Muscles return torques to apply to joints they span.
   for(size_t i = 0; i < m_muscles.size(); ++i)

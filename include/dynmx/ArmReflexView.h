@@ -32,6 +32,8 @@ public:
   
 protected:
   
+  virtual void createArmViz();
+  
   ArmReflex* m_armRx;
   int m_selectedReflex;
   int m_previousReflex;
@@ -48,28 +50,25 @@ protected:
 //----------------------------------------------------------------------------------------------------------------------  
 // Inline implementation
 //----------------------------------------------------------------------------------------------------------------------    
+inline void ArmReflexView::createArmViz()
+{
+  m_armViz = new ArmReflexViz(m_armRx);  
+}
+  
+//----------------------------------------------------------------------------------------------------------------------    
 inline void ArmReflexView::setupScene()
 {
+  // Let parent setup first
   ArmMuscledView::setupScene();
-  
-  // Todo: This is very ugly!!!
-  delete m_armViz;
-  m_armViz = new ArmReflexViz(m_armRx);
-  m_armViz->rotate(ci::Vec4f(0,0,1,1), -PI_OVER_TWO);
-  m_armViz->translate(ci::Vec4f(-0.25, 0, 0, 1));
-  m_scene3d.m_children[0] = m_armViz;  
-  
+    
   ((ArmMuscledViz*)m_armViz)->setDrawDesired(true);
   
   m_reflexGains[0] = m_armRx->getReflex(m_selectedReflex)->m_Kspp[0];
   m_reflexGains[1] = m_armRx->getReflex(m_selectedReflex)->m_Kspv[0];
   m_reflexGains[2] = m_armRx->getReflex(m_selectedReflex)->m_Kspd[0];
   
-  int pointsPerPlot = SETTINGS->getChild("Config/Globals/PlotDuration").getAttributeValue<float>("Value") * 
-                      SETTINGS->getChild("Config/Globals/FrameRate").getAttributeValue<int>("Value");
-  
   // Create a plot for reflex data
-  m_reflexPlot1 = new dmx::Plot(300.0, 180, 6, pointsPerPlot);
+  m_reflexPlot1 = new dmx::Plot(300.0, 180, 6, m_numPointsPerPlot);
   m_reflexPlot1->translate(ci::Vec4f(0, 180 + 20, 0, 1));   
   m_reflexPlot1->setTitle("Reflex Elbow");
   m_reflexPlot1->setLabel(0, "aMN");
@@ -80,7 +79,7 @@ inline void ArmReflexView::setupScene()
   m_reflexPlot1->setLabel(5, "vErr");  
   m_uiColumn->m_children.push_back(m_reflexPlot1);
   
-  m_reflexPlot2 = new dmx::Plot(300.0, 180, 6, pointsPerPlot);
+  m_reflexPlot2 = new dmx::Plot(300.0, 180, 6, m_numPointsPerPlot);
   m_reflexPlot2->translate(ci::Vec4f(0, 400, 0, 1));   
   m_reflexPlot2->setTitle("Reflex Shoulder");
   m_reflexPlot2->setLabel(0, "aMN");
@@ -91,7 +90,7 @@ inline void ArmReflexView::setupScene()
   m_reflexPlot2->setLabel(5, "vErr");    
   m_uiColumn->m_children.push_back(m_reflexPlot2);  
   
-  m_jointTrajPlot = new dmx::Plot(300.0, 180, 6, pointsPerPlot);
+  m_jointTrajPlot = new dmx::Plot(300.0, 180, 6, m_numPointsPerPlot);
   m_jointTrajPlot->translate(ci::Vec4f(0, 600, 0, 1));   
   m_jointTrajPlot->setTitle("Joint Trajectory");
   m_jointTrajPlot->setLabel(0, "Des");

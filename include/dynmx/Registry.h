@@ -26,6 +26,7 @@ enum Models
   kNumModels
 };
 
+#if 0  
 static const char* ModelNames [kNumModels] =
 {
   "None",
@@ -35,6 +36,7 @@ static const char* ModelNames [kNumModels] =
   "TestEvolvableCTRNN",
   "TestArm",
 };
+#endif
 
 } // namespace dmx
 

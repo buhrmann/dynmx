@@ -27,9 +27,12 @@ class ArmReflex : public ArmMuscled
 public:
   
   // Functions inherited from class Model
+  virtual ~ArmReflex();
   virtual void init();
-  virtual void reset(float elbAngle = 0.0f, float shdAngle = 0.0f);
+  virtual void reset() { resetTo(0.0f, 0.0f); };
   virtual void update(float timeStep); 
+  
+  void resetTo(double elbAngle, double shdAngle);
   
   // Custom updates
   void update(Pos pos, float timeStep, int elbPos = 1);

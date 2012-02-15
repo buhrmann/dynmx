@@ -62,11 +62,11 @@ inline void MinJerkTrajectory::update(float dt)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-inline void MinJerkTrajectory::setNew(const Pos& initPos, const Pos& finalPos, float duration)
+inline void MinJerkTrajectory::setNew(const Pos& initPos, const Pos& finalPos, float dur)
 {
   initial = initPos;
   target = finalPos;
-  duration = duration;
+  duration = dur;
   time = 0.0f;
 }
 

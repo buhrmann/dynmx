@@ -98,16 +98,16 @@ void Arm::init()
 #define ARM_USE_KARNIEL_PARAMS 1
 #if ARM_USE_KARNIEL_PARAMS
     // Parameters from Karniel and Inbar
-    const float lowerArmMass = 1.3f;
-    const float upperArmMass = 2.52f;
-    const float lowerArmLength = 0.32f;
-    const float upperArmLength = 0.33f;
+    const double lowerArmMass = 1.3;
+    const double upperArmMass = 2.52;
+    const double lowerArmLength = 0.32;
+    const double upperArmLength = 0.33;
 #else
     // Parameters from Gribble
-    const float lowerArmMass = 1.65f;
-    const float upperArmMass = 2.1f;
-    const float lowerArmLength = 0.34f;
-    const float upperArmLength = 0.46f;    
+    const double lowerArmMass = 1.65;
+    const double upperArmMass = 2.1;
+    const double lowerArmLength = 0.34;
+    const double upperArmLength = 0.46;    
 #endif
     
     setParameters(lowerArmMass, upperArmMass, lowerArmLength, upperArmLength);
@@ -116,20 +116,20 @@ void Arm::init()
     m_frictions[0] = m_frictions[1] = 0.12;
 
     // setup limits
-    const float limit = PI * 0.75f;
+    const double limit = PI * 0.75;
     m_limits[JT_shoulder][0] = limit;
     m_limits[JT_shoulder][1] = -limit;  
     m_limits[JT_elbow][0] = limit;
-    m_limits[JT_elbow][1] = /*-limit; //*/-0.01f;    
+    m_limits[JT_elbow][1] = /*-limit; //*/-0.01;    
     
     m_jointLocked[0] = m_jointLocked[1] = false;
   }    
     
-  reset(0,0);
+  resetTo(0.0, 0.0);
 }  
 
 //----------------------------------------------------------------------------------------------------------------------
-void Arm::reset(float elbAngle, float shdAngle)
+void Arm::resetTo(double elbAngle, double shdAngle)
 {
   m_state.angles[JT_elbow] = elbAngle;
   m_state.angles[JT_shoulder] = shdAngle;  
@@ -153,14 +153,14 @@ void Arm::reset(float elbAngle, float shdAngle)
 
 // takes proportional distance from joint along bone d
 //----------------------------------------------------------------------------------------------------------------------
-Pos Arm::getPointOnUpperArm(float d) const
+Pos Arm::getPointOnUpperArm(double d) const
 {
   return Pos(d * m_elbowPos.x, d * m_elbowPos.y); 
 }
 
 // takes proportional distance from joint along bone d
 //----------------------------------------------------------------------------------------------------------------------
-Pos Arm::getPointOnLowerArm(float d) const
+Pos Arm::getPointOnLowerArm(double d) const
 {
   return Pos(
     m_elbowPos.x + d * (m_effectorPos.x - m_elbowPos.x), 
@@ -178,27 +178,27 @@ void Arm::forwardKinematics()
 //----------------------------------------------------------------------------------------------------------------------
 void Arm::forwardKinematics(double elbAngle, double shdAngle, Pos& elbPos, Pos& effPos)
 {
-  elbPos.x = m_lengths[JT_shoulder] * cos(shdAngle);
-  elbPos.y = m_lengths[JT_shoulder] * sin(shdAngle);
+  elbPos.x = m_lengths[JT_shoulder] * std::cos(shdAngle);
+  elbPos.y = m_lengths[JT_shoulder] * std::sin(shdAngle);
 
-  effPos.x = elbPos.x + (m_lengths[JT_elbow] * cos(elbAngle + shdAngle));
-  effPos.y = elbPos.y + (m_lengths[JT_elbow] * sin(elbAngle + shdAngle));
+  effPos.x = elbPos.x + (m_lengths[JT_elbow] * std::cos(elbAngle + shdAngle));
+  effPos.y = elbPos.y + (m_lengths[JT_elbow] * std::sin(elbAngle + shdAngle));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 void Arm::inverseKinematics(const Pos& pos, float elbDir, double& elbAngle, double& shdAngle)
 {
-  float eAngle = pos.x*pos.x + pos.y*pos.y - m_lengthsSq[JT_elbow] - m_lengthsSq[JT_shoulder];
+  double eAngle = sqr(pos.x) + sqr(pos.y) - m_lengthsSq[JT_elbow] - m_lengthsSq[JT_shoulder];
   eAngle /= 2.0 * m_lengths[JT_elbow] * m_lengths[JT_shoulder];
   // clamp to [-1, 1]
   eAngle = eAngle < -1 ? -1 : eAngle > 1 ? 1 : eAngle;
-  elbAngle = elbDir * fabs(acosf(eAngle));
+  elbAngle = elbDir * std::abs(std::acos(eAngle));
   
-  float t1 = m_lengths[JT_shoulder] +  m_lengths[JT_elbow] * cos(elbAngle);
-  float t2 = m_lengths[JT_elbow] * sin(elbAngle);
-  float xx = pos.x * t1 + pos.y * t2;
-  float yy = pos.y * t1 - pos.x * t2;
-  shdAngle = atan2(yy, xx);
+  double t1 = m_lengths[JT_shoulder] +  m_lengths[JT_elbow] * std::cos(elbAngle);
+  double t2 = m_lengths[JT_elbow] * std::sin(elbAngle);
+  double xx = pos.x * t1 + pos.y * t2;
+  double yy = pos.y * t1 - pos.x * t2;
+  shdAngle = std::atan2(yy, xx);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -212,7 +212,7 @@ void Arm::preCompute()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void Arm::setParameters(float mass1, float mass2, float length1, float length2)
+void Arm::setParameters(double mass1, double mass2, double length1, double length2)
 {
   m_masses[JT_elbow] = mass1;
   m_masses[JT_shoulder] = mass2;
@@ -224,7 +224,7 @@ void Arm::setParameters(float mass1, float mass2, float length1, float length2)
 }
 
 //----------------------------------------------------------------------------------------------------------------------  
-void Arm::solveEuler(const double* torques, float dt)
+void Arm::solveEuler(double dt)
 {  
   computeAccelerations(m_state);  
 
@@ -238,13 +238,11 @@ void Arm::solveEuler(const double* torques, float dt)
   
 // With predictive correction of Euler error
 //----------------------------------------------------------------------------------------------------------------------  
-void Arm::solveImprovedEuler(float timeStep)
+void Arm::solveImprovedEuler(double dt)
 {
   // Todo: and fix to 0.5 below for little optimisation
   const double w1 = 0.5;
   const double w2 = 1.0 - w1;
-  
-  float dt = timeStep;
   
   // 1. Use Euler to create predicted state
   computeAccelerations(m_state);
@@ -287,11 +285,11 @@ void Arm::update(float timeStep, double torqElb, double torqShd)
   
   if(m_integrator == kInteg_heun)
   {
-    solveImprovedEuler(timeStep);
+    solveImprovedEuler((double)timeStep);
   }
   else
   {
-    solveEuler(m_state.torques, timeStep);
+    solveEuler((double)timeStep);
   }
   
   // Limit clamping  
@@ -332,8 +330,8 @@ void Arm::update(float timeStep, double torqElb, double torqShd)
   
 #define CHECK_ROUND_TRIP 0
 #if CHECK_ROUND_TRIP
-  float elbAngle, shdAngle;
-  float elbDir = m_angles[JT_elbow] > 0 ? 1 : -1;
+  double elbAngle, shdAngle;
+  double elbDir = m_angles[JT_elbow] > 0 ? 1 : -1;
   inverseKinematics(m_effectorPos[0], m_effectorPos[1], elbDir, elbAngle, shdAngle);
 #endif
 }
@@ -343,9 +341,9 @@ void Arm::update(float timeStep, double torqElb, double torqShd)
 void Arm::computeAccelerations(State& state)
 {
   // calculate these only once:
-  double cosElbAngle = cosf(state.angles[JT_elbow]);
-  double sinElbAngle = sinf(state.angles[JT_elbow]);
-  double sinElbShd = sinf(state.angles[JT_elbow] + state. angles[JT_shoulder]);
+  double cosElbAngle = std::cos(state.angles[JT_elbow]);
+  double sinElbAngle = std::sin(state.angles[JT_elbow]);
+  double sinElbShd = std::sin(state.angles[JT_elbow] + state. angles[JT_shoulder]);
   
   // compute elbow acceleration
   double elbAcceleration = 0.0;
@@ -376,7 +374,7 @@ void Arm::computeAccelerations(State& state)
     
     // shoulder gravity is elbow gravity + shoulder
     state.gravityAcc[JT_shoulder] = state.gravityAcc[JT_elbow];
-    state.gravityAcc[JT_shoulder] += m_gravity * (m_masses[JT_elbow] + m_masses[JT_shoulder]) * m_lengths[JT_shoulder] * sinf(state.angles[JT_shoulder]);
+    state.gravityAcc[JT_shoulder] += m_gravity * (m_masses[JT_elbow] + m_masses[JT_shoulder]) * m_lengths[JT_shoulder] * std::sin(state.angles[JT_shoulder]);
     state.dampingAcc[JT_shoulder] = m_frictions[JT_shoulder] * state.velocities[JT_shoulder];
     shdAcceleration = (state.torques[JT_shoulder] - state.interactionAcc[JT_shoulder] - state.coriolisAcc[JT_shoulder] - state.gravityAcc[JT_shoulder] - state.dampingAcc[JT_shoulder]) / state.inertiaAcc[JT_shoulder];
   }

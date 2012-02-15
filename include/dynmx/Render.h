@@ -103,15 +103,15 @@ namespace dmx
     {
       const char* c = "xyz";
       glColor3f(1,0,0);
-      glRasterPos3f(l*1.1, 0, 0);
+      glRasterPos3f(l*1.1f, 0.0f, 0.0f);
       glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c[0]);
 
-      glColor3f(0,1,0);
-      glRasterPos3f(0, l*1.1, 0);
+      glColor3f(0.0f,1.0f,0.0f);
+      glRasterPos3f(0.0f, l*1.1f, 0.0f);
       glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c[1]);
 
-      glColor3f(0,0,1);
-      glRasterPos3f(0, 0, l*1.1);
+      glColor3f(0.0f, 0.0f , 1.0f);
+      glRasterPos3f(0.0f, 0.0f, l*1.1f);
       glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, c[2]);
     }
 	}

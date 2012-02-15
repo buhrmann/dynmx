@@ -322,7 +322,7 @@ void CTRNNViz::update()
   ci::gl::drawString("CTRNN outputs", textPadding, m_textColor, m_font);  
   
   // Mode button
-  ci::gl::color(0.7,0.7,0.7);
+  ci::gl::color(0.7f, 0.7f, 0.7f);
   ci::gl::drawSolidRect(m_modeButton);
   
   // Draw according to selected mode
@@ -372,8 +372,7 @@ void CTRNNViz::update()
     const int& iW = m_weights->m_iSel;
     const int& jW = m_weights->m_jSel; 
     if(iW != -1 && jW != -1)
-    {
-      char str [128];       
+    {      
       sprintf(str, "weight %i > %i: %2.2f", iW, jW, m_ctrnn->weights[iW][jW]);
       ci::gl::drawString(str, textPos, m_textColor, m_font);
     }

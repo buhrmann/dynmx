@@ -340,12 +340,12 @@ void Reflex::updateInContractionCoords(float dt)
   m_spindleSec[1] = spindleActivation(m_Kspp[1] * m_posErr[1]);
   
   m_spindlePri[0] = spindleActivation((m_Kspp[0] * m_posErr[0]) + 
-                                      (m_Kspv[0] * powf(m_velErr[0], m_Espv[0])) +
+                                      (m_Kspv[0] * powf(m_velErr[0], 1.0)) + // m_Espv[0])) +
                                       (m_Kspd[0] * powf(std::max(-m_contractionVel[0], 0.0), m_Espv[0])) // only negative contraction, i.e. lengthening, leads to damping, as muscle can only contract actively
                                       );
   
   m_spindlePri[1] = spindleActivation((m_Kspp[1] * m_posErr[1]) + 
-                                      (m_Kspv[1] * powf(m_velErr[1], m_Espv[1])) +
+                                      (m_Kspv[1] * powf(m_velErr[1], 1.0)) + // m_Espv[1])) +
                                       (m_Kspd[1] * powf(std::max(-m_contractionVel[1], 0.0), m_Espv[1])) // only negative contraction, i.e. lengthening, leads to damping, as muscle can only contract actively
                                       );
   
@@ -407,13 +407,15 @@ void Reflex::updateInContractionCoords(float dt)
   
   // Alpha motor neuron
 #if REFLEX_USE_OWN_IAIN_IMPL  
-  m_alpha[0] = m_cocontraction[0] + m_Wspmn[0] * m_spindlePri[0] + m_ofpv[0] 
+  m_alpha[0] = m_cocontraction[0] + m_ofpv[0] 
+  + (m_Wspmn[0] * m_spindlePri[0])
   - (m_Wrnmn[0] * m_RnOut[0]) 
   - (m_Wiamn[0] * m_IaInOut[1]) 
   - (m_Wibmn[0] * m_IbInOut[0])
   + (m_Wismn[0] * m_interSegmentInput[0]);
   
-  m_alpha[1] = m_cocontraction[1] + m_Wspmn[1] * m_spindlePri[1] + m_ofpv[1] 
+  m_alpha[1] = m_cocontraction[1] + m_ofpv[1] 
+  + (m_Wspmn[1] * m_spindlePri[1])
   - (m_Wrnmn[1] * m_RnOut[1]) 
   - (m_Wiamn[1] * m_IaInOut[0]) 
   - (m_Wibmn[1] * m_IbInOut[1])

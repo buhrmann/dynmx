@@ -31,8 +31,8 @@ void GAViz::init()
   m_fitness = new VectorView<float>(
     m_gaRunner->getGA()->getFitnesses(), 
     m_gaRunner->getGA()->getPopulationSize(), 
-    m_width, 1.0); 
-  m_fitness->translate(Vec4f(0, 0.5 * m_unitSize, 0, 1));
+    m_width, 1.0f); 
+  m_fitness->translate(Vec4f(0.0f, 0.5f * m_unitSize, 0.0f, 1.0f));
   
   // genomes
   m_genomes = new MatrixView<double>(
@@ -113,7 +113,7 @@ void GAViz::update()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void GAViz::onMouseMove(const Vec3f& mPos)
+  void GAViz::onMouseMove(const ci::Vec4f& mPos)
 {
 //  const float r3 = m_width / 2;
 //  const float r2 = r3 - 5;

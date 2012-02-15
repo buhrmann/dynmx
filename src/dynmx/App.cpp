@@ -16,6 +16,8 @@ namespace dmx
 //--------------------------------------------------------------------------------------------------------------------
 void App::setup()
 { 
+  std::cout << "App::setup()" << std::endl;
+  
   m_paused = false;
   m_useFixedTimeStep = true;  
   m_prevTime = getElapsedSeconds();
@@ -71,6 +73,8 @@ void App::update(float dt)
 //--------------------------------------------------------------------------------------------------------------------
 void App::prepareSettings( Settings *settings )
 {
+  std::cout << "App::prepareSettings()" << std::endl;
+  
   // Window size
   int w = 800;
   int h = 600;
@@ -99,7 +103,6 @@ void App::prepareSettings( Settings *settings )
   // VSync
   if (SETTINGS->hasChild("Config/Globals/VSync"))
   {
-    //bool vsync = SETTINGS->getChild("Config/Globals/VSync").getAttributeValue<bool>("Value");
     bool vsync = SETTINGS->getChild("Config/Globals/VSync")["Value"].as<bool>();
     m_view->setVSync(vsync);
   }

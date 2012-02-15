@@ -11,6 +11,8 @@
 
 namespace dmx
 {
+  
+#define ELB_SWITCH_TRIAL 9
 
 //----------------------------------------------------------------------------------------------------------------------
 EvoArmCoCon::EvoArmCoCon() : m_arm(0), m_time(0) 
@@ -84,7 +86,9 @@ int EvoArmCoCon::getNumGenes()
   
   // Intersegmental inputs (weights to mn and iain)
   if(m_evolveIntersegmentInputs)
-    numGenes += 2 * 4;
+  {
+    numGenes += m_numMoves * 2 * 2;
+  }
   
   return numGenes;
 };
@@ -145,9 +149,9 @@ void EvoArmCoCon::decodeGenome(const double* genome)
   }
   
   // Spindle parameters
-  const float maxSpP = 20.0;
-  const float maxSpV = 0.0;
-  const float maxSpD = 5.0;
+  const float maxSpP = 10.0;
+  const float maxSpV = 1.0;
+  const float maxSpD = 2.0;
   const float minSpExp = 0.5;
   m_arm->getReflex(0)->setSpindleParameters(genome[start + 0]*maxSpP, genome[start + 0]*maxSpP, 
                                             genome[start + 1]*maxSpV, genome[start + 1]*maxSpV, 
@@ -175,7 +179,7 @@ void EvoArmCoCon::decodeGenome(const double* genome)
   
   
   // Alpha MN params: input from spindles
-  float maxW = 1.0;
+  float maxW = 2.0;
   m_arm->getReflex(0)->setMotoNeuronParameters(genome[start+0] * maxW, genome[start+0] * maxW); 
   m_arm->getReflex(1)->setMotoNeuronParameters(genome[start+1] * maxW, genome[start+1] * maxW);
   start += 2;
@@ -285,27 +289,57 @@ void EvoArmCoCon::decodeGenome(const double* genome)
   // Intersegmental inputs
   if(m_evolveIntersegmentInputs)
   { 
-    float Wismn = -maxW + 2 * maxW * genome[start+0];
-    float Wisia = -maxW + 2 * maxW * genome[start+1];
+    m_intersegParams.clear(); // This instance could repeatedly be decoded!
+    for(int i = 0; i < m_numMoves; i++)
+    {
+      double Wismn = mapUnitIntervalToRange(genome[start + (i * 4) + 0], -maxW, maxW);
+      double Wisia = mapUnitIntervalToRange(genome[start + (i * 4) + 1], -maxW, maxW);
+      m_intersegParams.push_back(Wismn);
+      m_intersegParams.push_back(Wismn);
+      m_intersegParams.push_back(Wisia);
+      m_intersegParams.push_back(Wisia);
+      Wismn = mapUnitIntervalToRange(genome[start + (i * 4) + 2], -maxW, maxW);
+      Wisia = mapUnitIntervalToRange(genome[start + (i * 4) + 3], -maxW, maxW);
+      m_intersegParams.push_back(Wismn);
+      m_intersegParams.push_back(Wismn);
+      m_intersegParams.push_back(Wisia);
+      m_intersegParams.push_back(Wisia);
+    }
+/*    
+    float Wismn = mapUnitIntervalToRange(genome[start+0], -maxW, maxW);
+    float Wisia = mapUnitIntervalToRange(genome[start+1], -maxW, maxW);
     m_arm->getReflex(0)->setIntersegmentalParameters(Wismn, Wismn, Wisia, Wisia);
     
-    Wismn = -maxW + 2 * maxW * genome[start+2];
-    Wisia = -maxW + 2 * maxW * genome[start+3];
+    Wismn = mapUnitIntervalToRange(genome[start+2], -maxW, maxW);
+    Wisia = mapUnitIntervalToRange(genome[start+3], -maxW, maxW);
     m_arm->getReflex(1)->setIntersegmentalParameters(Wismn, Wismn, Wisia, Wisia);    
-    
-    start += 4;
+*/
+    start += m_numMoves * 4;
   }
   
   createTrajectories();
 };
 
 
-  // Define distance measure for fitness function
+// Define distance measure for fitness function
 //----------------------------------------------------------------------------------------------------------------------
+struct DiffSq
+{
+  double operator() (double d1, double d2) { return sqr(d1-d2); };
+};  
+  
 struct VecDist
 {
   double operator() (ci::Vec2f t1, ci::Vec2f t2) { return (t1-t2).lengthSquared(); };
 };  
+  
+struct VecNorm
+{
+  VecNorm(float dt = 1) : m_rdt(1.0f/dt) {};
+  double operator() (ci::Vec2f t1) { return t1.length() * m_rdt; };
+  
+  float m_rdt;
+};    
 
 //----------------------------------------------------------------------------------------------------------------------
 float EvoArmCoCon::getFitness() 
@@ -313,16 +347,39 @@ float EvoArmCoCon::getFitness()
   const double dt = 1.0 / (double)SETTINGS->getChild("Config/Globals/FrameRate").getAttributeValue<int>("Value");
   
 #define FITNESS_USE_CROSS_CORRELATION 1
+  
 #if !FITNESS_USE_CROSS_CORRELATION  
-  float distFit = 1.0 - sqrt(m_fitness / (m_time / dt));
+  float fitness = 1.0 - sqrt(m_fitness / (m_time / dt));
 #else  
+  
   int minDelay = -100;
   int maxDelay = 100;
-  std::vector<double> cc = crossCorrelation(m_desiredPositions, m_actualPositions, VecDist(), minDelay, maxDelay);
-  std::vector<double>::iterator optElem = min_element(cc.begin(), cc.end());
-  double optVal = *optElem / (m_time / dt);
-  //int optAt = minDelay + std::distance(cc.begin(), optElem);
-  float distFit = 1.0 - sqrt(optVal);
+  
+  // Position-based evaluation
+  std::vector<double> posCorr = crossCorrelation(m_desiredPositions, m_actualPositions, VecDist(), minDelay, maxDelay);
+  std::vector<double>::iterator optElem = min_element(posCorr.begin(), posCorr.end());
+  double optPosVal = *optElem / (m_time / dt);
+  float posFitness = 1.0 - sqrt(optPosVal);
+  
+  // Store what time delay lead to best fitness (for later plotting).
+  int optAt = minDelay + std::distance(posCorr.begin(), optElem);
+  m_bestFitDelay = optAt * dt;
+  
+  // Velocity based evaluation
+  std::vector<double> tangentialVels;
+  differences(m_actualPositions, tangentialVels, VecNorm(dt), true);
+  std::vector<double> desTangentialVels;
+  differences(m_desiredPositions, desTangentialVels, VecNorm(dt), true);
+  std::vector<double> velCorr = crossCorrelation(desTangentialVels, tangentialVels, DiffSq(), minDelay, maxDelay);
+  optElem = min_element(velCorr.begin(), velCorr.end());  
+  double optVelVal = *optElem / (m_time / dt);
+  float velFitness = 1.0 - sqrt(optVelVal);
+
+  // Store what time delay lead to best fitness (for later plotting).
+  //int optAt = minDelay + std::distance(velCorr.begin(), optElem);
+  //m_bestFitDelay = optAt * dt;
+  
+  double fitness = posFitness * velFitness;
 #endif
   
   
@@ -335,10 +392,10 @@ float EvoArmCoCon::getFitness()
       coconFit += std::max(m_coconIncrements[i], 0.0f);
     }
     coconFit /= N;
-    distFit *= coconFit;
+    fitness *= coconFit;
   }
   
-  return distFit;
+  return fitness;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -346,6 +403,9 @@ void EvoArmCoCon::init()
 { 
   assert(m_arm); 
   m_arm->init(); 
+  
+  std::fill(m_openLoop, m_openLoop + EVOARM_NUM_OPENLOOP, 0.0);
+  m_bestFitDelay = -1.0f;
   
   // Read settings
   if (SETTINGS->hasChild("Config/GA/Evolvable/EvoFlags")) 
@@ -372,6 +432,7 @@ void EvoArmCoCon::init()
     
     // Read trajectory from settings file    
     // Requires arm to be setup to do FK, but that's already done in init() above, so should be fine.
+    m_numMoves = -1; // First is the start pose for settling!
     if(SETTINGS->hasChild("Config/GA/Evolvable/DesiredTrajectory"))
     {
       ci::Vec2f pos, tmp;
@@ -381,6 +442,8 @@ void EvoArmCoCon::init()
       bool convertToRadians = xml.getAttributeValue<bool>("InDegrees");
       for (ci::XmlTree::ConstIter viaPoint = xml.begin(); viaPoint != xml.end(); ++viaPoint)
       {
+        m_numMoves++;
+        
         float elbAngle = viaPoint->getChild("Position").getAttributeValue<float>("x");
         float shdAngle = viaPoint->getChild("Position").getAttributeValue<float>("y");
         if (convertToRadians)
@@ -388,6 +451,7 @@ void EvoArmCoCon::init()
           elbAngle = degreesToRadians(elbAngle);
           shdAngle = degreesToRadians(shdAngle);
         }
+        
         m_arm->forwardKinematics(elbAngle, shdAngle, tmp, pos);
         approachDuration = viaPoint->getChild("ApproachDuration").getValue<float>();
         maintainDuration = viaPoint->getChild("MaintainDuration").getValue<float>();
@@ -458,7 +522,7 @@ void EvoArmCoCon::createTrajectories()
   // Transform cartesian effector position into joint angle targets
   for(int i = 0; i < m_commandedTrajectory.size(); i++)
   {
-    int elbDir = i < 8 ? 1 : -1;
+    int elbDir = i < ELB_SWITCH_TRIAL ? 1 : -1;
     double desiredAngles[2];
     m_arm->inverseKinematics(m_commandedTrajectory[i].position, elbDir, desiredAngles[JT_elbow], desiredAngles[JT_shoulder]);  
     m_targetJointAngles.add(m_commandedTrajectory[i]);
@@ -499,7 +563,16 @@ void EvoArmCoCon::reset()
   m_coconIncrements.clear();
   
   m_coconStarted = false;
-  m_arm->reset();
+  float elbStart = 0, shdStart = 0;
+  
+  // If possible set arm to initial position 
+  if(m_targetJointAngles.size() > 0)
+  {
+    elbStart = m_targetJointAngles[0].position.x;
+    shdStart = m_targetJointAngles[0].position.y;
+  }
+  
+  m_arm->resetTo(elbStart, shdStart);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -530,28 +603,7 @@ void EvoArmCoCon::update(float dt)
     m_arm->getReflex(1)->setCocontraction(m_cocontraction, m_cocontraction);    
   }
   
-  // Static activation added for each target
-#if 0
-  if(m_evolveOpenLoop)
-  {
-    if (command.id == 1 || command.id == 2)
-    {
-      m_arm->getReflex(0)->setCocontraction(m_openLoop[2], m_openLoop[3]);
-      m_arm->getReflex(1)->setCocontraction(m_openLoop[4], m_openLoop[5]);        
-    }
-    else if (command.id == 5 || command.id == 6)
-    {
-      m_arm->getReflex(0)->setCocontraction(m_openLoop[3], m_openLoop[2]); // Mirror image of first set
-      m_arm->getReflex(1)->setCocontraction(m_openLoop[5], m_openLoop[4]);        
-    }
-    else
-    {
-      m_arm->getReflex(0)->setCocontraction(m_openLoop[0], m_openLoop[0]);
-      m_arm->getReflex(1)->setCocontraction(m_openLoop[1], m_openLoop[1]);    
-    }   
-  }
-#endif  
-  
+  // Set open-loop parameters for the current movement
   if(m_evolveOpenLoop)
   {
     if (command.id == 1 || command.id == 2)
@@ -584,9 +636,28 @@ void EvoArmCoCon::update(float dt)
       m_arm->getReflex(0)->setCocontraction(m_openLoop[4], m_openLoop[4]);
       m_arm->getReflex(1)->setCocontraction(m_openLoop[5], m_openLoop[5]);      
     }
-
   }  
   
+  // Set open-loop parameters for the current movement
+  if(m_evolveIntersegmentInputs)
+  {
+    if(desired.id > 0)
+    {
+      int moveId = (int)((desired.id - 1) / 2);
+      int i = moveId * 8; 
+      m_arm->getReflex(0)->setIntersegmentalParameters(m_intersegParams[i+0], m_intersegParams[i+1], m_intersegParams[i+2], m_intersegParams[i+3]);
+      m_arm->getReflex(1)->setIntersegmentalParameters(m_intersegParams[i+4], m_intersegParams[i+5], m_intersegParams[i+6], m_intersegParams[i+7]);
+    }
+    else 
+    {
+      m_arm->getReflex(0)->setIntersegmentalParameters(0,0,0,0);
+      m_arm->getReflex(1)->setIntersegmentalParameters(0,0,0,0);
+    }
+
+  }
+  
+  
+  // Update arm simulation
   if(m_useMuscleCoords)
   {
     Pos commandedElbLengths = m_targetElbLengths.atTime(m_time).position;
@@ -596,7 +667,7 @@ void EvoArmCoCon::update(float dt)
   }
   else
   {
-    m_arm->update(command.position, dt, command.id < 8 ? 1 : -1);    
+    m_arm->update(command.position, dt, command.id < ELB_SWITCH_TRIAL ? 1 : -1);    
   }
   
   
@@ -650,7 +721,7 @@ void EvoArmCoCon::updateCurrentCommand(Target<Pos>& command, Target<Pos>& desire
   
   // Transform desired position to joint angles (IK) and muscle lengths
   double currentDesiredAngles[2];
-  m_arm->inverseKinematics(desired.position, desired.id < 8 ? 1.0f : -1.0f, currentDesiredAngles[0], currentDesiredAngles[1]);
+  m_arm->inverseKinematics(desired.position, desired.id < ELB_SWITCH_TRIAL ? 1.0f : -1.0f, currentDesiredAngles[0], currentDesiredAngles[1]);
   m_currentDesiredAngles.x = clamp(currentDesiredAngles[0], m_arm->getJointLimitLower(JT_elbow), m_arm->getJointLimitUpper(JT_elbow));  
   m_currentDesiredAngles.y = clamp(currentDesiredAngles[1], m_arm->getJointLimitLower(JT_shoulder), m_arm->getJointLimitUpper(JT_shoulder));    
   
@@ -678,7 +749,7 @@ bool EvoArmCoCon::hasFinished()
 
 //----------------------------------------------------------------------------------------------------------------------  
 void EvoArmCoCon::finish()
-{
+{ 
 #if DEBUGGING
   std::cout << "Fitness: " << getFitness() << std::endl;
 #endif
@@ -689,6 +760,20 @@ void EvoArmCoCon::toXml(ci::XmlTree& xml)
 {
   ci::XmlTree evolvable ("EvoArmCoCon", "");
   evolvable.setAttribute("Fitness", getFitness());
+  
+  ci::XmlTree rampDur ("RampDurationFactor", toString(m_rampDurationFactor));
+  evolvable.push_back(rampDur);
+  
+  ci::XmlTree bestFitDelay ("BestFitnessMatchDelay", toString(m_bestFitDelay));
+  evolvable.push_back(bestFitDelay);  
+  
+  ci::XmlTree openLoop("OpenLoopActivations", "");
+  for(int i = 0; i < EVOARM_NUM_OPENLOOP; i++)
+  {
+    ci::XmlTree act ("Value", toString(m_openLoop[i]));
+    openLoop.push_back(act);
+  }
+  evolvable.push_back(openLoop);
   
   // Add ArmMuscled xml data
   m_arm->toXml(evolvable);  

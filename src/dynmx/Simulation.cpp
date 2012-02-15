@@ -71,7 +71,7 @@ void Simulation::runVisual()
 
 //----------------------------------------------------------------------------------------------------------------------
 void Simulation::runNonVisual()
-{
+{  
   // Read global config
   float dt = 1.0 / (float) DEFAULT_FRAMERATE;
   if (SETTINGS->hasChild("Config/Globals/FrameRate"))

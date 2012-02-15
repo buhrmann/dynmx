@@ -19,9 +19,16 @@ using namespace cinder::app;
 const int View::m_selectBufSize = 128;
 
 //----------------------------------------------------------------------------------------------------------------------
+View::~View()
+{
+  
+}
+  
 //----------------------------------------------------------------------------------------------------------------------
 void View::init()
 {
+  std::cout << "View::init()" << std::endl;
+  
   m_paused = false;
 
   m_backgroundColor = Vec4f(0.3f, 0.3f, 0.3f, 1.0);
@@ -229,7 +236,8 @@ int View::pick(int x, int y)
   RenderState::g_renderPass = RenderState::RENDER_SURFACE;
 
   // process hits: find closest (assumes not hierarchical names for now)
-  GLuint names, *ptr, minZ, *ptrNames, numberOfNames;
+  GLuint names, *ptr, minZ, numberOfNames;
+  GLuint *ptrNames = NULL;
 
   ptr = (GLuint *) m_selectionBuffer;
   minZ = 0xffffffff;

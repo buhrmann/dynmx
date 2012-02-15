@@ -22,6 +22,8 @@
 namespace dmx
 {
   
+#define EVOARM_NUM_OPENLOOP 6  
+  
 //----------------------------------------------------------------------------------------------------------------------
 // Evolves a simple PD-like reflex for a single joint, two movements
 //----------------------------------------------------------------------------------------------------------------------
@@ -75,6 +77,7 @@ protected:
   
   float m_time;
   float m_fitness;
+  float m_bestFitDelay;
   double m_cocontraction;
   
   float m_minJerkTrajDelay;     // Time between start of commanded ramp and min jerk trajectory used for fitness
@@ -84,7 +87,11 @@ protected:
   double m_coconAtStart[2];       // For two reflexes
   bool m_coconStarted;
   
-  double m_openLoop[6];  
+  double m_openLoop[EVOARM_NUM_OPENLOOP];  
+
+  std::vector<double> m_intersegParams;
+  
+  int m_numMoves;
   
   // Flags and params
   bool m_evolveIAIN;
