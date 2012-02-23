@@ -52,6 +52,14 @@ static inline T clamp(T Value, T Min, T Max)
   return (Value < Min)? Min : (Value > Max)? Max : Value;
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+template<class T>
+static inline int sign(T val)
+{
+  return val < 0 ? -1 : 1;
+}
+
+
 // Vector sum
 //----------------------------------------------------------------------------------------------------------------------
 template<class T>

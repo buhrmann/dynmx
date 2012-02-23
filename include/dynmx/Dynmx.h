@@ -56,13 +56,13 @@ namespace dmx
 class Globals 
 {
 public:
-  static Globals* Inst();
+  static Globals* Inst(const std::string& cfgFnm="");
   std::string getDataDir() { return m_dataDir; };
   ci::XmlTree* getSettings() { return m_settings; };
   
 protected:
-  Globals();
-  void initialise();
+  Globals(const std::string& cfgFnm="");
+  void initialise(const std::string& cfgFnm="");
   void saveToDataDir();  
   
 private:

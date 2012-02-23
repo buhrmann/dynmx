@@ -7,6 +7,7 @@
  *
  */
 
+#include "Dynmx.h"
 #include "Simulation.h"
 #include "SimulationFactory.h"
 
@@ -18,6 +19,13 @@ int main( int argc, char * const argv[] )
 #if defined( CINDER_COCOA )
   ci::cocoa::SafeNsAutoreleasePool pool;
 #endif
+  
+  // Process command line arguments, if any
+  if(argc > 1)
+  {
+    std::string configFnm = argv[1];
+    dmx::Globals::Inst(configFnm);
+  }
   
   // Createa a simulation, using the global config file as input
   dmx::Simulation* sim = dmx::SimulationFactory::create();

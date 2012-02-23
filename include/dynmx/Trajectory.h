@@ -76,12 +76,13 @@ inline void MinJerkTrajectory::setNew(const Pos& initPos, const Pos& finalPos, f
 template <class T>
 struct Target
 {
-  T position;
-  float start;
-  float stop;
-  int id;
+  Target() {};
+  Target(T pos, float t, int nm=0) : position(pos), time(t), name(nm) {};
   
-  float getDuration() { return stop-start; };
+  T position;
+  float time;
+  int id;
+  int name;
 };
   
 //----------------------------------------------------------------------------------------------------------------------
@@ -100,24 +101,23 @@ public:
     kTr_BlendMinJerk
   };
   
-  Trajectory() : m_loop(false), m_blend(kTr_BlendNone) {};
+  Trajectory() : m_loop(false), m_blend(kTr_BlendNone), m_duration(0.0) {};
   
   // Setters
   void add(Target<T> pos);
-  void add(T pos, float duration);  
+  void add(T pos, float time, int name = 0);  
   void setLoop(bool l) { m_loop = l; };
   void setBlend(BlendType b) { m_blend = b; };
-  void clear() { m_targets.clear(); };
+  void clear() { m_targets.clear(); m_duration = 0.0; };
   
   // Getters
   Target<T>& operator[] (const int id) { assert(id < m_targets.size()); return m_targets[id]; };  
   const Target<T>& operator[] (const int id) const { assert(id < m_targets.size()); return m_targets[id]; };  
   std::vector<Target<T> >& getTargets() { return m_targets; };
   
-  
   T getPositionAtTime(float time);
   Target<T> atTime(float time);
-  float getDuration() { return m_targets.back().stop; };
+  float getDuration() { return m_targets.back().time; };
   float size() const { return m_targets.size(); };
   
 protected:
@@ -126,6 +126,7 @@ protected:
                                   
   bool m_loop;
   BlendType m_blend;
+  float m_duration;
   
 }; // class Trajectory
   
@@ -134,26 +135,18 @@ protected:
 // Inline implementations  
 //----------------------------------------------------------------------------------------------------------------------      
 template <class T>
-void Trajectory<T>::add(T pos, float duration)
+void Trajectory<T>::add(T pos, float time, int name)
 {
-  Target<T> target;
-  target.position = pos;
-  target.start = 0.0f;
-  if(m_targets.size() > 0)
-  {
-    // starts when previous has finished
-    target.start = m_targets.back().stop;
-  }
-  target.stop = target.start + duration;
-  m_targets.push_back(target);
-  
+  float accTime = m_duration + time;
+  add(Target<T> (pos, accTime, name));
 };  
 
 //----------------------------------------------------------------------------------------------------------------------        
 template <class T>
 void Trajectory<T>::add(Target<T> target)
-{
+{  
   m_targets.push_back(target);  
+  m_duration = m_targets.back().time;  
 };    
 
 //----------------------------------------------------------------------------------------------------------------------      
@@ -170,40 +163,43 @@ Target<T> Trajectory<T>::atTime(float time)
   Target<T> target;
   
   // Loop around
-  if(m_loop && time > m_targets.back().stop)
+  if(m_loop && (time > m_duration))
   {
-    time = fmod(time, m_targets.back().stop);
+    time = fmod(time, m_duration);
   }
   
-  if(time < m_targets.back().stop)
+  if(time < m_duration)
   {
     // Within duration of set of targets
-    for(int i = 0; i < m_targets.size(); i++)
+    for(int i = 0; i < m_targets.size() - 1; i++)
     {
-      if(time >= m_targets[i].start && time <= m_targets[i].stop)
+      if(time >= m_targets[i].time && time < m_targets[i+1].time)
       {
         target = m_targets[i];
         target.id = i;
+        const Target<T>& nextTarget = m_targets[i+1];
         
         // Blend between current and next target
-        if((m_blend > kTr_BlendNone) && (i < m_targets.size() - 1))
+        if((m_blend > kTr_BlendNone) && (target.position != nextTarget.position))
         {
-          float duration = target.stop - target.start;
+          float duration = nextTarget.time - target.time;
           if(m_blend == kTr_BlendLinear)
           {
             // Blend linearly
-            float timeProp = (time - target.start) / duration;
-            target.position = target.position + timeProp * (m_targets[i+1].position - target.position);
+            float timeProp = (time - target.time) / duration;
+            target.position = target.position + timeProp * (nextTarget.position - target.position);
           }
           else 
           {
             // Create minimum jerk trajectory
-            float t = time - m_targets[i].start;
-            target.position = MinJerkTrajectory::getPosition(target.position, m_targets[i+1].position, duration, t);
+            float t = time - target.time;
+            target.position = MinJerkTrajectory::getPosition(target.position, nextTarget.position, duration, t);
           }
         }
         
-        // We've found it
+        // We've found it!
+        // If two targets have the same position in time, then time couldn't be greater than the first and
+        // less than the second. So only the second will be returned.
         break;
       }
     }

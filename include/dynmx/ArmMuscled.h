@@ -49,6 +49,8 @@ public:
   
   // Store output in human readable format
   virtual void toXml(ci::XmlTree& xml);
+  
+  virtual void record(Recorder& recorder);    
 
 protected:
 

@@ -44,6 +44,7 @@ public:
   
   // Getters
   Reflex* getReflex(int i) { assert(i < m_reflexes.size()); return m_reflexes[i]; };
+  int getNumReflexes() { return m_reflexes.size(); };
   const Pos& getDesiredPos() const { return m_desiredPos; };
   const std::deque<Pos>& getDesiredTrajectory() const { return m_desiredTrajectory; };
   

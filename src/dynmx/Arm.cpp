@@ -19,7 +19,7 @@ namespace dmx
 #define PI_OVER_FOUR 0.7853981
 #endif
 
-
+#define TEST_ZERO_INTERACTION_TORQUE 0
 //----------------------------------------------------------------------------------------------------------------------
 // Equations from Hollerbach and Flash 1981. Also see Shadmehr 1990 or Uno et al 1989.
 // Typical dimensions from Arnon(1990), referenced in Karniel and Inbar (1997), 
@@ -72,12 +72,12 @@ void Arm::init()
     double elbowFriction = xml.getChild("Elbow").getAttributeValue<double>("Friction");
     setFriction(elbowFriction, shoulderFriction);
     
-    double shoulderUpperLimit = PI * xml.getChild("Shoulder").getAttributeValue<double>("UpperLimit");
-    double shoulderLowerLimit = PI * xml.getChild("Shoulder").getAttributeValue<double>("LowerLimit");
+    double shoulderUpperLimit = degreesToRadians(xml.getChild("Shoulder").getAttributeValue<double>("UpperLimit"));
+    double shoulderLowerLimit = degreesToRadians(xml.getChild("Shoulder").getAttributeValue<double>("LowerLimit"));
     setLimit(JT_shoulder, shoulderUpperLimit, shoulderLowerLimit);    
     
-    double elbowUpperLimit = PI * xml.getChild("Elbow").getAttributeValue<double>("UpperLimit");
-    double elbowLowerLimit = PI * xml.getChild("Elbow").getAttributeValue<double>("LowerLimit");
+    double elbowUpperLimit = degreesToRadians(xml.getChild("Elbow").getAttributeValue<double>("UpperLimit"));
+    double elbowLowerLimit = degreesToRadians(xml.getChild("Elbow").getAttributeValue<double>("LowerLimit"));
     setLimit(JT_elbow, elbowUpperLimit, elbowLowerLimit);
     
     bool locked[2] = {false, false};
@@ -353,6 +353,9 @@ void Arm::computeAccelerations(State& state)
     state.coriolisAcc[JT_elbow] = m_massElbLLHalf * sqr(state.velocities[JT_shoulder]) * sinElbAngle;
     state.inertiaAcc[JT_elbow] = m_inertias[JT_elbow] + m_massElbLSq4;
     state.interactionAcc[JT_elbow] = state.accelerations[JT_shoulder] * (m_inertias[JT_elbow] + m_massElbLSq4 + (m_massElbLLHalf * cosElbAngle));     
+#if TEST_ZERO_INTERACTION_TORQUE
+    state.interactionAcc[JT_elbow] = 0.0;
+#endif
     state.dampingAcc[JT_elbow] = m_frictions[JT_elbow] * state.velocities[JT_elbow];
     elbAcceleration = (state.torques[JT_elbow] - state.interactionAcc[JT_elbow] - state.coriolisAcc[JT_elbow] - state.gravityAcc[JT_elbow] - state.dampingAcc[JT_elbow]) / state.inertiaAcc[JT_elbow];
   }
@@ -371,6 +374,9 @@ void Arm::computeAccelerations(State& state)
                                  + (m_masses[JT_elbow] * m_lengthsSq[JT_shoulder]) );
     
     state.interactionAcc[JT_shoulder] = state.accelerations[JT_elbow] * (m_inertias[JT_elbow] + m_massElbLSq4 + (m_massElbLLHalf * cosElbAngle));
+#if TEST_ZERO_INTERACTION_TORQUE
+    state.interactionAcc[JT_shoulder] = 0.0;
+#endif
     
     // shoulder gravity is elbow gravity + shoulder
     state.gravityAcc[JT_shoulder] = state.gravityAcc[JT_elbow];
@@ -406,15 +412,15 @@ void Arm::toXml(ci::XmlTree& xml)
   // Joints
   ci::XmlTree shoulder("Shoulder", "");
   shoulder.setAttribute("Friction", m_frictions[JT_shoulder]);
-  shoulder.setAttribute("UpperLimit", m_limits[JT_shoulder][0]);
-  shoulder.setAttribute("LowerLimit", m_limits[JT_shoulder][1]);
+  shoulder.setAttribute("UpperLimit", radiansToDegrees(m_limits[JT_shoulder][0]));
+  shoulder.setAttribute("LowerLimit", radiansToDegrees(m_limits[JT_shoulder][1]));
   shoulder.setAttribute("Locked", m_jointLocked[JT_shoulder]);
   arm.push_back(shoulder);
   
   ci::XmlTree elbow("Elbow", "");
   elbow.setAttribute("Friction", m_frictions[JT_elbow]);
-  elbow.setAttribute("UpperLimit", m_limits[JT_elbow][0]);
-  elbow.setAttribute("LowerLimit", m_limits[JT_elbow][1]);
+  elbow.setAttribute("UpperLimit", radiansToDegrees(m_limits[JT_elbow][0]));
+  elbow.setAttribute("LowerLimit", radiansToDegrees(m_limits[JT_elbow][1]));
   elbow.setAttribute("Locked", m_jointLocked[JT_elbow]);  
   arm.push_back(elbow);
   

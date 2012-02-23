@@ -158,6 +158,11 @@ void ArmReflex::record(Recorder& recorder)
 { 
   // Let muscles record themselves
   ArmMuscled::record(recorder); 
+  
+  for(int i = 0; i < m_reflexes.size(); i++)
+  {
+    m_reflexes[i]->record(recorder);
+  }
 
   recorder.push_back("comX", m_desiredPos.x);
   recorder.push_back("comY", m_desiredPos.y);

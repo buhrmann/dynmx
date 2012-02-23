@@ -48,6 +48,13 @@ static double mapUnitIntervalToRange(double val, double min, double max)
   assert(val >=0.0 && val <= 1.0);
   return min + val * (max - min);
 }
+  
+static double map01To(double val, double min, double max)
+{
+  assert(max > min);
+  assert(val >=0.0 && val <= 1.0);
+  return min + val * (max - min);
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -101,6 +108,7 @@ protected:
   
   
   double m_reducedMutationMax;
+  double m_reducedRecombinationRate;
   int m_reduceMutationMaxAt;
   
   int m_verbosity;

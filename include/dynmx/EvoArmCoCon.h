@@ -21,9 +21,7 @@
 
 namespace dmx
 {
-  
-#define EVOARM_NUM_OPENLOOP 6  
-  
+    
 //----------------------------------------------------------------------------------------------------------------------
 // Evolves a simple PD-like reflex for a single joint, two movements
 //----------------------------------------------------------------------------------------------------------------------
@@ -31,6 +29,18 @@ class EvoArmCoCon : public Evolvable
 {
   
 public:
+  
+  enum MovePhase
+  {
+    kMvPh_invalid = -1,
+    kMvPh_leadIn,
+    kMvPh_move,    
+    kMvPh_leadOut,
+    kMvPh_end,
+    kMvPh_numPhases
+  };
+  
+  static const std::string PhaseNames [kMvPh_numPhases];
   
   EvoArmCoCon();
   
@@ -74,9 +84,9 @@ protected:
   
   void createTrajectories();
   void updateCurrentCommand(Target<Pos>& command, Target<Pos>& desired);
+  int decodeMuscle(int mId, const double* genome, int start);
   
   float m_time;
-  float m_fitness;
   float m_bestFitDelay;
   double m_cocontraction;
   
@@ -84,16 +94,23 @@ protected:
   float m_rampDurationFactor;   // Scales the duration of the commanded ramp as proportion of desired movement time
   
   std::vector<float> m_coconIncrements;  // At three different positions
-  double m_coconAtStart[2];       // For two reflexes
+  double m_coconAtStart[2];              // For two reflexes
   bool m_coconStarted;
   
-  double m_openLoop[EVOARM_NUM_OPENLOOP];  
-
+  // Size of these depend on the number of moves specified in config file
+  std::vector<double> m_openLoopParams;  
   std::vector<double> m_intersegParams;
   
+  bool m_resetEachMove;
+  bool m_fitnessEvalVel;
+  
   int m_numMoves;
+  int m_currentMove;
+  int m_currentPhase;
   
   // Flags and params
+  bool m_symmetricMuscles;
+  bool m_evolveSpindles;
   bool m_evolveIAIN;
   bool m_evolveRenshaw;
   bool m_evolveIBIN;

@@ -74,6 +74,7 @@ void GARunner::init()
     if(ga.hasChild("MutationMaxReduceAt"))
     {
       m_reducedMutationMax = ga.getChild("MutationMaxReduced").getAttributeValue<double>("Value");
+      m_reducedRecombinationRate = ga.getChild("RecombinationRateReduced").getAttributeValue<double>("Value");
       m_reduceMutationMaxAt = ga.getChild("MutationMaxReduceAt").getAttributeValue<int>("Value");      
     }
     
@@ -201,6 +202,7 @@ void GARunner::update(float dt)
         if(m_reduceMutationMaxAt > 0 && currentGen == m_reduceMutationMaxAt)
         {
           m_ga->setMutationMax(m_reducedMutationMax);
+          m_ga->setRecombinationRate(m_reducedRecombinationRate);
         }
         
         // When the maximum number of generations has been reached. 
@@ -226,7 +228,7 @@ void GARunner::update(float dt)
           const int numEvaluations = currentGen * m_ga->getPopulationSize() * m_numTrials;
           if (m_verbosity >= kGAVerbosityPopulation)
           {
-            std::cout << "GA finished. Evaluated " <<  numEvaluations << " trials" << std::endl;
+            std::cout << "GA finished. Best fitness: " << bestFitness << ". Evaluated " <<  numEvaluations << " trials." << std::endl;
           }
 #endif             
         }

@@ -81,7 +81,7 @@ public:
   
   // Conversion between unit length [0,1] and actual length
   double lengthToUnitLength (double l) { return (l - m_lengthMin) / (m_lengthMax - m_lengthMin); };
-  double unitLengthToLength (double l) { return m_lengthMin + l * (m_lengthMax - m_lengthMin); };
+  double unitLengthToLength (double l) { return m_lengthMin + (l * (m_lengthMax - m_lengthMin)); };
   
   // "InverseKinematics"
   virtual double getLengthFromJointAngles(double elbAngle, double shdAngle) = 0;
@@ -90,6 +90,8 @@ public:
   
   // Store output in human readable format
   virtual void toXml(ci::XmlTree& xml);  
+  
+  virtual void record(Recorder& recorder);
   
   // Parameters different per muscle
   double m_maxForce; 

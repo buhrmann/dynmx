@@ -36,7 +36,7 @@ public:
   // Setters
   void setDesiredAngles(double elbAngle, double shdAngle); // Get desired length from arm's desired joint angles    
   void setDesiredLength(double l0, double l1); // Will also update desired velocity, contraction etc...
-  void setCocontraction(double c0, double c1);  
+  void setOpenLoop(double c0, double c1);  
   void setSpindleParameters(double Kp0, double Kp1, double Kv0, double Kv1, double Kd0, double Kd1, double E0, double E1);
   void setLoadCompensationParameters(double g0, double g1, double inh0, double inh1);
   void setInertiaCompensationParameters(double g0, double g1, double b0, double b1);
@@ -52,7 +52,7 @@ public:
   
   // Getters
   double getAlphaOutput(int i) { return m_alpha[i]; };
-  double getCoContraction(int i) { return m_cocontraction[i]; };
+  double getOpenLoop(int i) { return m_openLoop[i]; };
   double getLength(int i) { return m_length[i]; };
   double getDesiredLength(int i) { return m_desiredLength[i]; };
   double getDesiredVelocity(int i) { return m_desiredVelocity[i]; };
@@ -65,6 +65,8 @@ public:
   // Store output in human readable format
   virtual void toXml(ci::XmlTree& xml);  
   
+  void record(Recorder& recorder);  
+  
   // Public parameters
   //-------------------------------------------------
   // Spindle
@@ -75,6 +77,8 @@ public:
   
   
 protected:
+  
+  void recordStatePair(Recorder& recorder, const std::string& name, const double* var);
   
   static double spindleActivation(double x) { return x;/* / (1 + 100 * (x*x));*/ };
   static double neuronActivation(double x) { return 1.0 / (1.0 + exp(-x));};
@@ -129,7 +133,7 @@ protected:
   
   // Inputs
   //-------------------------------------------------  
-  double m_cocontraction[2];
+  double m_openLoop[2];
   double m_interSegmentInput[2]; 
   
   // State
@@ -139,6 +143,9 @@ protected:
   double m_posErr [2];
   double m_velErr [2];
   double m_spindlePri [2];
+  double m_spindlePosRes [2];
+  double m_spindleVelRes [2];
+  double m_spindleDmpRes [2];
   double m_spindleSec [2];
   double m_golgi[2];
   
@@ -177,10 +184,10 @@ protected:
 //----------------------------------------------------------------------------------------------------------------------
 /// Inline implementations
 //----------------------------------------------------------------------------------------------------------------------    
-inline void Reflex::setCocontraction(double c0, double c1) 
+inline void Reflex::setOpenLoop(double c0, double c1) 
 { 
-  m_cocontraction[0] = c0; 
-  m_cocontraction[1] = c1; 
+  m_openLoop[0] = c0; 
+  m_openLoop[1] = c1; 
 };
 
 //----------------------------------------------------------------------------------------------------------------------    

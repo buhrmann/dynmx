@@ -178,5 +178,18 @@ void ArmMuscled::toXml(ci::XmlTree& xml)
     }
   }
 }
+  
+//----------------------------------------------------------------------------------------------------------------------    
+void ArmMuscled::record(Recorder& recorder)
+{
+  Arm::record(recorder);
+  
+  for(int i = 0; i < m_muscles.size(); i++)
+  {
+    m_muscles[i]->record(recorder);
+  }
+
+  
+}
 
 } // namespace dmx

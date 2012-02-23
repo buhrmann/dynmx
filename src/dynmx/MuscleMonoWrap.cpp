@@ -12,6 +12,8 @@
 
 namespace dmx
 {
+  
+#define TEST_CONST_MOMEMT_ARM 0
 
 //----------------------------------------------------------------------------------------------------------------------  
 MuscleMonoWrap::MuscleMonoWrap(ArmMuscled* arm, float originDist, float insertDist, Joint jointId, bool isFlex) :
@@ -54,18 +56,19 @@ void MuscleMonoWrap::calculateMinMaxLength(double& minLength, double& maxLength)
 {
   double upperLimit = m_arm->getJointLimitUpper(m_joint);
   double lowerLimit = m_arm->getJointLimitLower(m_joint);
+  double midLimit = lowerLimit + (0.5 * (upperLimit - lowerLimit));
   double lowerLength, upperLength, midLength;
   if(m_joint == JT_elbow)
   {
     lowerLength = getLengthFromJointAngles(lowerLimit, 0); // Second joint angle is irrelevant
     upperLength = getLengthFromJointAngles(upperLimit, 0); // Second joint angle is irrelevant
-    midLength = getLengthFromJointAngles(0.0, 0); // Second joint angle is irrelevant
+    midLength = getLengthFromJointAngles(midLimit, 0); // Second joint angle is irrelevant
   }
   else 
   {
     lowerLength = getLengthFromJointAngles(0, lowerLimit); // Second joint angle is irrelevant
     upperLength = getLengthFromJointAngles(0, upperLimit); // Second joint angle is irrelevant    
-    midLength = getLengthFromJointAngles(0, 0.0); // Second joint angle is irrelevant
+    midLength = getLengthFromJointAngles(0, midLimit); // Second joint angle is irrelevant
   }
   
   minLength = std::min(upperLength, std::min(lowerLength, midLength));
@@ -95,6 +98,10 @@ void MuscleMonoWrap::updateLengthAndMomentArm()
     m_length = m_originCapsuleDist + (r * wrapAngle) + m_insertCapsuleDist;
     m_momentArm = r;     
   }    
+  
+#if TEST_CONST_MOMEMT_ARM  
+  m_momentArm = 0.05;
+#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------      

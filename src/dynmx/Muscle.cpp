@@ -10,14 +10,16 @@
 #include "Muscle.h"
 #include "ArmMuscled.h"
 #include "MathUtils.h"
+#include "MuscleMonoWrap.h"
+#include "MuscleBiWrap.h"
 
 namespace dmx
 {
 
 // Parameters describing the Hill curve
 //----------------------------------------------------------------------------------------------------------------------
-static const double s_hillShDefault = 0.25;   // shape parameter for shortening = a/F0 = b/vmax
-static const double s_hillLnDefault = 0.25;   // shape parameter for lengthening
+static const double s_hillShDefault = 0.15;   // shape parameter for shortening = a/F0 = b/vmax
+static const double s_hillLnDefault = 0.15;   // shape parameter for lengthening
 static const double s_hillMaxDefault = 1.5;   // lenghthening asymptote
 static const double s_hillSlopeDefault = 2.0; // multiple of shortening slope at v=0
   
@@ -229,6 +231,35 @@ void Muscle::toXml(ci::XmlTree& muscle)
   muscle.push_back(hillParams);
     
   //xml.push_back(muscle);
+}
+  
+//----------------------------------------------------------------------------------------------------------------------    
+void Muscle::record(Recorder& recorder)
+{
+  recorder.push_back(m_name + "LengthNorm", m_lengthNorm);
+  recorder.push_back(m_name + "VelocityNorm", m_velocityNorm);
+  recorder.push_back(m_name + "Act", m_activation);
+  recorder.push_back(m_name + "FrcPsv", m_passiveForceNorm);
+  recorder.push_back(m_name + "FrcAct", m_activeForceNorm);
+  recorder.push_back(m_name + "FrcVel", m_velocityForceNorm);
+  recorder.push_back(m_name + "Force", m_force);
+  
+  if(m_isMonoArticulate)
+  {
+    double ma = ((MuscleMonoWrap*)this)->getMomentArm();
+    recorder.push_back(m_name + "MomentArm", ma);
+    recorder.push_back(m_name + "Torque", ma * m_force);
+  }
+  else 
+  {
+    double maElb = ((MuscleBiWrap*)this)->getMomentArm(JT_elbow);
+    double maShd = ((MuscleBiWrap*)this)->getMomentArm(JT_shoulder);
+    recorder.push_back(m_name + "MomentArmElb", maElb);
+    recorder.push_back(m_name + "MomentArmShd", maShd);
+    recorder.push_back(m_name + "TorqueElb", maElb * m_force);
+    recorder.push_back(m_name + "TorqueShd", maShd * m_force);
+  }
+
 }
   
 } // namespace dmx
