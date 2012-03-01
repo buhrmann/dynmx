@@ -133,7 +133,13 @@ void ArmReflex::update(float dt)
     m_reflexes[i]->update(dt);
   }
   
+  // Update arm
   ArmMuscled::update(dt);
+  
+  // Feed some information from arm kinematics or dynamics back to reflexes
+  // Elbow reflex receives torque information from shoulder and vice versa
+  m_reflexes[0]->setIntersegmentInput(m_state.torques[JT_shoulder], m_state.torques[JT_shoulder]);
+  m_reflexes[1]->setIntersegmentInput(m_state.torques[JT_elbow], m_state.torques[JT_elbow]);
 }
 
 //----------------------------------------------------------------------------------------------------------------------  

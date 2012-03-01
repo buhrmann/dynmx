@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Config>
+	<Globals>
+        <WindowSize Width="1280" Height="1000"/>    
+		<FrameRate Value="100"/>    
+		<Visual Value="1"/>    
+        <FullScreen Value="0"/>      
+		<Model Value="SMCAgent"/>		
+		<DebugLevel Value="1"/>
+	</Globals>
+</Config>

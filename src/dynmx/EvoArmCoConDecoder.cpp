@@ -25,12 +25,13 @@ int EvoArmCoCon::decodeMuscle(int mId, const double* genome, int start)
     isElbowMuscle = ((MuscleMonoWrap*)m)->getJoint() == JT_elbow;
   }
   const float forceScalar = isElbowMuscle ? 0.75f : 1.0f;
-  
-  double origin = 0.06 + 0.2 * genome[start + 0];
-  double insertion =  0.06 + 0.2 * genome[start + 1];
-  double maxIsoForce = 100.0 + (forceScalar * 1500.0 * genome[start + 2]); 
-  double optimalLength = 0.8 + 0.4 * genome[start + 3];          
-  double maxVel = 5.0 + 10.0 * genome[start + 4];                  
+    
+  const DecodeLimits::MuscleLimits& limits = m_decodeLimits.muscle;
+  const double origin = map01To(genome[start + 0], limits.attach);
+  const double insertion =  map01To(genome[start + 1], limits.attach);
+  const double maxIsoForce = map01To(forceScalar * genome[start + 2], limits.force); 
+  const double optimalLength = map01To(genome[start + 3], limits.optLength);
+  const double maxVel = map01To(genome[start + 4], limits.maxVel);
   m_arm->setMuscleParams(mId, origin, insertion, maxIsoForce, optimalLength, maxVel); 
   
   // Muscles need to be reinitialized so that correct values can be precalculated from new parameters
@@ -95,54 +96,56 @@ void EvoArmCoCon::decodeGenome(const double* genome)
   }
   
   // Spindle parameters
+  const DecodeLimits::SpindleLimits& lim = m_decodeLimits.spindle;
   if(m_evolveSpindles)
   {
-    const float maxSpP = 10.0;
-    const float maxSpV = 2.0;
-    const float maxSpD = 2.0;
-    const float minSpExp = 0.5;
+    int pI = 0;
+    int vI = 1;
+    int dI = m_evolveVelRef ? 2 : 1;
+    int eI = m_evolveVelRef ? 3 : 2;
     
     if(m_evolveUniformSpindles)
-    {
-      m_arm->getReflex(0)->setSpindleParameters(genome[start + 0]*maxSpP, genome[start + 0]*maxSpP, 
-                                                genome[start + 1]*maxSpV, genome[start + 1]*maxSpV, 
-                                                genome[start + 2]*maxSpD, genome[start + 2]*maxSpD, 
-                                                minSpExp + (genome[start + 3] * (1 - minSpExp)), minSpExp + (genome[start + 3] * (1 - minSpExp)));  
-      start += 4;
-      
-      m_arm->getReflex(1)->setSpindleParameters(genome[start + 0]*maxSpP, genome[start + 0]*maxSpP, 
-                                                genome[start + 1]*maxSpV, genome[start + 1]*maxSpV, 
-                                                genome[start + 2]*maxSpD, genome[start + 2]*maxSpD, 
-                                                minSpExp + (genome[start + 3] * (1 - minSpExp)),minSpExp + (genome[start + 3] * (1 - minSpExp)));  
-      start += 4;
+    {      
+      m_arm->getReflex(0)->setSpindleParameters(map01To(genome[start + pI],lim.pos), map01To(genome[start + pI],lim.pos), 
+                                                map01To(genome[start + vI],lim.vel), map01To(genome[start + vI],lim.vel), 
+                                                map01To(genome[start + dI],lim.dmp), map01To(genome[start + dI],lim.dmp), 
+                                                map01To(genome[start + eI],lim.exp), map01To(genome[start + eI],lim.exp));  
+      start += m_evolveVelRef ? 4 : 3;
+
+      m_arm->getReflex(1)->setSpindleParameters(map01To(genome[start + pI],lim.pos), map01To(genome[start + pI],lim.pos), 
+                                                map01To(genome[start + vI],lim.vel), map01To(genome[start + vI],lim.vel), 
+                                                map01To(genome[start + dI],lim.dmp), map01To(genome[start + dI],lim.dmp), 
+                                                map01To(genome[start + eI],lim.exp), map01To(genome[start + eI],lim.exp));        
+      start += m_evolveVelRef ? 4 : 3;
     }
     else 
     {
-      m_arm->getReflex(0)->setSpindleParameters(genome[start + 0]*maxSpP, genome[start + 4]*maxSpP, 
-                                                genome[start + 1]*maxSpV, genome[start + 5]*maxSpV, 
-                                                genome[start + 2]*maxSpD, genome[start + 6]*maxSpD, 
-                                                minSpExp + (genome[start + 3] * (1 - minSpExp)), minSpExp + (genome[start + 7] * (1 - minSpExp)));  
-      start += 8;
+      int ofs = m_evolveVelRef ? 4 : 3;
+      m_arm->getReflex(0)->setSpindleParameters(map01To(genome[start + pI],lim.pos), map01To(genome[start + ofs + pI],lim.pos), 
+                                                map01To(genome[start + vI],lim.vel), map01To(genome[start + ofs + vI],lim.vel), 
+                                                map01To(genome[start + dI],lim.dmp), map01To(genome[start + ofs + dI],lim.dmp), 
+                                                map01To(genome[start + eI],lim.exp), map01To(genome[start + ofs + eI],lim.exp));  
       
-      m_arm->getReflex(1)->setSpindleParameters(genome[start + 0]*maxSpP, genome[start + 4]*maxSpP, 
-                                                genome[start + 1]*maxSpV, genome[start + 5]*maxSpV, 
-                                                genome[start + 2]*maxSpD, genome[start + 6]*maxSpD, 
-                                                minSpExp + (genome[start + 3] * (1 - minSpExp)), minSpExp + (genome[start + 7] * (1 - minSpExp)));  
-      start += 8;  
+      start += m_evolveVelRef ? 8 : 6;
+      
+      m_arm->getReflex(1)->setSpindleParameters(map01To(genome[start + pI],lim.pos), map01To(genome[start + ofs + pI],lim.pos), 
+                                                map01To(genome[start + vI],lim.vel), map01To(genome[start + ofs + vI],lim.vel), 
+                                                map01To(genome[start + dI],lim.dmp), map01To(genome[start + ofs + dI],lim.dmp), 
+                                                map01To(genome[start + eI],lim.exp), map01To(genome[start + ofs + eI],lim.exp));        
+      start += m_evolveVelRef ? 8 : 6;  
     }
     
     // Alpha MN params: input from spindles
-    float maxW = 2.0;
     if(m_symmetricMuscles)
     {
-      m_arm->getReflex(0)->setMotoNeuronParameters(genome[start+0] * maxW, genome[start+0] * maxW); 
-      m_arm->getReflex(1)->setMotoNeuronParameters(genome[start+1] * maxW, genome[start+1] * maxW);
+      m_arm->getReflex(0)->setMotoNeuronParameters(map01To(genome[start+0],lim.weight), map01To(genome[start+0],lim.weight)); 
+      m_arm->getReflex(1)->setMotoNeuronParameters(map01To(genome[start+1],lim.weight), map01To(genome[start+1],lim.weight));
       start += 2;
     }
     else 
     {
-      m_arm->getReflex(0)->setMotoNeuronParameters(genome[start+0] * maxW, genome[start+1] * maxW); 
-      m_arm->getReflex(1)->setMotoNeuronParameters(genome[start+2] * maxW, genome[start+3] * maxW);
+      m_arm->getReflex(0)->setMotoNeuronParameters(map01To(genome[start+0],lim.weight), map01To(genome[start+1],lim.weight)); 
+      m_arm->getReflex(1)->setMotoNeuronParameters(map01To(genome[start+2],lim.weight), map01To(genome[start+3],lim.weight));
       start += 4;    
     }
   }  
@@ -338,20 +341,15 @@ void EvoArmCoCon::decodeGenome(const double* genome)
     m_intersegParams.clear(); // This instance could repeatedly be decoded!
     
     int N = m_symmetricMuscles ? (m_numMoves * numReflexes) : (m_numMoves * numMuscles);
-    N *= 2; // Two params per muscle
-    
-    for(int i = 0; i < N; i += 2)
+    for(int i = 0; i < N; ++i)
     {
-      double Wismn = map01To(genome[i + 0], -maxW, maxW);
-      double Wisia = map01To(genome[i + 1], -maxW, maxW);
-      m_intersegParams.push_back(Wismn);
-      m_intersegParams.push_back(Wisia);
+      double Wisep = map01To(genome[start + i], 0.0, m_maxInterseg);
+      m_intersegParams.push_back(Wisep);
       
       // We have to duplicate each muscle activation (one encoded, but two identical needed for symmetry)
       if(m_symmetricMuscles)
       {
-        m_intersegParams.push_back(Wismn);
-        m_intersegParams.push_back(Wisia);
+        m_intersegParams.push_back(Wisep);
       }
     }
     start += N;
@@ -393,10 +391,11 @@ int EvoArmCoCon::getNumGenes()
   if(m_evolveSpindles)
   {
     // Spindle gains: p,v,d, exponent
+    const int numSpindleParams = m_evolveVelRef ? 4 : 3;
     if(m_evolveUniformSpindles)
-      numGenes += numReflexes * 4; // Spindles differ only between elbow and shoulder
+      numGenes += numReflexes * numSpindleParams; // Spindles differ only between elbow and shoulder
     else
-      numGenes += numMuscles * 4;
+      numGenes += numMuscles * numSpindleParams;
     
     // Weights to aMN
     if(m_symmetricMuscles)
@@ -454,13 +453,13 @@ int EvoArmCoCon::getNumGenes()
       numGenes += numMuscles * m_numMoves;  
   }
   
-  // Intersegmental inputs (weights to mn and iain)
+  // Intersegmental inputs (weight to mn)
   if(m_evolveIntersegmentInputs)
   {
     if(m_symmetricMuscles)
-      numGenes += m_numMoves * numReflexes * 2;
+      numGenes += m_numMoves * numReflexes;
     else
-      numGenes += m_numMoves * numMuscles * 2;
+      numGenes += m_numMoves * numMuscles;
   }
   
   return numGenes;

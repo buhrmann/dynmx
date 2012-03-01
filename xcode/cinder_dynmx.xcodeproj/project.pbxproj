@@ -80,6 +80,7 @@
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* cinder_dynmx.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = cinder_dynmx.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D602B8A91448C92400620B97 /* TestModelArmReflex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestModelArmReflex.h; path = ../include/dynmx/Tests/TestModelArmReflex.h; sourceTree = SOURCE_ROOT; };
+		D607B1F714F7958F00D9D4C1 /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Log.h; path = ../include/dynmx/Log.h; sourceTree = SOURCE_ROOT; };
 		D60CB06813E8361A00AAF10C /* EPController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EPController.cpp; sourceTree = "<group>"; };
 		D60CB06A13E8362F00AAF10C /* EPController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EPController.h; path = ../include/dynmx/EPController.h; sourceTree = SOURCE_ROOT; };
 		D6108AD213D047F800680AD5 /* Recorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Recorder.h; path = ../include/dynmx/Recorder.h; sourceTree = SOURCE_ROOT; };
@@ -295,6 +296,7 @@
 				D6B7EAF313B791800019114A /* Registry.cpp */,
 				D64F246712EE295E0014F069 /* Light.h */,
 				D64F246C12EE2AF10014F069 /* Light.cpp */,
+				D607B1F714F7958F00D9D4C1 /* Log.h */,
 				D64F209C12ECE1640014F069 /* Scene.h */,
 				D64F20A712ECE1720014F069 /* Scene.cpp */,
 				D64F209312ECE1640014F069 /* Render.h */,

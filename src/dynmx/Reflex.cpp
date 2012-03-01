@@ -78,8 +78,7 @@ void Reflex::init()
   m_Kifv[0] = m_Kifv[1] = 0.0;
   m_Bifv[0] = m_Bifv[1] = 0.0;
   
-  m_Wismn[0] = m_Wismn[1] = 0.0;
-  m_Wisia[0] = m_Wisia[1] = 0.0;
+  m_Wisep[0] = m_Wisep[1] = 0.0;
   
   reset();
 }
@@ -145,7 +144,7 @@ void Reflex::setDesiredLength(double l0, double l1)
   
   m_desiredLengthPrev[1] = m_desiredLength[1]; 
   m_desiredLength[1] = m_muscles[1]->lengthToUnitLength(l1);
-
+  
   // Contraction coordinates
   m_desiredContractionPrev[0] = m_desiredContraction[0]; 
   m_desiredContraction[0] = 1.0 - m_desiredLength[0];
@@ -156,13 +155,32 @@ void Reflex::setDesiredLength(double l0, double l1)
   
 //----------------------------------------------------------------------------------------------------------------------  
 void Reflex::update(float dt)
-{  
+{   
+  // Store original commands before internal modification
+  m_commandedLength[0] = m_desiredLength[0];
+  m_commandedLength[1] = m_desiredLength[1];
+  m_commandedContraction[0] = m_desiredContraction[0];
+  m_commandedContraction[1] = m_desiredContraction[1];
+  
+  // Intersegmental torque feedback modifies virtual (desired) EP
+  m_desiredLength[0] -= m_Wisep[0] * m_interSegmentInput[0];  // +
+  m_desiredLength[1] += m_Wisep[1] * m_interSegmentInput[1];  // +
+  
+  m_desiredContraction[0] += m_Wisep[0] * m_interSegmentInput[0]; // -
+  m_desiredContraction[1] -= m_Wisep[1] * m_interSegmentInput[1]; // -
+  
+  // Calculate desired velocities
   m_desiredVelocity[0] = (m_desiredLength[0] - m_desiredLengthPrev[0]) / dt;
   m_desiredVelocity[1] = (m_desiredLength[1] - m_desiredLengthPrev[1]) / dt;
   m_desiredContractionVel[0] = (m_desiredContraction[0] - m_desiredContractionPrev[0]) / dt;
   m_desiredContractionVel[1] = (m_desiredContraction[1] - m_desiredContractionPrev[1]) / dt;
 
-  // Actual current values
+  // Actual current position and velocities
+  m_lengthPrev[0] = m_length[0];
+  m_lengthPrev[1] = m_length[1];  
+  m_contractionPrev[0] = m_contraction[0];
+  m_contractionPrev[1] = m_contraction[1];    
+  
   m_length[0] = m_muscles[0]->getUnitLength();
   m_length[1] = m_muscles[1]->getUnitLength();
   m_contraction[0] = 1.0 - m_length[0];
@@ -172,11 +190,6 @@ void Reflex::update(float dt)
   m_vel[1] = (m_length[1] - m_lengthPrev[1]) / dt;
   m_contractionVel[0] = (m_contraction[0] - m_contractionPrev[0]) / dt;
   m_contractionVel[1] = (m_contraction[1] - m_contractionPrev[1]) / dt;
-  
-  m_lengthPrev[0] = m_length[0];
-  m_lengthPrev[1] = m_length[1];  
-  m_contractionPrev[0] = m_contraction[0];
-  m_contractionPrev[1] = m_contraction[1];    
   
   // Normalised force sensor
   double f = m_muscles[0]->getForce();
@@ -291,14 +304,12 @@ void Reflex::updateInLengthCoords(float dt)
   m_alpha[0] = m_openLoop[0] + m_ofpv[0] + m_Wspmn[0] * m_spindlePri[0] 
   - (m_Wrnmn[0] * m_RnOut[0]) 
   - (m_Wiamn[0] * m_IaInOut[1]) 
-  - (m_Wibmn[0] * m_IbInOut[0])
-  + (m_Wismn[0] * m_interSegmentInput[0]);
+  - (m_Wibmn[0] * m_IbInOut[0]);
   
   m_alpha[1] = m_openLoop[1] + m_ofpv[1] + m_Wspmn[1] * m_spindlePri[1] 
   - (m_Wrnmn[1] * m_RnOut[1]) 
   - (m_Wiamn[1] * m_IaInOut[0]) 
-  - (m_Wibmn[1] * m_IbInOut[1])
-  + (m_Wismn[1] * m_interSegmentInput[1]);  
+  - (m_Wibmn[1] * m_IbInOut[1]);  
 #else
   m_alpha[0] = m_openLoop[0] + m_ofpv[0] + m_Wspmn[0] * m_spindlePri[0] - max(0.0, m_IaIn[1]);
   m_alpha[1] = m_openLoop[1] + m_ofpv[1] + m_Wspmn[1] * m_spindlePri[1] - max(0.0, m_IaIn[0]);  
@@ -332,6 +343,7 @@ void Reflex::updateInContractionCoords(float dt)
   //m_posErr[1] = std::max(m_posErr[1], 0.0);
   m_spindlePosRes[0] = m_Kspp[0] * m_posErr[0];
   m_spindlePosRes[1] = m_Kspp[1] * m_posErr[1];
+  
   m_spindleSec[0] = spindleActivation(m_spindlePosRes[0]);
   m_spindleSec[1] = spindleActivation(m_spindlePosRes[1]);
   
@@ -412,15 +424,13 @@ void Reflex::updateInContractionCoords(float dt)
   + (m_Wspmn[0] * m_spindlePri[0])
   - (m_Wrnmn[0] * m_RnOut[0]) 
   - (m_Wiamn[0] * m_IaInOut[1]) 
-  - (m_Wibmn[0] * m_IbInOut[0])
-  + (m_Wismn[0] * m_interSegmentInput[0]);
+  - (m_Wibmn[0] * m_IbInOut[0]);
   
   m_alpha[1] = m_openLoop[1] + m_ofpv[1] 
   + (m_Wspmn[1] * m_spindlePri[1])
   - (m_Wrnmn[1] * m_RnOut[1]) 
   - (m_Wiamn[1] * m_IaInOut[0]) 
-  - (m_Wibmn[1] * m_IbInOut[1])
-  + (m_Wismn[1] * m_interSegmentInput[1]);    
+  - (m_Wibmn[1] * m_IbInOut[1]);    
   
 #else
   m_alpha[0] = m_openLoop[0] + m_ofpv[0] + m_Wspmn[0] * m_spindlePri[0] - max(0.0, m_IaIn[1]);
@@ -502,8 +512,7 @@ void Reflex::toXml(ci::XmlTree& xml)
 
   // Intersegmental inputs
   ci::XmlTree isin("IsIn", "");
-  paramToXml(isin, "Wismn", &m_Wismn[0]);
-  paramToXml(isin, "Wisia", &m_Wisia[0]);
+  paramToXml(isin, "Wisep", &m_Wisep[0]);
   reflex.push_back(isin);
 
                                                  
@@ -533,9 +542,14 @@ void Reflex::record(Recorder& recorder)
   recordStatePair(recorder, prefix + "PosRes", &m_spindlePosRes[0]);
   recordStatePair(recorder, prefix + "VelRes", &m_spindleVelRes[0]);
   recordStatePair(recorder, prefix + "DmpRes", &m_spindleDmpRes[0]);
-  recordStatePair(recorder, prefix + "SpRes", &m_spindleDmpRes[0]);
+  recordStatePair(recorder, prefix + "SpRes", &m_spindlePri[0]);
   recordStatePair(recorder, prefix + "OpenLoop", &m_openLoop[0]);
   recordStatePair(recorder, prefix + "InterSeg", &m_interSegmentInput[0]);
+  recordStatePair(recorder, prefix + "ComContraction", &m_commandedContraction[0]);  
+  recordStatePair(recorder, prefix + "DesContraction", &m_desiredContraction[0]);
+  recordStatePair(recorder, prefix + "ActContraction", &m_contraction[0]);
+  recordStatePair(recorder, prefix + "DesContractionVel", &m_desiredContractionVel[0]);
+  recordStatePair(recorder, prefix + "ActContractionVel", &m_contractionVel[0]);
   recordStatePair(recorder, prefix + "MN", &m_alpha[0]);
 }
   

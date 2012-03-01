@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Config>
+	<Globals>
+        <WindowSize Width="1280" Height="1000"/>    
+		<FrameRate Value="50"/>    
+		<Visual Value="1"/>    
+        <FullScreen Value="0"/>      	
+		<DebugLevel Value="1"/>
+		<Model Value="GA"/>	        
+	</Globals>
+	<GA>
+		<Evolvable Name="SMCAgentEvo">
+			<NumNeurons Value="10"/>
+		</Evolvable>	
+		<Incremental Value="0"/>
+		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/11_12_23__13_19_41/GA_Result.xml"/>
+		<PopulationSize Value="50"/>
+		<DemeSize Value="5"/>
+		<NumGenerations Value="1000"/>
+		<MutationMax Value="0.01"/>
+        <MutationMaxReduced Value="0.001"/>
+        <MutationMaxReduceAt Value="500"/>        
+		<RecombinationRate Value="0.1"/>        
+		<NumTrials Value="1"/>
+		<TrialDuration Value="2.0"/>	
+        <SaveBestEachGeneration Value="0"/>
+        <Eval Run="0">
+            <NumTrials Value="10"/>
+            <LoadFrom Value="/Users/thomasbuhrmann/Experiments/11_12_23__13_19_41/GA_Progress.xml"/>
+        </Eval>         
+	</GA>    
+</Config>

@@ -57,7 +57,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "Output/12_02_24__18_23_31/EvoArmInteractHillInterSegMv2Test.xml"
+            argument = "12_02_24__18_22_54/EvoArmInteractHillInterSegMv1Test.xml"
             isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>

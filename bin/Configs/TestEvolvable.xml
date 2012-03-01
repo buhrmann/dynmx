@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Config>
+	<Globals>
+		<Model Value ="GA"/>		
+		<FrameRate Value="30"/>
+		<Visual Value="1"/>
+		<DebugLevel Value="3"/>
+	</Globals>
+	<GA>
+		<Evolvable Name="TestEvolvable">
+			<FitnessFunction Value="2"/>
+		</Evolvable>	
+		<Incremental Value="0"/>
+		<LoadFrom Value=""/>			
+		<PopulationSize Value="50"/>
+		<DemeSize Value="5"/>
+		<NumGenerations Value="300"/>
+		<MutationMax Value="0.01"/>
+		<RecombinationRate Value="0.05"/>
+		<NumTrials Value="1"/>
+		<TrialDuration Value="0.0"/>	
+	</GA>
+</Config>

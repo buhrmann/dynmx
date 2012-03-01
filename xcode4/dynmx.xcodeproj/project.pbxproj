@@ -60,6 +60,7 @@
 		D6D9F20F14DC6A93009C0C95 /* glut32.dll in Resources */ = {isa = PBXBuildFile; fileRef = D6D9F20C14DC6A93009C0C95 /* glut32.dll */; };
 		D6D9F21014DC6A93009C0C95 /* glut32.lib in Frameworks */ = {isa = PBXBuildFile; fileRef = D6D9F20D14DC6A93009C0C95 /* glut32.lib */; };
 		D6E6E57014E15C2E00FE6B07 /* Spin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E6E56F14E15C2E00FE6B07 /* Spin.cpp */; };
+		D6FFB99D14F860900057C7AD /* EvoArmCoConDecoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6FFB99C14F860900057C7AD /* EvoArmCoConDecoder.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -182,6 +183,8 @@
 		D6D9F20D14DC6A93009C0C95 /* glut32.lib */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = glut32.lib; sourceTree = "<group>"; };
 		D6E6E56D14E15C1300FE6B07 /* Spin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Spin.h; path = ../include/dynmx/Spin.h; sourceTree = "<group>"; };
 		D6E6E56F14E15C2E00FE6B07 /* Spin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Spin.cpp; path = ../src/dynmx/Spin.cpp; sourceTree = "<group>"; };
+		D6FFB99A14F860390057C7AD /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Log.h; path = ../include/dynmx/Log.h; sourceTree = "<group>"; };
+		D6FFB99C14F860900057C7AD /* EvoArmCoConDecoder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EvoArmCoConDecoder.cpp; path = ../src/dynmx/EvoArmCoConDecoder.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -236,6 +239,7 @@
 				D6D9F0DC14DC62A4009C0C95 /* GAViz.h */,
 				D6D9F11114DC62D6009C0C95 /* Light.cpp */,
 				D6D9F0DD14DC62A4009C0C95 /* Light.h */,
+				D6FFB99A14F860390057C7AD /* Log.h */,
 				D6D9F14614DC62E9009C0C95 /* main.cpp */,
 				D6D9F0DE14DC62A4009C0C95 /* MathUtils.h */,
 				D6D9F0DF14DC62A4009C0C95 /* Model.h */,
@@ -498,6 +502,7 @@
 		D6E6E57514E164DD00FE6B07 /* Evolvables */ = {
 			isa = PBXGroup;
 			children = (
+				D6FFB99C14F860900057C7AD /* EvoArmCoConDecoder.cpp */,
 				D6D9F10C14DC62D6009C0C95 /* EvoArmCoCon.cpp */,
 				D6D9F0D814DC62A4009C0C95 /* EvoArmCoCon.h */,
 			);
@@ -605,6 +610,7 @@
 				D6D9F14714DC62E9009C0C95 /* main.cpp in Sources */,
 				D6D9F1FB14DC64A9009C0C95 /* SimpleGUI.cpp in Sources */,
 				D6E6E57014E15C2E00FE6B07 /* Spin.cpp in Sources */,
+				D6FFB99D14F860900057C7AD /* EvoArmCoConDecoder.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -615,6 +621,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CINDER_PATH = ../../Cinder;
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -627,14 +635,14 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = dynmx_Prefix.pch;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../glut/lib/win\"",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				OTHER_LDFLAGS = "\"$(CINDER_PATH)/lib/libcinder_d.a\"";
 				PRODUCT_NAME = dynmx;
 				WRAPPER_EXTENSION = app;
@@ -645,8 +653,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CINDER_PATH = ../../Cinder;
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
 				DEAD_CODE_STRIPPING = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../glut/lib/osx\"",
@@ -659,14 +669,14 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = dynmx_Prefix.pch;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../glut/lib/win\"",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				OTHER_LDFLAGS = "\"$(CINDER_PATH)/lib/libcinder.a\"";
 				PRODUCT_NAME = dynmx;
 				STRIP_INSTALLED_PRODUCT = YES;
@@ -680,9 +690,11 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = i386;
 				CINDER_PATH = ../../../Cinder;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libc++";
 				GCC_CHECK_RETURN_VALUE_OF_OPERATOR_NEW = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -708,7 +720,10 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = i386;
 				CINDER_PATH = ../../../Cinder;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;

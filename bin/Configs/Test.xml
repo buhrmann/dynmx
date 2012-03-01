@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Config>
+	<Globals>
+		<Model Value ="Test"/>		
+		<FrameRate Value="30"/>
+		<Visual Value="1"/>
+		<DebugLevel Value="1"/>
+	</Globals>
+</Config>

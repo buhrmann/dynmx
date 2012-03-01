@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Config>
+	<Globals>
+        <WindowSize Width="1200" Height="1000"/>    
+		<FrameRate Value="800"/>    
+		<Visual Value="0"/>    
+        <FullScreen Value="0"/>        
+		<Model Value ="GA"/>		
+		<DebugLevel Value="1"/>
+        <PlotDuration Value="0.5"/>
+	</Globals>
+	<GA>
+		<Evolvable Name="EvoArmCoCon">
+          <DesiredTrajectory InDegrees="1">
+            <ViaPoint>
+              <Position x="0" y="0"></Position>
+              <ApproachDuration>0</ApproachDuration>
+              <MaintainDuration>0.5</MaintainDuration>
+            </ViaPoint>
+            <ViaPoint>
+              <Position x="30" y="20"></Position>
+              <ApproachDuration>0.3</ApproachDuration>
+              <MaintainDuration>0.5</MaintainDuration>
+            </ViaPoint>
+            <ViaPoint>
+              <Position x="0" y="0"></Position>
+              <ApproachDuration>0.3</ApproachDuration>
+              <MaintainDuration>0.5</MaintainDuration>
+            </ViaPoint>
+            <ViaPoint>
+              <Position x="30" y="-20"></Position>            
+              <ApproachDuration>0.3</ApproachDuration>
+              <MaintainDuration>0.5</MaintainDuration>
+            </ViaPoint>            
+            <ViaPoint>
+              <Position x="0" y="0"></Position>
+              <ApproachDuration>0.3</ApproachDuration>
+              <MaintainDuration>0.5</MaintainDuration>
+            </ViaPoint>
+            <ViaPoint>
+              <Position x="-30" y="20"></Position>
+              <ApproachDuration>0.3</ApproachDuration>
+              <MaintainDuration>0.5</MaintainDuration>
+            </ViaPoint>
+            <ViaPoint>
+              <Position x="0" y="0"></Position>
+              <ApproachDuration>0.3</ApproachDuration>
+              <MaintainDuration>0.5</MaintainDuration>
+            </ViaPoint>                        
+            <ViaPoint>
+              <Position x="-30" y="-20"></Position>
+              <ApproachDuration>0.3</ApproachDuration>
+              <MaintainDuration>1.0</MaintainDuration>
+            </ViaPoint>
+            <ViaPoint>
+              <Position x="0" y="0"></Position>
+              <ApproachDuration>0.3</ApproachDuration>
+              <MaintainDuration>1.0</MaintainDuration>
+            </ViaPoint>                        
+          </DesiredTrajectory>
+          <EvoFLags>
+            <iain>0</iain>
+            <renshaw>0</renshaw>
+            <ibin>0</ibin>
+            <ifv>0</ifv>
+            <sfv>0</sfv>
+            <openLoop>1</openLoop>
+            <maxOpenLoop>0.3</maxOpenLoop>            
+            <uniformSpindles>0</uniformSpindles>
+            <hillParams>1</hillParams>
+            <minJerkDelay>0</minJerkDelay>
+            <interSegmentInput>1</interSegmentInput>
+          </EvoFlags>
+          <enableCoconInc>0</enableCoconInc>
+          <minCocon>0.1</minCocon>
+          <maxCocon>0.4</maxCocon>
+          <useMuscleCoords>0</useMuscleCoords>
+		</Evolvable>	
+		<Incremental Value="0"/>
+		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/12_01_26__20_05_10/GA_Result.xml" />
+		<PopulationSize Value="100"/>
+		<DemeSize Value="10"/>
+		<NumGenerations Value="2000"/>
+		<MutationMax Value="0.01"/>
+        <MutationMaxReduced Value="0.001"/>
+        <MutationMaxReduceAt Value="1000"/>
+		<RecombinationRate Value="0.5"/>
+		<NumTrials Value="1"/>
+        <SaveBestEachGeneration Value="1"/>
+        <Eval Run="0">
+            <NumTrials Value="1"/>
+            <LoadFrom Value="/Users/thomasbuhrmann/Experiments/12_01_26__20_05_10/GA_Progress.xml"/>
+            <RecordState Value="0"/>
+        </Eval>        
+	</GA>    
+    <Arm Gravity="0.0" Integrator="euler">
+        <UpperArm Length="0.33" Mass="2.52"/>
+        <LowerArm Length="0.32" Mass="1.3"/>
+        <Shoulder Friction="0.05" UpperLimit="0.85" LowerLimit="-0.85" Radius="0.05" Locked="0" />
+        <Elbow Friction="0.05" UpperLimit="0.85" LowerLimit="-0.85" Radius="0.035" Locked="0" />        
+        <Muscle Name="ElbowFlexor" IsFlexor="1" IsMono="1">
+            <Joint Value="Elbow"/>
+            <Origin Value="0.1"/> 
+            <Insertion Value="0.2"/>
+            <MaxIsoForce Value="600"/>
+            <OptimalLength Value="0.25"/>            
+            <MaxVelocity Value="10"/>
+        </Muscle>
+        <Muscle Name="ElbowExtensor" IsFlexor="0" IsMono="1">
+            <Joint Value="Elbow"/>
+            <Origin Value="0.2"/> 
+            <Insertion Value="0.075"/>
+            <MaxIsoForce Value="600"/>
+            <OptimalLength Value="0.4"/>               
+            <MaxVelocity Value="10"/>     
+        </Muscle>
+        <Muscle Name="ShoulderFlexor" IsFlexor="1" IsMono="1">
+            <Joint Value="Shoulder"/>
+            <Origin Value="0.13"/> 
+            <Insertion Value="0.1"/>
+            <MaxIsoForce Value="1050"/>
+            <OptimalLength Value="0.25"/>               
+            <MaxVelocity Value="10"/>     
+        </Muscle>
+        <Muscle Name="ShoulderExtensor" IsFlexor="0" IsMono="1">
+            <Joint Value="Shoulder"/>
+            <Origin Value="0.1"/> 
+            <Insertion Value="0.12"/>
+            <MaxIsoForce Value="1000"/>
+            <OptimalLength Value="0.25"/>               
+            <MaxVelocity Value="10"/>     
+        </Muscle>          
+    </Arm>
+</Config>

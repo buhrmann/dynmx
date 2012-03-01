@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Config>
+	<Globals>
+		<Model Value ="TestArmPD"/>		
+		<FrameRate Value="30"/>
+		<Visual Value="1"/>
+		<DebugLevel Value="1"/>
+	</Globals>
+    <Arm>
+        <UpperArm Length="0.33" Mass="2.52"/>
+        <LowerArm Length="0.32" Mass="1.3"/>
+        <Shoulder Friction="0.02" UpperLimit="0.75" LowerLimit="-0.75" Radius="0.05"/>
+        <Elbow Friction="0.02" UpperLimit="0.75" LowerLimit="-0.75" Radius="0.035"/>  
+    </Arm>    
+</Config>

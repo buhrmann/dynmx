@@ -86,8 +86,8 @@ public:
   {
     // Calculate starting position
     dmx::Pos start (0.4+0.15, 0.0);
-    double initialElbowAngle = 0.0f * PI;
-    double initialShoulderAngle = 0.0f * PI;    
+    double initialElbowAngle = 0.0f * dmx::PI;
+    double initialShoulderAngle = 0.0f * dmx::PI;    
     m_arm->inverseKinematics(start, 1, initialElbowAngle, initialShoulderAngle);
     m_arm->resetTo(initialElbowAngle, initialShoulderAngle);
     m_fitness = 0.0f;
@@ -102,7 +102,7 @@ public:
     const float radius = 0.15f;
     const float offset = 0.4f;    
     
-    double angle = PI_OVER_TWO + 1.0f * m_time;
+    double angle = dmx::PI_OVER_TWO + 1.0f * m_time;
     float x = offset + radius * sinf(angle);
     float y = radius * cosf(angle);
     dmx::Pos desPos(x,y);
@@ -111,7 +111,7 @@ public:
     // Fitness evaluation
     dmx::Pos diff = m_arm->getEffectorPos() - desPos;
     float dist = diff.length();
-    m_fitness += sqr(dist);
+    m_fitness += dmx::sqr(dist);
   };
   
   virtual void fromXML()

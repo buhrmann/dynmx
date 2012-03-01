@@ -14,6 +14,9 @@
 #include "assert.h"
 #include "float.h"
 
+namespace dmx
+{
+
 // TODO: MAX_FLOAT
 #define MAX_NEG_FLOAT -FLT_MAX
 #define GA_DONT_REEVALUATE 1 
@@ -479,7 +482,7 @@ bool GA::fromXml(const ci::XmlTree& parent, bool includeGenomes)
   return false;
 }
 
-
+} // namespace
 
 
 

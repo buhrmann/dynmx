@@ -79,12 +79,32 @@ public:
   
   std::vector<ci::Vec2f> m_desiredPositions;
   std::vector<ci::Vec2f> m_actualPositions;
+  std::vector<double> m_actualCoactivationsElb;
+  std::vector<double> m_actualCoactivationsShd;
   
 protected:
   
   void createTrajectories();
   void updateCurrentCommand(Target<Pos>& command, Target<Pos>& desired);
   int decodeMuscle(int mId, const double* genome, int start);
+  void readDecodeLimits();
+  void readRange(Range& range, const std::string& xmlElem);
+  
+  // Holds data constraining the decoding of a genome into this model
+  struct DecodeLimits 
+  {
+    struct MuscleLimits
+    { 
+      Range attach, force, optLength, maxVel;
+    } muscle;
+    
+    struct SpindleLimits
+    {
+      Range pos, vel, dmp, exp, weight;
+    } spindle;
+  };
+  
+  DecodeLimits m_decodeLimits;
   
   float m_time;
   float m_bestFitDelay;
@@ -103,6 +123,7 @@ protected:
   
   bool m_resetEachMove;
   bool m_fitnessEvalVel;
+  bool m_fitnessEvalCoact;
   
   int m_numMoves;
   int m_currentMove;
@@ -121,11 +142,14 @@ protected:
   bool m_evolveUniformSpindles;
   bool m_evolveHillParams;
   bool m_evolveMinJerkDelay;
+  bool m_evolveVelRef;
   
+  bool m_commandTrajSmooth;
   bool m_enableCoconIncrease;
   bool m_useMuscleCoords;
   
   float m_maxOpenLoop;
+  float m_maxInterseg;
   float m_minCocontraction;
   float m_maxCocontraction;
 };

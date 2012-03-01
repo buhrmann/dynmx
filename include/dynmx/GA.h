@@ -22,6 +22,9 @@
 
 #include "MathUtils.h"
 
+namespace dmx
+{
+
 #define GA_BOUND_CHECK 0  // 0 = clamping, 1 = mirroring
 #define MAX_NUM_PARALLEL_EVALS 8
 
@@ -131,5 +134,7 @@ protected:
     m_fitnessA,   // fitness of first individual in current tournament
     m_fitnessB;   // fitness of second individual in current tournament
 };
+  
+} // namespace
 
 #endif // GA_H

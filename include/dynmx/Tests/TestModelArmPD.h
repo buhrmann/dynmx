@@ -38,7 +38,7 @@ public:
   
   virtual void reset() 
   { 
-    ((dmx::Arm*)m_arm)->resetTo(0.5f*PI, 0.5f*PI); 
+    ((dmx::Arm*)m_arm)->resetTo(0.5f*dmx::PI, 0.5f*dmx::PI); 
   };
   
   virtual void update(float dt)

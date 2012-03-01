@@ -16,7 +16,9 @@
 
 namespace dmx
 {
-
+  
+namespace bfs = boost::filesystem; 
+  
 Globals* Globals::pInstance = NULL;
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -45,46 +47,37 @@ void Globals::saveToDataDir()
 //----------------------------------------------------------------------------------------------------------------------
 void Globals::initialise(const std::string& cfgFnm)
 {
-  // Get the base directory to save data to and read the config from  
-  std::string baseDir;
-#if DEPLOYING and defined DYNMX_MAC
-  char path[1024];
-  char path2[1024];
-  uint32_t size = sizeof(path);
-  _NSGetExecutablePath(path, &size);
-  realpath(path, path2);
-  std::string p(path2);
-  boost::filesystem::path bp (p);
-  baseDir = bp.parent_path().parent_path().parent_path().parent_path().string() + "/";
-#else
-  baseDir = std::string(DATA_BASE_DIR);
-#endif  
-  
-  // Read in config xml file, so content will be available in memory, rather than on disk.
+  // Defaults
   m_settings = 0;
+  m_fnm.clear();
+  
+  // Current directory of the executable
+  bfs::path currentPath ( bfs::current_path() );    
+  std::string currentPathStr = currentPath.string();
+  
+  // Look for config file in current exe's directory or in subfolder specified in argument
+  std::string pathToConfig;
   if(cfgFnm.empty())
   {
+#if DEBUGGING
+    std::cout << "No config file specified. Searching in local directory '" << currentPathStr << "'." << std::endl;    
+#endif    
     // No config file name given, so load first in base directory with xml ending.
-    boost::filesystem::directory_iterator end_itr;  
-    for (boost::filesystem::directory_iterator itr(baseDir); itr != end_itr; ++itr)
+    bfs::directory_iterator end_itr;  
+    for (bfs::directory_iterator itr(currentPath); itr != end_itr; ++itr)
     {
       // If it's not a directory ...
       if (!is_directory(itr->status()))
       {
         // ... and the filename contains the xml ending      
-        m_fnm = itr->path().filename().string();
-        if(m_fnm.find(".xml") != std::string::npos)
+        const std::string& fnm = itr->path().filename().string();
+        if(fnm.find(".xml") != std::string::npos)
         {
-          // ... then load the file
-          try
-          {
-            m_settings = new ci::XmlTree(ci::loadFile(baseDir + m_fnm));
-            std::cout << "Loaded global settings implicitly from '" << m_fnm << "'." << std::endl;
-          }
-          catch (rapidxml::parse_error& e)
-          {
-            std::cout << ">> XML parse error: '" << e.what() << "'. Aborting!" << std::endl;
-          }
+          m_fnm = fnm;
+          pathToConfig = itr->path().string();
+#if DEBUGGING
+          std::cout << "Found config file '" << m_fnm << "'." << std::endl;    
+#endif              
           break;
         }               
       }
@@ -92,31 +85,70 @@ void Globals::initialise(const std::string& cfgFnm)
   }
   else
   {
-    // Specific config file name given, so load that
+    // Global paths start with a forward slash '/', local paths don't.
+    if (cfgFnm[0] == '/' && bfs::exists(cfgFnm))
+    {
+      m_fnm = cfgFnm.substr(cfgFnm.rfind('/') + 1);
+      pathToConfig = cfgFnm;
+#if DEBUGGING
+      std::cout << "Found specified config file in global directory '" << cfgFnm << "'." << std::endl;    
+#endif                
+    }
+    else 
+    {
+      const std::string localPath = currentPathStr + "/" + cfgFnm;      
+      if(bfs::exists(localPath))
+      {
+        m_fnm = cfgFnm;
+        pathToConfig = localPath;
+  #if DEBUGGING
+        std::cout << "Found specified config file in local directory '" << localPath << "'." << std::endl;    
+  #endif
+      }
+    }
+  }
+  
+  
+  // If we have a valid config filename, load it
+  if(!pathToConfig.empty())
+  {
+#if DEBUGGING
+    std::cout << "Loading settings from '" << pathToConfig << "'." << std::endl;    
+#endif
     try
     {    
-      m_settings = new ci::XmlTree(ci::loadFile(baseDir + cfgFnm));
-      m_fnm = cfgFnm;
-      std::cout << "Loaded global settings explicitly from '" << cfgFnm << "'." << std::endl;
+      m_settings = new ci::XmlTree(ci::loadFile(pathToConfig));
     }
     catch (rapidxml::parse_error& e)
     {
-      std::cout << "XML parse error: '" << e.what() << "'. Aborting!" << std::endl;
+      std::cout << "XML parse error trying to read config: '" << e.what() << "'. Aborting!" << std::endl;
     }    
   }
-  
-  // Choose subfolder to save output file
-  std::string subDir = "Output/";
-  if(m_settings->hasChild("Config/Globals/OutputFolder"))
+  else 
   {
-    std::string dir = (m_settings->getChild("Config/Globals/OutputFolder"))["Name"].as<std::string>();
-    if(!dir.empty())
-    {
-      subDir = dir;
-      subDir += "/";
-    }
+#if DEBUGGING
+    std::cout << "No config file specified. Not loading any settings! '" << std::endl;    
+#endif    
   }
   
+  // Choose folder to save output file. It's either a hard-coded subfolder of current directory,
+  // or one specified in config file
+  std::string outputDir(currentPathStr + "/Output/");
+  if(m_settings && m_settings->hasChild("Config/Globals/OutputFolder"))
+  {
+    std::string dir = m_settings->getChild("Config/Globals/OutputFolder").getAttributeValue<std::string>("Name");
+    if(!dir.empty())
+    {
+      bool isRelative = dir[0] != '/';
+      
+      if(isRelative)
+        outputDir = currentPathStr + "/" + dir + "/";
+      else
+        outputDir = dir + "/";
+    }
+  }
+
+
   // Create a new directory based on current data and time and store the path for global access
   time_t now = time(NULL);
   static const int TimeMaxChar = 128; 
@@ -124,9 +156,9 @@ void Globals::initialise(const std::string& cfgFnm)
   dateTime[0] = '\0';
   strftime(dateTime, TimeMaxChar, "%y_%m_%d__%H_%M_%S", localtime(&now));   
   
-  // Actually create the data directory
-  m_dataDir = baseDir + subDir + dateTime + "/";
-  boost::filesystem::create_directories(boost::filesystem::path(m_dataDir));
+  // Finally create the data directory
+  m_dataDir = outputDir + dateTime + "/";
+  bfs::create_directories(boost::filesystem::path(m_dataDir));
   
 }
 

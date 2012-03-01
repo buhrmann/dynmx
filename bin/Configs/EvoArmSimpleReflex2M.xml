@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Config>
+	<Globals>
+		<Model Value ="GA"/>		
+		<FrameRate Value="100"/>
+		<Visual Value="1"/>
+		<DebugLevel Value="1"/>
+	</Globals>
+	<GA>
+		<Evolvable Name="EvoArmSimpleReflex">
+		</Evolvable>	
+		<Incremental Value="1"/>        
+		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/11_09_26__15_32_38/GA_Result.xml"/>
+		<PopulationSize Value="100"/>
+		<DemeSize Value="10"/>
+		<NumGenerations Value="600"/>
+		<MutationMax Value="0.001"/>
+		<RecombinationRate Value="0.1"/>
+		<NumTrials Value="1"/>
+		<TrialDuration Value="6.28"/>	
+        <Eval Run="1">
+            <NumTrials Value="1"/>
+            <TrialDuration Value="6.28"/>
+            <LoadFrom Value="/Users/thomasbuhrmann/Experiments/11_09_26__15_37_15/GA_Progress.xml"/>		
+        </Eval>        
+	</GA>    
+    <Arm Gravity="0.0">
+        <UpperArm Length="0.33" Mass="2.52"/>
+        <LowerArm Length="0.32" Mass="1.3"/>
+        <Shoulder Friction="0.002" UpperLimit="0.65" LowerLimit="-0.85" Radius="0.05" Locked="1" />
+        <Elbow Friction="0.002" UpperLimit="0.85" LowerLimit="-0.85" Radius="0.035" Locked="0" />        
+        <Muscle Name="ElbowFlexor" IsFlexor="1" IsMono="1">
+            <Joint Value="Elbow"/>
+            <Origin Value="0.1"/> 
+            <Insertion Value="0.2"/>
+            <MaxIsoForce Value="600"/>
+            <OptimalLength Value="0.25"/>            
+            <MaxVelocity Value="10"/>
+        </Muscle>
+        <Muscle Name="ElbowExtensor" IsFlexor="0" IsMono="1">
+            <Joint Value="Elbow"/>
+            <Origin Value="0.2"/> 
+            <Insertion Value="0.075"/>
+            <MaxIsoForce Value="600"/>
+            <OptimalLength Value="0.4"/>               
+            <MaxVelocity Value="10"/>     
+        </Muscle>
+    </Arm>
+</Config>

@@ -37,6 +37,7 @@ public:
   void setDesiredAngles(double elbAngle, double shdAngle); // Get desired length from arm's desired joint angles    
   void setDesiredLength(double l0, double l1); // Will also update desired velocity, contraction etc...
   void setOpenLoop(double c0, double c1);  
+  void setIntersegmentInput(double i1, double i2);
   void setSpindleParameters(double Kp0, double Kp1, double Kv0, double Kv1, double Kd0, double Kd1, double E0, double E1);
   void setLoadCompensationParameters(double g0, double g1, double inh0, double inh1);
   void setInertiaCompensationParameters(double g0, double g1, double b0, double b1);
@@ -48,7 +49,7 @@ public:
   void setIbInParameters(double Wglib0, double Wglib1, double Wibib0, double Wibib1, double Wibmn0, double Wibmn1,
                          double t1, double t2, double b1, double b2);  
   void setMotoNeuronParameters(double Wspmn0, double Wspmn1);
-  void setIntersegmentalParameters(double Wismn0, double Wismn1, double Wisia0, double Wisia1);
+  void setIntersegmentalParameters(double Wisep0, double Wisep1);
   
   // Getters
   double getAlphaOutput(int i) { return m_alpha[i]; };
@@ -128,8 +129,7 @@ protected:
   double m_Wspmn [2];   // Stretch reflex (monosynaptic spindle input)
   
   // Intersegmental force feedback
-  double m_Wismn [2];  // intersegmental input to alpha MN
-  double m_Wisia [2];  // intersegmental input to IaIn
+  double m_Wisep [2];  // intersegmental influence on desired position
   
   // Inputs
   //-------------------------------------------------  
@@ -178,12 +178,23 @@ protected:
   double m_desiredContractionPrev [2];  // For calculating desired velocity
   double m_desiredContractionVel [2];   // In contraction coordinates (1-length), where length in [0,1]
   
+  // For distinguishing centrally specified position, and internally modified one
+  double m_commandedLength[2];
+  double m_commandedContraction[2];
+  
   Muscle* m_muscles [2];
 };
   
 //----------------------------------------------------------------------------------------------------------------------
 /// Inline implementations
 //----------------------------------------------------------------------------------------------------------------------    
+inline void Reflex::setIntersegmentInput(double i0, double i1)
+{
+  m_interSegmentInput[0] = i0;
+  m_interSegmentInput[1] = i1;
+}
+
+//----------------------------------------------------------------------------------------------------------------------      
 inline void Reflex::setOpenLoop(double c0, double c1) 
 { 
   m_openLoop[0] = c0; 
@@ -288,12 +299,10 @@ inline void Reflex::setMotoNeuronParameters(double Wspmn0, double Wspmn1)
 }
   
 //----------------------------------------------------------------------------------------------------------------------            
-inline void Reflex::setIntersegmentalParameters(double Wismn0, double Wismn1, double Wisia0, double Wisia1)
+inline void Reflex::setIntersegmentalParameters(double Wisep0, double Wisep1)
 {
-  m_Wismn[0] = Wismn0;
-  m_Wismn[1] = Wismn1;
-  m_Wisia[0] = Wisia0;
-  m_Wisia[1] = Wisia1;
+  m_Wisep[0] = Wisep0;
+  m_Wisep[1] = Wisep1;
 }
 
   

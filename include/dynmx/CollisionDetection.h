@@ -16,6 +16,8 @@
 #include "MathUtils.h"
 #include "cinder/Vector.h"
 
+namespace dmx
+{
 
 // Returns whether intersection occured in return argument and intersection point in first argument
 // For details see http://paulbourke.net/geometry/lineline2d/
@@ -186,8 +188,8 @@ static inline float lineSegmentCircleClosestIntersect(ci::Vec2f& res, const ci::
     // No intersection
     return -1;
   }
-
 }
 
+} // namespace
 
 #endif

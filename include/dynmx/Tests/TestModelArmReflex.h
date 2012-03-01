@@ -42,14 +42,14 @@ public:
     m_targetMode = TM_Cursor;
     
     // Starting position
-    const float startPosElb = PI_OVER_FOUR;
-    const float startPosShd = PI_OVER_FOUR;
+    const float startPosElb = dmx::PI_OVER_FOUR;
+    const float startPosShd = dmx::PI_OVER_FOUR;
     Vec2f startPos, tmp;
     m_arm->forwardKinematics(startPosElb, startPosShd, tmp, startPos);
     m_targets.add(startPos, 1.5f);
     
     // Synergistic movement
-    const float target1PosElb = PI_OVER_TWO;
+    const float target1PosElb = dmx::PI_OVER_TWO;
     const float target1PosShd = 0.0f;
     Vec2f target1Pos;
     m_arm->forwardKinematics(target1PosElb, target1PosShd, tmp, target1Pos);     

@@ -15,6 +15,9 @@
 #include <numeric>
 #include <sstream>
 
+namespace dmx
+{
+
 const float PI = 3.1415926535897932384626433832795f;
 const float TWO_PI = 6.283185307179586f;
 const float PI_OVER_180 = 0.017453292519943295769236907684886f;
@@ -32,6 +35,34 @@ static const float asinh(float v)
   return log(v + sqrt(v*v + 1));
 }
 #endif
+
+//----------------------------------------------------------------------------------------------------------------------
+struct Range
+{
+  Range(double mi = 0.0, double ma = 1.0) : min(mi), max(ma) {};
+  double min, max;
+};
+
+// Map one range to another
+//----------------------------------------------------------------------------------------------------------------------
+static double mapUnitIntervalToRange(double val, double min, double max)
+{
+  assert(max >= min);
+  assert(val >=0.0 && val <= 1.0);
+  return min + val * (max - min);
+}
+
+static double map01To(double val, double min, double max)
+{
+  assert(max >= min);
+  assert(val >=0.0 && val <= 1.0);
+  return min + val * (max - min);
+}
+
+static double map01To(double val, const Range& r)
+{
+  return map01To(val, r.min, r.max);
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 static const float sqr(float v) { return v * v; };
@@ -320,5 +351,7 @@ static double gasdev(long *idum)
 		return gset;
 	}
 }
+  
+} //namespace
 
 #endif // _MATH_UTILS_
