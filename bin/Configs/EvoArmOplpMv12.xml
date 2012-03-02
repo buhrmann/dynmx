@@ -9,15 +9,19 @@
 		<Model Value ="GA"/>		
 		<DebugLevel Value="1"/>
         <PlotDuration Value="0.5"/>
-        <OutputFolder Name="/Users/thomasbuhrmann/Experiments/Output/Mv2"/>
+        <OutputFolder Name="/Users/thomasbuhrmann/Experiments/Output"/>
 	</Globals>
 	<GA>
 		<Evolvable Name="EvoArmCoCon">
           <DesiredTrajectory InDegrees="1" ResetEachMove="1">
             <Move Duration="0.3" LeadIn="0.3" LeadOut="0.6">
               <From x="90" y="60"/>
-              <To x="60" y="80"/>
+              <To x="60" y="40"/>
             </Move>
+            <Move Duration="0.3" LeadIn="0.3" LeadOut="0.6">
+              <From x="90" y="60"/>
+              <To x="60" y="80"/>
+            </Move>            
           </DesiredTrajectory>
           <EvoFlags>
             <symMuscles>0</symMuscles>
@@ -47,7 +51,7 @@
               </SpindleLimits>
             </DecodeLimits>
           </EvoFlags>
-          <enableCoconInc min="0.1" max="0.4">0</enableCoconInc>          
+          <enableCoconInc min="0.1" max="0.4">0</enableCoconInc>
           <commandTrajSmooth>1</commandTrajSmooth>
           <useMuscleCoords>0</useMuscleCoords>
           <fitnessEvalVel>1</fitnessEvalVel>
@@ -57,7 +61,7 @@
 		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Output/12_02_20__18_55_31/GA_Result.xml" />
 		<PopulationSize Value="100"/>
 		<DemeSize Value="10"/>
-		<NumGenerations Value="10"/>
+		<NumGenerations Value="2000"/>
 		<MutationMax Value="0.01"/>
         <MutationMaxReduced Value="0.005"/>
         <MutationMaxReduceAt Value="1500"/>

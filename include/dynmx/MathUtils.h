@@ -94,9 +94,12 @@ static inline int sign(T val)
 // Vector sum
 //----------------------------------------------------------------------------------------------------------------------
 template<class T>
-static inline T sum(std::vector<T>& vec)
+static inline T sum(std::vector<T>& vec, int i0 = 0, int iN = 0)
 {
-  T sum = std::accumulate(vec.begin(), vec.end(), (T)0); 
+  typename std::vector<T>::iterator first = vec.begin() + i0;
+  typename std::vector<T>::iterator last = iN > 0 ? vec.begin() + iN : vec.end();
+  
+  T sum = std::accumulate(first, last, (T)0); 
   return sum;
 }
 
@@ -117,26 +120,33 @@ static inline void elemWiseSum(const std::vector<T>& vec1, const std::vector<T>&
   std::transform(vec1.begin(), vec1.end(), vec2.begin(), res.begin(), std::plus<T>());
 }
 
-// Returns vector of successive differences, after transformation by operator
+// Returns vector of successive differences, after transformation by operator.
 //----------------------------------------------------------------------------------------------------------------------
 template<class T, class Operator>
-static inline void differences(const std::vector<T>& v1, std::vector<double>& res, Operator operate, bool padRight = true)
+static inline void differences(const std::vector<T>& v1, std::vector<double>& res, Operator operate, 
+                               bool padRight = true, int i0 = 0, int iN = 0)
 {
   assert(v1.size() > 1);
+  assert(i0 >= 0);
+  
+  if(iN == 0)
+    iN = v1.size();
+  
+  assert(iN > i0 && iN <= v1.size());  
 
   // res will hold same amount of data as v1
-  int N = v1.size();
-  res.resize(N);
+  res.resize(iN-i0);
   res.clear();
   
-  for (int i = 0; i < N-1; i++) 
+  for (int i = i0; i < iN - 1; ++i) 
   {
     T diff = v1[i+1] - v1[i];
     res.push_back(operate(diff));
   }
   
   // Ensure same length by duplicating last element
-  res.push_back(*res.end());
+  if(padRight)
+    res.push_back(*res.end());
 }
 
 // Cross-correlation of two vectors
@@ -159,22 +169,28 @@ static inline std::vector<double> crossCorrelation(std::vector<T>& v1, std::vect
 // (see http://paulbourke.net/miscellaneous/correlate/)
 //----------------------------------------------------------------------------------------------------------------------
 template<class T, class Operator>
-static inline std::vector<double> crossCorrelation(std::vector<T>& v1, std::vector<T>& v2, Operator operate, int minDelay, int maxDelay)
+static inline std::vector<double> crossCorrelation(std::vector<T>& v1, std::vector<T>& v2, Operator operate, 
+                                                   int minDelay, int maxDelay, 
+                                                   int i0 = 0, int iN = 0)
 {
   assert(maxDelay > minDelay);
+  assert(i0 >= 0);
   
-  int N = v1.size();
+  if(iN == 0)
+    iN = v1.size();
+  
+  assert(iN > i0 && iN <= v1.size());
   
   // Calculate the correlation series
   std::vector<double> crossCor;
-  for (int delay = minDelay; delay < maxDelay; delay++) 
+  for (int delay = minDelay; delay < maxDelay; ++delay) 
   {
     double corr = 0;
-    for (int i = 0; i < N; i++) 
+    for (int i = i0; i < iN; ++i) 
     {
       int j = i + delay;
-      // For out of range values extend with first or last value
-      T v2Val = j < 0 ? v2[0] : j < N ? v2[j] : v2[N-1];
+      // For out of range values in second vector replace with first or last value
+      T v2Val = j < i0 ? v2[i0] : j < iN ? v2[j] : v2[iN-1];
       double val = operate(v1[i], v2Val);
       corr += val;
     }

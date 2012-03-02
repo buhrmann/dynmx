@@ -89,6 +89,7 @@ protected:
   int decodeMuscle(int mId, const double* genome, int start);
   void readDecodeLimits();
   void readRange(Range& range, const std::string& xmlElem);
+  float getFitness(float t0, float tmax);
   
   // Holds data constraining the decoding of a genome into this model
   struct DecodeLimits 
@@ -121,10 +122,14 @@ protected:
   std::vector<double> m_openLoopParams;  
   std::vector<double> m_intersegParams;
   
+  // Fitness related
   bool m_resetEachMove;
   bool m_fitnessEvalVel;
   bool m_fitnessEvalCoact;
+  double m_trialFitness;
+  double m_fitness;
   
+  // Trajectory related
   int m_numMoves;
   int m_currentMove;
   int m_currentPhase;

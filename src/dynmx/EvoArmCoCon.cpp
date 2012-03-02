@@ -52,20 +52,26 @@ struct VecNorm
   float m_rdt;
 };    
 
+// Returns fitness based on trajectory between time t0 and tmax only
 //----------------------------------------------------------------------------------------------------------------------
-float EvoArmCoCon::getFitness() 
-{ 
+float EvoArmCoCon::getFitness(float start, float end) 
+{
   const double dt = 1.0 / (double)SETTINGS->getChild("Config/Globals/FrameRate").getAttributeValue<int>("Value");
-  const int numSteps = m_time / dt;
   
   int minDelay = -100;
   int maxDelay = 100;
   
+  // Convert time [s] into array indices
+  int t0 = start / dt;
+  int tmax = end / dt;  
+  int numSteps = tmax - t0;
+  
   // Position-based evaluation
-  std::vector<double> posCorr = crossCorrelation(m_desiredPositions, m_actualPositions, VecDist(), minDelay, maxDelay);
+  std::vector<double> posCorr = crossCorrelation(m_desiredPositions, m_actualPositions, VecDist(), minDelay, maxDelay, t0, tmax);
   std::vector<double>::iterator optElem = min_element(posCorr.begin(), posCorr.end());
   double optPosVal = *optElem / numSteps;
   double fitness = 1.0 - sqrt(optPosVal);
+  assert(fitness <= 1.0);
   
   // Store what time delay lead to best fitness (for later plotting).
   int optAt = minDelay + std::distance(posCorr.begin(), optElem);
@@ -75,14 +81,18 @@ float EvoArmCoCon::getFitness()
   if(m_fitnessEvalVel)
   {
     std::vector<double> tangentialVels;
-    differences(m_actualPositions, tangentialVels, VecNorm(dt), true);
+    differences(m_actualPositions, tangentialVels, VecNorm(dt), true, t0, tmax);
+    
     std::vector<double> desTangentialVels;
-    differences(m_desiredPositions, desTangentialVels, VecNorm(dt), true);
+    differences(m_desiredPositions, desTangentialVels, VecNorm(dt), true, t0, tmax);
+    
+    // Correlation between start and end of differences, as we have already extracted data for the correct period
     std::vector<double> velCorr = crossCorrelation(desTangentialVels, tangentialVels, DiffSq(), minDelay, maxDelay);
     optElem = min_element(velCorr.begin(), velCorr.end());  
     double optVelVal = *optElem / numSteps;
     double velFitness = 1.0 - sqrt(optVelVal);
-
+    assert(velFitness <= 1.0);    
+    
     // Store what time delay lead to best fitness (for later plotting).
     //int optAt = minDelay + std::distance(velCorr.begin(), optElem);
     //m_bestFitDelay = optAt * dt;
@@ -95,10 +105,43 @@ float EvoArmCoCon::getFitness()
   // Minimise coactivation
   if(m_fitnessEvalCoact)
   {
-    double totalCoact = 0.5 * (sum(m_actualCoactivationsElb) + sum(m_actualCoactivationsShd));
+    double totalCoact = 0.5 * (sum(m_actualCoactivationsElb, t0, tmax) + sum(m_actualCoactivationsShd, t0, tmax));
     totalCoact /= numSteps;
+    assert(totalCoact <= 1.0);
     fitness *= 1 - totalCoact;
   }
+  
+  return fitness;
+}    
+  
+//----------------------------------------------------------------------------------------------------------------------
+float EvoArmCoCon::getFitness() 
+{ 
+  float fitness;
+  if(m_resetEachMove)
+  {
+    // We evaluate fitness over each movement separately
+    fitness = 1.0;
+    for(int i = 0; i < m_numMoves; i++)
+    {
+      // Assumes each move consists of 4 trajectory points      
+      float start = m_desiredTrajectory[i * 4 + 0].time; 
+      float end = m_desiredTrajectory[i * 4 + 3].time; 
+      float moveFitness = getFitness(start, end);
+      fitness *= moveFitness;
+      if(moveFitness < 0)
+      {
+        // Ensure a single negative multiplier always leads to negative fitness
+        fitness = -std::abs(fitness);
+      }
+    }
+  }
+  else
+  {
+    // We evaluate fitness over the whole run
+    fitness = getFitness(0, m_actualPositions.size());
+  }
+
   
   if(m_enableCoconIncrease)
   {
@@ -194,7 +237,7 @@ void EvoArmCoCon::init()
     
     // Following function may depend on some of above variables
     readDecodeLimits(); 
-    
+        
     // Read trajectory from settings file    
     // Requires arm to be setup to do FK, but that's already done in init() above, so should be fine.
     m_numMoves = 0; // First is the start pose for settling!

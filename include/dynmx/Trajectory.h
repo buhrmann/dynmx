@@ -104,8 +104,8 @@ public:
   Trajectory() : m_loop(false), m_blend(kTr_BlendNone), m_duration(0.0) {};
   
   // Setters
-  void add(Target<T> pos);
-  void add(T pos, float time, int name = 0);  
+  void add(Target<T> pos);                        // Adds a target at specified point in time to trajectory
+  void add(T pos, float duration, int name = 0);  // Adds a target of specified duration to end of trajectory
   void setLoop(bool l) { m_loop = l; };
   void setBlend(BlendType b) { m_blend = b; };
   void clear() { m_targets.clear(); m_duration = 0.0; };
@@ -134,13 +134,17 @@ protected:
 //----------------------------------------------------------------------------------------------------------------------      
 // Inline implementations  
 //----------------------------------------------------------------------------------------------------------------------      
+  
+// Specifies the new target's duration
+//----------------------------------------------------------------------------------------------------------------------        
 template <class T>
-void Trajectory<T>::add(T pos, float time, int name)
+void Trajectory<T>::add(T pos, float duration, int name)
 {
-  float accTime = m_duration + time;
+  float accTime = m_duration + duration;
   add(Target<T> (pos, accTime, name));
 };  
 
+// This adds a target whose position has explicitly been set
 //----------------------------------------------------------------------------------------------------------------------        
 template <class T>
 void Trajectory<T>::add(Target<T> target)

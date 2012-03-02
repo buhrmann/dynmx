@@ -1,8 +1,8 @@
 #!/bin/bash
 # Executes binary with specified argument N times
 
-N=2
-CFG="Configs/EvoArmInteractHillInterSegMv2.xml"
+N=7
+CFG="Configs/EvoArmOplpInterSegMv12.xml"
 
 # Copy exe here, so one can keep coding and building the original exe
 cd `dirname $0`

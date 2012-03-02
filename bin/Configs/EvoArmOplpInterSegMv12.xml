@@ -9,7 +9,7 @@
 		<Model Value ="GA"/>		
 		<DebugLevel Value="1"/>
         <PlotDuration Value="0.5"/>
-        <OutputFolder Name=""/>
+        <OutputFolder Name="/Users/thomasbuhrmann/Experiments/Output"/>
 	</Globals>
 	<GA>
 		<Evolvable Name="EvoArmCoCon">
@@ -21,35 +21,49 @@
             <Move Duration="0.3" LeadIn="0.3" LeadOut="0.6">
               <From x="90" y="60"/>
               <To x="60" y="80"/>
-            </Move>
+            </Move>            
           </DesiredTrajectory>
           <EvoFlags>
             <symMuscles>0</symMuscles>
-            <spindles>1</spindles>
+            <spindles velRef="0">1</spindles>
             <iain>0</iain>
             <renshaw>0</renshaw>
             <ibin>0</ibin>
             <ifv>0</ifv>
             <sfv>0</sfv>
-            <openLoop>1</openLoop>
-            <maxOpenLoop>0.5</maxOpenLoop>            
-            <uniformSpindles>0</uniformSpindles>
+            <openLoop max="0.2">1</openLoop>
+            <uniformSpindles>1</uniformSpindles>
             <hillParams>0</hillParams>
-            <interSegmentInput>0</interSegmentInput>
+            <interSegmentInput max="0.1">1</interSegmentInput>
+            <DecodeLimits>
+              <MuscleLimits>
+                <attach min="0.06" max="0.26" />
+                <force min="100" max="1000" />
+                <optLength min="0.8" max="1.2"/>
+                <maxVel min="5.0" max="15" />
+              </MuscleLimits>
+              <SpindleLimits>
+                <pos max="6.0" />
+                <vel max="0.5" />
+                <dmp max="1.0" />
+                <exp min="0.5" max="1.0" />
+                <weight min="0.99" max="1.0" />
+              </SpindleLimits>
+            </DecodeLimits>
           </EvoFlags>
-          <enableCoconInc>0</enableCoconInc>
-          <minCocon>0.1</minCocon>
-          <maxCocon>0.4</maxCocon>
+          <enableCoconInc min="0.1" max="0.4">0</enableCoconInc>
+          <commandTrajSmooth>1</commandTrajSmooth>
           <useMuscleCoords>0</useMuscleCoords>
-          <fitnessEvalVel>0</fitnessEvalVel>
+          <fitnessEvalVel>1</fitnessEvalVel>
+          <fitnessEvalCoact>1</fitnessEvalCoact>
 		</Evolvable>	
-		<Incremental Value="1"/>
+		<Incremental Value="0"/>
 		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Output/12_02_20__18_55_31/GA_Result.xml" />
 		<PopulationSize Value="100"/>
 		<DemeSize Value="10"/>
-		<NumGenerations Value="3000"/>
-		<MutationMax Value="0.01"/>
-        <MutationMaxReduced Value="0.005"/>
+		<NumGenerations Value="2000"/>
+		<MutationMax Value="0.05"/>
+        <MutationMaxReduced Value="0.01"/>
         <MutationMaxReduceAt Value="1500"/>
 		<RecombinationRate Value="0.5"/>
         <RecombinationRateReduced Value="0.25"/>
@@ -58,8 +72,8 @@
         <AutoEval Run="1"/>
         <Eval Run="0">
             <NumTrials Value="1"/>
-            <RecordState Value="0"/>            
-            <LoadFrom Value="/Users/thomasbuhrmann/Experiments/Output/12_02_20__15_47_50/GA_BestGenome.xml"/>
+            <RecordState Value="1"/>            
+            <LoadFrom Value="/Users/thomasbuhrmann/Experiments/Output/12_02_24__11_58_13/GA_BestGenome.xml"/>
         </Eval>        
 	</GA>    
     <Arm Gravity="0.0" Integrator="euler">

@@ -99,7 +99,7 @@ void Globals::initialise(const std::string& cfgFnm)
       const std::string localPath = currentPathStr + "/" + cfgFnm;      
       if(bfs::exists(localPath))
       {
-        m_fnm = cfgFnm;
+        m_fnm = cfgFnm.substr(cfgFnm.rfind('/') + 1);;
         pathToConfig = localPath;
   #if DEBUGGING
         std::cout << "Found specified config file in local directory '" << localPath << "'." << std::endl;    
