@@ -16,12 +16,16 @@
           <DesiredTrajectory InDegrees="1" ResetEachMove="1">
             <Move Duration="0.3" LeadIn="0.3" LeadOut="0.6">
               <From x="90" y="60"/>
-              <To x="60" y="40"/>
+              <To x="60" y="80"/>
             </Move>
             <Move Duration="0.3" LeadIn="0.3" LeadOut="0.6">
-              <From x="90" y="60"/>
-              <To x="60" y="80"/>
-            </Move>            
+              <From x="70" y="40"/>
+              <To x="40" y="60"/>
+            </Move>
+            <Move Duration="0.3" LeadIn="0.3" LeadOut="0.6">
+              <From x="50" y="20"/>
+              <To x="20" y="40"/>
+            </Move>                        
           </DesiredTrajectory>
           <EvoFlags>
             <symMuscles>0</symMuscles>

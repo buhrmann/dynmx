@@ -1,11 +1,11 @@
 #!/bin/bash
-# Executes specified program N times with first command line param, then N times with second etc..
-# until all command line params have been processed
+# Executes specified program N times with first param, then N times with second etc..
+# until all params have been processed
 
-N=4
-CFGs=("Configs/EvoArmInteractHillInterSegMv1.xml" "Configs/EvoArmInteractHillInterSegMv2.xml")
+# Params
+N=7
+CFGs=("Configs/EvoArmOpLpInterSegMv111.xml" "Configs/EvoArmOpLpInterSegMv222.xml")
 
-# Original executable
 # Copy exe here, so one can keep coding and building the original exe
 cd `dirname $0`
 EXE="../xcode/build/Release/cinder_dynmx.app/Contents/MacOS/cinder_dynmx"
