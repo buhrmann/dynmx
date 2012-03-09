@@ -259,11 +259,14 @@ class Disk : public NodeGeometry
 public:
   
   Disk() : m_radius1(1), m_radius2(0), m_resolution(16) { init(); };
-  Disk(float r1, float r2, int resolution = 16) : m_radius1(r1), m_radius2(r2), m_resolution(resolution) { init(); };
+  Disk(float r1, float r2, int resolution = 16) : m_radius1(r1), m_radius2(r2), m_startAngle(0), m_sweepAngle(0), m_resolution(resolution) { init(); };
+  Disk(float r1, float r2, float a1, float a2, int resolution = 16) : m_radius1(r1), m_radius2(r2), m_startAngle(a1), m_sweepAngle(a2), m_resolution(resolution) { init(); };
   virtual void createGeometry();
   
   float m_radius1;
   float m_radius2;
+  float m_startAngle;
+  float m_sweepAngle;
   int m_resolution;
   
 protected:

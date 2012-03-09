@@ -18,6 +18,24 @@ float DistanceSensor::senseEnvironment(SMCEnvironment& environment)
   ci::Vec2f end = m_position + m_direction * m_maxDistance;  
   m_distance = m_maxDistance;  
   ci::Vec2f collision;  
+
+  // Lines
+  for(int i = 0; i < environment.getLines().size(); i++)
+  {
+    const Line& line = environment.getLines()[i];
+    bool collided = lineSegmentIntersect(collision, m_position, end, line.getPosition(), line.getEnd());
+    if(collided)
+    {
+      float distance = collision.distance(m_position);
+      if(distance < m_distance)
+      {
+        m_distance = distance;
+        m_collision = collision;
+      }
+    }
+  }
+
+  // Circles
   for(int i = 0; i < environment.getCircles().size(); i++)
   {
     const Circle& circle = environment.getCircles()[i];
@@ -29,6 +47,7 @@ float DistanceSensor::senseEnvironment(SMCEnvironment& environment)
     }
   }
   
+  // Triangles
   for(int i = 0; i < environment.getTriangles().size(); i++)
   {
     const Triangle& tri = environment.getTriangles()[i];

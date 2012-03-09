@@ -35,12 +35,13 @@ public:
   
   float senseEnvironment(SMCEnvironment& environment);
   
-  const ci::Vec2f& getPosition() { return m_position; };
-  const ci::Vec2f& getDirection() { return m_direction; };
-  const ci::Vec2f& getCollision() { return m_collision; };  
-  float getDistance() { return m_distance; };
-  float getDistanceProportional() { return m_distance / m_maxDistance; };
-  float getMaxDistance() { return m_maxDistance; };
+  const ci::Vec2f& getPosition() const { return m_position; };
+  const ci::Vec2f& getDirection() const { return m_direction; };
+  const ci::Vec2f& getCollision() const { return m_collision; };  
+  float getDistance() const { return m_distance; };
+  float getDistanceProportional() const { return m_distance / m_maxDistance; };
+  float getMaxDistance() const { return m_maxDistance; };
+  bool isColliding() const { return m_distance < m_maxDistance; };
 
 protected:
   

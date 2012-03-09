@@ -19,6 +19,12 @@ void SMCEnvironmentViz::update()
   glDisable(GL_LIGHTING);
   
   glColor3f(0.1, 0.1, 0.1);
+
+  for(int i = 0; i < m_environment->getLines().size(); i++)
+  {
+    const Line& line = m_environment->getLines()[i];
+    ci::gl::drawLine(line.getPosition(), line.getEnd());
+  }
   
   for(int i = 0; i < m_environment->getCircles().size(); i++)
   {

@@ -114,6 +114,7 @@ protected:
   GLuint m_selectionBuffer[128];
   
   std::string m_name;
+  ci::Font m_font;
   
   bool m_paused;
 };

@@ -1,29 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Config>
 	<Globals>
-        <WindowSize Width="1280" Height="1000"/>    
+        <WindowSize Width="1000" Height="800"/>    
 		<FrameRate Value="50"/>    
-		<Visual Value="1"/>    
+		<Visual Value="0"/>    
         <FullScreen Value="0"/>      	
 		<DebugLevel Value="1"/>
-		<Model Value="GA"/>	        
+		<Model Value="GA"/>	   
+        <OutputFolder Name="/Users/thomasbuhrmann/Experiments/Output"/>     
 	</Globals>
 	<GA>
 		<Evolvable Name="SMCAgentEvo">
-			<NumNeurons Value="10"/>
+			<NumNeurons>4</NumNeurons>
+            <MaxSensorDist>5.0</MaxSensorDist>
+            <MaxSpeed>5.0</MaxSpeed>
+            <MaxAngularSpeed>360</MaxAngularSpeed>
 		</Evolvable>	
-		<Incremental Value="0"/>
-		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/11_12_23__13_19_41/GA_Result.xml"/>
-		<PopulationSize Value="50"/>
-		<DemeSize Value="5"/>
-		<NumGenerations Value="1000"/>
-		<MutationMax Value="0.01"/>
-        <MutationMaxReduced Value="0.001"/>
-        <MutationMaxReduceAt Value="500"/>        
-		<RecombinationRate Value="0.1"/>        
-		<NumTrials Value="1"/>
-		<TrialDuration Value="2.0"/>	
-        <SaveBestEachGeneration Value="0"/>
+		<Incremental Value="1"/>
+		<LoadFrom Value="/Users/thomasbuhrmann/Code/cinder_dynmx/xcode/build/Release/Output/12_03_06__20_34_57/GA_Result.xml"/>
+		<PopulationSize Value="100"/>
+		<DemeSize Value="10"/>
+		<NumGenerations Value="2000"/>
+		<MutationMax Value="0.1"/>
+        <MutationMaxReduced Value="0.05"/>
+        <MutationMaxReduceAt Value="1000"/>        
+		<RecombinationRate Value="0.5"/>
+        <RecombinationRateReduced Value="0.2"/>        
+		<NumTrials Value="20"/>
+        <SaveBestEachGeneration Value="1"/>
+        <AutoEval Run="1"/>
         <Eval Run="0">
             <NumTrials Value="10"/>
             <LoadFrom Value="/Users/thomasbuhrmann/Experiments/11_12_23__13_19_41/GA_Progress.xml"/>

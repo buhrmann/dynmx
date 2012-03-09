@@ -352,7 +352,15 @@ void Disk::createGeometry()
 {
   m_dl = glGenLists(1);
   glNewList(m_dl,GL_COMPILE);
-    drawDisk(m_radius1, m_radius2, m_resolution, m_resolution);
+  if(m_sweepAngle > 0)
+  {
+    drawPartialDisk(m_radius2, m_radius1, m_resolution, 2, m_startAngle, m_sweepAngle);
+  }
+  else 
+  {
+    drawDisk(m_radius1, m_radius2, m_resolution, 2);  
+  }
+
   glEndList();
 }
 
@@ -606,15 +614,15 @@ void Plot::update()
       else
         sprintf(str, "%i: %2.4f", pl, current);        
       
-      const int h = 10;
+      const int h = 8;
       const bool legendInside = true;
       const float xoffset = legendInside ? 0 : m_w;
       glPushMatrix();
-      glTranslatef(xoffset + 2*h, pl*2*h + h, 0.0);
+      glTranslatef(xoffset + 2*h, pl*1.5*h + h, 0.0);
       glColor4f(col.x, col.y, col.z, 1.0);      
       drawRectangle(h, h);
       glPopMatrix();
-      drawString(Vec3f(xoffset + 3*h, pl*2*h + h + h/2, 0), str); 
+      ci::gl::drawString(str, ci::Vec2f(xoffset + 3*h, pl*1.5*h /* + h*/ + 3), ci::Color(col.x, col.y, col.z), m_font);    
 #endif
     }
   }

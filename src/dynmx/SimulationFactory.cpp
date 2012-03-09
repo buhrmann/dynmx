@@ -86,8 +86,7 @@ Simulation* SimulationFactory::create()
     }
     else if ("SMCAgentEvo" == evolvableName)
     {    
-      const int numNeurons = SETTINGS->getChild("Config/GA/Evolvable/NumNeurons").getAttributeValue<int>("Value");      
-      evolvable = new SMCAgentEvo(numNeurons);
+      evolvable = new SMCAgentEvo();
       model = evaluateOnly ? (Model*) new GATester(evolvable) : (Model*) new GARunner (evolvable);
       if(visual)
       {

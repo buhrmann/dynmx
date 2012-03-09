@@ -75,6 +75,25 @@ public:
 protected:
   float m_radius;
 };
+
+//----------------------------------------------------------------------------------------------------------------------
+// A circle
+//----------------------------------------------------------------------------------------------------------------------  
+class Line : public Positionable
+{
+public:
+  virtual ~Line(){};
+  Line(const ci::Vec2f& pos, float angle, float length) : Positionable(pos) 
+  {
+    m_end = pos + length * ci::Vec2f(cos(angle), sin(angle));
+  };
+  
+  void setEnd(const ci::Vec2f& end) { m_end = end; };
+  const ci::Vec2f& getEnd() const { return m_end; };
+    
+protected:
+  ci::Vec2f m_end;
+};
   
 //----------------------------------------------------------------------------------------------------------------------
 // An environment that can contain circles and triangles
@@ -94,16 +113,20 @@ public:
   
   void addCircle(const Circle& c) { m_circles.push_back(c); };
   void addTriangle(const Triangle& t) { m_triangles.push_back(t); };
-  
+  void addLine(const Line& l) { m_lines.push_back(l); };
+    
   std::vector<Circle>& getCircles() { return m_circles; };
   const std::vector<Circle>& getCircles() const { return m_circles; };
   std::vector<Triangle>& getTriangles() { return m_triangles; };
   const std::vector<Triangle>& getTriangles() const { return m_triangles; };
+  std::vector<Line>& getLines() { return m_lines; };
+  const std::vector<Line>& getLines() const { return m_lines; };
   
 protected:
   
   std::vector<Triangle> m_triangles;
   std::vector<Circle> m_circles;
+  std::vector<Line> m_lines;
 };
   
 } // namespace

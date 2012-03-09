@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Config>
+	<Globals>
+        <WindowSize Width="1000" Height="800"/>    
+		<FrameRate Value="50"/>    
+		<Visual Value="1"/>    
+        <FullScreen Value="0"/>      	
+		<DebugLevel Value="1"/>
+		<Model Value="GA"/>	        
+        <OutputFolder Name="/Users/thomasbuhrmann/Experiments/Output"/>
+	</Globals>
+	<GA>
+		<Evolvable Name="SMCAgentEvo">
+			<NumNeurons>4</NumNeurons>
+            <MaxSensorDist>0.5</MaxSensorDist>
+            <MaxSpeed>0.2</MaxSpeed>
+            <MaxAngularSpeed>180</MaxAngularSpeed>
+            <TrackLength>10</TrackLength>
+            <PositionWraps>1</PositionWraps>
+		</Evolvable>	
+		<Incremental Value="0"/>
+		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/11_12_23__13_19_41/GA_Result.xml"/>
+		<PopulationSize Value="100"/>
+		<DemeSize Value="10"/>
+		<NumGenerations Value="3000"/>
+		<MutationMax Value="0.05"/>
+        <MutationMaxReduced Value="0.01"/>
+        <MutationMaxReduceAt Value="2000"/>        
+		<RecombinationRate Value="0.5"/>
+        <RecombinationRateReduced Value="0.1"/>        
+		<NumTrials Value="10"/>	
+        <SaveBestEachGeneration Value="0"/>
+        <Eval Run="1">
+            <NumTrials Value="10"/>
+            <LoadFrom Value="/Users/thomasbuhrmann/Experiments/Output/12_03_07__17_58_04/GA_BestGenome.xml"/>
+            <LoadFromOld Value="/Users/thomasbuhrmann/Code/cinder_dynmx/xcode/build/Release/Output/12_03_06__20_34_57/GA_BestGenome.xml"/>
+        </Eval>         
+	</GA>    
+</Config>

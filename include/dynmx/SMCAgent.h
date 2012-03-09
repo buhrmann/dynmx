@@ -29,22 +29,27 @@ class SMCAgent : public Model
 public:
   
   SMCAgent(int numNeurons = 3);
-  ~SMCAgent() {};
+  ~SMCAgent();
   
   // Inherited from class Model
   virtual void init();
   virtual void reset();
   virtual void update(float dt);
   
+  // Setters
+  void setMaxSensorDistance(double d) { m_distanceSensor.setMaxDistance(d); };
+  void setMaxSpeed(double s) { m_maxSpeed = s; };
+  void setMaxAngularSpeed(double s) { m_maxAngularSpeed = s; };
+  
+  // Getters
   SMCEnvironment* getEnvironment() { return &m_environment; };
   CTRNN* getCTRNN() { return m_ctrnn; };  
-  DistanceSensor& getDistanceSensor() { return m_distanceSensor; };
+  const DistanceSensor& getDistanceSensor() const { return m_distanceSensor; };
   const ci::Vec2f& getPosition() { return m_position; };
   float getAngle() { return m_angle; };
   float getRadius() { return m_radius; };
   float getSensedValue() { return m_sensedValue; };
-  float getTime() { return m_time; };
-  
+  float getTime() { return m_time; };  
   float getAngleWithHeading(ci::Vec2f pos);
   
 protected:
@@ -54,12 +59,21 @@ protected:
   SMCEnvironment m_environment;
   CTRNN* m_ctrnn;
   DistanceSensor m_distanceSensor;
+
+  // States
   ci::Vec2f m_position;
-  float m_angle;
-  float m_maxSpeed;
-  float m_radius;
+  ci::Vec2f m_velocity;
+  float m_angle;  
+  float m_angularVelocity;  
   float m_sensedValue;
+    
+  // Params
+  float m_maxSpeed;
+  float m_maxAngularSpeed;
+  float m_radius;
+  
   float m_time;
+  
 }; // class
   
 } // namespace

@@ -39,7 +39,6 @@
 		D64F246D12EE2AF10014F069 /* Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D64F246C12EE2AF10014F069 /* Light.cpp */; };
 		D67358DA149E6D2F008C7541 /* SMCAgent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D67358D9149E6D2F008C7541 /* SMCAgent.cpp */; };
 		D67358F6149E73F7008C7541 /* SMCAgentViz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D67358F5149E73F7008C7541 /* SMCAgentViz.cpp */; };
-		D6735903149E752F008C7541 /* SMCEnvironment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6735902149E752F008C7541 /* SMCEnvironment.cpp */; };
 		D673591E149E791C008C7541 /* SMCEnvironmentViz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D673591D149E791C008C7541 /* SMCEnvironmentViz.cpp */; };
 		D67710BA149B77EA0031DC48 /* DistanceSensor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D67710B9149B77EA0031DC48 /* DistanceSensor.cpp */; };
 		D68AC7DA13E9937F009887A9 /* pf_tempesta_seven.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D68AC79113E9937F009887A9 /* pf_tempesta_seven.ttf */; };
@@ -128,7 +127,6 @@
 		D67358F4149E73E4008C7541 /* SMCAgentViz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCAgentViz.h; path = ../include/dynmx/SMCAgentViz.h; sourceTree = SOURCE_ROOT; };
 		D67358F5149E73F7008C7541 /* SMCAgentViz.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SMCAgentViz.cpp; sourceTree = "<group>"; };
 		D6735901149E751A008C7541 /* SMCEnvironment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCEnvironment.h; path = ../include/dynmx/SMCEnvironment.h; sourceTree = SOURCE_ROOT; };
-		D6735902149E752F008C7541 /* SMCEnvironment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SMCEnvironment.cpp; sourceTree = "<group>"; };
 		D673591C149E790B008C7541 /* SMCEnvironmentViz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCEnvironmentViz.h; path = ../include/dynmx/SMCEnvironmentViz.h; sourceTree = SOURCE_ROOT; };
 		D673591D149E791C008C7541 /* SMCEnvironmentViz.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SMCEnvironmentViz.cpp; sourceTree = "<group>"; };
 		D6735935149E7C40008C7541 /* SMCView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCView.h; path = ../include/dynmx/SMCView.h; sourceTree = SOURCE_ROOT; };
@@ -357,7 +355,6 @@
 				D67358F4149E73E4008C7541 /* SMCAgentViz.h */,
 				D67358F5149E73F7008C7541 /* SMCAgentViz.cpp */,
 				D6735901149E751A008C7541 /* SMCEnvironment.h */,
-				D6735902149E752F008C7541 /* SMCEnvironment.cpp */,
 				D673591C149E790B008C7541 /* SMCEnvironmentViz.h */,
 				D673591D149E791C008C7541 /* SMCEnvironmentViz.cpp */,
 				D6735935149E7C40008C7541 /* SMCView.h */,
@@ -587,7 +584,6 @@
 				D67710BA149B77EA0031DC48 /* DistanceSensor.cpp in Sources */,
 				D67358DA149E6D2F008C7541 /* SMCAgent.cpp in Sources */,
 				D67358F6149E73F7008C7541 /* SMCAgentViz.cpp in Sources */,
-				D6735903149E752F008C7541 /* SMCEnvironment.cpp in Sources */,
 				D673591E149E791C008C7541 /* SMCEnvironmentViz.cpp in Sources */,
 				D696B7B214A3685F00580D3C /* SMCAgentEvo.cpp in Sources */,
 				D68CF04B14C6DF4300493D39 /* EvoArmCoCon.cpp in Sources */,
@@ -661,7 +657,7 @@
 				HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/boost\"";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PREBINDING = NO;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.6;
 				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\" ../include ../include/dynmx";
 			};
 			name = Debug;

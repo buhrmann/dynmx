@@ -67,6 +67,8 @@ inline void SMCView::setupScene()
 {
   assert(m_agent);
   
+  m_light.toggle();
+  
   // Background
   m_backgroundColor = ci::Vec4f(0.9, 0.9, 0.9, 1.0);
   const float g = 0.1f;
@@ -76,7 +78,7 @@ inline void SMCView::setupScene()
   m_background.bottomRight = ci::ColorA(1,1,1,0.0);
   
   // 3d view
-#if 1
+#if 0
   // Coordinate axes
   Axes* axes = new Axes(0.1);
   axes->createGeometry();
@@ -87,7 +89,7 @@ inline void SMCView::setupScene()
   // Background grid
   Grid* grid = new Grid(0.5, 0.5, 10, 10);
   grid->createGeometry();
-  grid->m_color = ci::Vec4f(0.8f, 0.8f, 0.8f, 0.25f); 
+  grid->m_color = ci::Vec4f(0.8f, 0.8f, 0.8f, 0.05f); 
   grid->translate(ci::Vec4f(0.0, 0.0, -0.002, 1.0f));  
   grid->rotate(ci::Vec3f(1.0, 0.0, 0.0), PI_OVER_TWO);  
   m_scene3d.m_children.push_back(grid);
@@ -104,28 +106,29 @@ inline void SMCView::setupScene()
   // 2d viz
   float columnWidth = 300;
   float columnMargin = 5;
+  float plotHeight = 100;
   float left = columnWidth + columnMargin;
   NodeGroup* column = new NodeGroup();
   column->setRightAligned(true);
   column->translate(ci::Vec4f(left, columnMargin, 0, 1));
 
   // Add ctrnnViz to column
-  m_ctrnnViz = new CTRNNViz(m_agent->getCTRNN(), 200);  
+  m_ctrnnViz = new CTRNNViz(m_agent->getCTRNN(), 150);  
   column->m_children.push_back(m_ctrnnViz);
 
   // Add plots to column
-  m_ctrnnPlot = new Plot(300.0, 150, m_agent->getCTRNN()->getSize(), 200);
+  m_ctrnnPlot = new Plot(columnWidth, plotHeight, m_agent->getCTRNN()->getSize(), 200);
   m_ctrnnPlot->translate(Vec4f(0, m_ctrnnViz->getHeight() + 16, 0, 1));  
   m_ctrnnPlot->setTitle("Neural outputs");
   column->m_children.push_back(m_ctrnnPlot);    
   
-  m_plot = new dmx::Plot(300.0, 150, 2, 200);
-  m_plot->translate(ci::Vec4f(0, m_ctrnnViz->getHeight() + 16 + 150 + 32, 0, 1));
+  m_plot = new dmx::Plot(columnWidth, plotHeight, 2, 200);
+  m_plot->translate(ci::Vec4f(0, m_ctrnnViz->getHeight() + 16 + plotHeight + 32, 0, 1));
   m_plot->setTitle("Sensor Data");
   column->m_children.push_back(m_plot);
 
-  m_fitnessPlot = new dmx::Plot(300.0, 150, 2, 200);
-  m_fitnessPlot->translate(ci::Vec4f(0, m_ctrnnViz->getHeight() + 16 + 150 + 32 + 150 + 32, 0, 1));
+  m_fitnessPlot = new dmx::Plot(columnWidth, plotHeight, 2, 200);
+  m_fitnessPlot->translate(ci::Vec4f(0, m_ctrnnViz->getHeight() + 16 + plotHeight + 32 + plotHeight + 32, 0, 1));
   m_fitnessPlot->setTitle("Fitness");
   column->m_children.push_back(m_fitnessPlot);
   

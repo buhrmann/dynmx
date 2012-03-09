@@ -17,7 +17,7 @@ namespace dmx
 {
   
 #define SMC_TRIAL_DURATION 10.0f
-#define SMC_CIRC_AND_TRI 0
+#define SMC_CIRC_AND_TRI 1
   
 //----------------------------------------------------------------------------------------------------------------------
 // A minimal agent scanning the encironment with a distance sensor
@@ -26,7 +26,8 @@ class SMCAgentEvo : public Evolvable
 {
   
 public:
-  SMCAgentEvo(int numNeurons);
+  SMCAgentEvo();
+  ~SMCAgentEvo();
   
   virtual int getNumGenes();
   virtual void decodeGenome(const double* genome);

@@ -38,6 +38,8 @@ void View::init()
   m_background.bottomLeft = ci::ColorA(1,1,1,0.0);
   m_background.bottomRight = ci::ColorA(1,1,1,0.0);
   
+  m_font = ci::Font(ci::app::loadResource("pf_tempesta_seven.ttf"), 24);  
+  
   // setup openGL modes
   glEnable(GL_LIGHTING);
   glEnable(GL_LIGHT0);
@@ -207,6 +209,8 @@ void View::draw()
       m_scene2d.update();
       draw2d();
     }
+    
+    //ci::gl::drawString("dynmx", ci::Vec2f(25,75), ci::ColorA(1,1,1,0.5), m_font);    
 
     // finally draw the GUI on top
     glDisable(GL_BLEND);
