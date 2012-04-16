@@ -8,13 +8,11 @@
  */
 
 #include "SMCAgentEvo.h"
+#include "CTRNNFactory.h"
 
 namespace dmx
 {
 
-static ci::Vec2f SMC_POS_LEFT (0.2, 0.2);
-static ci::Vec2f SMC_POS_RIGHT (0.2, -0.2);
-  
 //----------------------------------------------------------------------------------------------------------------------  
 SMCAgentEvo::SMCAgentEvo()
 {
@@ -29,32 +27,31 @@ SMCAgentEvo::~SMCAgentEvo()
 
 //----------------------------------------------------------------------------------------------------------------------    
 void SMCAgentEvo::init() 
-{   
+{    
   const ci::XmlTree* settings = SETTINGS;
   if (settings->hasChild("Config/GA/Evolvable"))
   {
     // Use setting from globals file
     const ci::XmlTree& xml = settings->getChild("Config/GA/Evolvable");
-    
-    const int numNeurons = xml.getChild("NumNeurons").getValue<int>();    
-    m_agent = new SMCAgent(numNeurons);
-
-    const double maxSensorDist = xml.getChild("MaxSensorDist").getValue<double>();    
-    m_agent->setMaxSensorDistance(maxSensorDist);
-    
-    const double maxSpeed = xml.getChild("MaxSpeed").getValue<double>();    
-    m_agent->setMaxSpeed(maxSpeed);
-    
-    const double maxAngularSpeed = degreesToRadians(xml.getChild("MaxAngularSpeed").getValue<double>());
-    m_agent->setMaxAngularSpeed(maxAngularSpeed);
-  }
-
-  m_agent->getEnvironment()->addCircle(Circle(SMC_POS_LEFT, 0.05f));
-#if SMC_CIRC_AND_TRI
-  m_agent->getEnvironment()->addTriangle(Triangle(SMC_POS_RIGHT, 0.1f));
   
-  m_agent->getEnvironment()->addLine(Line(ci::Vec2f(0.4,0.3), -PI_OVER_TWO, 0.6));
-#endif
+    m_topology.fromXml(xml.getChild("Topology"));
+    
+    m_agent = new SMCAgent(m_topology.getSize());
+    
+    m_agent->setMaxSensorDistance(xml.getChild("MaxSensorDist").getValue<double>(1.0));
+    m_agent->getDistanceSensor().setTransferFunction(xml.getChild("SensorTransferFunc").getValue<std::string>("Binary"));
+    m_agent->setMaxSpeed(xml.getChild("MaxSpeed").getValue<double>(1.0));
+    m_agent->setMaxAngularSpeed(degreesToRadians(xml.getChild("MaxAngularSpeed").getValue<double>(180)));
+    m_agent->setMaxAngle(degreesToRadians(xml.getChild("MaxAngle").getValue<double>(90)));
+    m_agent->setMaxPosition(xml.getChild("MaxPosition").getValue<double>(0.5));
+    m_agent->setAngleWraps(xml.getChild("AngleWraps").getValue<bool>(1));
+    m_agent->setPositionWraps(xml.getChild("PositionWraps").getValue<bool>(1));
+    m_trialDuration = xml.getChild("TrialDuration").getValue<double>(10.0);
+    m_fitnessEvalDelay = xml.getChild("FitnessEvalDelay").getValue<double>(8.0);    
+    
+    // Load environment objects
+    m_agent->getEnvironment().fromXml(xml.getChild("Environment"));
+  }
 };  
 
 //----------------------------------------------------------------------------------------------------------------------  
@@ -64,81 +61,68 @@ void SMCAgentEvo::reset()
   m_agent->reset();   
   
   m_fitness = 0.0f;
-  
-  // Randomise initial state of CTRNN
-  m_agent->getCTRNN()->zeroStates();
-  
-# if 0  
-  float min = -10;
-  float max = 10;
-  m_agent->getCTRNN()->randomizeState(min, max);
-#endif  
-  
-  // Randomise environment objects
-#if SMC_CIRC_AND_TRI
-  float maxOffset = 0.1;
-  if(m_agent->getEnvironment()->getCircles()[0].getPosition().y > 0)
-  {
-    // if circle now left
-    ci::Vec2f randOffset (UniformRandom(-maxOffset, maxOffset), UniformRandom(-maxOffset, maxOffset));
-    m_agent->getEnvironment()->getCircles()[0].setPosition(SMC_POS_RIGHT + randOffset);
-    randOffset = ci::Vec2f(UniformRandom(-maxOffset, maxOffset), UniformRandom(-maxOffset, maxOffset));    
-    m_agent->getEnvironment()->getTriangles()[0].setPosition(SMC_POS_LEFT + randOffset);
-  }
-  else 
-  {
-    ci::Vec2f randOffset (UniformRandom(-maxOffset, maxOffset), UniformRandom(-maxOffset, maxOffset));
-    m_agent->getEnvironment()->getCircles()[0].setPosition(SMC_POS_LEFT + randOffset);
-    randOffset = ci::Vec2f(UniformRandom(-maxOffset, maxOffset), UniformRandom(-maxOffset, maxOffset));    
-    m_agent->getEnvironment()->getTriangles()[0].setPosition(SMC_POS_RIGHT + randOffset);
 
-  }  
+#define NN_RAND 0
+#if NN_RAND
+  float min = -1;
+  float max = 1;
+  m_agent->getCTRNN().randomizeState(min, max);  
 #else
-  float distMin = 4 * m_agent->getRadius();
-  float distMax = 12 * m_agent->getRadius();  
-  float randDist = UniformRandom(distMin, distMax);
-  float randAngle = UniformRandom(0, TWO_PI);
-  float randRad = UniformRandom(0.025, 0.1);
-  ci::Vec2f randPos = randDist * ci::Vec2f(cos(randAngle), sin(randAngle));
-  m_agent->getEnvironment()->getCircles()[0].setPosition(randPos);
-  m_agent->getEnvironment()->getCircles()[0].setRadius(randRad);
-#endif
-}
+  m_agent->getCTRNN().zeroStates();
+#endif  
+ }
   
 //----------------------------------------------------------------------------------------------------------------------  
 void SMCAgentEvo::update(float dt) 
 { 
   m_agent->update(dt);
   
-  // Measure fitness: find circle 
-  float agentAngle = m_agent->getAngle();
-  float circleAngle = m_agent->getAngleWithHeading(m_agent->getEnvironment()->getTriangles()[0].getPosition());
-
-  if(m_agent->getTime() >= 8.0f)
-  {
-    float diff = sqr(agentAngle - circleAngle);
-    m_fitness += diff;
-  }
+  updateFitness();
 }
+  
 
 //----------------------------------------------------------------------------------------------------------------------
 int SMCAgentEvo::getNumGenes()
 {
-  const int numNeurons = m_agent->getCTRNN()->getSize();
-  const int numInputs = 1;
-  return m_agent->getCTRNN()->getNumRequiredParams(numNeurons, numInputs);
+  return m_topology.getNumParameters();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 void SMCAgentEvo::decodeGenome(const double* genome)
 {
-  m_agent->getCTRNN()->decodeGenome(genome, 1);
+  // Todo: add to xml!
+  CTRNNFactory::DecodeLimits limits;
+  limits.tau.set(0.2, 2.0);
+  CTRNNFactory::decode(m_agent->getCTRNN(), genome, limits, m_topology);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 float SMCAgentEvo::getFitness()
 {
   return - sqrt(m_fitness);
+}
+
+//----------------------------------------------------------------------------------------------------------------------  
+void SMCAgentEvo::toXml(ci::XmlTree& xml)
+{
+  ci::XmlTree evolvable ("SMCAgent", "");
+  evolvable.setAttribute("Fitness", getFitness());
+  
+  // Let agent output xml
+  m_agent->toXml(evolvable);
+  
+  evolvable.push_back(ci::XmlTree("TrialDuration", toString(m_trialDuration)));
+  evolvable.push_back(ci::XmlTree("FitnessEvalDelay", toString(m_fitnessEvalDelay)));  
+                      
+  m_topology.toXml(evolvable);
+  
+  xml.push_back(evolvable);
+}
+
+//----------------------------------------------------------------------------------------------------------------------  
+void SMCAgentEvo::record(Recorder& recorder)
+{
+  m_agent->record(recorder);
 }
 
 } // namespace

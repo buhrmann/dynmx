@@ -65,6 +65,7 @@ public:
   
   // Store output in human readable format
   virtual void toXml(ci::XmlTree& xml);  
+  virtual void fromXml(const ci::XmlTree& xml);
   
   void record(Recorder& recorder);  
   
@@ -89,6 +90,7 @@ protected:
   void updateInContractionCoords(float dt);  
   
   void paramToXml(ci::XmlTree& xml, const std::string& str, double* p); 
+  void paramFromXml(const ci::XmlTree& xml, const std::string& str, double* p); 
   
   
   // Parameters

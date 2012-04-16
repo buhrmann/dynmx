@@ -36,6 +36,7 @@ public:
   
   double getMomentArm() const { return m_momentArm; };  
   Joint getJoint() { return m_joint; };
+  bool getWraps() { return m_muscleWraps; };
   
   virtual double getLengthFromJointAngles(double elbAngle, double shdAngle);  
   

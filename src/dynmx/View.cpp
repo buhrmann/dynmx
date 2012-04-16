@@ -48,6 +48,7 @@ void View::init()
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glShadeModel(GL_SMOOTH);
+  glEnable(GL_LINE_SMOOTH); 
   glEnable(GL_CULL_FACE);
   glHint (GL_LINE_SMOOTH_HINT, GL_NICEST);	// Use The Good Calculations
   RenderState::g_shadingMode = GL_SMOOTH;

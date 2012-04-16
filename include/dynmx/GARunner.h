@@ -30,7 +30,9 @@ public:
   virtual int getNumGenes() = 0;
   virtual void decodeGenome(const double* genome) = 0;
   virtual float getFitness() = 0;
-  
+  virtual void nextTrial(int trial = 0) {};
+
+  // Inherited from Model
   // An evolvable can just return  its fitness explicitly, so doesn't necessarily need an update etc...
   virtual void update(float dt) {};
   virtual void init() {};

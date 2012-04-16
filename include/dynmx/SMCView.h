@@ -13,6 +13,7 @@
 #include "View.h"
 #include "Scene.h"
 #include "SMCAgent.h"
+#include "SMCAgentEvo.h"
 #include "SMCAgentViz.h"
 #include "SMCEnvironmentViz.h"
 #include "CTRNNViz.h"
@@ -30,7 +31,7 @@ class SMCView : public dmx::View
   
 public:
   
-  SMCView(SMCAgent* agent) : m_agent(agent), m_fixedFrameRate(DEFAULT_VIEW_FRAME_RATE) {};
+  SMCView(SMCAgentEvo* agent) : m_agent(agent), m_fixedFrameRate(DEFAULT_VIEW_FRAME_RATE) {};
   
   // Inherited functions
   virtual void setupScene();
@@ -46,7 +47,7 @@ public:
   
 protected:
   
-  SMCAgent* m_agent; 
+  SMCAgentEvo* m_agent; 
   SMCAgentViz* m_agentViz;
   SMCEnvironmentViz* m_environViz;
   CTRNNViz* m_ctrnnViz;
@@ -70,7 +71,7 @@ inline void SMCView::setupScene()
   m_light.toggle();
   
   // Background
-  m_backgroundColor = ci::Vec4f(0.9, 0.9, 0.9, 1.0);
+  m_backgroundColor = ci::Vec4f(1, 1, 1, 1.0);
   const float g = 0.1f;
   m_background.topLeft = ci::ColorA(g, g, g, 0.5f);
   m_background.topRight= ci::ColorA(g, g, g, 0.5f);
@@ -80,28 +81,29 @@ inline void SMCView::setupScene()
   // 3d view
 #if 0
   // Coordinate axes
-  Axes* axes = new Axes(0.1);
+  Axes* axes = new Axes(0.05);
   axes->createGeometry();
   m_scene3d.m_children.push_back(axes);
 #endif
   
 #if 1
   // Background grid
-  Grid* grid = new Grid(0.5, 0.5, 10, 10);
+  Grid* grid = new Grid(0.6, 1.0, 12, 20);
   grid->createGeometry();
   grid->m_color = ci::Vec4f(0.8f, 0.8f, 0.8f, 0.05f); 
-  grid->translate(ci::Vec4f(0.0, 0.0, -0.002, 1.0f));  
-  grid->rotate(ci::Vec3f(1.0, 0.0, 0.0), PI_OVER_TWO);  
+  grid->translate(ci::Vec4f(0.3, 0.0, -0.002, 1.0f));      
+  grid->rotate(ci::Vec3f(1.0, 0.0, 0.0), PI_OVER_TWO);
   m_scene3d.m_children.push_back(grid);
 #endif
   
   // Agent and environment
-  m_agentViz = new SMCAgentViz(m_agent);
-  m_environViz = new SMCEnvironmentViz(m_agent->getEnvironment());
+  m_agentViz = new SMCAgentViz(m_agent->getAgent());
+  m_environViz = new SMCEnvironmentViz(&m_agent->getAgent()->getEnvironment());
   m_scene3d.m_children.push_back(m_agentViz);
   m_scene3d.m_children.push_back(m_environViz);
   
-  //m_scene3d.translate(ci::Vec4f(0.0,-0.0,0,1));
+  m_scene3d.translate(ci::Vec4f(-0.15,-0.15,0,1));
+  m_scene3d.rotate(ci::Vec4f(0,0,1,1), PI/2);
   
   // 2d viz
   float columnWidth = 300;
@@ -113,11 +115,11 @@ inline void SMCView::setupScene()
   column->translate(ci::Vec4f(left, columnMargin, 0, 1));
 
   // Add ctrnnViz to column
-  m_ctrnnViz = new CTRNNViz(m_agent->getCTRNN(), 150);  
+  m_ctrnnViz = new CTRNNViz(&m_agent->getAgent()->getCTRNN(), 150, &m_agent->getTopology());  
   column->m_children.push_back(m_ctrnnViz);
 
   // Add plots to column
-  m_ctrnnPlot = new Plot(columnWidth, plotHeight, m_agent->getCTRNN()->getSize(), 200);
+  m_ctrnnPlot = new Plot(columnWidth, plotHeight, m_agent->getAgent()->getCTRNN().getSize(), 200);
   m_ctrnnPlot->translate(Vec4f(0, m_ctrnnViz->getHeight() + 16, 0, 1));  
   m_ctrnnPlot->setTitle("Neural outputs");
   column->m_children.push_back(m_ctrnnPlot);    
@@ -139,18 +141,18 @@ inline void SMCView::setupScene()
 inline void SMCView::update(float dt)
 {
   // update data in graph
-  for(int i = 0; i < m_agent->getCTRNN()->getSize(); i++)
+  for(int i = 0; i < m_agent->getAgent()->getCTRNN().getSize(); i++)
   {
-    m_ctrnnPlot->addPoint(m_agent->getCTRNN()->getOutput(i), i);
+    m_ctrnnPlot->addPoint(m_agent->getAgent()->getCTRNN().getOutput(i), i);
   }   
   
   // Add data to plot
-  double val = m_agent->getSensedValue();
+  double val = m_agent->getAgent()->getSensedValue();
   m_plot->addPoint(val, 0);
   
   // Update fitness-related data
-  m_fitnessPlot->addPoint(m_agent->getAngle(), 0);
-  m_fitnessPlot->addPoint(m_agent->getAngleWithHeading(m_agent->getEnvironment()->getCircles()[0].getPosition()), 1);
+  m_fitnessPlot->addPoint(m_agent->getAgent()->getAngle(), 0);
+  //m_fitnessPlot->addPoint(m_agent->getAngleWithHeading(m_agent->getEnvironment().getObjects()[0]->getPosition()), 1);
 }
 
 //---------------------------------------------------------------------------------------------------------------------

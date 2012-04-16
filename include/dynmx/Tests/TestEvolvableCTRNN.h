@@ -11,7 +11,8 @@
 #define _TEST_EVOLVABLE_CTRNN_
 
 #include "GARunner.h"
-#include "CTRNN.h"
+#include "Topology.h"
+#include "CTRNNFactory.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------
@@ -21,8 +22,13 @@ public:
 
   TestEvolvableCTRNN(int numNeurons = 1) : m_fitness(0.0), m_numSteps(0)
   {
-    m_ctrnn = new CTRNN(numNeurons);
+    m_ctrnn = new dmx::CTRNN(numNeurons);
     reset();
+    
+    // Fully connected single layer
+    m_topology.setSize(0, 5, 0);
+    m_topology.setSymmetric(false);
+    m_topology.setInputsAreNeurons(false);
   };
   
   ~TestEvolvableCTRNN() { delete m_ctrnn; };
@@ -35,7 +41,8 @@ public:
   virtual void reset();
   virtual bool hasFinished() { return m_numSteps >= 100; };
   
-  CTRNN* m_ctrnn;
+  dmx::CTRNN* m_ctrnn;
+  dmx::Topology m_topology;
   float m_fitness;
   int m_numSteps;
 };
@@ -45,13 +52,15 @@ public:
 //----------------------------------------------------------------------------------------------------------------------
 int TestEvolvableCTRNN::getNumGenes() 
 { 
-  return m_ctrnn->getNumRequiredParams(m_ctrnn->getSize(), 0); 
+  return m_topology.getNumParameters();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 void TestEvolvableCTRNN::decodeGenome(const double* g)
 {
-  m_ctrnn->decodeGenome(g, 0);
+  dmx::CTRNNFactory::DecodeLimits limits;
+  limits.tau.set(0.2, 2.0);
+  dmx::CTRNNFactory::decode(*m_ctrnn, g, limits, m_topology);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

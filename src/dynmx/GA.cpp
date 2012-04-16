@@ -12,14 +12,9 @@
 
 #include <time.h>
 #include "assert.h"
-#include "float.h"
 
 namespace dmx
 {
-
-// TODO: MAX_FLOAT
-#define MAX_NEG_FLOAT -FLT_MAX
-#define GA_DONT_REEVALUATE 1 
 
 // --------------------------------------------------------------------------------------------
 GA::GA(int popsize, int genomeLength, int demeWidth) : 
@@ -50,6 +45,7 @@ void GA::init()
   // Some defaults, though should be set externally and not subsequently reset to these defaults
   m_maxMutation = 0.01;      // amount of mutation  (scales a gaussian random variable)
   m_recombinationRate = 0.05; // probability of copying a gene from winner to loser of tournament  
+  m_avoidReevaluation = true;
   
   reset();
 }
@@ -258,18 +254,19 @@ void GA::startNextTournament()
   getRandomPairInDeme(m_currentIndA, m_currentIndB);
   m_currentGenome = GA_FIRST_GENOME;
   
-#if GA_DONT_REEVALUATE  
-  // Test of potential speed up by not reevaluating already evaluated genomes
-  if(m_fitnesses[m_currentIndA] != MAX_NEG_FLOAT)
+  if(m_avoidReevaluation)
   {
-    setFitness(m_fitnesses[m_currentIndA]);
+    // Test of potential speed up by not reevaluating already evaluated genomes
+    if(m_fitnesses[m_currentIndA] != MAX_NEG_FLOAT)
+    {
+      setFitness(m_fitnesses[m_currentIndA]);
+    }
+    // Do same for second genome in tournament
+    if(m_fitnesses[m_currentIndB] != MAX_NEG_FLOAT)
+    {
+      setFitness(m_fitnesses[m_currentIndB]);
+    }
   }
-  // Do same for second genome in tournament
-  if(m_fitnesses[m_currentIndB] != MAX_NEG_FLOAT)
-  {
-    setFitness(m_fitnesses[m_currentIndB]);
-  }
-#endif
   
 }
 
@@ -291,14 +288,14 @@ void GA::performTournament(uint16_t indA, float fitA, uint16_t indB, float fitB)
   {
     winner = indA;
     loser = indB;
-    assert(fitA >= m_fitnesses[indA]); // Make sure we're not overwriting a better one    
+    assert(!m_avoidReevaluation || fitA >= m_fitnesses[indA]); // Make sure we're not overwriting a better one    
     m_fitnesses[winner] = fitA;
   }
   else 
   {
     winner = indB;
     loser = indA;
-    assert(fitB >= m_fitnesses[indB]); // Make sure we're not overwriting a better one    
+    assert(!m_avoidReevaluation || fitB >= m_fitnesses[indB]); // Make sure we're not overwriting a better one    
     m_fitnesses[winner] = fitB;
   }
 

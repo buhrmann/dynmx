@@ -21,8 +21,8 @@ class TestViewCTRNN : public dmx::View
 public:
 
   //--------------------------------------------------------------------------------------------------------------------
-  TestViewCTRNN() : m_ctrnn(0), m_activationFunction(CTRNN::kAF_Sigmoid) {};
-  TestViewCTRNN(CTRNN* ctrnn) : m_ctrnn(ctrnn), m_activationFunction(CTRNN::kAF_Sigmoid) {};
+  TestViewCTRNN() : m_ctrnn(0), m_activationFunction(dmx::CTRNN::kAF_Sigmoid) {};
+  TestViewCTRNN(dmx::CTRNN* ctrnn) : m_ctrnn(ctrnn), m_activationFunction(dmx::CTRNN::kAF_Sigmoid) {};
   
   // functions to be implemented by subclasses
   //--------------------------------------------------------------------------------------------------------------------
@@ -41,7 +41,7 @@ public:
   //---------------------------------------------------------------------------------------------------------------------
   virtual void draw2d()
   {
-    m_ctrnn->setActivationFunction(m_activationFunction);
+    m_ctrnn->setGlobalActivationFunction(static_cast<dmx::CTRNN::ActFuncName>(m_activationFunction));
   };
   
   //---------------------------------------------------------------------------------------------------------------------
@@ -66,11 +66,11 @@ public:
   { 
     m_gui->addPanel();
     m_gui->addLabel("Muscle Controls");
-    m_gui->addParam("ActivationFunction", &m_activationFunction, 0.0, CTRNN::kAF_NumFunctions, CTRNN::kAF_Sigmoid);
+    m_gui->addParam("ActivationFunction", &m_activationFunction, 0.0, dmx::CTRNN::kAF_NumFunctions, dmx::CTRNN::kAF_Sigmoid);
   };
   
   
-  CTRNN* m_ctrnn; 
+  dmx::CTRNN* m_ctrnn; 
   dmx::CTRNNViz* m_ctrnnView;
   int m_activationFunction;
 };

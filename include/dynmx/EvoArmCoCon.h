@@ -94,6 +94,12 @@ protected:
   // Holds data constraining the decoding of a genome into this model
   struct DecodeLimits 
   {
+    struct ArmLimits
+    {
+      Range jointRadius;
+      Range jointFriction;
+    } arm;
+    
     struct MuscleLimits
     { 
       Range attach, force, optLength, maxVel;
@@ -124,6 +130,7 @@ protected:
   
   // Fitness related
   bool m_resetEachMove;
+  bool m_fitnessEndPointOnly;
   bool m_fitnessEvalVel;
   bool m_fitnessEvalCoact;
   double m_trialFitness;
@@ -135,6 +142,7 @@ protected:
   int m_currentPhase;
   
   // Flags and params
+  bool m_evolveMuscles;
   bool m_symmetricMuscles;
   bool m_evolveSpindles;
   bool m_evolveIAIN;

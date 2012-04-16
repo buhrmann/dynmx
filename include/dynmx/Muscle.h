@@ -24,6 +24,9 @@ class ArmMuscled;
 struct MusclePathPoint;
 class Recorder;
   
+#define MUSCLE_DEFAULT_TIMECONST_ACT 0.04
+#define MUSCLE_DEFAULT_TIMECONST_DEACT 0.07
+  
 //----------------------------------------------------------------------------------------------------------------------
 // Hill-type non-linear muscle model
 //----------------------------------------------------------------------------------------------------------------------
@@ -50,6 +53,7 @@ public:
   void setParameters(double maxIsoForce, double optimalLength, double maxVelocity);
   void setHillParameters(double hSh, double hLn, double hMax, double hSlope);
   void setOriginInsertion(double origin, double insertion) { m_originJointDist = origin; m_insertJointDist = insertion; };
+  void setTimeConstants(double act, double deact) { m_tauAct = act; m_tauDeact = deact; };
   
   // Getters
   double getLength() const { return m_length; };

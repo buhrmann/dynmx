@@ -12,11 +12,11 @@
 
 #include "SMCAgent.h"
 #include "GARunner.h"
+#include "Topology.h"
 
 namespace dmx
 {
   
-#define SMC_TRIAL_DURATION 10.0f
 #define SMC_CIRC_AND_TRI 1
   
 //----------------------------------------------------------------------------------------------------------------------
@@ -28,23 +28,35 @@ class SMCAgentEvo : public Evolvable
 public:
   SMCAgentEvo();
   ~SMCAgentEvo();
+
+  // Inherited from Model  
+  virtual void update(float dt);
+  virtual void init();
+  virtual void reset();  
   
+  // Inherited from Evolvable
   virtual int getNumGenes();
   virtual void decodeGenome(const double* genome);
   virtual float getFitness();
+  virtual void nextTrial(int trial = 0) {};
+  virtual inline bool hasFinished() { return m_agent->getTime() >= m_trialDuration; };
   
-  virtual void update(float dt);
-  virtual void init();
-  virtual void reset();
+  virtual void toXml(ci::XmlTree& xml);
+  virtual void record(Recorder& recorder);
   
-  virtual bool hasFinished() { return m_agent->getTime() >= SMC_TRIAL_DURATION; };
-  
+  // Custom
   SMCAgent* getAgent() { return m_agent; };
+  const Topology& getTopology() const { return m_topology; };
   
 protected:
   
+  virtual void updateFitness() {};
+  
   SMCAgent* m_agent;
+  Topology m_topology;
   float m_fitness;
+  float m_trialDuration;
+  float m_fitnessEvalDelay;
 };
   
 } // namespace

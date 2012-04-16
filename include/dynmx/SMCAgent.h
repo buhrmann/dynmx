@@ -15,6 +15,8 @@
 #include "DistanceSensor.h"
 #include "SMCEnvironment.h"
 #include "CTRNN.h"
+#include "Recorder.h"
+
 #include "cinder/Vector.h"
 
 namespace dmx
@@ -37,20 +39,29 @@ public:
   virtual void update(float dt);
   
   // Setters
-  void setMaxSensorDistance(double d) { m_distanceSensor.setMaxDistance(d); };
-  void setMaxSpeed(double s) { m_maxSpeed = s; };
-  void setMaxAngularSpeed(double s) { m_maxAngularSpeed = s; };
+  void setMaxSensorDistance(float d) { m_distanceSensor.setMaxDistance(d); };
+  void setMaxSpeed(float s) { m_maxSpeed = s; };
+  void setMaxAngularSpeed(float s) { m_maxAngularSpeed = s; };
+  void setMaxAngle(float a) { m_maxAngle = a; };
+  void setMaxPosition(float p) { m_maxPosition = p; };
+  void setPositionWraps(bool w) { m_positionWraps = w; };
+  void setAngleWraps(bool w) { m_angleWraps = w; };
   
   // Getters
-  SMCEnvironment* getEnvironment() { return &m_environment; };
-  CTRNN* getCTRNN() { return m_ctrnn; };  
+  SMCEnvironment& getEnvironment() { return m_environment; };
+  CTRNN& getCTRNN() { return *m_ctrnn; };  
   const DistanceSensor& getDistanceSensor() const { return m_distanceSensor; };
+  DistanceSensor& getDistanceSensor() { return m_distanceSensor; };
   const ci::Vec2f& getPosition() { return m_position; };
   float getAngle() { return m_angle; };
   float getRadius() { return m_radius; };
   float getSensedValue() { return m_sensedValue; };
   float getTime() { return m_time; };  
   float getAngleWithHeading(ci::Vec2f pos);
+  float getMaxPosition() { return m_maxPosition; };
+  
+  virtual void toXml(ci::XmlTree& xml);
+  virtual void record(Recorder& recorder);  
   
 protected:
   
@@ -71,6 +82,11 @@ protected:
   float m_maxSpeed;
   float m_maxAngularSpeed;
   float m_radius;
+  float m_maxAngle;
+  float m_maxPosition;
+
+  bool m_positionWraps;
+  bool m_angleWraps;
   
   float m_time;
   

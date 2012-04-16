@@ -55,8 +55,8 @@ void Muscle::init()
   // Set default hill parameters
   setHillParameters(s_hillShDefault, s_hillLnDefault, s_hillMaxDefault, s_hillSlopeDefault);
   
-  m_tauAct = 0.04;
-  m_tauDeact = 0.07;
+  m_tauAct = MUSCLE_DEFAULT_TIMECONST_ACT;
+  m_tauDeact = MUSCLE_DEFAULT_TIMECONST_DEACT;
   
   // Get min and max lengths
   calculateMinMaxLength(m_lengthMin, m_lengthMax);
@@ -99,12 +99,15 @@ void Muscle::update(float dt)
   
 #if DEBUGGING  
   // Todo: Temporary check that the min/max muscle length calculations are correct
-  double delta = 0.001;
+  double delta = 0.00001;
   bool lengthOK = (m_length - m_lengthMin) >= -delta && (m_length - m_lengthMax) < delta ;
   if(!lengthOK)
   {
-    std::cout << getName() << std::endl;
-    std::cout << "Length: " << m_length << " " << m_lengthMin << " " << m_lengthMax << std::endl;
+    std::cout << getName() << "\t";
+    std::cout << "Length Error: " << m_length << " " << m_lengthMin << " " << m_lengthMax << " " << m_lengthOpt;
+    std::cout << ". Angles:" << m_arm->getJointAngle(JT_elbow) << " " << m_arm->getJointAngle(JT_shoulder);
+    std::cout << ". Wraps: " << ((MuscleMonoWrap*)this)->getWraps() << std::endl;
+    m_length = clamp(m_length, m_lengthMin, m_lengthMax);
   }
   assert(lengthOK);
 #endif
@@ -205,16 +208,17 @@ void Muscle::toXml(ci::XmlTree& muscle)
   muscle.setAttribute("IsFlexor", isFlexor());
   muscle.setAttribute("IsMono", isMonoArticulate());
     
-  ci::XmlTree origin("Origin",""); origin.setAttribute("Value", getOrigin()); 
-  muscle.push_back(origin);
+  ci::XmlTree attach("Attachment",""); 
+  attach.setAttribute("Origin", getOrigin()); 
+  attach.setAttribute("Insertion", getInsertion());   
+  muscle.push_back(attach);
   
-  ci::XmlTree insertion("Insertion",""); insertion.setAttribute("Value", getInsertion()); 
-  muscle.push_back(insertion);
-  
-  ci::XmlTree maxForce("MaxIsoForce",""); maxForce.setAttribute("Value", getForceMax()); 
+  double Fmax = getForceMax();
+  ci::XmlTree maxForce("MaxIsoForce", toString(Fmax));
   muscle.push_back(maxForce);
   
-  ci::XmlTree maxVel("MaxVelocity",""); maxVel.setAttribute("Value", getVelocityMax()); 
+  double Vmax = getVelocityMax();
+  ci::XmlTree maxVel("MaxVelocity", toString(Vmax));
   muscle.push_back(maxVel);  
   
   ci::XmlTree length("Length",""); 
@@ -229,8 +233,6 @@ void Muscle::toXml(ci::XmlTree& muscle)
   hillParams.setAttribute("Asymptote", m_hillMax); 
   hillParams.setAttribute("Slope", m_hillSlope); 
   muscle.push_back(hillParams);
-    
-  //xml.push_back(muscle);
 }
   
 //----------------------------------------------------------------------------------------------------------------------    

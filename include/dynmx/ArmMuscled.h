@@ -37,7 +37,11 @@ public:
   void resetTo(double elbAngle, double shdAngle);  
   
   // Setters
-  void setJointRadii(float elbRad, float shdRad) { m_jointRadius[JT_elbow] = elbRad; m_jointRadius[JT_shoulder] = shdRad; };
+  inline void setJointRadii(float elbRad, float shdRad) 
+  { 
+    m_jointRadius[JT_elbow] = elbRad; 
+    m_jointRadius[JT_shoulder] = shdRad; 
+  };
   void setMuscleParams(int mId, double origin, double insertion, double maxIsoForce, double optimalLength, double maxVelocity);
   void setDesiredJointAngle(Joint j, double angle);
   
@@ -50,7 +54,11 @@ public:
   // Store output in human readable format
   virtual void toXml(ci::XmlTree& xml);
   
+  // Record all current state
   virtual void record(Recorder& recorder);    
+  
+  // Output steady state behaviour
+  void recordIsometric(Recorder& recorder, const std::vector<float>& musclAct, float jointIncDeg = 1.0);
 
 protected:
 

@@ -120,7 +120,7 @@ protected:
   
   bool m_jointLocked[2];
   
-  // states
+  // States
   State m_state;  
   
   Pos
@@ -130,7 +130,7 @@ protected:
   
   std::deque<Pos> m_trajectory;
   
-  // parameters
+  // Parameters
   double
     m_gravity,
     m_lengths[2],
@@ -139,7 +139,7 @@ protected:
     m_frictions[2],
     m_limits[2][2];
   
-  // internal pre-computed values
+  // Internal pre-computed values
   double
     m_lengthsSq[2],
     m_massElbLSq4,

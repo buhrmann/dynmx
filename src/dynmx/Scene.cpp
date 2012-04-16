@@ -437,7 +437,7 @@ void Grid::init()
 //----------------------------------------------------------------------------------------------------------------------
 // vertex array/buffer
 //----------------------------------------------------------------------------------------------------------------------
-RealMatrixViz::RealMatrixViz(double **d, int N, int M, float width, double maxVal) : 
+RealMatrixViz::RealMatrixViz(const double* const* d, int N, int M, float width, double maxVal) : 
   m_data(d), m_N(N), m_M(M), m_maxVal(maxVal), m_iSel(-1), m_jSel(-1)
 {
   init();

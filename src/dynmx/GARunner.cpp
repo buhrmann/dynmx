@@ -70,6 +70,8 @@ void GARunner::init()
     m_numGenerations = ga.getChild("NumGenerations").getAttributeValue<int>("Value");
     m_numTrials = ga.getChild("NumTrials").getAttributeValue<int>("Value");
     
+    m_ga->setAvoidReevaluation(ga.getChild("AvoidReevaluation").getAttributeValue<bool>("Value", true));
+    
     // Parameters for automatic reduction of mutation rate
     if(ga.hasChild("MutationMaxReduceAt"))
     {
@@ -156,6 +158,10 @@ void GARunner::update(float dt)
     
     m_accFitness += fitness;
     m_trial++;
+    m_time = 0.0;
+    
+    m_evolvable->reset();        
+    m_evolvable->nextTrial(m_trial);
     
     // Finished all trials? Move on to evaluate next genome.
     //-------------------------------------------------------
@@ -174,8 +180,9 @@ void GARunner::update(float dt)
       // ... and get a new genome to evaluate
       m_evolvable->decodeGenome(m_ga->getCurrentGenome());
       
+      // Reset simulation for new trial
       m_trial = 0;
-      m_accFitness = 0.0;
+      m_accFitness = 0.0;  
       
       // End of one "generation"
       //-------------------------------------------------------
@@ -235,10 +242,6 @@ void GARunner::update(float dt)
       }
     }
     
-    // Reset simulation for new trial
-    //-------------------------------------------------------
-    m_time = 0.0;
-    m_evolvable->reset();
   }
 }
 

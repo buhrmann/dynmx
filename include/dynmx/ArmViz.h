@@ -35,24 +35,15 @@ public:
   Vec3f toLocalSpace(Vec3f p);
   Vec3f toWorldSpace(Vec3f p);
   
+  void setDrawOverlays(bool b) { m_drawOverlays = b; };
+  
 protected:
   virtual void init();
   
   // pointer to model to retrieve updated coordinates from
   Arm* m_arm;
   
-  // the rendered geometry
-  Cylinder m_elbow;
-  Cylinder m_shoulder;
-#if 0  
-  Box m_lowerArm;
-  Box m_upperArm;
-#else
-  Cylinder m_lowerArm;
-  Cylinder m_upperArm;
-#endif
-  
-  
+  bool m_drawOverlays;
 };
 
 } // namespace dmx

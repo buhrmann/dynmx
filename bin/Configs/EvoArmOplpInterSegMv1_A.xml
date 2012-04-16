@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Config>
+	<Globals>
+		<Visual Value="1"/>      
+        <WindowSize Width="1200" Height="1000"/>    
+		<FrameRate Value="1000"/>      
+        <FullScreen Value="0"/>    
+        <VSync Value="0"/>    
+		<Model Value ="GA"/>		
+		<DebugLevel Value="1"/>
+        <PlotDuration Value="0.5"/>
+        <OutputFolder Name="/Users/thomasbuhrmann/Experiments/Arm/Output"/>
+	</Globals>
+	<GA>
+		<Evolvable Name="EvoArmCoCon">
+          <DesiredTrajectory InDegrees="1" ResetEachMove="1">
+            <Move Duration="0.3" LeadIn="0.3" LeadOut="0.4">
+              <From x="90" y="60"/>
+              <To x="60" y="40"/>
+            </Move>                            
+          </DesiredTrajectory>
+          <EvoFlags>
+            <Muscles symmetric="0" hillParams="1">0</muscles>
+            <Spindles velRef="0" uniform="0">1</spindles>
+            <iain>0</iain>
+            <renshaw>0</renshaw>
+            <ibin>0</ibin>
+            <ifv>0</ifv>
+            <sfv>0</sfv>
+            <openLoop max="1.0">1</openLoop>
+            <interSegmentInput max="0.1">0</interSegmentInput>
+            <DecodeLimits>
+              <ArmLimits>
+                <jointRadius min="0.01" max="0.05" />
+                <jointFriction min="0.01" max="0.2"/>
+              </ArmLimits>
+              <MuscleLimits>
+                <attach min="0.06" max="0.26" />
+                <force min="100" max="2000" />
+                <optLength min="0.01" max="1.25"/>
+                <maxVel min="8.0" max="12.0" />
+              </MuscleLimits>
+              <SpindleLimits>
+                <pos max="6.0" />
+                <vel max="0.5" />
+                <dmp max="1.0" />
+                <exp min="0.25" max="4.0" />
+                <weight min="0.1" max="1.0" />
+              </SpindleLimits>
+            </DecodeLimits>
+          </EvoFlags>
+          <enableCoconInc min="0.1" max="0.4">0</enableCoconInc>
+          <commandTrajSmooth>1</commandTrajSmooth>
+          <useMuscleCoords>0</useMuscleCoords>
+          <FitnessFunction>
+            <EndPointOnly>0</EndPointOnly>
+            <Velocity>1</Velocity>
+            <Coactivation>0</Coactivation>
+          </FitnessFunction>            
+        <recordIsometric>0</recordIsometric>
+		</Evolvable>	
+		<Incremental Value="1"/>
+		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/Output/12_04_09__19_06_57/GA_Result.xml" />
+		<PopulationSize Value="100"/>
+		<DemeSize Value="5"/>
+		<NumGenerations Value="3000"/>
+		<MutationMax Value="0.001"/>
+        <MutationMaxReduced Value="0.0001"/>
+        <MutationMaxReduceAt Value="2800"/>
+		<RecombinationRate Value="0.5"/>
+        <RecombinationRateReduced Value="0.5"/>
+        <AvoidReevaluation Value="1"/>
+		<NumTrials Value="1"/>
+        <SaveBestEachGeneration Value="1"/>
+        <AutoEval Run="1"/>
+        <Eval Run="1">
+            <NumTrials Value="1"/>
+            <RecordState Value="1"/>
+            <LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/Output/12_04_10__11_33_03/GA_BestGenome.xml"/>
+        </Eval>        
+	</GA>    
+    <Arm Gravity="0.0" Integrator="euler">
+  			<UpperArm Length="0.33000000000000002" Mass="2.52" Inertia="0.022869"/>
+			<LowerArm Length="0.32000000000000001" Mass="1.3" Inertia="0.011093333333333334"/>
+			<Shoulder Friction="0.14053771913051608" UpperLimit="159.99996992675921" LowerLimit="0" Locked="0" Radius="0.0500000007"/>
+			<Elbow Friction="0.17262468993663788" UpperLimit="159.99996992675921" LowerLimit="0" Locked="0" Radius="0.0494333431"/>
+			<Muscle Joint="Elbow" Name="ElbowFlexor" IsFlexor="1" IsMono="1">
+				<Attachment Origin="0.14009138703346252" Insertion="0.072136930972337726"/>
+				<MaxIsoForce>584.94</MaxIsoForce>
+				<MaxVelocity>8.15018</MaxVelocity>
+				<Length Optimal="0.27189077634792658" Min="0.076398395243288217" Max="0.23876456621667336"/>
+				<HillParameters Shortening="0.14999999999999999" Lengthening="0.14999999999999999" Asymptote="1.5" Slope="2"/>
+			</Muscle>
+			<Muscle Joint="Elbow" Name="ElbowExtensor" IsFlexor="0" IsMono="1">
+				<Attachment Origin="0.14598176240921021" Insertion="0.13177379727363586"/>
+				<MaxIsoForce>534.232</MaxIsoForce>
+				<MaxVelocity>11.1642</MaxVelocity>
+				<Length Optimal="0.45305813376687631" Min="0.29559397367338042" Max="0.43363789091932475"/>
+				<HillParameters Shortening="0.14999999999999999" Lengthening="0.14999999999999999" Asymptote="1.5" Slope="2"/>
+			</Muscle>
+			<Muscle Joint="Shoulder" Name="ShoulderFlexor" IsFlexor="1" IsMono="1">
+				<Attachment Origin="0.069108997136354447" Insertion="0.12884210109710692"/>
+				<MaxIsoForce>1342.21</MaxIsoForce>
+				<MaxVelocity>11.5789</MaxVelocity>
+				<Length Optimal="0.24458876941628091" Min="0.068132354132130257" Max="0.22682214242890611"/>
+				<HillParameters Shortening="0.14999999999999999" Lengthening="0.14999999999999999" Asymptote="1.5" Slope="2"/>
+			</Muscle>
+			<Muscle Joint="Shoulder" Name="ShoulderExtensor" IsFlexor="0" IsMono="1">
+				<Attachment Origin="0.09890266716480256" Insertion="0.07397304981946945"/>
+				<MaxIsoForce>1897.26</MaxIsoForce>
+				<MaxVelocity>8.82549</MaxVelocity>
+				<Length Optimal="0.35322156246623726" Min="0.20346083114272137" Max="0.34308715480536256"/>
+				<HillParameters Shortening="0.14999999999999999" Lengthening="0.14999999999999999" Asymptote="1.5" Slope="2"/>
+			</Muscle>
+    </Arm>
+</Config>

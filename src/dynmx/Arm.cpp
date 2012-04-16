@@ -66,7 +66,7 @@ void Arm::init()
     double lowerArmLength = xml.getChild("LowerArm").getAttributeValue<double>("Length");
     double upperArmMass = xml.getChild("UpperArm").getAttributeValue<double>("Mass");
     double lowerArmMass = xml.getChild("LowerArm").getAttributeValue<double>("Mass");
-    setParameters(lowerArmMass, upperArmMass, lowerArmLength, upperArmLength);
+    setParameters(lowerArmMass, upperArmMass, lowerArmLength, upperArmLength); // Will calculate inertia
     
     double shoulderFriction = xml.getChild("Shoulder").getAttributeValue<double>("Friction");    
     double elbowFriction = xml.getChild("Elbow").getAttributeValue<double>("Friction");
@@ -395,6 +395,7 @@ void Arm::toXml(ci::XmlTree& xml)
 {
   ci::XmlTree arm ("Arm", "");
   arm.setAttribute("Gravity", m_gravity);
+  arm.setAttribute("Integrator", m_integrator == kInteg_heun ? "heun" : "euler");
   
   // Skeleton
   ci::XmlTree upperArm("UpperArm", "");

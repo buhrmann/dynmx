@@ -50,30 +50,52 @@ void SMCAgent::reset()
 //----------------------------------------------------------------------------------------------------------------------
 void SMCAgent::update(float dt)
 {
-  // Sense
+  static const int motTrans2 = m_ctrnn->getSize() - 1; // last one
+  static const int motTrans1 = motTrans2 - 3;  
+  static const int motRot1 = motTrans2 - 2;  
+  static const int motRot2 = motTrans2 - 1;
+
+  
+  // Sense environment
   updateSensor(dt);
-  m_sensedValue = 1.0f - m_distanceSensor.getDistanceProportional();
+  m_sensedValue = m_distanceSensor.getActivation();  
+
+  const bool angleDependentSensor = false;
+  if(angleDependentSensor)
+  {
+    m_sensedValue = sign(m_angle) * m_distanceSensor.getActivation();
+  }
   
-  // Think
-  m_ctrnn->setExternalInput(0, m_sensedValue);
-  m_ctrnn->update(dt);
+  // Update neural network
+  if(m_angle < 0)
+  {
+    m_ctrnn->setExternalInput(0, m_sensedValue);    
+    m_ctrnn->setExternalInput(1, 0.0);    
+  }
+  else 
+  {
+    m_ctrnn->setExternalInput(0, 0.0);    
+    m_ctrnn->setExternalInput(1, m_sensedValue);
+  }
+
+  m_ctrnn->updateDynamic(dt);
   
-  // Act
-  m_angularVelocity = m_maxAngularSpeed * (m_ctrnn->getOutput(1) - m_ctrnn->getOutput(2));
+  // Update agent movement
+  m_angularVelocity = m_maxAngularSpeed * (m_ctrnn->getOutput(motRot1) - m_ctrnn->getOutput(motRot2));
+  m_angularVelocity += UniformRandom(-m_maxAngularSpeed / 100.0, m_maxAngularSpeed / 100.0);
   m_angle += m_angularVelocity * dt; 
+  if(m_angleWraps)
+    m_angle = wrap(m_angle, -m_maxAngle, m_maxAngle);
+  else 
+    m_angle = clamp(m_angle, -m_maxAngle, m_maxAngle);
 
-  // Map angle into [-pi, pi]
-  if (m_angle > PI)
-  {
-    m_angle = -(TWO_PI - m_angle);
-  }
-  else if (m_angle < -PI)
-  {
-    m_angle = TWO_PI + m_angle;
-  }
-
-  m_velocity = m_maxSpeed * (m_ctrnn->getOutput(1) - m_ctrnn->getOutput(2)) * ci::Vec2f(0, 1);
+  // Update positions 
+  m_velocity = m_maxSpeed * (m_ctrnn->getOutput(motTrans1) - m_ctrnn->getOutput(motTrans2)) * ci::Vec2f(0, 1);
   m_position += m_velocity * dt;
+  if(m_positionWraps)
+    m_position.y = wrap(m_position.y, -m_maxPosition, m_maxPosition);
+  else 
+    m_position.y = clamp(m_position.y, -m_maxPosition, m_maxPosition);
   
   m_time += dt;
 }
@@ -92,5 +114,36 @@ float SMCAgent::getAngleWithHeading(ci::Vec2f pos)
   ci::Vec2f agentRelPos  = pos - getPosition();
   return atan2(agentRelPos.y, agentRelPos.x);
 }
+  
+//----------------------------------------------------------------------------------------------------------------------  
+void SMCAgent::toXml(ci::XmlTree& xml)
+{
+  m_distanceSensor.toXml(xml);
+  
+  xml.push_back(ci::XmlTree("MaxSpeed", toString(m_maxSpeed)));
+  xml.push_back(ci::XmlTree("MaxAngularSpeed", toString(radiansToDegrees(m_maxAngularSpeed))));
+  xml.push_back(ci::XmlTree("MaxPosition", toString(m_maxPosition)));
+  xml.push_back(ci::XmlTree("PositionWraps", toString(m_positionWraps)));
+  xml.push_back(ci::XmlTree("MaxAngle", toString(radiansToDegrees(m_maxAngle))));
+  xml.push_back(ci::XmlTree("AngleWraps", toString(m_angleWraps)));
+    
+  // ctrnn
+  m_ctrnn->toXml(xml);
+}
+
+//----------------------------------------------------------------------------------------------------------------------  
+void SMCAgent::record(Recorder& recorder)
+{
+  /*
+  ci::Vec2f m_position;
+  ci::Vec2f m_velocity;
+  float m_angle;  
+  float m_angularVelocity;  
+  float m_sensedValue;
+   */
+  
+  // sensor 
+  // ctrnn
+}  
                                 
 } // namespace

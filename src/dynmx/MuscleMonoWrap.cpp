@@ -79,16 +79,20 @@ void MuscleMonoWrap::calculateMinMaxLength(double& minLength, double& maxLength)
 void MuscleMonoWrap::updateLengthAndMomentArm()
 {
   // An extensors length and moment arm are exactly those of an equivalent flexor when the joint angle is mirrored.
-  int sign = m_isFlexor ? 1 : -1;
+  double sign = m_isFlexor ? 1.0 : -1.0;
   double jointAngle = sign * m_arm->getJointAngle(m_joint);
+  if(jointAngle == 0)
+  {
+    jointAngle = jointAngle;
+  }
   m_muscleWraps = jointAngle < m_wrapAngleThreshold;
   
   if(!m_muscleWraps)
   {
     // Verify muscle length and moment arm
     double cosTheta = cos(jointAngle);
-    m_length = sqrt(sqr(m_originJointDist) + sqr(m_insertJointDist) + (2 * m_originJointDist * m_insertJointDist * cosTheta));
-    double k = acos((m_originJointDist + m_insertJointDist*cosTheta) / m_length);
+    m_length = sqrt(sqr(m_originJointDist) + sqr(m_insertJointDist) + (2.0 * m_originJointDist * m_insertJointDist * cosTheta));
+    double k = std::acos((m_originJointDist + m_insertJointDist*cosTheta) / m_length);
     m_momentArm = m_originJointDist * sin(k);
   }    
   else
@@ -156,14 +160,10 @@ Pos MuscleMonoWrap::getInsertionWorld()
 void MuscleMonoWrap::toXml(ci::XmlTree& xml)
 {
   ci::XmlTree muscle("Muscle", "");
-
-  // First let Muscle write generic parameters
-  Muscle::toXml(muscle);
+  muscle.setAttribute("Joint", getJoint() == JT_elbow ? "Elbow" : "Shoulder"); 
   
-  // Then add our own
-  ci::XmlTree joint("Joint",""); 
-  joint.setAttribute("Value", getJoint() == JT_elbow ? "Elbow" : "Shoulder"); 
-  muscle.push_back(joint);
+  // Let Muscle write generic parameters
+  Muscle::toXml(muscle);
   
   xml.push_back(muscle);
 }

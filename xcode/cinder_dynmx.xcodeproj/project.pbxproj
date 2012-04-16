@@ -37,6 +37,7 @@
 		D64F20C412ECE4050014F069 /* Random.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D64F20C312ECE4050014F069 /* Random.cpp */; };
 		D64F237712EE14550014F069 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D64F237612EE14550014F069 /* GLUT.framework */; };
 		D64F246D12EE2AF10014F069 /* Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D64F246C12EE2AF10014F069 /* Light.cpp */; };
+		D650865F150A7CC500E8D94F /* SMCEnvironment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D650865E150A7CC500E8D94F /* SMCEnvironment.cpp */; };
 		D67358DA149E6D2F008C7541 /* SMCAgent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D67358D9149E6D2F008C7541 /* SMCAgent.cpp */; };
 		D67358F6149E73F7008C7541 /* SMCAgentViz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D67358F5149E73F7008C7541 /* SMCAgentViz.cpp */; };
 		D673591E149E791C008C7541 /* SMCEnvironmentViz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D673591D149E791C008C7541 /* SMCEnvironmentViz.cpp */; };
@@ -47,6 +48,8 @@
 		D68CFC961428DAEF003CA32E /* Reflex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D68CFC951428DAEF003CA32E /* Reflex.cpp */; };
 		D696B7B214A3685F00580D3C /* SMCAgentEvo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D696B7B114A3685F00580D3C /* SMCAgentEvo.cpp */; };
 		D69FBB4B13B222C300D5F6F0 /* Simulation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D69FBB4A13B222C300D5F6F0 /* Simulation.cpp */; };
+		D6B4E820151886D700C42D0D /* CTRNNFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6B4E81F151886D700C42D0D /* CTRNNFactory.cpp */; };
+		D6B4EADB151B27C900C42D0D /* Topology.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6B4EADA151B27C900C42D0D /* Topology.cpp */; };
 		D6B7EAF413B791800019114A /* Registry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6B7EAF313B791800019114A /* Registry.cpp */; };
 		D6BA379B13BA249900CFED09 /* Muscle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6BA379A13BA249900CFED09 /* Muscle.cpp */; };
 		D6BA37D113BA2B9200CFED09 /* PD.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6BA37D013BA2B9200CFED09 /* PD.cpp */; };
@@ -122,6 +125,7 @@
 		D64F237612EE14550014F069 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GLUT.framework; sourceTree = "<group>"; };
 		D64F246712EE295E0014F069 /* Light.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Light.h; path = ../include/dynmx/Light.h; sourceTree = SOURCE_ROOT; };
 		D64F246C12EE2AF10014F069 /* Light.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Light.cpp; sourceTree = "<group>"; };
+		D650865E150A7CC500E8D94F /* SMCEnvironment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SMCEnvironment.cpp; sourceTree = "<group>"; };
 		D67358D7149E6C8B008C7541 /* SMCAgent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCAgent.h; path = ../include/dynmx/SMCAgent.h; sourceTree = SOURCE_ROOT; };
 		D67358D9149E6D2F008C7541 /* SMCAgent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SMCAgent.cpp; sourceTree = "<group>"; };
 		D67358F4149E73E4008C7541 /* SMCAgentViz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCAgentViz.h; path = ../include/dynmx/SMCAgentViz.h; sourceTree = SOURCE_ROOT; };
@@ -146,6 +150,10 @@
 		D696B7B114A3685F00580D3C /* SMCAgentEvo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SMCAgentEvo.cpp; sourceTree = "<group>"; };
 		D69FBB4A13B222C300D5F6F0 /* Simulation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Simulation.cpp; sourceTree = "<group>"; };
 		D69FBB4C13B222DA00D5F6F0 /* Simulation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Simulation.h; path = ../include/dynmx/Simulation.h; sourceTree = SOURCE_ROOT; };
+		D6B4E81F151886D700C42D0D /* CTRNNFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CTRNNFactory.cpp; sourceTree = "<group>"; };
+		D6B4EAD3151B26E700C42D0D /* CTRNNFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CTRNNFactory.h; path = ../include/dynmx/CTRNNFactory.h; sourceTree = SOURCE_ROOT; };
+		D6B4EADA151B27C900C42D0D /* Topology.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Topology.cpp; sourceTree = "<group>"; };
+		D6B4EADC151B27DD00C42D0D /* Topology.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Topology.h; path = ../include/dynmx/Topology.h; sourceTree = SOURCE_ROOT; };
 		D6B7EAF313B791800019114A /* Registry.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Registry.cpp; sourceTree = "<group>"; };
 		D6B7EAF513B791B00019114A /* Registry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Registry.h; path = ../include/dynmx/Registry.h; sourceTree = SOURCE_ROOT; };
 		D6BA379A13BA249900CFED09 /* Muscle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Muscle.cpp; sourceTree = "<group>"; };
@@ -170,6 +178,7 @@
 		D6CAA9D912FD9D72003BE477 /* TestView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestView.h; path = ../include/dynmx/Tests/TestView.h; sourceTree = SOURCE_ROOT; };
 		D6CAA9DA12FD9D72003BE477 /* TestViewCTRNN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestViewCTRNN.h; path = ../include/dynmx/Tests/TestViewCTRNN.h; sourceTree = SOURCE_ROOT; };
 		D6CAA9FE12FDA1CF003BE477 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../src/main.cpp; sourceTree = SOURCE_ROOT; };
+		D6D2122F150E3CEC0054A059 /* SMCAgentLineDis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCAgentLineDis.h; path = ../include/dynmx/SMCAgentLineDis.h; sourceTree = SOURCE_ROOT; };
 		D6D7FB9B14DED8BB005FC21D /* Spin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Spin.h; path = ../include/dynmx/Spin.h; sourceTree = SOURCE_ROOT; };
 		D6D7FB9C14DED8C9005FC21D /* Spin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Spin.cpp; sourceTree = "<group>"; };
 		D6D8EC8D13AA647200160C37 /* Dynmx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Dynmx.h; path = ../../include/dynmx/Dynmx.h; sourceTree = "<group>"; };
@@ -273,6 +282,8 @@
 		D64F209E12ECE1720014F069 /* dynmx */ = {
 			isa = PBXGroup;
 			children = (
+				D6B4EAD9151B27AB00C42D0D /* CTRNN */,
+				D6B4EAD8151B279A00C42D0D /* GA */,
 				D6D7FB9A14DED840005FC21D /* Spin */,
 				D67710B8149B77850031DC48 /* SMC */,
 				D6BA37DF13BA2DAE00CFED09 /* Arm */,
@@ -300,18 +311,6 @@
 				D64F209312ECE1640014F069 /* Render.h */,
 				D64F20E112ECE4340014F069 /* Random.h */,
 				D64F20C312ECE4050014F069 /* Random.cpp */,
-				D64F209912ECE1640014F069 /* GA.h */,
-				D64F20A412ECE1720014F069 /* GA.cpp */,
-				D64F209A12ECE1640014F069 /* GARunner.h */,
-				D64F20A512ECE1720014F069 /* GARunner.cpp */,
-				D6E94EB31423650800E8D8BD /* GATester.h */,
-				D6E94EB41423652300E8D8BD /* GATester.cpp */,
-				D64236DC131D7D5A0047734B /* GAViz.h */,
-				D64236E5131D7E5C0047734B /* GAViz.cpp */,
-				D64F209712ECE1640014F069 /* CTRNN.h */,
-				D64F20A212ECE1720014F069 /* CTRNN.cpp */,
-				D64F209812ECE1640014F069 /* CTRNNViz.h */,
-				D64F20A312ECE1720014F069 /* CTRNNViz.cpp */,
 			);
 			name = dynmx;
 			path = ../src/dynmx;
@@ -352,9 +351,11 @@
 				D67358D9149E6D2F008C7541 /* SMCAgent.cpp */,
 				D696B7AF14A3684C00580D3C /* SMCAgentEvo.h */,
 				D696B7B114A3685F00580D3C /* SMCAgentEvo.cpp */,
+				D6D2122F150E3CEC0054A059 /* SMCAgentLineDis.h */,
 				D67358F4149E73E4008C7541 /* SMCAgentViz.h */,
 				D67358F5149E73F7008C7541 /* SMCAgentViz.cpp */,
 				D6735901149E751A008C7541 /* SMCEnvironment.h */,
+				D650865E150A7CC500E8D94F /* SMCEnvironment.cpp */,
 				D673591C149E790B008C7541 /* SMCEnvironmentViz.h */,
 				D673591D149E791C008C7541 /* SMCEnvironmentViz.cpp */,
 				D6735935149E7C40008C7541 /* SMCView.h */,
@@ -414,6 +415,36 @@
 				D6CAA9FE12FDA1CF003BE477 /* main.cpp */,
 			);
 			name = src;
+			sourceTree = "<group>";
+		};
+		D6B4EAD8151B279A00C42D0D /* GA */ = {
+			isa = PBXGroup;
+			children = (
+				D64F209912ECE1640014F069 /* GA.h */,
+				D64F20A412ECE1720014F069 /* GA.cpp */,
+				D64F209A12ECE1640014F069 /* GARunner.h */,
+				D64F20A512ECE1720014F069 /* GARunner.cpp */,
+				D6E94EB31423650800E8D8BD /* GATester.h */,
+				D6E94EB41423652300E8D8BD /* GATester.cpp */,
+				D64236DC131D7D5A0047734B /* GAViz.h */,
+				D64236E5131D7E5C0047734B /* GAViz.cpp */,
+			);
+			name = GA;
+			sourceTree = "<group>";
+		};
+		D6B4EAD9151B27AB00C42D0D /* CTRNN */ = {
+			isa = PBXGroup;
+			children = (
+				D64F209712ECE1640014F069 /* CTRNN.h */,
+				D64F20A212ECE1720014F069 /* CTRNN.cpp */,
+				D6B4EAD3151B26E700C42D0D /* CTRNNFactory.h */,
+				D6B4E81F151886D700C42D0D /* CTRNNFactory.cpp */,
+				D64F209812ECE1640014F069 /* CTRNNViz.h */,
+				D64F20A312ECE1720014F069 /* CTRNNViz.cpp */,
+				D6B4EADC151B27DD00C42D0D /* Topology.h */,
+				D6B4EADA151B27C900C42D0D /* Topology.cpp */,
+			);
+			name = CTRNN;
 			sourceTree = "<group>";
 		};
 		D6BA37DF13BA2DAE00CFED09 /* Arm */ = {
@@ -589,6 +620,9 @@
 				D68CF04B14C6DF4300493D39 /* EvoArmCoCon.cpp in Sources */,
 				D6D7FB9D14DED8C9005FC21D /* Spin.cpp in Sources */,
 				D62DE3B014ED20F800DEEECE /* EvoArmCoConDecoder.cpp in Sources */,
+				D650865F150A7CC500E8D94F /* SMCEnvironment.cpp in Sources */,
+				D6B4E820151886D700C42D0D /* CTRNNFactory.cpp in Sources */,
+				D6B4EADB151B27C900C42D0D /* Topology.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

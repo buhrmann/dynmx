@@ -16,6 +16,10 @@
 
 #include "CTRNN.h"
 #include "Random.h"
+#include <iomanip>
+
+namespace dmx 
+{
 
 // A fast sigmoid implementation using a table w/ linear interpolation
 //----------------------------------------------------------------------------------------------------------------------
@@ -52,28 +56,6 @@ double fastsigmoid(double x)
 }
 #endif
 
-
-// Initialize static members
-//----------------------------------------------------------------------------------------------------------------------
-CTRNN::ActivationFunction CTRNN::s_activationFunctions[kAF_NumFunctions] = {0};
-
-// helpers
-//----------------------------------------------------------------------------------------------------------------------
-int CTRNN::getNumRequiredParams(int N, bool numInputs)
-{
-  // as many gains as inputs, n*n weights, and n*2 for bias, tau
-  return numInputs + (N * N) + (2 * N);
-}
-
-// Populate array of pointers to activation functions
-//----------------------------------------------------------------------------------------------------------------------
-void CTRNN::initActivationFunctionTable()
-{
-  s_activationFunctions[kAF_Sigmoid] = &sigmoid;
-  s_activationFunctions[kAF_Linear] = &linearActivation;
-  s_activationFunctions[kAF_Sine] = &sineActivation;
-}
-
 //----------------------------------------------------------------------------------------------------------------------
 // The constructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -83,8 +65,6 @@ CTRNN::CTRNN(int newsize)
   initSigmoidTable();
 #endif
   
-  initActivationFunctionTable();
-
 	size = newsize;
   
   // allocate
@@ -95,13 +75,17 @@ CTRNN::CTRNN(int newsize)
   taus = new double[size];
   Rtaus = new double[size];
   externalinputs = new double[size];
+  m_updateFunctions = new UpdateFunction[size];
+  m_activationFunctions = new ActivationFunction[size];
   
   weights = new double*[size];
   for(int i = 0; i < size; i++)
   {
     weights[i] = new double[size];
     for(int j = 0; j < size; j++)
+    {
       weights[i][j] = 0.0;
+    }
   }
   
   // initialize
@@ -113,7 +97,10 @@ CTRNN::CTRNN(int newsize)
   std::fill(taus, taus + size, 1.0);
   std::fill(Rtaus, Rtaus + size, 1.0);
   
-  setActivationFunction(kAF_Sigmoid);
+  std::fill(m_updateFunctions, m_updateFunctions + size, &CTRNN::updateNeuron);
+  std::fill(m_activationFunctions, m_activationFunctions + size, &sigmoid);
+  
+  setGlobalActivationFunction(kAF_Sigmoid);
 }
 
 
@@ -122,41 +109,64 @@ CTRNN::CTRNN(int newsize)
 CTRNN::~CTRNN()
 {
   //TODO
+  delete [] states;
+  delete [] outputs;
+  delete [] biases;
+  delete [] gains;
+  delete [] taus;
+  delete [] Rtaus;
+  delete [] externalinputs;
+  
+  delete [] m_updateFunctions;
+  delete [] m_activationFunctions;
+  
+  for(int i = 0; i < size; i++)
+  {
+    delete [] weights[i];
+  }
+  
+  delete [] weights;
+}
+  
+//----------------------------------------------------------------------------------------------------------------------    
+CTRNN::UpdateFunction CTRNN::getUpdateFunction(UpdFuncName name)
+{
+  switch (name)
+  {
+    case kUF_Neuron:
+    default:
+      return &CTRNN::updateNeuron;
+      break;
+    case kUF_Input:
+      return &CTRNN::updateInput;
+  }
+}  
+
+//----------------------------------------------------------------------------------------------------------------------    
+CTRNN::ActivationFunction CTRNN::getActivationFunction(ActFuncName name)
+{
+  switch (name)
+  {
+    case kAF_Sigmoid:
+    default:
+      return &sigmoid;      
+    case kAF_Sine:
+      return &sineActivation;
+    case kAF_Linear:
+      return &linearActivation;
+    case kAF_Identity:
+      return &identity;
+  }
 }
 
-// Set all parameters, e.g. from a genome, assumes params in [0,1]
-//----------------------------------------------------------------------------------------------------------------------
-void CTRNN::decodeGenome(const double* params, int numInputs)
+//----------------------------------------------------------------------------------------------------------------------  
+void CTRNN::setInputNeuron(int i)
 {
-  // inputs gains
-  for(int i = 0; i < size; i++)
-  {
-    if(i < numInputs)
-      gains[i] = -10.0 + 20.0 * params[i];
-    else
-      gains[i] = 1.0;
-  }
-  
-  // biases and taus
-  int I = numInputs;
-  for(int i = 0; i < size; i++)
-  {
-    setBias        (i, -10.0 + 20.0 * params[I + 2 * i]);
-    setTimeConstant(i, 0.2 + 2.0 * params[I + 2 * i + 1]);
-  }
-  
-  // weights
-  I += 2 * size;
-  int id = 0;
-  for(int i = 0; i < size; i++)
-  {
-    for(int j = 0; j < size; j++)
-    {
-      setWeight(i, j, -10.0 + 20.0 * params[I + id]);
-      id++;
-    }
-  }
+  setUpdateFunction(i, kUF_Input);
+  setActivationFunction(i, kAF_Identity);
+  setBias(i, 0.0);
 }
+    
 
 // Randomize the states or outputs of a circuit.
 //----------------------------------------------------------------------------------------------------------------------
@@ -230,6 +240,7 @@ void CTRNN::update(double stepsize)
     {
       input += weights[j][i] * outputs[j];
     }
+    
     states[i] += stepsize * Rtaus[i] * (input - states[i]);
   }
   
@@ -239,7 +250,43 @@ void CTRNN::update(double stepsize)
     outputs[i] = (*m_activationFunction)(states[i] + biases[i]);
   }
 }
+  
+// Integrate a circuit using dynamic choice of update and activation function
+//----------------------------------------------------------------------------------------------------------------------
+void CTRNN::updateDynamic(double stepsize)
+{
+  // Synchronously update the state of all neurons.
+  for (int i = 0; i < size; i++) 
+  {
+    // Call this neuron's pointer to member function
+    (this->*(m_updateFunctions[i]))(i, stepsize);    
+  }
+  
+  // Synchronously update the outputs of all neurons.
+  for (int i = 0; i < size; i++)
+  {
+    outputs[i] = (*m_activationFunctions[i])(states[i] + biases[i]);
+  }
+}  
 
+//----------------------------------------------------------------------------------------------------------------------  
+void CTRNN::updateNeuron(int i, double stepsize)
+{
+  // Update the state of all neurons.
+  double input = gains[i] * externalinputs[i];
+  for (int j = 0; j < size; j++) 
+  {
+    input += weights[j][i] * outputs[j];
+  }
+  
+  states[i] += stepsize * Rtaus[i] * (input - states[i]);
+}
+
+//----------------------------------------------------------------------------------------------------------------------  
+void CTRNN::updateInput(int i, double stepsize)
+{
+  states[i] = gains[i] * externalinputs[i];
+}
 
 // Set the biases of the CTRNN to their center-crossing values
 //----------------------------------------------------------------------------------------------------------------------
@@ -259,62 +306,60 @@ void CTRNN::setCenterCrossing(void)
       setBias(i, ThetaStar);
   }
 }
-
-
-#include <iomanip>
-//----------------------------------------------------------------------------------------------------------------------
-ostream& operator<<(ostream& os, CTRNN& c)
+  
+//----------------------------------------------------------------------------------------------------------------------  
+void CTRNN::toXml(ci::XmlTree& xml)
 {
-	// Set the precision
-	os << setprecision(32);
-	// Write the size
-	os << c.size << endl << endl;
-	// Write the time constants
-	for (int i = 0; i < c.size; i++)
-		os << c.taus[i] << " ";
-	os << endl << endl;
-	// Write the biases
-	for (int i = 0; i < c.size; i++)
-		os << c.biases[i] << " ";
-	os << endl << endl;
-	// Write the gains
-	for (int i = 0; i < c.size; i++)
-		os << c.gains[i] << " ";
-	os << endl << endl;
-	// Write the weights
-	for (int i = 0; i < c.size; i++) {
-		for (int j = 0; j < c.size; j++)
-			os << c.weights[i][j] << " ";
-		os << endl;
-	}
-	// Return the ostream
-	return os;
+  ci::XmlTree nn("CTRNN","");
+  nn.setAttribute("Size", size);
+  
+  for(int i = 0; i < size; ++i)
+  {
+    ci::XmlTree n("Neuron","");
+    n.setAttribute("Index", i);
+    n.setAttribute("Bias", biases[i]);
+    n.setAttribute("TimeConstant", taus[i]);
+    n.setAttribute("Gain", gains[i]);
+    
+    for(int j = 0; j < size; ++j)
+    {
+      ci::XmlTree w("Weight", toString(weights[j][i]));
+      w.setAttribute("From", j);
+      n.push_back(w);
+    }
+
+    nn.push_back(n);
+  }
+  
+  xml.push_back(nn);
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-istream& operator>>(istream& is, CTRNN& c)
+//----------------------------------------------------------------------------------------------------------------------  
+void CTRNN::fromXml(const ci::XmlTree& xml)
 {
-	// Read the size
-	int size;
-	is >> size;
-	
-	// Read the time constants
-	for (int i = 0; i < size; i++) 
+  if(xml.getTag() == "CTRNN")
   {
-		is >> c.taus[i];
-		c.Rtaus[i] = 1 / c.taus[i];
-	}
-	// Read the biases
-	for (int i = 0; i < size; i++)
-		is >> c.biases[i];
-	// Read the gains
-	for (int i = 0; i < size; i++)
-		is >> c.gains[i];
-	// Read the weights
-	for (int i = 0; i < size; i++)
-		for (int j = 0; j < size; j++)
-			is >> c.weights[i][j];
-	// Return the istream		
-	return is;
-}		
+    assert(xml.getAttributeValue<int>("Size") == size);
+    
+    ci::XmlTree::ConstIter neuron = xml.begin("Neuron");
+    for (; neuron != xml.end(); ++neuron)
+    {
+      const ci::XmlTree& n = *neuron;
+      int i = n.getAttributeValue<double>("Index");
+      biases[i] = n.getAttributeValue<double>("Bias");
+      taus[i] = n.getAttributeValue<double>("TimeConstant");
+      gains[i] = n.getAttributeValue<double>("Gain");
+      
+      ci::XmlTree::ConstIter weight = n.begin("Weight");
+      for (; weight != n.end(); ++weight)
+      {
+        int from = weight->getAttributeValue<double>("From");
+        double w = weight->getValue<double>();
+        weights[from][i] = w;
+      }
+    }    
+  }
+}
+  
+} // namespace
 		

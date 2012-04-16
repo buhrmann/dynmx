@@ -36,7 +36,6 @@ void ArmMuscled::init()
   // First let base of arm init
   Arm::init();
   
-  
   ci::XmlTree* settings = SETTINGS;
   if (settings->hasChild("Config/Arm"))
   {
@@ -49,18 +48,18 @@ void ArmMuscled::init()
     for (; muscle != settings->end(); ++muscle)
     {
       // Parameters common to mono- and biarticulate muscles
+      std::string name = muscle->getAttributeValue<std::string>("Name");            
       bool isFlexor = muscle->getAttributeValue<bool>("IsFlexor");      
-      double origin = muscle->getChild("Origin").getAttributeValue<double>("Value");
-      double insertion = muscle->getChild("Insertion").getAttributeValue<double>("Value");
-      double Fmax = muscle->getChild("MaxIsoForce").getAttributeValue<double>("Value");
-      double L0 = muscle->getChild("OptimalLength").getAttributeValue<double>("Value");
-      double Vmax = muscle->getChild("MaxVelocity").getAttributeValue<double>("Value");
-      std::string name = muscle->getAttributeValue<std::string>("Name");      
+      double origin = muscle->getChild("Attachment").getAttributeValue<double>("Origin");
+      double insertion = muscle->getChild("Attachment").getAttributeValue<double>("Insertion");
+      double Fmax = muscle->getChild("MaxIsoForce").getValue<double>();
+      double L0 = muscle->getChild("Length").getAttributeValue<double>("Optimal");
+      double Vmax = muscle->getChild("MaxVelocity").getValue<double>();
       
       if(muscle->getAttributeValue<bool>("IsMono"))
       {
         // Monoarticulate muscles
-        std::string jointName = muscle->getChild("Joint").getAttributeValue<std::string>("Value"); 
+        std::string jointName = muscle->getAttributeValue<std::string>("Joint"); 
         Joint joint = (jointName == "Elbow") ? JT_elbow : JT_shoulder;
 
         MuscleMonoWrap* monoMuscle = new MuscleMonoWrap(this, origin, insertion, joint, isFlexor);
@@ -78,8 +77,20 @@ void ArmMuscled::init()
         biMuscle->init();
         m_muscles.push_back(biMuscle);        
       }
-    }
-  }
+      
+      // Hill Params (optional)
+      if(muscle->hasChild("HillParameters"))
+      {
+        const ci::XmlTree& hillParams = muscle->getChild("HillParameters");
+        double sh = hillParams.getAttributeValue<double>("Shortening");
+        double lg = hillParams.getAttributeValue<double>("Lengthening");
+        double asymp = hillParams.getAttributeValue<double>("Asymptote");
+        double slope = hillParams.getAttributeValue<double>("Slope");
+        m_muscles.back()->setHillParameters(sh, lg, asymp, slope);
+      }
+      
+    } // for muscles
+  } // if xml
   else 
   {
     m_jointRadius[JT_elbow] = 0.04;
@@ -170,6 +181,8 @@ void ArmMuscled::toXml(ci::XmlTree& xml)
   if(xml.hasChild("Arm"))
   {
     ci::XmlTree& arm = xml.getChild("Arm");
+    arm.getChild("Shoulder").setAttribute("Radius", m_jointRadius[JT_shoulder]);
+    arm.getChild("Elbow").setAttribute("Radius", m_jointRadius[JT_elbow]);  
     
     // Write out muscle data
     for(int i = 0; i < m_muscles.size(); i++)
@@ -188,8 +201,96 @@ void ArmMuscled::record(Recorder& recorder)
   {
     m_muscles[i]->record(recorder);
   }
-
+}
   
+  
+//----------------------------------------------------------------------------------------------------------------------
+void ArmMuscled::recordIsometric(Recorder& recorder, const std::vector<float>& muscleAct, float jointIncDeg)
+{
+  const float dt = 0.01; // Arbitrary really
+  float jointIncRad = degreesToRadians(jointIncDeg);
+  
+  // Updating muscle with same dt as time constant means activation will instantly be same as excitation, 
+  // i.e. no slow dynamics. Will be reset at end of this function.
+  for(size_t i = 0; i < m_muscles.size(); ++i)
+  {
+    m_muscles[i]->setTimeConstants(dt, dt);
+  }
+
+  // Loop over range of shoulder and elbow angles  
+  double elbMax = getJointLimitUpper(JT_elbow);
+  double shdMax = getJointLimitUpper(JT_shoulder);
+  double elbAngle = getJointLimitLower(JT_elbow);    
+  double shdAngle = getJointLimitLower(JT_shoulder);  
+
+  // First elbow
+  while(elbAngle < elbMax)
+  {
+    // "Move" kinematically
+    resetTo(elbAngle, shdAngle);
+    
+    // Set excitation and update
+    m_muscles[0]->setExcitation(muscleAct[0]);
+    m_muscles[1]->setExcitation(muscleAct[1]);
+    
+    m_muscles[0]->update(dt);
+    m_muscles[1]->update(dt);    
+    
+    // Store state
+    record(recorder);
+    
+    elbAngle += jointIncRad;
+  }  
+  
+  // Now shoulder
+  while(shdAngle < shdMax)
+  {
+    // "Move" kinematically
+    resetTo(elbAngle, shdAngle);
+
+    // Set excitation and update
+    m_muscles[2]->setExcitation(muscleAct[2]);
+    m_muscles[3]->setExcitation(muscleAct[3]);    
+    
+    m_muscles[2]->update(dt);
+    m_muscles[3]->update(dt);    
+    
+    // Store state
+    record(recorder);
+    
+    shdAngle += jointIncRad;
+  }  
+  
+#if 0  
+  while(shdAngle < shdMax)
+  {
+    double elbAngle = m_limits[JT_elbow][0];
+    while(elbAngle < elbMax)
+    {
+      // "Move" kinematically
+      resetTo(elbAngle, shdAngle);
+      
+      // Updating muscle with same dt as time constant means activation will instantly be same as excitation, 
+      // i.e. no slow dynamics
+      for(size_t i = 0; i < m_muscles.size(); ++i)
+      {
+        m_muscles[i]->update(dt);        
+      }
+      
+      // Store state
+      record(recorder);
+      
+      elbAngle += jointIncRad;
+    }
+    shdAngle += jointIncRad;
+  }
+#endif
+  
+  // Reset to default time constants
+  for(size_t i = 0; i < m_muscles.size(); ++i)
+  {
+    m_muscles[i]->setTimeConstants(MUSCLE_DEFAULT_TIMECONST_ACT, MUSCLE_DEFAULT_TIMECONST_DEACT);
+  }
 }
 
 } // namespace dmx

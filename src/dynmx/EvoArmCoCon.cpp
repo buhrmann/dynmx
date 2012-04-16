@@ -13,7 +13,7 @@
 namespace dmx
 {
   
-#define ELB_SWITCH_TRIAL 9
+#define ELB_SWITCH_TRIAL 99
 
 //----------------------------------------------------------------------------------------------------------------------  
 const std::string EvoArmCoCon::PhaseNames [kMvPh_numPhases] = 
@@ -117,6 +117,12 @@ float EvoArmCoCon::getFitness(float start, float end)
 //----------------------------------------------------------------------------------------------------------------------
 float EvoArmCoCon::getFitness() 
 { 
+  // Only calculate once. Otherwise early out.
+  if(fabs(m_fitness - MAX_NEG_FLOAT) > 1.0)
+  {
+    return m_fitness;
+  }
+  
   float fitness;
   if(m_resetEachMove)
   {
@@ -124,15 +130,41 @@ float EvoArmCoCon::getFitness()
     fitness = 1.0;
     for(int i = 0; i < m_numMoves; i++)
     {
-      // Assumes each move consists of 4 trajectory points      
+      // Assumes each move consists of 4 trajectory points            
       float start = m_desiredTrajectory[i * 4 + 0].time; 
-      float end = m_desiredTrajectory[i * 4 + 3].time; 
-      float moveFitness = getFitness(start, end);
-      fitness *= moveFitness;
-      if(moveFitness < 0)
+      float end = m_desiredTrajectory[i * 4 + 3].time;       
+      if(m_fitnessEndPointOnly)
       {
-        // Ensure a single negative multiplier always leads to negative fitness
-        fitness = -std::abs(fitness);
+        const double dt = 1.0 / (double)SETTINGS->getChild("Config/Globals/FrameRate").getAttributeValue<int>("Value");        
+
+        // Minimise position error at end
+        int i = (end / dt) - 1;        
+        const ci::Vec2f& desEnd = m_desiredPositions[i];
+        const ci::Vec2f& actEnd = m_actualPositions[i];
+        fitness *= 1.0 - desEnd.distance(actEnd);     
+        // Minimise velocity at end
+        const ci::Vec2f& prevActEnd = m_actualPositions[i - 1];
+        fitness *= 1.0 - actEnd.distance(prevActEnd); 
+        
+        // Minimise position error at start
+        i = (start / dt) + 1;        
+        const ci::Vec2f& desStart = m_desiredPositions[i];
+        const ci::Vec2f& actStart = m_actualPositions[i];
+        fitness *= 1.0 - desStart.distance(actStart);     
+        // Minimise velocity at start
+        const ci::Vec2f& prevAct = m_actualPositions[i - 1];
+        fitness *= 1.0 - actStart.distance(prevAct); 
+        
+      }
+      else
+      {
+        float moveFitness = getFitness(start, end);
+        fitness *= moveFitness;
+        if(moveFitness < 0)
+        {
+          // Ensure a single negative multiplier always leads to negative fitness
+          fitness = -std::abs(fitness);
+        }
       }
     }
   }
@@ -155,7 +187,8 @@ float EvoArmCoCon::getFitness()
     fitness *= coconFit;
   }
   
-  return fitness;
+  m_fitness = fitness;
+  return m_fitness;
 };
 
 //----------------------------------------------------------------------------------------------------------------------    
@@ -178,8 +211,21 @@ void EvoArmCoCon::readDecodeLimits()
 {
   if (SETTINGS->hasChild("Config/GA/Evolvable/EvoFlags/DecodeLimits"))
   {
+    // Arm limits
+    std::string nm = "Config/GA/Evolvable/EvoFlags/DecodeLimits/ArmLimits/";
+    if(SETTINGS->hasChild(nm))
+    {
+      readRange(m_decodeLimits.arm.jointRadius, nm + "jointRadius");
+      readRange(m_decodeLimits.arm.jointFriction, nm + "jointFriction");
+    }
+    else 
+    {
+      m_decodeLimits.arm.jointRadius = Range(0.01, 0.05);
+      m_decodeLimits.arm.jointFriction = Range(0.01, 0.2);
+    }
+
     // Muscle limits
-    std::string nm = "Config/GA/Evolvable/EvoFlags/DecodeLimits/MuscleLimits/";
+    nm = "Config/GA/Evolvable/EvoFlags/DecodeLimits/MuscleLimits/";
     readRange(m_decodeLimits.muscle.attach, nm + "attach");
     readRange(m_decodeLimits.muscle.force, nm + "force");
     readRange(m_decodeLimits.muscle.optLength, nm + "optLength");
@@ -211,9 +257,12 @@ void EvoArmCoCon::init()
   if (SETTINGS->hasChild("Config/GA/Evolvable/EvoFlags")) 
   {   
     const ci::XmlTree& xmlFlags = SETTINGS->getChild("Config/GA/Evolvable/EvoFlags");    
-    m_symmetricMuscles = (xmlFlags / "symMuscles").getValue<bool>();
-    m_evolveSpindles = xmlFlags.getChild("spindles").getValue<bool>();
-    m_evolveVelRef = xmlFlags.getChild("spindles").getAttributeValue<bool>("velRef");
+    m_evolveMuscles = xmlFlags.getChild("Muscles").getValue<bool>();
+    m_symmetricMuscles = xmlFlags.getChild("Muscles").getAttributeValue<bool>("symmetric");
+    m_evolveHillParams = xmlFlags.getChild("Muscles").getAttributeValue<bool>("hillParams");    
+    m_evolveSpindles = xmlFlags.getChild("Spindles").getValue<bool>();
+    m_evolveUniformSpindles = xmlFlags.getChild("Spindles").getAttributeValue<bool>("uniform");    
+    m_evolveVelRef = xmlFlags.getChild("Spindles").getAttributeValue<bool>("velRef");
     m_evolveIAIN = xmlFlags.getChild("iain").getValue<bool>();
     m_evolveRenshaw = xmlFlags.getChild("renshaw").getValue<bool>();
     m_evolveIBIN = xmlFlags.getChild("ibin").getValue<bool>();
@@ -221,8 +270,6 @@ void EvoArmCoCon::init()
     m_evolveSFV = xmlFlags.getChild("sfv").getValue<bool>();
     m_evolveOpenLoop = xmlFlags.getChild("openLoop").getValue<bool>();
     m_maxOpenLoop = xmlFlags.getChild("openLoop").getAttributeValue<float>("max");    
-    m_evolveUniformSpindles = xmlFlags.getChild("uniformSpindles").getValue<bool>();
-    m_evolveHillParams = xmlFlags.getChild("hillParams").getValue<bool>();
     m_evolveIntersegmentInputs = xmlFlags.getChild("interSegmentInput").getValue<bool>();
     m_maxInterseg = xmlFlags.getChild("interSegmentInput").getAttributeValue<double>("max");
         
@@ -232,11 +279,41 @@ void EvoArmCoCon::init()
     m_maxCocontraction = xml.getChild("enableCoconInc").getAttributeValue<float>("max");
     m_commandTrajSmooth = xml.getChild("commandTrajSmooth").getValue<bool>();    
     m_useMuscleCoords = xml.getChild("useMuscleCoords").getValue<bool>();    
-    m_fitnessEvalVel = xml.getChild("fitnessEvalVel").getValue<bool>();
-    m_fitnessEvalCoact = xml.getChild("fitnessEvalCoact").getValue<bool>();
+
+    m_fitnessEndPointOnly = xml.getChild("FitnessFunction/EndPointOnly").getValue<bool>();    
+    m_fitnessEvalVel = xml.getChild("FitnessFunction/Velocity").getValue<bool>();
+    m_fitnessEvalCoact = xml.getChild("FitnessFunction/Coactivation").getValue<bool>();
     
     // Following function may depend on some of above variables
     readDecodeLimits(); 
+    
+    // Open-loop activations
+    if (SETTINGS->hasChild("Config/Arm/OpenLoopActivations")) 
+    {   
+      m_openLoopParams.clear();
+      
+      ci::XmlTree& oplp = SETTINGS->getChild("Config/Arm/OpenLoopActivations");    
+      ci::XmlTree::Iter val = oplp.begin("Value");
+      for (; val != oplp.end(); ++val)
+      {
+        double v = val->getValue<double>();
+        m_openLoopParams.push_back(v);
+      }
+    }
+    
+    // Intersegmental parameters
+    if (SETTINGS->hasChild("Config/Arm/IntersegmentalParams")) 
+    {   
+      m_intersegParams.clear();
+      
+      ci::XmlTree& params = SETTINGS->getChild("Config/Arm/IntersegmentalParams");    
+      ci::XmlTree::Iter val = params.begin("Value");
+      for (; val != params.end(); ++val)
+      {
+        double v = val->getValue<double>();
+        m_intersegParams.push_back(v);
+      }
+    }
         
     // Read trajectory from settings file    
     // Requires arm to be setup to do FK, but that's already done in init() above, so should be fine.
@@ -285,6 +362,8 @@ void EvoArmCoCon::init()
   }
   else 
   {
+    m_evolveMuscles = true;
+    m_symmetricMuscles = false;
     m_evolveIAIN = false;
     m_evolveRenshaw = false;
     m_evolveIBIN = false;
@@ -382,6 +461,8 @@ void EvoArmCoCon::reset()
   
   m_time = 0.0f;
   
+  m_fitness = MAX_NEG_FLOAT;
+  
   m_desiredPositions.clear();
   m_actualPositions.clear();
   m_actualCoactivationsElb.clear();
@@ -409,24 +490,26 @@ void EvoArmCoCon::update(float dt)
   // Get position first
   Target<Pos> desired = m_desiredTrajectory.atTime(m_time);
   Target<Pos> command = m_commandedTrajectory.atTime(m_time);
-  updateCurrentCommand(command, desired);
   
-  // When switching between moves, reset to moves initial position, if so desired
+  // Current move and phase
   int prevMove = m_currentMove;
-  m_currentMove = desired.name; 
-  if(m_resetEachMove && (m_currentMove != prevMove))
-  {
-    m_arm->resetTo(m_currentDesiredAngles.x, m_currentDesiredAngles.y);
-  }
-
-  // Current phase within move
+  m_currentMove = desired.name;   
   int prevPhase = m_currentPhase;
   m_currentPhase = desired.id % kMvPh_numPhases;
   
 #if 0 // DEBUGGING
   if(m_currentPhase != prevPhase)
     std::cout << "Mv: " << m_currentMove << "| Ph: " << PhaseNames[m_currentPhase] << ". " << std::endl;
-#endif  
+#endif
+  
+  // Calculate current desired angles and muscle lengths and store for later fitness evaluation
+  updateCurrentCommand(command, desired);  
+  
+  // When switching between moves, reset to moves initial position, if so desired
+  if(m_resetEachMove && (m_currentMove != prevMove))
+  {
+    m_arm->resetTo(m_currentDesiredAngles.x, m_currentDesiredAngles.y);
+  }  
   
   // Incremental increase in cocontraction at target position
   const Target<Pos>& coconTarget = desired;
@@ -457,6 +540,11 @@ void EvoArmCoCon::update(float dt)
       int i = m_currentMove * 4; // 4 muscles
       m_arm->getReflex(0)->setOpenLoop(m_openLoopParams[i+0], m_openLoopParams[i+1]);
       m_arm->getReflex(1)->setOpenLoop(m_openLoopParams[i+2], m_openLoopParams[i+3]);
+    }
+    else if(m_currentPhase == kMvPh_leadOut)
+    {
+      m_arm->getReflex(0)->setOpenLoop(0, 0);
+      m_arm->getReflex(1)->setOpenLoop(0, 0);
     }
   }  
   

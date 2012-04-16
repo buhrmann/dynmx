@@ -26,6 +26,7 @@ void ArmMuscledViz::init()
   // Let parent class initialize first
   ArmViz::init();
   
+#if 0  
   // Modify the joint render size
   m_elbow.m_radius1 = m_arm->getJointRadius(JT_elbow);
   m_elbow.m_radius2 = m_elbow.m_radius1;
@@ -34,8 +35,22 @@ void ArmMuscledViz::init()
   m_shoulder.m_radius1 =  m_arm->getJointRadius(JT_shoulder);
   m_shoulder.m_radius2 = m_shoulder.m_radius1;
   m_shoulder.createGeometry();
+#endif
   
   m_drawDesiredState = false;
+  
+  // Setup colors
+  m_colors.shortMuscle = ci::ColorA::gray(0.8);
+  m_colors.longMuscle = ci::ColorA::gray(0.8);
+  m_colors.midMuscle  = ci::ColorA::black();
+
+  m_colors.boneOutline = ci::ColorA::gray(0.5);
+  m_colors.boneFill = ci::ColorA(0.9, 0.9, 0.9, 0.5);
+  m_colors.jointOutline = ci::ColorA::black();
+  m_colors.jointFill = ci::ColorA::white();
+  m_colors.limitsFill = ci::ColorA(0.5, 0.5, 0.5, 0.5);
+  m_colors.desired = ci::ColorA::gray(0.75);
+  m_colors.trajectory = ci::ColorA(235.0/255.0, 89.0/255.0, 55.0/255.0, 1.0);
 }
 
 // Overwrite base class update
@@ -43,12 +58,41 @@ void ArmMuscledViz::init()
 void ArmMuscledViz::update()
 {
   // Let simple viz do its rendering first
-  ArmViz::update();
+  //ArmViz::update();
   
-  // Overlay desired state
-  glDisable(GL_DEPTH_TEST);
+  glPushAttrib(GL_LIGHTING);
+  glDisable(GL_LIGHTING);  
+  glDisable(GL_DEPTH_TEST);  
+  
+  // Get shoulder and elbow TMs and other useful data
+  const float shdAngle = m_arm->getJointAngle(JT_shoulder);
+  const float elbAngle = m_arm->getJointAngle(JT_elbow);
+  
+  const ci::Vec3f elbPos = Vec3f(m_arm->getElbowPos());
+  const ci::Vec3f effPos = Vec3f(m_arm->getEffectorPos());
+  const ci::Vec3f shdPos = Vec3f(0,0,0);
+  
+  const double elbRad = m_arm->getJointRadius(JT_elbow);
+  const double shdRad = m_arm->getJointRadius(JT_shoulder);   
+
+  ci::Matrix44f elbLimTM;
+  elbLimTM.setToIdentity();
+  elbLimTM.rotate(Vec3f(0.0f, 0.0f, 1.0f), shdAngle); 
+  elbLimTM.setTranslate(elbPos);    
+  
+  ci::Matrix44f elbTM = elbLimTM;
+  elbTM.rotate(Vec3f(0,0,1), elbAngle);
+  
+  ci::Matrix44f shdTM;
+  shdTM.setToIdentity();
+  shdTM.rotate(Vec3f(0.0f, 0.0f, 1.0f), shdAngle); 
+  shdTM.setTranslate(shdPos);      
+
+  // Overall position and orientation
   glPushMatrix();
-  glMultMatrixf(*m_pTM);
+  glMultMatrixf(*m_pTM);   
+  glLineWidth(1.0);
+  glColor3f(0,0,0);
   
   // Desired kinematic state
   if(m_drawDesiredState)
@@ -61,45 +105,108 @@ void ArmMuscledViz::update()
     Vec3f desShdPos(0,0,0);
     Vec3f desElbPos(p1);
     Vec3f desEffPos(p2);
-    glColor4f(1.0, 0.25, 0.25, 0.5);    
+    ci::gl::color(m_colors.desired);
     // Draw bones
+    glEnable(GL_LINE_STIPPLE);
+    glLineStipple(2, 0xAAAA);
     ci::gl::drawLine(desShdPos, desElbPos);
     ci::gl::drawLine(desElbPos, desEffPos);
-
+    glDisable(GL_LINE_STIPPLE);
+    
     // Points indicating joints
     glPointSize(4.0);
     glBegin(GL_POINTS);
-      glVertex3f(desShdPos.x, desShdPos.y, 0.0);
-      glVertex3f(desElbPos.x, desElbPos.y, 0.0);
-      glVertex3f(desEffPos.x, desEffPos.y, 0.0);
+    glVertex3f(desShdPos.x, desShdPos.y, 0.0);
+    glVertex3f(desElbPos.x, desElbPos.y, 0.0);
+    glVertex3f(desEffPos.x, desEffPos.y, 0.0);
     glEnd();
-  }  
+  }    
+  
+  // Draw elbow joint and bone
+  glPushMatrix();
+  glMultMatrixf(elbTM);
+  // bone triangle
+  ci::gl::color(m_colors.boneFill);
+  ci::Vec3f lt = -elbRad * ci::Vec3f(0,1,0);
+  ci::Vec3f rt = elbRad * ci::Vec3f(0,1,0);
+  ci::Vec3f bt = m_arm->getLength(JT_elbow) * ci::Vec3f(1,0,0);
+  drawTriangle(rt, lt, bt);
+  ci::gl::color(m_colors.boneOutline);
+  drawTriangle(rt, lt, bt, GL_LINE);
+  ci::gl::drawLine(ci::Vec2f(bt), elbRad * ci::Vec2f(1,0));      
+  // joint disk
+  ci::gl::color(m_colors.jointFill);
+  ci::gl::drawSolidCircle(ci::Vec2f(0,0), elbRad, 32);
+  ci::gl::color(m_colors.jointOutline);
+  ci::gl::drawStrokedCircle(ci::Vec2f(0,0), elbRad, 32);
+
+  glPopMatrix();
+  
+  // Draw elbow limits
+  glPushMatrix();
+  glMultMatrixf(elbLimTM);
+  float limMin = radiansToDegrees(m_arm->getJointLimitLower(JT_elbow));
+  float limMax = radiansToDegrees(m_arm->getJointLimitUpper(JT_elbow));
+  ci::gl::color(m_colors.limitsFill);
+  drawPartialDisk(elbRad, elbRad + 0.01, 16, 1, 90 - limMin, -(limMax - limMin));
+  glPopMatrix();
+  
+  // Draw shoulder joint and bone
+  glColor3f(0,0,0);  
+  glPushMatrix();
+  glMultMatrixf(shdTM);
+  // bone triangle
+  lt = -shdRad * ci::Vec3f(0,1,0);
+  rt = shdRad * ci::Vec3f(0,1,0);
+  bt = m_arm->getLength(JT_shoulder) * ci::Vec3f(1,0,0);  
+  ci::gl::color(m_colors.boneFill);
+  drawTriangle(rt, lt, bt);
+  ci::gl::color(m_colors.boneOutline);
+  drawTriangle(rt, lt, bt, GL_LINE);
+  ci::gl::drawLine(m_arm->getLength(JT_shoulder) * ci::Vec2f(1,0), shdRad * ci::Vec2f(1,0));
+  // joint disk
+  ci::gl::color(m_colors.jointFill);
+  ci::gl::drawSolidCircle(ci::Vec2f(0,0), shdRad, 32);
+  ci::gl::color(m_colors.jointOutline);
+  ci::gl::drawStrokedCircle(ci::Vec2f(0,0), shdRad, 32);
+  glPopMatrix();
+  
+  // Draw shoulder limits
+  limMin = m_arm->getJointLimitLower(JT_shoulder) * RAD_TO_DEG;
+  limMax = m_arm->getJointLimitUpper(JT_shoulder) * RAD_TO_DEG;  
+  ci::gl::color(m_colors.limitsFill);
+  drawPartialDisk(shdRad, shdRad + 0.01, 16, 1, 90 - limMin, -(limMax - limMin));
+  glLineWidth(1.0);    
   
   // Trajectory  
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_COLOR_ARRAY);
-  const std::deque<Pos>& effTrajectory = m_arm->getTrajectory();
-  int numPoints =  effTrajectory.size();  
-  float lineVerts[numPoints*2];
-  float colors[numPoints*4];
-  glVertexPointer(2, GL_FLOAT, 0, lineVerts); // 2d positions
-  glColorPointer(4, GL_FLOAT, 0, colors);     // 4d colors
-  
-  // Draw actual trajectory
-  for(size_t i = 0; i < numPoints; i++)
+  if(m_drawOverlays)
   {
-    lineVerts[i*2 + 0] = effTrajectory[i].x;
-    lineVerts[i*2 + 1] = effTrajectory[i].y;
-    float c = (float)i / (float)numPoints;
-    colors[i*4 + 0] = c;
-    colors[i*4 + 1] = c;
-    colors[i*4 + 2] = c;
-    colors[i*4 + 3] = c;
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+    const std::deque<Pos>& effTrajectory = m_arm->getTrajectory();
+    int numPoints =  effTrajectory.size();  
+    float lineVerts[numPoints*2];
+    float colors[numPoints*4];
+    glVertexPointer(2, GL_FLOAT, 0, lineVerts); // 2d positions
+    glColorPointer(4, GL_FLOAT, 0, colors);     // 4d colors
+    
+    for(size_t i = 0; i < numPoints; i++)
+    {
+      lineVerts[i*2 + 0] = effTrajectory[i].x;
+      lineVerts[i*2 + 1] = effTrajectory[i].y;
+      float a = 0.5 * (float)i / (float)numPoints;
+      
+      colors[i*4 + 0] = m_colors.trajectory[0];
+      colors[i*4 + 1] = m_colors.trajectory[1];
+      colors[i*4 + 2] = m_colors.trajectory[2];
+      colors[i*4 + 3] = a;
+    }
+    glLineWidth(2.0);
+    glDrawArrays( GL_LINE_STRIP, 0, numPoints);
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
+    glLineWidth(1.0);  
   }
-  glDrawArrays( GL_LINE_STRIP, 0, numPoints);
-  glDisableClientState(GL_VERTEX_ARRAY);
-  glDisableClientState(GL_COLOR_ARRAY);
-  
   
   // Draw muscles
   for(size_t i = 0; i < m_arm->getNumMuscles(); ++i)
@@ -109,7 +216,17 @@ void ArmMuscledViz::update()
     // Muscle colour dependent on length
     float l = muscle->getNormalisedLength() - 1;
     l = clamp(l, -1.0f, 1.0f);
-    setColor3(getColorMapBlueRed(l));
+
+    ci::ColorA col = m_colors.midMuscle;
+    if(l >= 0)
+    {
+      col += (m_colors.longMuscle - m_colors.midMuscle) * l;
+    }
+    else
+    {
+      col -= (m_colors.shortMuscle - m_colors.midMuscle) * l;
+    }    
+    ci::gl::color(col);
     
     // Draw origin and insertion points
     Vec3f origin = Vec3f(muscle->getOriginWorld());
@@ -241,6 +358,8 @@ void ArmMuscledViz::update()
   
   glPopMatrix();
   glEnable(GL_DEPTH_TEST);    
+  
+  glPopAttrib();  
 }
 
 } // namespace dmx

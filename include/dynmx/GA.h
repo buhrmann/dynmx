@@ -64,13 +64,17 @@ public:
   const double* getWeightedAverageGenome(float &fitness) const;
   
   /// Returns complete population, e.g. for drawing
-  double** getPopulation() const { return m_genomes; };
+  const double* const* getPopulation() const { return m_genomes; };
   float* getFitnesses() const {return m_fitnesses; };
 
   void setRandomSeed(long seed) { m_idum = seed; };
   void setDemeWidth(int width) { m_demeWidth = width; };
   void setMutationMax(double mut) { m_maxMutation = mut; };
   void setRecombinationRate(double rcr) { m_recombinationRate = rcr; };
+  
+  // If evaluation is deterministic an already evaluated individual does not need
+  // to be evaluated again in a subsequent tournament.
+  void setAvoidReevaluation(bool re) { m_avoidReevaluation = re; };
   
   void toXml(ci::XmlTree& xml, bool includeGenomes = true) const;
   bool fromXml(const ci::XmlTree& xml, bool includeGenomes = true);
@@ -133,6 +137,8 @@ protected:
   float 
     m_fitnessA,   // fitness of first individual in current tournament
     m_fitnessB;   // fitness of second individual in current tournament
+  
+  bool m_avoidReevaluation;
 };
   
 } // namespace

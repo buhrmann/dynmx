@@ -38,6 +38,7 @@
 
 #include "SMCAgent.h"
 #include "SMCAgentEvo.h"
+#include "SMCAgentLineDis.h"
 #include "SMCView.h"
 
 #include "Spin.h"
@@ -90,10 +91,20 @@ Simulation* SimulationFactory::create()
       model = evaluateOnly ? (Model*) new GATester(evolvable) : (Model*) new GARunner (evolvable);
       if(visual)
       {
-        View* view = new SMCView(((SMCAgentEvo*)evolvable)->getAgent());
+        View* view = new SMCView((SMCAgentEvo*)evolvable);
         app = new App(model, view);
       }
     }
+    else if ("SMCAgentLineDis" == evolvableName)
+    {    
+      evolvable = new SMCAgentLineDis();
+      model = evaluateOnly ? (Model*) new GATester(evolvable) : (Model*) new GARunner (evolvable);
+      if(visual)
+      {
+        View* view = new SMCView((SMCAgentEvo*)evolvable);
+        app = new App(model, view);
+      }
+    }    
     else if ("TestEvolvable" == evolvableName)
     {
       // Doesn't have a visualisation
@@ -167,6 +178,7 @@ Simulation* SimulationFactory::create()
       app = new TestAppCTRNN((TestModelCTRNN*)model);
     }    
   }
+  /*
   else if ("SMCAgent" == modelName)
   {
     model = new SMCAgent();
@@ -175,7 +187,7 @@ Simulation* SimulationFactory::create()
       View* view = new SMCView((SMCAgent*)model);      
       app = new App(model, view);
     }
-  }  
+  } */ 
   else if ("Test" == modelName)
   {
     model = new TestModel();

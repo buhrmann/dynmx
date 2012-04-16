@@ -53,7 +53,17 @@ void SMCAgentViz::update()
   glLineStipple(2, 0xAAAA);
   glColor3f(0.2, 0.2, 0.2);    
   ci::gl::drawLine(sensor.getPosition(), sensor.getPosition() + sensor.getDirection() * sensedDistance);  
+  
+  // draw positional range
+  glLineStipple(5, 0xAAAA);
+  glColor3f(0.2, 0.2, 0.2);
+  ci::Vec2f trackEnd(0, m_agent->getMaxPosition());
+  ci::gl::drawLine(trackEnd, -trackEnd);    
   glDisable(GL_LINE_STIPPLE);
+  ci::Vec2f vertOff (0.01, 0);
+  ci::gl::drawLine(trackEnd + vertOff, trackEnd - vertOff);
+  ci::gl::drawLine(-trackEnd + vertOff, -trackEnd - vertOff);
+  
   if(sensedDistance < sensor.getMaxDistance())
   {  
     drawPoint(ci::Vec3f(sensor.getCollision()), 5.0f);

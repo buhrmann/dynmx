@@ -392,7 +392,7 @@ class RealMatrixViz : public Node
 {
 public:
 
-  RealMatrixViz(double **data, int n, int m, float width = 100.0f, double maxVal = 1.0);
+  RealMatrixViz(const double* const* data, int n, int m, float width = 100.0f, double maxVal = 1.0);
   virtual Node* getNode(int pickID){ if(m_uniqueID == pickID) return this; else return 0;};
   virtual void update();
   
@@ -409,7 +409,7 @@ public:
   int m_iSel, m_jSel;  
 
 protected:
-  double** m_data;
+  const double* const* m_data;
   float m_scale;
   double m_maxVal;
   int m_N, m_M;
@@ -427,7 +427,7 @@ class MatrixView : public Node
 {
 public:
 
-  MatrixView(Type **d, int n, int m, float s = 1.0f, float maxVal = 1) : 
+  MatrixView(const Type* const* d, int n, int m, float s = 1.0f, float maxVal = 1) : 
     m_data(d), m_N(n), m_M(m), m_scale(s/n), m_maxVal(maxVal), m_iSel(-1), m_jSel(-1) { init(); };
 
   virtual Node* getNode(int pickID){ if(m_uniqueID == pickID) return this; else return 0;};
@@ -455,15 +455,31 @@ public:
         glTranslatef(i, j, 0.0);
         
         float w = m_data[i][j] / m_maxVal;
-        col = w > 0 ? Vec3f(0,0,0) : Vec3f(235.0/255.0, 0.0/255.0, 103.0/255.0); //Vec3f(215.0/255.0, 19.0/255.0, 69.0/255.0);
-        glColor4f(col.x, col.y, col.z, 1);
-        drawRectangle(w*0.98, w*0.98);
+        
+        if(w > 0)
+        {
+          col = Vec3f(0,0,0);
+          glColor3f(0, 0, 0);
+          drawRectangle(w*0.98, w*0.98);
+        }
+        else if (w < 0)
+        {
+          glColor3f(235.0/255.0, 0.0/255.0, 103.0/255.0);
+          drawFrame(w*0.98, w*0.98);
+        }
+        else
+        {
+          glColor4f(0.5, 0.5, 0.5, 0.5);
+          drawCross(0.98);
+        }
+
         //ci::gl::drawSolidRect(ci::Rectf(ci::Area(ci::Vec2f(0.0f,0.0f), ci::Vec2f(1.0f, 1.0f))), false);
         if (i == m_iSel && j == m_jSel)
         {
           glLineWidth(2.0f);
           glColor3f(1, 1, 1);         
           drawFrame(1, 1);  
+          glLineWidth(1.0f);
         }
         glPopMatrix();
       }
@@ -505,7 +521,7 @@ protected:
   #endif
   };
 
-  Type** m_data;
+  const Type* const* m_data;
   float m_scale;
   float m_maxVal;
   int
@@ -522,7 +538,7 @@ class VectorView : public Node
 {
 public:
 
-  VectorView(Type *d, int n, float s = 1.0f, float maxVal = 1.0f) : 
+  VectorView(const Type* d, int n, float s = 1.0f, float maxVal = 1.0f) : 
     m_data(d), m_N(n), m_scale(s/n), m_maxVal(maxVal), m_iSel(-1)  { init(); };
 
   void update()
@@ -587,7 +603,7 @@ protected:
 #endif
   };
 
-  Type* m_data;
+  const Type* m_data;
   float m_scale;
   float m_maxVal;
   int

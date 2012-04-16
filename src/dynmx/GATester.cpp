@@ -43,7 +43,7 @@ void GATester::init()
   // Load info about trials etc
   if (settings->hasChild("Config/GA/Eval"))
   {
-    const ci::XmlTree& eval = settings->getChild("Config/GA/EVAL");
+    const ci::XmlTree& eval = settings->getChild("Config/GA/Eval");
     
     m_numTrials = (eval / "NumTrials")["Value"].as<int>();
     
@@ -152,10 +152,13 @@ void GATester::update(float dt)
       }
     }
     
-    // Reset simulation for new trial
+    // Reset simulation for new trial. Do reset here, at end, so the writing out can happen before, when actual
+    // values still persist.
     m_time = 0.0;
     m_evolvable->reset();
+    m_evolvable->nextTrial(m_trial);
   }
+  
 }
 
   

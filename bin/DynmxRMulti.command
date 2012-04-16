@@ -14,9 +14,7 @@ CMD="./cinder_dynmx $CFG"
 CD="cd `dirname $0`"
 
 # Start with first then open terminal tabs for rest
-$CMD &
-
-for ((i=0; i<$N-1; i++))
+for ((i=0; i<$N; i++))
 do 
   sleep 1s
 

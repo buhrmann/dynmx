@@ -14,6 +14,7 @@
 #include <cmath>
 #include <numeric>
 #include <sstream>
+#include "float.h"
 
 namespace dmx
 {
@@ -27,6 +28,9 @@ const float PI_OVER_FOUR = 0.785398163397448f;
 
 const float DEG_TO_RAD = PI / 180.0f;
 const float RAD_TO_DEG = 180.0f / PI;
+  
+// TODO: MAX_FLOAT
+#define MAX_NEG_FLOAT -FLT_MAX  
 
 //----------------------------------------------------------------------------------------------------------------------
 #ifdef DYNMX_WIN
@@ -40,6 +44,7 @@ static const float asinh(float v)
 struct Range
 {
   Range(double mi = 0.0, double ma = 1.0) : min(mi), max(ma) {};
+  void set(double mi, double ma) { min = mi; max = ma; };
   double min, max;
 };
 
@@ -85,11 +90,37 @@ static inline T clamp(T Value, T Min, T Max)
 
 //----------------------------------------------------------------------------------------------------------------------
 template<class T>
+static inline T wrap(T v, T min, T max)
+{ 
+  if(v > max)
+  {
+    return min + (v - max);
+  }
+  else if (v < min)
+  {
+    return max - (min - v);
+  }
+
+  return v;
+}
+  
+//----------------------------------------------------------------------------------------------------------------------
+template<class T>
 static inline int sign(T val)
 {
   return val < 0 ? -1 : 1;
 }
-
+  
+//----------------------------------------------------------------------------------------------------------------------  
+static inline int even(int i)
+{
+  return i % 2 == 0;
+}
+  
+static inline int odd(int i)
+{
+  return i % 2 != 0;
+}  
 
 // Vector sum
 //----------------------------------------------------------------------------------------------------------------------
@@ -176,10 +207,12 @@ static inline std::vector<double> crossCorrelation(std::vector<T>& v1, std::vect
   assert(maxDelay > minDelay);
   assert(i0 >= 0);
   
-  if(iN == 0)
-    iN = v1.size();
+  const int v1Size = v1.size();
   
-  assert(iN > i0 && iN <= v1.size());
+  if(iN == 0)
+    iN = v1Size;
+  
+  assert(iN > i0 && iN <= v1Size);
   
   // Calculate the correlation series
   std::vector<double> crossCor;

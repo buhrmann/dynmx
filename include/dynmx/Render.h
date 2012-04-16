@@ -184,7 +184,7 @@ namespace dmx
 	}
   
   // in the y plane
-	static void drawRectangle(float lx, float ly, GLenum mode = GL_QUADS)
+	static void drawRectangle(float lx, float ly)
 	{
 	  lx *= 0.5;
 	  ly *= 0.5;
@@ -193,7 +193,7 @@ namespace dmx
     // as 2d, make sure it's drawn on both side
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_CULL_FACE);
-	  glBegin(mode);
+	  glBegin(GL_QUADS);
       glNormal3f (0,0,1);
       glVertex3f( lx, ly, 0.0f);
       glVertex3f(-lx, ly, 0.0f);
@@ -389,13 +389,16 @@ namespace dmx
 //    glEnd ();
 //	}
 //
-	static void drawTriangle(const Vec3f& a, const Vec3f& b, const Vec3f& c)
+	static void drawTriangle(const Vec3f& a, const Vec3f& b, const Vec3f& c, GLenum mode = GL_FILL, GLenum face = GL_FRONT)
 	{
+    glPushAttrib(GL_POLYGON_BIT);
+    glPolygonMode(face, mode);
 	  glBegin(GL_TRIANGLES);
       glVertex3fv(a);
       glVertex3fv(b);
       glVertex3fv(c);
     glEnd();
+    glPopAttrib();
 	};
 
 	// equilateral in z-plane
@@ -699,6 +702,21 @@ namespace dmx
       return Vec3f(1.0, 1.0, (yval-0.89)/0.11);
     }
   }
+
+  // assumes val in [-1, 1]
+  static Vec3f getColorMapTriad(float val, const Vec3f& negative, const Vec3f& neutral, const Vec3f& positive)
+  {
+    assert(fabs(val) <= 1.0);
+    
+    if(val >= 0)
+    {
+      return neutral + val * (positive - neutral);
+    }
+    else
+    {
+      return neutral - val * (negative - neutral);
+    }
+  };
   
   // assumes val in [-1, 1]
   static Vec3f getColorMapBlueRed(float val)

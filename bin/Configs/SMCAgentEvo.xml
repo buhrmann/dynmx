@@ -1,37 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Config>
 	<Globals>
+		<Visual Value="0"/>
         <WindowSize Width="1000" Height="800"/>    
 		<FrameRate Value="50"/>    
-		<Visual Value="0"/>    
-        <FullScreen Value="0"/>      	
-		<DebugLevel Value="1"/>
+        <FullScreen Value="0"/>   
+        <VSync Value="0"/>               	
 		<Model Value="GA"/>	   
-        <OutputFolder Name="/Users/thomasbuhrmann/Experiments/Output"/>     
+		<DebugLevel Value="1"/>
+        <PlotDuration Value="0.5"/>                
+        <OutputFolder Name="/Users/thomasbuhrmann/Experiments/eSMCs/Output"/>     
 	</Globals>
 	<GA>
-		<Evolvable Name="SMCAgentEvo">
-			<NumNeurons>4</NumNeurons>
-            <MaxSensorDist>5.0</MaxSensorDist>
-            <MaxSpeed>5.0</MaxSpeed>
+		<Evolvable Name="SMCAgentLineDis">
+            <MaxSensorDist>0.4</MaxSensorDist>
+            <SensorTransferFunc>Inverse</SensorTransferFunc>
+            <MaxSpeed>0.5</MaxSpeed>
             <MaxAngularSpeed>360</MaxAngularSpeed>
+            <MaxPosition>0.5</TrackLength>            
+            <PositionWraps>0</PositionWraps>
+            <MaxAngle>90</MaxSensorAngle>            
+            <AngleWraps>0</PositionWraps>
+            <TrialDuration>8</TrialDuration>
+            <FitnessEvalDelay>7</FitnessEvalDelay>
+            <Topology Symmetric="1" InputsAreNeurons="1">
+              <Inputs>2</Inputs>
+              <Hidden>3</Hidden>
+              <Outputs>4</Outputs>
+            </Topology>
+            <Environment Name="LinesLeftRight">
+              <Line PosX="0.3" PosY="0.0" Length="0.1" Angle="-45" PosVarX="0.05" PosVarY="0.05" AngleVar="1" Visible="1"/>
+              <Line PosX="0.3" PosY="0.0" Length="0.1" Angle="45" PosVarX="0.05" PosVarY="0.05" AngleVar="1" Visible="0"/>
+              <UnLine PosX="0.3" PosY="0.0" Length="0.1" Angle="90" PosVarX="0.05" PosVarY="0.05" AngleVar="1" Visible="0"/>
+              <UnCircle PosX="0.2" PosY="0.2" Radius="0.05" PosVar="0.1" Visible="1"/>
+              <UnTriangle PosX="0.2" PosY="-0.2" Size="0.1" PosVar="0.1"/>
+            </Environment>
 		</Evolvable>	
-		<Incremental Value="1"/>
-		<LoadFrom Value="/Users/thomasbuhrmann/Code/cinder_dynmx/xcode/build/Release/Output/12_03_06__20_34_57/GA_Result.xml"/>
+		<Incremental Value="0"/>
+		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/eSMCs/Output/12_03_27__12_26_40/GA_Result.xml"/>
 		<PopulationSize Value="100"/>
 		<DemeSize Value="10"/>
-		<NumGenerations Value="2000"/>
-		<MutationMax Value="0.1"/>
-        <MutationMaxReduced Value="0.05"/>
-        <MutationMaxReduceAt Value="1000"/>        
+		<NumGenerations Value="500"/>
+		<MutationMax Value="0.01"/>
+        <MutationMaxReduced Value="0.001"/>
+        <MutationMaxReduceAt Value="400"/>        
 		<RecombinationRate Value="0.5"/>
         <RecombinationRateReduced Value="0.2"/>        
-		<NumTrials Value="20"/>
+		<NumTrials Value="50"/>
+        <AvoidReevaluation Value="0"/>
         <SaveBestEachGeneration Value="1"/>
         <AutoEval Run="1"/>
         <Eval Run="0">
             <NumTrials Value="10"/>
-            <LoadFrom Value="/Users/thomasbuhrmann/Experiments/11_12_23__13_19_41/GA_Progress.xml"/>
+            <RecordState Value="0"/>
+            <LoadFrom Value="/Users/thomasbuhrmann/Experiments/eSMCs/Output/12_03_27__13_11_27/GA_BestGenome.xml"/>            
+            <LoadFromOld Value="/Users/thomasbuhrmann/Experiments/eSMCs/Output/12_03_13__21_57_53/GA_BestGenome.xml"/>
+            <LoadFromOld Value="/Users/thomasbuhrmann/Experiments/Output/12_03_13__13_41_31/GA_BestGenome.xml"/>
         </Eval>         
 	</GA>    
 </Config>

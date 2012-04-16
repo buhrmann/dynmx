@@ -27,7 +27,7 @@ public:
     m_view = new TestViewCTRNN(model->m_ctrnn);
   };
   
-  CTRNN* m_ctrnn;
+  dmx::CTRNN* m_ctrnn;
 };
 
 #endif

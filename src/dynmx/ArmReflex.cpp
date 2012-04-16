@@ -31,18 +31,35 @@ ArmReflex::~ArmReflex()
 //----------------------------------------------------------------------------------------------------------------------  
 void ArmReflex::init()
 {
-  // First let base of arm init
+  // First let parent class init. This will setup individual muscles.
   ArmMuscled::init();
   
-  ci::XmlTree* settings = SETTINGS;
-  if (settings->hasChild("Config/Arm"))
+  if (SETTINGS->hasChild("Config/Arm/Reflex"))
   {
-    // Todo: load stored reflex params
+    ci::XmlTree::Iter refxml = SETTINGS->begin("Config/Arm/Reflex");
+    for (; refxml != SETTINGS->end(); ++refxml)
+    {
+      Reflex* reflex;
+      std::string agonist = refxml->getAttributeValue<std::string>("Agonist");
+      if(agonist == "ElbowFlexor")
+      {
+        reflex = new Reflex(m_muscles[0], m_muscles[1]);
+      }
+      else 
+      {
+        reflex = new Reflex(m_muscles[2], m_muscles[3]);        
+      }
+      
+      reflex->fromXml(*refxml);
+      
+      m_reflexes.push_back(reflex);
+    }
   }
   
-  // Todo: temporary test of reflex control
-  m_reflexes.push_back(new Reflex(m_muscles[0], m_muscles[1]));
-  m_reflexes.push_back(new Reflex(m_muscles[2], m_muscles[3]));
+  if (SETTINGS->hasChild("Config/Arm/TorqueFeedback"))
+    m_torqueFdbIsMeasured = SETTINGS->getChild("Config/Arm/TorqueFeedback").getAttributeValue<bool>("Measured");
+  else
+    m_torqueFdbIsMeasured = true;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -59,7 +76,7 @@ void ArmReflex::resetTo(double elbAngle, double shdAngle)
   m_desiredPos = Pos(0,0);
   m_desiredAngles[JT_elbow] = m_desiredAngles[JT_shoulder] = 0.0;
   
-  m_desiredTrajectory.empty();
+  m_desiredTrajectory.clear();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -138,8 +155,18 @@ void ArmReflex::update(float dt)
   
   // Feed some information from arm kinematics or dynamics back to reflexes
   // Elbow reflex receives torque information from shoulder and vice versa
-  m_reflexes[0]->setIntersegmentInput(m_state.torques[JT_shoulder], m_state.torques[JT_shoulder]);
-  m_reflexes[1]->setIntersegmentInput(m_state.torques[JT_elbow], m_state.torques[JT_elbow]);
+  if(m_torqueFdbIsMeasured)
+  {
+    double elbTrq = m_state.accelerations[JT_elbow] * m_state.inertiaAcc[JT_elbow];
+    double shdTrq = m_state.accelerations[JT_shoulder] * m_state.inertiaAcc[JT_shoulder];
+    m_reflexes[0]->setIntersegmentInput(shdTrq, shdTrq);
+    m_reflexes[1]->setIntersegmentInput(elbTrq, elbTrq);
+  }
+  else
+  {
+    m_reflexes[0]->setIntersegmentInput(m_state.torques[JT_shoulder], m_state.torques[JT_shoulder]);
+    m_reflexes[1]->setIntersegmentInput(m_state.torques[JT_elbow], m_state.torques[JT_elbow]);    
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------  

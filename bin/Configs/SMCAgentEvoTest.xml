@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+ <?xml version="1.0" encoding="utf-8"?>
 <Config>
 	<Globals>
         <WindowSize Width="1000" Height="800"/>    
@@ -11,12 +11,14 @@
 	</Globals>
 	<GA>
 		<Evolvable Name="SMCAgentEvo">
-			<NumNeurons>4</NumNeurons>
+			<NumNeurons>6</NumNeurons>
             <MaxSensorDist>0.5</MaxSensorDist>
+            <MaxSensorAngle>90</MaxSensorAngle>
             <MaxSpeed>0.2</MaxSpeed>
             <MaxAngularSpeed>180</MaxAngularSpeed>
-            <TrackLength>10</TrackLength>
+            <MaxPosition>0.5</TrackLength>
             <PositionWraps>1</PositionWraps>
+            <AngleWraps>1</PositionWraps>
 		</Evolvable>	
 		<Incremental Value="0"/>
 		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/11_12_23__13_19_41/GA_Result.xml"/>

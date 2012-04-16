@@ -17,7 +17,8 @@ namespace dmx
 
 #define REFLEX_USE_CONTRACTION_COORDS 1
 #define REFLEX_USE_OWN_IAIN_IMPL 1
-
+#define OPENLOOP_AS_CCOMMAND 0
+  
 //----------------------------------------------------------------------------------------------------------------------      
 Reflex::Reflex() 
 { 
@@ -144,6 +145,11 @@ void Reflex::setDesiredLength(double l0, double l1)
   
   m_desiredLengthPrev[1] = m_desiredLength[1]; 
   m_desiredLength[1] = m_muscles[1]->lengthToUnitLength(l1);
+  
+#if OPENLOOP_AS_CCOMMAND  
+  m_desiredLength[0] = clamp(m_desiredLength[0] - m_openLoop[0], 0.0, 1.0);
+  m_desiredLength[1] = clamp(m_desiredLength[1] - m_openLoop[0], 0.0, 1.0);
+#endif
   
   // Contraction coordinates
   m_desiredContractionPrev[0] = m_desiredContraction[0]; 
@@ -420,13 +426,19 @@ void Reflex::updateInContractionCoords(float dt)
   
   // Alpha motor neuron
 #if REFLEX_USE_OWN_IAIN_IMPL  
-  m_alpha[0] = m_openLoop[0] + m_ofpv[0] 
+  m_alpha[0] =  m_ofpv[0] 
+#if !OPENLOOP_AS_CCOMMAND
+  + m_openLoop[0] 
+#endif
   + (m_Wspmn[0] * m_spindlePri[0])
   - (m_Wrnmn[0] * m_RnOut[0]) 
   - (m_Wiamn[0] * m_IaInOut[1]) 
   - (m_Wibmn[0] * m_IbInOut[0]);
   
-  m_alpha[1] = m_openLoop[1] + m_ofpv[1] 
+  m_alpha[1] = m_ofpv[1] 
+#if !OPENLOOP_AS_CCOMMAND  
+  + m_openLoop[1] 
+#endif
   + (m_Wspmn[1] * m_spindlePri[1])
   - (m_Wrnmn[1] * m_RnOut[1]) 
   - (m_Wiamn[1] * m_IaInOut[0]) 
@@ -451,6 +463,16 @@ void Reflex::paramToXml(ci::XmlTree& xml, const std::string& str, double* p)
   params.setAttribute("An", p[1]);
   xml.push_back(params);
 }
+  
+//----------------------------------------------------------------------------------------------------------------------    
+void Reflex::paramFromXml(const ci::XmlTree& xml, const std::string& str, double* p)
+{
+  if(xml.hasChild(str))
+  {
+    p[0] = xml.getChild(str).getAttributeValue<double>("Ag");
+    p[1] = xml.getChild(str).getAttributeValue<double>("An");
+  }
+}  
   
 //----------------------------------------------------------------------------------------------------------------------  
 void Reflex::toXml(ci::XmlTree& xml)
@@ -515,8 +537,81 @@ void Reflex::toXml(ci::XmlTree& xml)
   paramToXml(isin, "Wisep", &m_Wisep[0]);
   reflex.push_back(isin);
 
-                                                 
   xml.push_back(reflex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------        
+void Reflex::fromXml(const ci::XmlTree& xml)
+{
+  // Spindle
+  if(xml.hasChild("Spindle"))
+  {
+    const ci::XmlTree& spindle = xml.getChild("Spindle");
+    paramFromXml(spindle, "PosGain", &m_Kspp[0]);
+    paramFromXml(spindle, "VelGain", &m_Kspv[0]);
+    paramFromXml(spindle, "DmpGain", &m_Kspd[0]);
+    paramFromXml(spindle, "VelExp", &m_Espv[0]);
+    paramFromXml(spindle, "Wspmn", &m_Wspmn[0]);
+  }
+  
+  // Static load compensation  
+  if(xml.hasChild("Sfv"))
+  {
+    const ci::XmlTree& sfv = xml.getChild("Sfv");
+    paramFromXml(sfv, "Gain", &m_Ksfv[0]);
+    paramFromXml(sfv, "RecInh", &m_Ksfi[0]); 
+  }
+  
+  // Inertial load compensation  
+  if(xml.hasChild("Ifv"))
+  {  
+    const ci::XmlTree& ifv = xml.getChild("Ifv");
+    paramFromXml(ifv, "Gain", &m_Kifv[0]);
+    paramFromXml(ifv, "Bias", &m_Bifv[0]); 
+  }
+  
+  // IaIn
+  if(xml.hasChild("IaIn"))
+  {  
+    const ci::XmlTree& iain = xml.getChild("IaIn");    
+    paramFromXml(iain, "Wiaia", &m_Wiaia[0]);
+    paramFromXml(iain, "Wspia", &m_Wspia[0]);
+    paramFromXml(iain, "Wrnia", &m_Wrnia[0]);
+    paramFromXml(iain, "Waia", &m_Waia[0]);
+    paramFromXml(iain, "Wiamn", &m_Wiamn[0]);  
+    paramFromXml(iain, "Bias", &m_Biain[0]);  
+    paramFromXml(iain, "Tau", &m_Tiain[0]);
+  }
+  
+  // Renshaw
+  if(xml.hasChild("Renshaw"))
+  {    
+    const ci::XmlTree& rn = xml.getChild("Renshaw");
+    paramFromXml(rn, "Wmnrn", &m_Wmnrn[0]);
+    paramFromXml(rn, "Wrnrn", &m_Wrnrn[0]);
+    paramFromXml(rn, "Wrnmn", &m_Wrnmn[0]);  
+    paramFromXml(rn, "Bias", &m_Brn[0]);  
+    paramFromXml(rn, "Tau", &m_Trn[0]);    
+  } 
+  
+  // IbIn
+  if(xml.hasChild("IbIn"))
+  {     
+    const ci::XmlTree& ibin = xml.getChild("IbIn");
+    paramFromXml(ibin, "Wibib", &m_Wibib[0]);
+    paramFromXml(ibin, "Wglib", &m_Wglib[0]);
+    paramFromXml(ibin, "Wibmn", &m_Wibmn[0]);
+    paramFromXml(ibin, "Bias", &m_Bib[0]);  
+    paramFromXml(ibin, "Tau", &m_Tib[0]);
+  }
+  
+  // Intersegmental inputs
+  if(xml.hasChild("IsIn"))
+  {       
+    const ci::XmlTree isin = xml.getChild("IsIn");
+    paramFromXml(isin, "Wisep", &m_Wisep[0]);
+  }
+  
 }
 
 //----------------------------------------------------------------------------------------------------------------------      

@@ -38,10 +38,7 @@ public:
   void update(Pos pos, float timeStep, int elbPos = 1);
   void update(double desElbAngle, double desShdAngle, float timeStep);
   void update(double lengthElb0, double lengthElb1, double lengthShd0, double lengthShd1, float timeStep);  
-  
-  // Setters
-
-  
+   
   // Getters
   Reflex* getReflex(int i) { assert(i < m_reflexes.size()); return m_reflexes[i]; };
   int getNumReflexes() { return m_reflexes.size(); };
@@ -51,6 +48,7 @@ public:
   // Store output in human readable format
   virtual void toXml(ci::XmlTree& xml);
   
+  // Save complete state
   void record(Recorder& recorder);
   
 protected:
@@ -58,6 +56,8 @@ protected:
   std::vector<Reflex*> m_reflexes;
   Pos m_desiredPos;
   std::deque<Pos> m_desiredTrajectory;
+  
+  bool m_torqueFdbIsMeasured;
   
 }; // class 
   

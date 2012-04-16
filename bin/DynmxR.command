@@ -8,4 +8,5 @@ cp $EXE .
 
 # Execute from here with first input argument
 CMD=./cinder_dynmx
-$CMD 
+CFG="Configs/EvoArmOpLpInterSegMv1_A.xml"
+$CMD $CFG

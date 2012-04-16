@@ -91,7 +91,7 @@ void Globals::initialise(const std::string& cfgFnm)
       m_fnm = cfgFnm.substr(cfgFnm.rfind('/') + 1);
       pathToConfig = cfgFnm;
 #if DEBUGGING
-      std::cout << "Found specified config file in global directory '" << cfgFnm << "'." << std::endl;    
+      std::cout << "Found specified config file in ABSOLUTE path '" << cfgFnm << "'." << std::endl;    
 #endif                
     }
     else 
@@ -102,7 +102,7 @@ void Globals::initialise(const std::string& cfgFnm)
         m_fnm = cfgFnm.substr(cfgFnm.rfind('/') + 1);;
         pathToConfig = localPath;
   #if DEBUGGING
-        std::cout << "Found specified config file in local directory '" << localPath << "'." << std::endl;    
+        std::cout << "Found specified config file in LOCAL path '" << localPath << "'." << std::endl;    
   #endif
       }
     }
@@ -112,9 +112,6 @@ void Globals::initialise(const std::string& cfgFnm)
   // If we have a valid config filename, load it
   if(!pathToConfig.empty())
   {
-#if DEBUGGING
-    std::cout << "Loading settings from '" << pathToConfig << "'." << std::endl;    
-#endif
     try
     {    
       m_settings = new ci::XmlTree(ci::loadFile(pathToConfig));

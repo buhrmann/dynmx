@@ -40,7 +40,22 @@ protected:
   ArmMuscled* m_arm;
   
   bool m_drawDesiredState;
-    
+  
+  struct ColorPalette
+  {
+    ci::ColorA shortMuscle;
+    ci::ColorA longMuscle;
+    ci::ColorA midMuscle;
+    ci::ColorA boneOutline;
+    ci::ColorA boneFill;
+    ci::ColorA jointOutline;
+    ci::ColorA jointFill;
+    ci::ColorA limitsFill;
+    ci::ColorA desired;
+    ci::ColorA trajectory;
+  };
+  
+  ColorPalette m_colors;
 };
    
 } // namespace dmx

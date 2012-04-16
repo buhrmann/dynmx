@@ -60,6 +60,7 @@ protected:
   int32_t m_fixedFrameRate;
   int32_t m_numPointsPerPlot;
   float m_gravity;
+  bool m_drawOverlays;
   bool m_trackMouse;
 }; // class
   
@@ -77,11 +78,20 @@ inline void ArmView::setupScene()
 {
   assert(m_arm);
   
+  // Background
+  m_backgroundColor = ci::Vec4f(1, 1, 1, 1.0);
+  const float g = 1.0f;
+  m_background.topLeft = ci::ColorA(1, 1, 1, 0);
+  m_background.bottomLeft = ci::ColorA(1, 1, 1, 0);
+  m_background.topRight= ci::ColorA(g, g, g, 0);
+  m_background.bottomRight = ci::ColorA(g, g, g, 0);
+  
+  
   // 3d view
   createArmViz(); // Virtual! Will call derived class' create function.
   
   m_armViz->rotate(ci::Vec4f(0,0,1,1), -PI_OVER_TWO);
-  m_armViz->translate(ci::Vec4f(-0.25f, 0.0f, 0.0f, 1.0f));
+  m_armViz->translate(ci::Vec4f(-0.25f, -0.5f, 0.0f, 1.0f));
   m_scene3d.m_children.push_back(m_armViz);
   
   m_trackMouse = false;
@@ -145,6 +155,8 @@ inline void ArmView::update(float dt)
   // Visual control of gravity
   m_arm->setGravity(m_gravity);
   
+  m_armViz->setDrawOverlays(m_drawOverlays);
+  
   // Update arm plot data
   const Pos& effPos = m_arm->getEffectorPos();
   m_armEffPlot->addPoint(effPos.x, 0);
@@ -165,7 +177,6 @@ inline void ArmView::update(float dt)
   m_armElbPlot->addPoint(damping, 3);
   m_armElbPlot->addPoint(total, 4);
   m_armElbPlot->addPoint(acc, 5);
-
 
   applied = state.torques[JT_shoulder];
   inertia = state.inertiaAcc[JT_shoulder];
@@ -208,6 +219,7 @@ inline void ArmView::buildGui()
   m_gui->addPanel();
   m_gui->addLabel("Arm Controls");
   m_gui->addParam("Gravity", &m_gravity, 0.0, 9.81, m_arm->getGravity());
+  m_gui->addParam("Overlays", &m_drawOverlays, m_drawOverlays);
 };
   
 

@@ -175,5 +175,5 @@ double RandomState::GaussianRandom(double mean, double variance)
 //----------------------------------------------------------------------------------------------------------------------
 int RandomState::ProbabilisticChoice(double prob)
 {
-	return (UniformRandom(0.0,1.0) <= prob)?1:0;
+	return (UniformRandom(0.0, 1.0) <= prob) ? 1 : 0;
 }

@@ -10,14 +10,16 @@
 #ifndef CTRNN_H
 #define CTRNN_H
 
+#include "Dynmx.h"
+#include "Random.h"
+#include "MathUtils.h"
+#include <iostream>
+
+namespace dmx
+{
+
 // Uncomment the following line for table-based fast sigmoid w/ linear interpolation
 #define FAST_SIGMOID
-
-#include "Random.h"
-#include <iostream>
-#include <math.h>
-
-#pragma once
 
 //----------------------------------------------------------------------------------------------------------------------
 // The sigmoid function
@@ -66,6 +68,11 @@ inline double sineActivation(double y)
 {
   return 0.5 * (sin(y) + 1);
 }
+  
+inline double identity(double y)
+{
+  return y;
+}  
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -73,42 +80,54 @@ inline double sineActivation(double y)
 //----------------------------------------------------------------------------------------------------------------------
 class CTRNN 
 {
-
-public:
   
   // Define a type of pointer to activation function
   typedef double (*ActivationFunction)(double);
   
+  // Define a type of pointer to member(!) update function
+  typedef void (CTRNN::*UpdateFunction)(int, double);
+  
+public:
+  
   // Name the activation functions
-  enum ActFuncNames
+  enum ActFuncName
   {
     kAF_Sigmoid,
     kAF_Linear,
     kAF_Sine,
+    kAF_Identity,
     kAF_NumFunctions
   };
   
-  // An array of activation function pointers
-  static ActivationFunction s_activationFunctions[kAF_NumFunctions];
-
-  static int getNumRequiredParams(int numNeurons, bool numInputs);
+  // Name the activation functions
+  enum UpdFuncName
+  {
+    kUF_Neuron,
+    kUF_Input,
+    kUF_NumFunctions
+  };  
 
   CTRNN(int newsize = 4);
   ~CTRNN();
   
+  // Your regular CTRNN update all neurons are treated as standard neurons
   void update(double stepsize);
+  
+  // Dynamically switches between regular CTRNN update and other update functions, without branching (uses fct pointer)
+  void updateDynamic(double stepsize);  
+
     
   // Accessors
-  int getSize(void) { return size; };  
-  double getState(int i) { return states[i]; };
-  double getOutput(int i) { return outputs[i]; };
-  double getBias(int i) { return biases[i]; };
-  double getGain(int i) { return gains[i]; };
-  double getTimeConstant(int i) { return taus[i]; };
-  double getExternalInput(int i) { return externalinputs[i]; };
-  double getWeight(int from, int to) { return weights[from][to]; };
-
-  void decodeGenome(const double* params, int numInputs = 0);
+  int getSize(void) const { return size; };  
+  double getState(int i) const { return states[i]; };
+  double getOutput(int i) const { return outputs[i]; };
+  const double* getOutputs() const { return outputs; };
+  double getBias(int i) const { return biases[i]; };
+  double getGain(int i) const { return gains[i]; };
+  double getTimeConstant(int i) const { return taus[i]; };
+  double getExternalInput(int i) const { return externalinputs[i]; };
+  double getWeight(int from, int to) const { return weights[from][to]; };
+  const double* const* getWeights() const { return weights; };
   
   void setState(int i, double value) { states[i] = value; outputs[i] = sigmoid(gains[i] * (states[i] + biases[i])); };
   void setOutput(int i, double value) { outputs[i] = value; states[i] = InverseSigmoid(value)/gains[i] - biases[i]; };
@@ -118,13 +137,11 @@ public:
   void setExternalInput(int i, double value) { externalinputs[i] = value; };
   void setWeight(int from, int to, double value) { weights[from][to] = value; };  
   void setCenterCrossing();
-  void setActivationFunction(int actFuncName) { m_activationFunction = s_activationFunctions[actFuncName]; };
-  void setActivationFunction(double (*pt2Func)(double)) { m_activationFunction = pt2Func; };
-  void initActivationFunctionTable();
-
-  // Input and output
-  friend ostream& operator<<(ostream& os, CTRNN& c);
-  friend istream& operator>>(istream& is, CTRNN& c);
+  void setInputNeuron(int i);
+  
+  void setGlobalActivationFunction(ActFuncName name) { m_activationFunction = getActivationFunction(name); };
+  void setActivationFunction(int i, ActFuncName name) { m_activationFunctions[i] = getActivationFunction(name); };
+  void setUpdateFunction(int i, UpdFuncName name) {   m_updateFunctions[i] = getUpdateFunction(name); };
                       
   // Control
   void randomizeState(double lb, double ub);
@@ -135,8 +152,18 @@ public:
   void randomizeWeights(double lb, double ub, RandomState &rs);  
   void randomizeBiases(double lb, double ub);
   void randomizeTimeConstants(double lb, double ub);
-  
   void zeroStates();
+  
+  void toXml(ci::XmlTree& xml);
+  void fromXml(const ci::XmlTree& xml);
+  
+protected:  
+  
+  void updateNeuron(int i, double stepsize);
+  void updateInput(int i, double stepsize);
+  
+  ActivationFunction getActivationFunction(ActFuncName name);
+  UpdateFunction getUpdateFunction(UpdFuncName name);  
   
   // function pointer for avoiding conditional statements
   ActivationFunction m_activationFunction;
@@ -152,10 +179,14 @@ public:
     *taus, 
     *Rtaus, 
     *externalinputs;
+  
+  UpdateFunction* m_updateFunctions;
+  ActivationFunction* m_activationFunctions; 
     
   double** weights;
-  
 };
+  
+} // namespace
 
 #endif
 

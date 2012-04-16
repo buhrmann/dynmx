@@ -19,23 +19,23 @@
 namespace dmx
 {
 
-#define CTRNNVIZ_NUM_MODES 3
-
 //----------------------------------------------------------------------------------------------------------------------
 // CTRNNNeuronViz implementation
 //----------------------------------------------------------------------------------------------------------------------
 void CTRNNNeuronViz::update()
 {
+  int N = m_ctrnn->getSize();
+  
   // left upper corner of circle's bounding box at 0,0:
-  const float segmentSize = TWO_PI / m_ctrnn->size;
+  const float segmentSize = TWO_PI / N;
   const float networkRadius = m_width / 2.5;  
-  const float neuronRadius = networkRadius / m_ctrnn->size;
+  const float neuronRadius = networkRadius / N;
 
   glPushMatrix();
   glMultMatrixf(*m_pTM);
   
   // connectivity
-  for(int i = 0; i < m_ctrnn->size; i++)
+  for(int i = 0; i < N; i++)
   {
     float angle = -((float)i + 0.5f) * segmentSize + PI_OVER_TWO;   
     Vec3f midPoint (networkRadius * cosf(angle), networkRadius * sinf(angle), 0.0f);
@@ -44,17 +44,22 @@ void CTRNNNeuronViz::update()
     if(i == m_selected || m_selected == -1)
     {
       // draw connections    
-      for(int j = 0; j < m_ctrnn->size; j++)
+      for(int j = 0; j < N; j++)
       {
-        float otherAngle = -((float)j + 0.5f) * segmentSize + PI_OVER_TWO; 
-        Vec3f otherMidPoint (networkRadius * cosf(otherAngle), networkRadius * sinf(otherAngle), 0.0f);
-        const float weight = m_ctrnn->weights[j][i];
-        glLineWidth(fabs(weight));
-        if(weight < 0)
-          glColor3f(235.0/255.0, 0.0/255.0, 103.0/255.0); 
-        else
-          glColor3f(0,0,0);
-        ci::gl::drawLine(midPoint, otherMidPoint);
+        const double eps = 0.001;
+        const float weight = m_ctrnn->getWeight(j,i);        
+        if(fabs(weight) > eps)
+        {
+          float otherAngle = -((float)j + 0.5f) * segmentSize + PI_OVER_TWO; 
+          Vec3f otherMidPoint (networkRadius * cosf(otherAngle), networkRadius * sinf(otherAngle), 0.0f);
+
+          glLineWidth(fabs(weight));
+          if(weight < 0)
+            glColor3f(235.0/255.0, 0.0/255.0, 103.0/255.0); 
+          else
+            glColor3f(0,0,0);
+          ci::gl::drawLine(midPoint, otherMidPoint);
+        }
       }   
       
       // render text 
@@ -75,10 +80,10 @@ void CTRNNNeuronViz::update()
         sprintf(str, "Node: %i", i);
         ci::gl::drawString(str, textPos, textColor, m_font);
         
-        sprintf(str, "b: %2.2f | t: %2.2f | g: %2.2f", m_ctrnn->biases[i], m_ctrnn->taus[i], m_ctrnn->gains[i]);
+        sprintf(str, "b: %2.2f | t: %2.2f | g: %2.2f", m_ctrnn->getBias(i), m_ctrnn->getTimeConstant(i), m_ctrnn->getGain(i));
         ci::gl::drawString(str, textPos + ci::Vec2f(0, lineHeight), textColor, m_font);      
         
-        sprintf(str, "in: %1.3f | out: %1.3f", m_ctrnn->externalinputs[i], m_ctrnn->outputs[i]);
+        sprintf(str, "in: %1.3f | out: %1.3f", m_ctrnn->getExternalInput(i), m_ctrnn->getOutput(i));
         ci::gl::drawString(str, textPos + ci::Vec2f(0, 2 * lineHeight), textColor, m_font);            
       }
     }
@@ -86,9 +91,9 @@ void CTRNNNeuronViz::update()
   
   glLineWidth(1.0f);
   float outerRadius = neuronRadius + 6;
-  for(int i = 0; i < m_ctrnn->size; i++)
+  for(int i = 0; i < N; i++)
   {
-    ci::Color col = m_ctrnn->states[i] > 0 ? ci::Color(0,0,0) : ci::Color(235.0/255.0, 0.0/255.0, 103.0/255.0);
+    ci::Color col = m_ctrnn->getState(i) > 0 ? ci::Color(0,0,0) : ci::Color(235.0/255.0, 0.0/255.0, 103.0/255.0);
 
     float angle = -((float)i + 0.5f) * segmentSize + PI_OVER_TWO;   
     Vec3f midPoint (networkRadius * cosf(angle), networkRadius * sinf(angle), 0.0f);
@@ -99,10 +104,10 @@ void CTRNNNeuronViz::update()
     drawDisk(outerRadius, 0.0, 32, 1);    
     ci::gl::color(col);
     // disk size indicating output value
-    drawDisk(neuronRadius * m_ctrnn->outputs[i], 0.0, 32, 1);
+    drawDisk(neuronRadius * m_ctrnn->getOutput(i), 0.0, 32, 1);
     // ring size indicating external input value
     glColor3f(181.0/255.0, 206.0/255.0, 26.0/255.0);    
-    float width = radiansToDegrees(m_ctrnn->externalinputs[i] * TWO_PI);
+    float width = radiansToDegrees(m_ctrnn->getExternalInput(i) * TWO_PI);
     dmx::drawPartialDisk(neuronRadius, outerRadius, 8, 1, 0, width, GLU_FILL);     
     glColor3f(0,0,0);
     ci::gl::drawStrokedCircle(ci::Vec2f(0,0), outerRadius, 32);
@@ -116,6 +121,7 @@ void CTRNNNeuronViz::update()
 //----------------------------------------------------------------------------------------------------------------------
 void CTRNNNeuronViz::onMouseMove(const Vec4f& mPos)
 {  
+  int N = m_ctrnn->getSize();
   m_selected = -1;
 
   // Update mouse info: transform mouse position into local space angle and radius
@@ -127,9 +133,9 @@ void CTRNNNeuronViz::onMouseMove(const Vec4f& mPos)
   }
 
   const float networkRadius = m_width / 2.5;  
-  const float neuronRadius = networkRadius / m_ctrnn->size + 6;   
-  int neuron = (int)angle / (360 / (int) m_ctrnn->size);    
-  float neuronAngle = -((float)neuron + 0.5f) * TWO_PI / m_ctrnn->size + PI_OVER_TWO;   
+  const float neuronRadius = networkRadius / N + 6;   
+  int neuron = (int)angle / (360 / (int) N);    
+  float neuronAngle = -((float)neuron + 0.5f) * TWO_PI / N + PI_OVER_TWO;   
   Vec4f neuronPos (networkRadius * cosf(neuronAngle), networkRadius * sinf(neuronAngle), 0.0f, 1.0);
   float dist = neuronPos.distance(posLocal);
      
@@ -140,11 +146,13 @@ void CTRNNNeuronViz::onMouseMove(const Vec4f& mPos)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// CTRNNNeuronViz implementation
+// CTRNNWheelViz implementation
 //----------------------------------------------------------------------------------------------------------------------
 void CTRNNWheelViz::update()
 {
-  const float segmentSizeDeg = 360.0f / m_ctrnn->size;
+  int N = m_ctrnn->getSize();
+  
+  const float segmentSizeDeg = 360.0f / N;
   const float segmentSizeRad = degreesToRadians(segmentSizeDeg);
   const float r3 = m_width / 2;
   const float r2 = r3 - 5;
@@ -155,38 +163,42 @@ void CTRNNWheelViz::update()
   glMultMatrixf(*m_pTM);
   
   // connectivity
-  for(int i = 0; i < m_ctrnn->size; i++)
+  for(int i = 0; i < N; i++)
   {
     // draw only the selected neuron's connections
     if(i == m_selected || m_selected == -1)
     {
       float angle = -((float)i + 0.5f) * segmentSizeRad + PI_OVER_TWO; 
       Vec3f midPoint ((r1+5) * cosf(angle), (r1+5) * sinf(angle), 0.0f);
-      for(int j = 0; j < m_ctrnn->size; j++)
+      for(int j = 0; j < N; j++)
       {
-        float otherAngle = -((float)j + 0.5f) * segmentSizeRad + PI_OVER_TWO; 
-        Vec3f otherMidPoint ((r1+5) * cosf(otherAngle), (r1+5) * sinf(otherAngle), 0.0f);
-        const float weight = m_ctrnn->weights[j][i];
-        glLineWidth(fabs(weight));
-        if(weight < 0)
-          glColor3f(235.0/255.0, 0.0/255.0, 103.0/255.0); 
-        else
-          glColor3f(0,0,0);
-        ci::gl::drawLine(midPoint, otherMidPoint);
+        const double eps = 0.001;
+        const float weight = m_ctrnn->getWeight(j, i);        
+        if(fabs(weight) > eps)
+        {
+          float otherAngle = -((float)j + 0.5f) * segmentSizeRad + PI_OVER_TWO; 
+          Vec3f otherMidPoint ((r1+5) * cosf(otherAngle), (r1+5) * sinf(otherAngle), 0.0f);
+          glLineWidth(fabs(weight));
+          if(weight < 0)
+            glColor3f(235.0/255.0, 0.0/255.0, 103.0/255.0); 
+          else
+            glColor3f(0,0,0);
+          ci::gl::drawLine(midPoint, otherMidPoint);
+        }
       }   
     }   
   }
   glLineWidth(1.0f);
   
   // outputs
-  for(int i = 0; i < m_ctrnn->size; i++)
+  for(int i = 0; i < N; i++)
   {
     // white background
     glColor3f(1,1,1);
     dmx::drawPartialDisk(r1, r2, 8, 1, i * segmentSizeDeg, segmentSizeDeg, GLU_FILL);
     // actual amount
     glColor3f(181.0/255.0, 206.0/255.0, 26.0/255.0);
-    float outputWidth = m_ctrnn->outputs[i] * segmentSizeDeg;
+    float outputWidth = m_ctrnn->getOutput(i) * segmentSizeDeg;
     dmx::drawPartialDisk(r1, r2, 8, 1, i * segmentSizeDeg, outputWidth, GLU_FILL); 
     // outline segment
     glColor3f(0,0,0);
@@ -194,10 +206,10 @@ void CTRNNWheelViz::update()
   }
   
   // indicators
-  for(int i = 0; i < m_ctrnn->size; i++)
+  for(int i = 0; i < N; i++)
   {
     glColor3f(0,0,0);
-    dmx::drawPartialDisk(r2, r3, 8, 1, i * segmentSizeDeg, m_ctrnn->externalinputs[i] * segmentSizeDeg, GLU_FILL);  
+    dmx::drawPartialDisk(r2, r3, 8, 1, i * segmentSizeDeg, m_ctrnn->getExternalInput(i) * segmentSizeDeg, GLU_FILL);  
     
     if(i == m_selected)
       glColor3f(235.0/255.0, 0.0/255.0, 103.0/255.0);
@@ -224,13 +236,157 @@ void CTRNNWheelViz::onMouseMove(const Vec4f& mPos)
   if(angle < 0) angle += 360.0f;
   if(radius > r1 && radius < r3)
   {
-    m_selected = (int)angle / (360 / (int) m_ctrnn->size);
+    m_selected = (int)angle / (360 / (int) m_ctrnn->getSize());
   }
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+// CTRNNLayerViz implementation
+//----------------------------------------------------------------------------------------------------------------------
+CTRNNLayerViz::CTRNNLayerViz(const CTRNN* ctrnn, const Topology* top, float width, bool text) : 
+  CTRNNBasicViz(ctrnn, width, text), 
+  m_topology(top) 
+{
+  int numInputs = m_topology->getInputsAreNeurons() ? m_topology->getNumInputs() : 0;
+  int numHidden = m_topology->getNumHidden();
+  int numOutputs = m_topology->getNumOutputs();
+  m_maxLayerN = std::max(numInputs, std::max(numHidden, numOutputs));
+  
+  int space = m_width / m_maxLayerN;   
+  m_r = space / 3;
+  
+  // Pre-calculate all neuron's positions
+  // Inputs
+  int x;
+  int y = 5.0/12.0 * m_width; // not quite 1/2
+  int xOffset = -space * (numInputs - 1) / 2;
+  for(int i = 0; i < numInputs; i++)
+  {
+    x = xOffset + i * space;
+    m_pos.push_back(ci::Vec3f(x, y, 0));
+  }
+  
+  // Hidden
+  y = 0.0;
+  xOffset = -space * (numHidden - 1) / 2;
+  float midPoint = (float)(numHidden - 1) / 2.0;
+  for(int i = 0; i < numHidden; i++)
+  {
+    x = xOffset + i * space;
+    // triangular arrangement so weights become discernable    
+    int yOffset = -space/3 * (midPoint - std::abs((float)i - midPoint)); 
+    m_pos.push_back(ci::Vec3f(x, y + yOffset, 0));
+  }
+  
+  // Output
+  y = -5.0/12.0 * m_width; // not quite 1/2
+  xOffset = -space * (numOutputs - 1) / 2.0;
+  midPoint = (float)(numOutputs - 1) / 2.0;
+  for(int i = 0; i < numOutputs; i++)
+  {
+    x = xOffset + i * space;
+    // triangular arrangement so weights become discernable    
+    int yOffset = -space/3 * (midPoint - std::abs((float)i - midPoint));     
+    m_pos.push_back(ci::Vec3f(x, y + yOffset, 0));
+  }  
+};
+
+//----------------------------------------------------------------------------------------------------------------------    
+void CTRNNLayerViz::update()
+{
+  const float innerRadius = m_r - 6;
+  
+  glPushMatrix();
+  glMultMatrixf(*m_pTM);
+  
+  // connectivity
+  for(int i = 0; i < m_pos.size(); i++)
+  {
+    // draw only the selected neuron's connections
+    if(i == m_selected || m_selected == -1)
+    {
+      for(int j = 0; j < m_pos.size(); j++)
+      {
+        const double eps = 0.001;
+        const float weight = m_ctrnn->getWeight(j, i);        
+        if(fabs(weight) > eps)
+        {
+          glLineWidth(fabs(weight));
+          if(weight < 0)
+            glColor3f(235.0/255.0, 0.0/255.0, 103.0/255.0); 
+          else
+            glColor3f(0,0,0);
+          ci::gl::drawLine(m_pos[j], m_pos[i]);
+        }
+      }   
+    }   
+  }
+  glLineWidth(1.0);  
+  
+  // Neurons
+  for(int i = 0; i < m_pos.size(); i++)
+  {
+    glPushMatrix();
+    glTranslatef(m_pos[i]);
+    CTRNNViz::drawNeuron(i, m_ctrnn, innerRadius, m_r);
+    glPopMatrix();
+  }
+  
+  glPopMatrix();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
-// CTRNNViz implementation
+void CTRNNLayerViz::onMouseMove(const Vec4f& mPos)
+{
+  m_selected = -1;
+  
+  // update mouse info: transform mouse position into local space angle and radius
+  Vec4f posLocal = mPos - m_pTM->getTranslate();
+  for(int i = 0; i < m_pos.size(); ++i)
+  {
+    if(posLocal.distanceSquared(m_pos[i]) < (m_r * m_r))
+    {
+      m_selected = i;
+    }
+  }
+}
+  
+//----------------------------------------------------------------------------------------------------------------------
+// CTRNNViz implementation  
+//----------------------------------------------------------------------------------------------------------------------  
+
+// Mormalises inputs to 1, if input neurons function as placeholders  
+//----------------------------------------------------------------------------------------------------------------------  
+double CTRNNViz::getOutputNorm(int i, const CTRNN* ctrnn)
+{
+  double out = ctrnn->getOutput(i);
+  if(out > 1)
+    out /= ctrnn->getGain(i);
+  
+  return out;
+}
+
+//----------------------------------------------------------------------------------------------------------------------  
+void CTRNNViz::drawNeuron(int i, const CTRNN* ctrnn, float inner, float outer)
+{
+  // white background    
+  glColor3f(1,1,1);
+  drawDisk(outer, 0.0, 32, 1);    
+  
+  // disk size indicating output value
+  ci::Color col = ctrnn->getState(i) > 0 ? ci::Color(0,0,0) : ci::Color(235.0/255.0, 0.0/255.0, 103.0/255.0);    
+  ci::gl::color(col);    
+  drawDisk(inner * getOutputNorm(i, ctrnn), 0.0, 32, 1);
+  
+  // ring size indicating external input value
+  glColor3f(181.0/255.0, 206.0/255.0, 26.0/255.0);    
+  float width = radiansToDegrees(ctrnn->getExternalInput(i) * TWO_PI);
+  dmx::drawPartialDisk(inner, outer, 8, 1, 0, width, GLU_FILL);     
+  glColor3f(0,0,0);
+  ci::gl::drawStrokedCircle(ci::Vec2f(0,0), outer, 32);
+  ci::gl::drawStrokedCircle(ci::Vec2f(0,0), inner, 32);      
+}
+  
 //----------------------------------------------------------------------------------------------------------------------
 void CTRNNViz::init()
 {
@@ -238,13 +394,13 @@ void CTRNNViz::init()
   
   m_font = ci::Font(ci::app::loadResource("pf_tempesta_seven.ttf"), 8);
   
-  m_mode = 0;
+  m_mode = kRM_Layers;
   m_selected = -1;
   m_angle = 0;
   m_labelHeight = 16;
   m_padding = 3;
   m_lineHeight = m_labelHeight - m_padding;  
-  m_unitSize = m_width / m_ctrnn->size;
+  m_unitSize = m_width / m_ctrnn->getSize();
 
   m_textColor = ci::Color(1,1,1);
   m_labelColor = ci::ColorA(0.0f, 0.0f, 0.0f, 0.5f);
@@ -258,12 +414,13 @@ void CTRNNViz::init()
   m_height =  m_label3y + m_labelHeight + m_padding + 3 * m_lineHeight + 2 * m_padding;
   
   // output vector
-  m_outputs = new VectorView<double>(m_ctrnn->outputs, m_ctrnn->size, m_width, 1.0); 
+  int N = m_ctrnn->getSize();
+  m_outputs = new VectorView<double>(m_ctrnn->getOutputs(), N, m_width, 1.0); 
   m_outputs->translate(Vec4f(0, m_labelHeight + m_padding, 0, 1));
   m_children.push_back(m_outputs);
   
   // weight matrix
-  m_weights = new MatrixView<double>(m_ctrnn->weights, m_ctrnn->size, m_ctrnn->size, m_width, 10.0);
+  m_weights = new MatrixView<double>(m_ctrnn->getWeights(), N, N, m_width, 10.0);
   m_weights->translate(Vec4f(0, m_label2y + m_labelHeight + m_padding , 0, 1));
   m_children.push_back(m_weights);  
   
@@ -276,18 +433,34 @@ void CTRNNViz::init()
   m_wheelViz = new CTRNNWheelViz(m_ctrnn, m_width, false);
   m_wheelViz->translate(ci::Vec4f(m_width / 2, m_label3y / 2, 0, 1));
   m_children.push_back(m_wheelViz);  
+  
+  // layerViz
+  if(m_topology)
+  {
+    m_layerViz = new CTRNNLayerViz(m_ctrnn, m_topology, m_width, false);
+    m_layerViz->translate(ci::Vec4f(m_width / 2, m_label3y / 2, 0, 1));
+    m_children.push_back(m_layerViz);      
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------  
-void CTRNNViz::renderAsNeurons()
+void CTRNNViz::renderAs(int m)
 {
-  m_children[2]->update();
-}
-
-//----------------------------------------------------------------------------------------------------------------------  
-void CTRNNViz::renderAsWheel()
-{
-  m_children[3]->update();  
+  switch (m) 
+  {
+    case kRM_Matrix:
+      renderAsMatrix();
+      break;
+    case kRM_Ring:
+      m_children[2]->update();
+      break;      
+    case kRM_Wheel:
+      m_children[3]->update();
+      break;
+    case kRM_Layers:
+      m_children[4]->update();
+      break;
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------  
@@ -327,18 +500,7 @@ void CTRNNViz::update()
   
   // Draw according to selected mode
   ci::gl::color(m_labelColor);  
-  if(m_mode == 1)
-  {
-    renderAsWheel();
-  } 
-  else if (m_mode == 2)
-  {     
-    renderAsMatrix();
-  }
-  else
-  {
-    renderAsNeurons();
-  }
+  renderAs(m_mode);
   
   // data label
   ci::gl::color(m_labelColor);  
@@ -353,27 +515,46 @@ void CTRNNViz::update()
   
   // text
   ci::Vec2f textPos = textBoxPos + textPadding;
-  const int i = (m_mode == 2) ? m_outputs->m_iSel : (m_mode == 1) ? m_wheelViz->getSelectedNeuron() : m_neuronViz->getSelectedNeuron();
+  
+  // get selected node from current viz
+  int i;
+  switch (m_mode) 
+  {
+    case kRM_Matrix:
+    default:
+      i = m_outputs->m_iSel;
+      break;
+    case kRM_Wheel:
+      i = m_wheelViz->getSelectedNeuron();
+      break;
+    case kRM_Ring:
+      i = m_neuronViz->getSelectedNeuron();
+      break;
+    case kRM_Layers:
+      i = m_layerViz->getSelectedNeuron();
+      break;      
+  }
+  
   char str [128];
   if(i != -1)
   {
     sprintf(str, "Node: %i", i);
     ci::gl::drawString(str, textPos, m_textColor, m_font);
     
-    sprintf(str, "b: %2.2f | t: %2.2f | g: %2.2f", m_ctrnn->biases[i], m_ctrnn->taus[i], m_ctrnn->gains[i]);
+    sprintf(str, "b: %2.2f | t: %2.2f | g: %2.2f", m_ctrnn->getBias(i), m_ctrnn->getTimeConstant(i), m_ctrnn->getGain(i));
     ci::gl::drawString(str, textPos + ci::Vec2f(0, m_lineHeight), m_textColor, m_font);      
     
-    sprintf(str, "in: %1.3f | out: %1.3f", m_ctrnn->externalinputs[i], m_ctrnn->outputs[i]);
+    sprintf(str, "in: %1.3f | out: %1.3f", m_ctrnn->getExternalInput(i), m_ctrnn->getOutput(i));
     ci::gl::drawString(str, textPos + ci::Vec2f(0, 2 * m_lineHeight), m_textColor, m_font);            
   }
   
-  if(m_mode == 2)
+  if(m_mode == kRM_Matrix)
   {
     const int& iW = m_weights->m_iSel;
     const int& jW = m_weights->m_jSel; 
     if(iW != -1 && jW != -1)
     {      
-      sprintf(str, "weight %i > %i: %2.2f", iW, jW, m_ctrnn->weights[iW][jW]);
+      sprintf(str, "weight %i > %i: %2.2f", iW, jW, m_ctrnn->getWeight(iW, jW));
       ci::gl::drawString(str, textPos, m_textColor, m_font);
     }
   }
@@ -396,7 +577,8 @@ void CTRNNViz::onMousePress(const Vec4f& mPos)
   // Button triggers view mode
   if(m_modeButton.contains(ci::Vec2f(localPos)) ) 
   {
-    m_mode = (m_mode + 1) % CTRNNVIZ_NUM_MODES;
+    // We have n viz in children (but matrix viz consists of two, therefore one less)
+    m_mode = (m_mode + 1) % (m_children.size() - 1);
   }
   
   NodeGroup::onMousePress(mPos);

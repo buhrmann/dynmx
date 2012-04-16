@@ -43,37 +43,40 @@ inline void ArmReflexViz::update()
 {
   ArmMuscledViz::update();
   
-  // Overlay desired state
-  glDisable(GL_DEPTH_TEST);
-  glPushMatrix();
-  glMultMatrixf(*m_pTM);
-  
-  // Draw desired trajectory
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_COLOR_ARRAY);  
-  const std::deque<Pos>& desTrajectory = m_armRx->getDesiredTrajectory();  
-  int numPoints =  desTrajectory.size();    
-  float lineVertsDes[numPoints*2];
-  float colorsDes[numPoints*4];
-  glVertexPointer(2, GL_FLOAT, 0, lineVertsDes); // 2d positions
-  glColorPointer(4, GL_FLOAT, 0, colorsDes);     // 4d colors  
-  for(size_t i = 0; i < numPoints; i++)
+  if(m_drawOverlays)
   {
-    lineVertsDes[i*2 + 0] = desTrajectory[i].x;
-    lineVertsDes[i*2 + 1] = desTrajectory[i].y;
-    float c = 0.5f * (float)i / (float)numPoints;
-    colorsDes[i*4 + 0] = 1;
-    colorsDes[i*4 + 1] = 0;
-    colorsDes[i*4 + 2] = 0;
-    colorsDes[i*4 + 3] = c;
+    // Overlay desired state
+    glDisable(GL_DEPTH_TEST);
+    glPushMatrix();
+    glMultMatrixf(*m_pTM);
+    
+    // Draw desired trajectory
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);  
+    const std::deque<Pos>& desTrajectory = m_armRx->getDesiredTrajectory();  
+    int numPoints =  desTrajectory.size();    
+    float lineVertsDes[numPoints*2];
+    float colorsDes[numPoints*4];
+    glVertexPointer(2, GL_FLOAT, 0, lineVertsDes); // 2d positions
+    glColorPointer(4, GL_FLOAT, 0, colorsDes);     // 4d colors  
+    for(size_t i = 0; i < numPoints; i++)
+    {
+      lineVertsDes[i*2 + 0] = desTrajectory[i].x;
+      lineVertsDes[i*2 + 1] = desTrajectory[i].y;
+      float c = 0.5f * (float)i / (float)numPoints;
+      colorsDes[i*4 + 0] = 0.5;
+      colorsDes[i*4 + 1] = 0.5;
+      colorsDes[i*4 + 2] = 0.5;
+      colorsDes[i*4 + 3] = c;
+    }
+    glDrawArrays( GL_LINE_STRIP, 0, numPoints);
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
+    
+    // Restore gl state
+    glPopMatrix();
+    glEnable(GL_DEPTH_TEST);     
   }
-  glDrawArrays( GL_LINE_STRIP, 0, numPoints);
-  glDisableClientState(GL_VERTEX_ARRAY);
-  glDisableClientState(GL_COLOR_ARRAY);
-  
-  // Restore gl state
-  glPopMatrix();
-  glEnable(GL_DEPTH_TEST);     
 }
   
 } // namespace dmx
