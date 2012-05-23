@@ -143,16 +143,22 @@ protected:
   
   // Flags and params
   bool m_evolveMuscles;
+  bool m_evolveFriction;
+  bool m_evolveRampDuration;
   bool m_symmetricMuscles;
   bool m_evolveSpindles;
   bool m_evolveIAIN;
+  bool m_evolveIAINsimple;
+  bool m_evolveIAINsym;  
   bool m_evolveRenshaw;
   bool m_evolveIBIN;
   bool m_evolveIFV;
   bool m_evolveSFV;
   bool m_evolveOpenLoop;
+  int m_openLoopSymmetry;
   bool m_evolveIntersegmentInputs;
-  bool m_evolveUniformSpindles;
+  int m_evolveUniformSpindles;
+  int m_evolveUniformSpindleWeights;
   bool m_evolveHillParams;
   bool m_evolveMinJerkDelay;
   bool m_evolveVelRef;

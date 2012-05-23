@@ -154,6 +154,7 @@
 		D6B4EAD3151B26E700C42D0D /* CTRNNFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CTRNNFactory.h; path = ../include/dynmx/CTRNNFactory.h; sourceTree = SOURCE_ROOT; };
 		D6B4EADA151B27C900C42D0D /* Topology.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Topology.cpp; sourceTree = "<group>"; };
 		D6B4EADC151B27DD00C42D0D /* Topology.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Topology.h; path = ../include/dynmx/Topology.h; sourceTree = SOURCE_ROOT; };
+		D6B6BCF6156BFD0500D5A957 /* Delay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Delay.h; path = ../include/dynmx/Delay.h; sourceTree = SOURCE_ROOT; };
 		D6B7EAF313B791800019114A /* Registry.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Registry.cpp; sourceTree = "<group>"; };
 		D6B7EAF513B791B00019114A /* Registry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Registry.h; path = ../include/dynmx/Registry.h; sourceTree = SOURCE_ROOT; };
 		D6BA379A13BA249900CFED09 /* Muscle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Muscle.cpp; sourceTree = "<group>"; };
@@ -462,6 +463,7 @@
 				D6BA381713BA32E000CFED09 /* ArmMuscled.cpp */,
 				D6C3A1D01448500700E89616 /* ArmReflex.h */,
 				D6C3A1D11448501B00E89616 /* ArmReflex.cpp */,
+				D6B6BCF6156BFD0500D5A957 /* Delay.h */,
 				D6BA379C13BA24B000CFED09 /* Muscle.h */,
 				D6BA379A13BA249900CFED09 /* Muscle.cpp */,
 				D62AB6F113D73354003020F7 /* MuscleMonoWrap.h */,

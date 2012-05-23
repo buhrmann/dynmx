@@ -105,10 +105,13 @@ float EvoArmCoCon::getFitness(float start, float end)
   // Minimise coactivation
   if(m_fitnessEvalCoact)
   {
-    double totalCoact = 0.5 * (sum(m_actualCoactivationsElb, t0, tmax) + sum(m_actualCoactivationsShd, t0, tmax));
-    totalCoact /= numSteps;
-    assert(totalCoact <= 1.0);
-    fitness *= 1 - totalCoact;
+    double maxCoact = 0.2;
+    double avgElbCoact = max(m_actualCoactivationsElb, t0, tmax);
+    double avgShdCoact = max(m_actualCoactivationsShd, t0, tmax);
+    double elbCoactFit = 1.0 - std::max(avgElbCoact - maxCoact, 0.0);
+    double shdCoactFit = 1.0 - std::max(avgShdCoact - maxCoact, 0.0);
+
+    fitness *= elbCoactFit * shdCoactFit;
   }
   
   return fitness;
@@ -259,16 +262,22 @@ void EvoArmCoCon::init()
     const ci::XmlTree& xmlFlags = SETTINGS->getChild("Config/GA/Evolvable/EvoFlags");    
     m_evolveMuscles = xmlFlags.getChild("Muscles").getValue<bool>();
     m_symmetricMuscles = xmlFlags.getChild("Muscles").getAttributeValue<bool>("symmetric");
-    m_evolveHillParams = xmlFlags.getChild("Muscles").getAttributeValue<bool>("hillParams");    
+    m_evolveHillParams = xmlFlags.getChild("Muscles").getAttributeValue<bool>("hillParams");
+    m_evolveFriction = xmlFlags.getChild("Friction").getValue<bool>();
+    m_evolveRampDuration = xmlFlags.getChild("RampDuration").getValue<bool>();    
     m_evolveSpindles = xmlFlags.getChild("Spindles").getValue<bool>();
-    m_evolveUniformSpindles = xmlFlags.getChild("Spindles").getAttributeValue<bool>("uniform");    
+    m_evolveUniformSpindles = xmlFlags.getChild("Spindles").getAttributeValue<int>("uniform");    
+    m_evolveUniformSpindleWeights = xmlFlags.getChild("Spindles").getAttributeValue<int>("uniformWeights");
     m_evolveVelRef = xmlFlags.getChild("Spindles").getAttributeValue<bool>("velRef");
     m_evolveIAIN = xmlFlags.getChild("iain").getValue<bool>();
+    m_evolveIAINsimple = xmlFlags.getChild("iain").getAttributeValue<bool>("simple");
+    m_evolveIAINsym = xmlFlags.getChild("iain").getAttributeValue<bool>("symmetric");    
     m_evolveRenshaw = xmlFlags.getChild("renshaw").getValue<bool>();
     m_evolveIBIN = xmlFlags.getChild("ibin").getValue<bool>();
     m_evolveIFV = xmlFlags.getChild("ifv").getValue<bool>();
     m_evolveSFV = xmlFlags.getChild("sfv").getValue<bool>();
     m_evolveOpenLoop = xmlFlags.getChild("openLoop").getValue<bool>();
+    m_openLoopSymmetry = xmlFlags.getChild("openLoop").getAttributeValue<int>("symmetric");
     m_maxOpenLoop = xmlFlags.getChild("openLoop").getAttributeValue<float>("max");    
     m_evolveIntersegmentInputs = xmlFlags.getChild("interSegmentInput").getValue<bool>();
     m_maxInterseg = xmlFlags.getChild("interSegmentInput").getAttributeValue<double>("max");
@@ -301,7 +310,7 @@ void EvoArmCoCon::init()
       }
     }
     
-    // Intersegmental parameters
+    // Intersegmental parameters    
     if (SETTINGS->hasChild("Config/Arm/IntersegmentalParams")) 
     {   
       m_intersegParams.clear();
@@ -313,7 +322,13 @@ void EvoArmCoCon::init()
         double v = val->getValue<double>();
         m_intersegParams.push_back(v);
       }
-    }
+    }      
+    
+    // Ramp duration factor
+    if (SETTINGS->hasChild("Config/Arm/RampDurationFactor")) 
+    {   
+      m_rampDurationFactor = SETTINGS->getChild("Config/Arm/RampDurationFactor").getValue<double>();    
+    }    
         
     // Read trajectory from settings file    
     // Requires arm to be setup to do FK, but that's already done in init() above, so should be fine.
@@ -371,7 +386,7 @@ void EvoArmCoCon::init()
     m_evolveSFV = false;
     m_evolveOpenLoop = false;
     m_maxOpenLoop = 0.25;
-    m_evolveUniformSpindles = true;
+    m_evolveUniformSpindles = 1;
     m_evolveHillParams = false;
     
     m_enableCoconIncrease = false;
@@ -532,7 +547,7 @@ void EvoArmCoCon::update(float dt)
   // Set open-loop parameters for the current movement
   // Vector of open-loop is arranged like this: [mv1m1 mv1m2 mv1m3 ... mv1mM | mv2m1 ... | mvNmM],
   // where mv = move, and m = muscle
-  if(m_evolveOpenLoop)
+  if(m_openLoopParams.size() > 0)
   {
     // We set open loop activations at beginning of movement phase. Will be reset to 0 in reflex->reset (next trial)
     if((m_currentPhase == kMvPh_move) && (m_currentPhase != prevPhase))
@@ -549,7 +564,7 @@ void EvoArmCoCon::update(float dt)
   }  
   
   // Set open-loop parameters for the current movement
-  if(m_evolveIntersegmentInputs)
+  if(m_intersegParams.size() > 0)
   {
     // We set interseg. params at beginning of each move, even in leadIn phase these should be fine to use
     //if(m_currentMove != prevMove)

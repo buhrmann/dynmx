@@ -34,6 +34,11 @@ void ArmReflex::init()
   // First let parent class init. This will setup individual muscles.
   ArmMuscled::init();
   
+  // Applies to all reflexes created below
+  bool coconAsCCommand = false; 
+  if (SETTINGS->hasChild("Config/Arm/CoContraction"))
+    coconAsCCommand = SETTINGS->getChild("Config/Arm/CoContraction").getAttributeValue<bool>("AsCCommand");  
+  
   if (SETTINGS->hasChild("Config/Arm/Reflex"))
   {
     ci::XmlTree::Iter refxml = SETTINGS->begin("Config/Arm/Reflex");
@@ -51,6 +56,8 @@ void ArmReflex::init()
       }
       
       reflex->fromXml(*refxml);
+      
+      reflex->setCoconAsCCommand(coconAsCCommand);
       
       m_reflexes.push_back(reflex);
     }

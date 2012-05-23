@@ -12,6 +12,7 @@
 
 #include "Dynmx.h"
 #include "Muscle.h"
+#include "Delay.h"
 #include "MathUtils.h"
 
 namespace dmx
@@ -22,6 +23,8 @@ namespace dmx
 //----------------------------------------------------------------------------------------------------------------------
 class Reflex : public Model
 {
+  
+friend class ArmReflexView;
 
 public:
   
@@ -38,22 +41,25 @@ public:
   void setDesiredLength(double l0, double l1); // Will also update desired velocity, contraction etc...
   void setOpenLoop(double c0, double c1);  
   void setIntersegmentInput(double i1, double i2);
-  void setSpindleParameters(double Kp0, double Kp1, double Kv0, double Kv1, double Kd0, double Kd1, double E0, double E1);
+  void setSpindleParameters(double Kp0, double Kp1, double Kv0, double Kv1, double Kd0, double Kd1, double E0, double E1, double Ed0=1, double Ed1=1);
   void setLoadCompensationParameters(double g0, double g1, double inh0, double inh1);
   void setInertiaCompensationParameters(double g0, double g1, double b0, double b1);
   void setIaInParameters(double Wspia0, double Wspia1, double Wiaia0, double Wiaia1, double Waia0, double Waia1, 
                          double Wrnia0, double Wrnia1, double Wiamn0, double Wiamn1, 
                          double t1, double t2, double b1, double b2);
+  void setIaInParametersMinimal(double Wspia0, double Wspia1, double Wiaia0, double Wiaia1, double Wiamn0, double Wiamn1, double t1, double t2);
   void setRenshawParameters(double Wmnrn0, double Wmnrn1, double Wrnrn0, double Wrnrn1, double Wrnmn0, double Wrnmn1,
                             double t1, double t2, double b1, double b2);  
   void setIbInParameters(double Wglib0, double Wglib1, double Wibib0, double Wibib1, double Wibmn0, double Wibmn1,
                          double t1, double t2, double b1, double b2);  
   void setMotoNeuronParameters(double Wspmn0, double Wspmn1);
   void setIntersegmentalParameters(double Wisep0, double Wisep1);
+  void setCoconAsCCommand(bool b) { m_coconAsCCommand = b; };
   
   // Getters
   double getAlphaOutput(int i) { return m_alpha[i]; };
   double getOpenLoop(int i) { return m_openLoop[i]; };
+  double getIntersegmentInput(int i) { return m_interSegmentInput[i]; };
   double getLength(int i) { return m_length[i]; };
   double getDesiredLength(int i) { return m_desiredLength[i]; };
   double getDesiredVelocity(int i) { return m_desiredVelocity[i]; };
@@ -76,6 +82,7 @@ public:
   double m_Kspv [2];   // Spindle velocity gain  
   double m_Kspd [2];   // Spindle damping
   double m_Espv [2];   // Spindle velocity exponent
+  double m_Espd [2];   // Spindle damping exponent
   
   
 protected:
@@ -83,7 +90,7 @@ protected:
   void recordStatePair(Recorder& recorder, const std::string& name, const double* var);
   
   static double spindleActivation(double x) { return x;/* / (1 + 100 * (x*x));*/ };
-  static double neuronActivation(double x) { return 1.0 / (1.0 + exp(-x));};
+  static double neuronActivation(double x) { return 1.0 / (1.0 + exp(5.0 - 12.0*x));};
   //static double neuronActivation(double x) { return clamp(x, 0.0, 1.0); };
   //static double neuronActivation(double x) { return smoothStep(0, 1, x); };
   void updateInLengthCoords(float dt);
@@ -92,6 +99,8 @@ protected:
   void paramToXml(ci::XmlTree& xml, const std::string& str, double* p); 
   void paramFromXml(const ci::XmlTree& xml, const std::string& str, double* p); 
   
+  // Delay lines
+  Delay m_posDelay [2];
   
   // Parameters
   //-------------------------------------------------
@@ -132,6 +141,8 @@ protected:
   
   // Intersegmental force feedback
   double m_Wisep [2];  // intersegmental influence on desired position
+  
+  bool m_coconAsCCommand;
   
   // Inputs
   //-------------------------------------------------  
@@ -204,7 +215,7 @@ inline void Reflex::setOpenLoop(double c0, double c1)
 };
 
 //----------------------------------------------------------------------------------------------------------------------    
-inline void Reflex::setSpindleParameters(double Kp0, double Kp1, double Kv0, double Kv1, double Kd0, double Kd1, double E0, double E1)
+inline void Reflex::setSpindleParameters(double Kp0, double Kp1, double Kv0, double Kv1, double Kd0, double Kd1, double E0, double E1, double Ed0, double Ed1)
 { 
   m_Kspp[0] = Kp0; 
   m_Kspp[1] = Kp1; 
@@ -214,6 +225,8 @@ inline void Reflex::setSpindleParameters(double Kp0, double Kp1, double Kv0, dou
   m_Kspd[1] = Kd1;
   m_Espv[0] = E0; 
   m_Espv[1] = E1;
+  m_Espd[0] = Ed0; 
+  m_Espd[1] = Ed1;  
 };
 
 //----------------------------------------------------------------------------------------------------------------------    
@@ -256,6 +269,20 @@ inline void Reflex::setIaInParameters(double Wspia0, double Wspia1, double Wiaia
   m_Biain[0] = b0;
   m_Biain[1] = b1;
 }
+
+//----------------------------------------------------------------------------------------------------------------------              
+inline void Reflex::setIaInParametersMinimal(double Wspia0, double Wspia1, double Wiaia0, double Wiaia1, 
+                                             double Wiamn0, double Wiamn1, double t0, double t1)
+{
+  m_Wspia[0] = Wspia0;
+  m_Wspia[1] = Wspia1;
+  m_Wiaia[0] = Wiaia0;
+  m_Wiaia[1] = Wiaia1;
+  m_Wiamn[0] = Wiamn0;
+  m_Wiamn[1] = Wiamn1;
+  m_Tiain[0] = t0;
+  m_Tiain[1] = t1;
+};
 
 //----------------------------------------------------------------------------------------------------------------------            
 inline void Reflex::setRenshawParameters(double Wmnrn0, double Wmnrn1, double Wrnrn0, double Wrnrn1, double Wrnmn0, double Wrnmn1,

@@ -133,6 +133,17 @@ static inline T sum(std::vector<T>& vec, int i0 = 0, int iN = 0)
   T sum = std::accumulate(first, last, (T)0); 
   return sum;
 }
+  
+// Vector max
+//----------------------------------------------------------------------------------------------------------------------
+template<class T>
+static inline T max(std::vector<T>& vec, int i0 = 0, int iN = 0)
+{
+  typename std::vector<T>::iterator first = vec.begin() + i0;
+  typename std::vector<T>::iterator last = iN > 0 ? vec.begin() + iN : vec.end();
+  
+  return *std::max_element(first, last); 
+}  
 
 // Vector mean
 //----------------------------------------------------------------------------------------------------------------------

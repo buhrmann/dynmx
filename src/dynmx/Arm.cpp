@@ -19,7 +19,6 @@ namespace dmx
 #define PI_OVER_FOUR 0.7853981
 #endif
 
-#define TEST_ZERO_INTERACTION_TORQUE 0
 //----------------------------------------------------------------------------------------------------------------------
 // Equations from Hollerbach and Flash 1981. Also see Shadmehr 1990 or Uno et al 1989.
 // Typical dimensions from Arnon(1990), referenced in Karniel and Inbar (1997), 
@@ -60,7 +59,9 @@ void Arm::init()
       {
         m_integrator = kInteg_euler;
       }
-    }    
+    } 
+    
+    m_interactionTorques = xml.getAttributeValue<bool>("InteractionTorques", true);
     
     double upperArmLength = xml.getChild("UpperArm").getAttributeValue<double>("Length");
     double lowerArmLength = xml.getChild("LowerArm").getAttributeValue<double>("Length");
@@ -350,12 +351,19 @@ void Arm::computeAccelerations(State& state)
   state.gravityAcc[JT_elbow] = m_gravity * m_masses[JT_elbow] * m_lengths[JT_elbow] * sinElbShd;
   if(!m_jointLocked[JT_elbow]) 
   {
-    state.coriolisAcc[JT_elbow] = m_massElbLLHalf * sqr(state.velocities[JT_shoulder]) * sinElbAngle;
     state.inertiaAcc[JT_elbow] = m_inertias[JT_elbow] + m_massElbLSq4;
-    state.interactionAcc[JT_elbow] = state.accelerations[JT_shoulder] * (m_inertias[JT_elbow] + m_massElbLSq4 + (m_massElbLLHalf * cosElbAngle));     
-#if TEST_ZERO_INTERACTION_TORQUE
-    state.interactionAcc[JT_elbow] = 0.0;
-#endif
+
+    if(m_interactionTorques)
+    {
+      state.coriolisAcc[JT_elbow] = m_massElbLLHalf * sqr(state.velocities[JT_shoulder]) * sinElbAngle;
+      state.interactionAcc[JT_elbow] = state.accelerations[JT_shoulder] * (m_inertias[JT_elbow] + m_massElbLSq4 + (m_massElbLLHalf * cosElbAngle));           
+    }
+    else
+    {
+      state.coriolisAcc[JT_elbow] = 0.0;
+      state.interactionAcc[JT_elbow] = 0.0;
+    }
+
     state.dampingAcc[JT_elbow] = m_frictions[JT_elbow] * state.velocities[JT_elbow];
     elbAcceleration = (state.torques[JT_elbow] - state.interactionAcc[JT_elbow] - state.coriolisAcc[JT_elbow] - state.gravityAcc[JT_elbow] - state.dampingAcc[JT_elbow]) / state.inertiaAcc[JT_elbow];
   }
@@ -364,19 +372,23 @@ void Arm::computeAccelerations(State& state)
   double shdAcceleration = 0.0; 
   if(!m_jointLocked[JT_shoulder])
   { 
-    state.coriolisAcc[JT_shoulder] = - m_massElbLLHalf * sqr(state.velocities[JT_elbow]) * sinElbAngle
-    - m_massElbLL * state.velocities[JT_elbow] * state.velocities[JT_shoulder] * sinElbAngle;
-    
     state.inertiaAcc[JT_shoulder] = (m_inertias[JT_elbow] + m_inertias[JT_shoulder] 
-                                 + m_massElbLL * cosElbAngle 
-                                 + (m_masses[JT_shoulder] * m_lengthsSq[JT_shoulder]) / 4.0f
-                                 + m_massElbLSq4 
-                                 + (m_masses[JT_elbow] * m_lengthsSq[JT_shoulder]) );
+                                     + m_massElbLL * cosElbAngle 
+                                     + (m_masses[JT_shoulder] * m_lengthsSq[JT_shoulder]) / 4.0f
+                                     + m_massElbLSq4 
+                                     + (m_masses[JT_elbow] * m_lengthsSq[JT_shoulder]) );
     
-    state.interactionAcc[JT_shoulder] = state.accelerations[JT_elbow] * (m_inertias[JT_elbow] + m_massElbLSq4 + (m_massElbLLHalf * cosElbAngle));
-#if TEST_ZERO_INTERACTION_TORQUE
-    state.interactionAcc[JT_shoulder] = 0.0;
-#endif
+    if(m_interactionTorques)
+    {
+      state.coriolisAcc[JT_shoulder] = - m_massElbLLHalf * sqr(state.velocities[JT_elbow]) * sinElbAngle
+      - m_massElbLL * state.velocities[JT_elbow] * state.velocities[JT_shoulder] * sinElbAngle;
+      state.interactionAcc[JT_shoulder] = state.accelerations[JT_elbow] * (m_inertias[JT_elbow] + m_massElbLSq4 + (m_massElbLLHalf * cosElbAngle));
+    }
+    else
+    {
+      state.coriolisAcc[JT_shoulder] = 0.0;
+      state.interactionAcc[JT_shoulder] = 0.0;
+    }
     
     // shoulder gravity is elbow gravity + shoulder
     state.gravityAcc[JT_shoulder] = state.gravityAcc[JT_elbow];

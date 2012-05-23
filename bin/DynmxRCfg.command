@@ -4,7 +4,7 @@
 
 # Params
 N=7
-CFGs=("Configs/EvoArmOplpInterSegMv111222.xml" "Configs/EvoArmOplpInterSegMv111222.xml")
+CFGs=("Configs/EvoArmOplpInterSegMv12.xml" "Configs/EvoArmOplpInterSegMv12.xml")
 
 # Copy exe here, so one can keep coding and building the original exe
 cd `dirname $0`

@@ -100,6 +100,34 @@ void GA::reset(bool randomizeGenomes)
 }
 
 // --------------------------------------------------------------------------------------------
+void GA::randomise(bool absolute, double maxAmount)
+{
+  if(absolute)
+  {
+    for (int i = 0; i < m_popSize; i++)
+    {
+      for (int j = 0; j < m_genomeLength; j++)
+      {
+        m_genomes[i][j] = maxAmount * ran1(&m_idum);
+        m_genomes[i][j] = clamp(m_genomes[i][j], 0.0, 1.0);
+      }
+    }  
+  }
+  else 
+  {
+    for (int i = 0; i < m_popSize; i++)
+    {
+      for (int j = 0; j < m_genomeLength; j++)
+      {
+        m_genomes[i][j] += maxAmount * ran1(&m_idum);
+        m_genomes[i][j] = clamp(m_genomes[i][j], 0.0, 1.0);        
+      }
+    }   
+  }
+
+}
+
+// --------------------------------------------------------------------------------------------
 // simply return current genome in tournament pair
 // --------------------------------------------------------------------------------------------
 const double* GA::getCurrentGenome() const

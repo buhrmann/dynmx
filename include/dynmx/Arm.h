@@ -119,6 +119,7 @@ protected:
   void computeAccelerations(State& state);  
   
   bool m_jointLocked[2];
+  bool m_interactionTorques;
   
   // States
   State m_state;  

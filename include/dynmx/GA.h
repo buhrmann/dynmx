@@ -82,6 +82,7 @@ public:
   /// Allow manual setting of the genomes in the population
   void setGenome(int iGenome, const double *genome, float fitness);
 
+  void randomise(bool absolute, double maxAmount);
 
 protected:
 

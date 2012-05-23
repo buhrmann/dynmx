@@ -70,9 +70,12 @@ void EvoArmCoCon::decodeGenome(const double* genome)
   const int numReflexes = m_arm->getNumReflexes();
   
   // Joint friction
-  double elbFriction = map01To(genome[I++], m_decodeLimits.arm.jointFriction);
-  double shdFriction = map01To(genome[I++], m_decodeLimits.arm.jointFriction);  
-  m_arm->setFriction(elbFriction, shdFriction);
+  if(m_evolveFriction)
+  {  
+    double elbFriction = map01To(genome[I++], m_decodeLimits.arm.jointFriction);
+    double shdFriction = map01To(genome[I++], m_decodeLimits.arm.jointFriction);  
+    m_arm->setFriction(elbFriction, shdFriction);
+  }
   
   // Decode muscles
   if(m_evolveMuscles)
@@ -102,14 +105,14 @@ void EvoArmCoCon::decodeGenome(const double* genome)
       }
     }
   }
-  else 
-  {
-    // Need to init, as otherwise the new jointRadii are not compatible with precalculated values
-    for(int i = 0; i < numMuscles; ++i)
-    {
-      m_arm->getMuscle(i)->init();
-    }
-  }
+//  else 
+//  {
+//    // Need to init, as otherwise the new jointRadii are not compatible with precalculated values
+//    for(int i = 0; i < numMuscles; ++i)
+//    {
+//      m_arm->getMuscle(i)->init();
+//    }
+//  }
 
   
   // Spindle parameters
@@ -117,39 +120,73 @@ void EvoArmCoCon::decodeGenome(const double* genome)
   if(m_evolveSpindles)
   {
     int pI = 0;
-    int vI = 1;
-    int dI = m_evolveVelRef ? 2 : 1;
-    int eI = m_evolveVelRef ? 3 : 2;
+    int dI = 1;
+    int edI = 2;
+    int vI = 3;
+    int evI = 4;
     
-    if(m_evolveUniformSpindles)
+    int numSpindleParams = m_evolveVelRef ? 5 : 3;
+    
+    // 1: identical for antagonists. 2: identical for all muscles.
+    if(m_evolveUniformSpindles >= 1)
     {      
-      m_arm->getReflex(0)->setSpindleParameters(map01To(genome[I + pI],lim.pos), map01To(genome[I + pI],lim.pos), 
-                                                map01To(genome[I + vI],lim.vel), map01To(genome[I + vI],lim.vel), 
-                                                map01To(genome[I + dI],lim.dmp), map01To(genome[I + dI],lim.dmp), 
-                                                map01To(genome[I + eI],lim.exp), map01To(genome[I + eI],lim.exp));  
-      I += m_evolveVelRef ? 4 : 3;
+      double kp = map01To(genome[I + pI], lim.pos);
+      double kd = map01To(genome[I + dI], lim.dmp);
+      double expD = map01To(genome[I + edI], lim.exp);
+      double kv = m_evolveVelRef ? map01To(genome[I + vI], lim.vel) : 0.0;      
+      double expV = m_evolveVelRef ? map01To(genome[I + evI], lim.exp) : 1.0;
+      
+      m_arm->getReflex(0)->setSpindleParameters(kp, kp, kv, kv, kd, kd, expV, expV, expD, expD);
 
-      m_arm->getReflex(1)->setSpindleParameters(map01To(genome[I + pI],lim.pos), map01To(genome[I + pI],lim.pos), 
-                                                map01To(genome[I + vI],lim.vel), map01To(genome[I + vI],lim.vel), 
-                                                map01To(genome[I + dI],lim.dmp), map01To(genome[I + dI],lim.dmp), 
-                                                map01To(genome[I + eI],lim.exp), map01To(genome[I + eI],lim.exp));        
-      I += m_evolveVelRef ? 4 : 3;
+      // Increase for next reflex, otherwise use same parameters
+      if(m_evolveUniformSpindles == 1)
+      {
+        I += numSpindleParams;
+      }
+
+      kp = map01To(genome[I + pI], lim.pos);
+      kd = map01To(genome[I + dI], lim.dmp);
+      expD = map01To(genome[I + edI], lim.exp);
+      kv = m_evolveVelRef ? map01To(genome[I + vI], lim.vel) : 0.0;      
+      expV = m_evolveVelRef ? map01To(genome[I + evI], lim.exp) : 1.0;
+      
+      m_arm->getReflex(1)->setSpindleParameters(kp, kp, kv, kv, kd, kd, expV, expV, expD, expD);
+      
+      I += numSpindleParams;
     }
     else 
     {
-      int ofs = m_evolveVelRef ? 4 : 3;
-      m_arm->getReflex(0)->setSpindleParameters(map01To(genome[I + pI],lim.pos), map01To(genome[I + ofs + pI],lim.pos), 
-                                                map01To(genome[I + vI],lim.vel), map01To(genome[I + ofs + vI],lim.vel), 
-                                                map01To(genome[I + dI],lim.dmp), map01To(genome[I + ofs + dI],lim.dmp), 
-                                                map01To(genome[I + eI],lim.exp), map01To(genome[I + ofs + eI],lim.exp));  
+      int ofs = numSpindleParams;
+      double kp[2] = { map01To(genome[I + pI], lim.pos), map01To(genome[I + ofs + pI], lim.pos) };
+      double kd[2] = { map01To(genome[I + dI], lim.dmp), map01To(genome[I + ofs + dI], lim.dmp) };
+      double expD[2] = { map01To(genome[I + edI], lim.exp), map01To(genome[I + ofs + edI], lim.exp) };
+      double kv[2] = {0,0};
+      double expV[2] = {1,1};
+      if(m_evolveVelRef)
+      {
+        kv[0] = map01To(genome[I + vI], lim.vel); kv[1] = map01To(genome[I + ofs + vI], lim.vel);        
+        expV[0] = map01To(genome[I + evI], lim.exp); expV[1] = map01To(genome[I + ofs + evI], lim.exp);;        
+      }      
       
-      I += m_evolveVelRef ? 8 : 6;
+      m_arm->getReflex(0)->setSpindleParameters(kp[0], kp[1], kv[0], kv[1], kd[0], kd[1], expV[0], expV[1], expD[0], expD[1]);
+      I += 2 * numSpindleParams;
       
-      m_arm->getReflex(1)->setSpindleParameters(map01To(genome[I + pI],lim.pos), map01To(genome[I + ofs + pI],lim.pos), 
-                                                map01To(genome[I + vI],lim.vel), map01To(genome[I + ofs + vI],lim.vel), 
-                                                map01To(genome[I + dI],lim.dmp), map01To(genome[I + ofs + dI],lim.dmp), 
-                                                map01To(genome[I + eI],lim.exp), map01To(genome[I + ofs + eI],lim.exp));        
-      I += m_evolveVelRef ? 8 : 6;  
+      // Same again for next reflex
+      {
+        double kp[2] = { map01To(genome[I + pI], lim.pos), map01To(genome[I + ofs + pI], lim.pos) };
+        double kd[2] = { map01To(genome[I + dI], lim.dmp), map01To(genome[I + ofs + dI], lim.dmp) };
+        double expD[2] = { map01To(genome[I + edI], lim.exp), map01To(genome[I + ofs + edI], lim.exp) };
+        double kv[2] = {0,0};
+        double expV[2] = {1,1};
+        if(m_evolveVelRef)
+        {
+          kv[0] = map01To(genome[I + vI], lim.vel); kv[1] = map01To(genome[I + ofs + vI], lim.vel);        
+          expV[0] = map01To(genome[I + evI], lim.exp); expV[1] = map01To(genome[I + ofs + evI], lim.exp);;        
+        }      
+        
+        m_arm->getReflex(1)->setSpindleParameters(kp[0], kp[1], kv[0], kv[1], kd[0], kd[1], expV[0], expV[1], expD[0], expD[1]);
+        I += 2 * numSpindleParams;
+      }
     }
     
     // Alpha MN params: input from spindles
@@ -161,59 +198,107 @@ void EvoArmCoCon::decodeGenome(const double* genome)
     }
     else 
     {
-      m_arm->getReflex(0)->setMotoNeuronParameters(map01To(genome[I+0],lim.weight), map01To(genome[I+1],lim.weight)); 
-      m_arm->getReflex(1)->setMotoNeuronParameters(map01To(genome[I+2],lim.weight), map01To(genome[I+3],lim.weight));
-      I += 4;    
+      if(m_evolveUniformSpindleWeights > 0)
+      {
+        m_arm->getReflex(0)->setMotoNeuronParameters(map01To(genome[I+0],lim.weight), map01To(genome[I+0],lim.weight)); 
+        m_arm->getReflex(1)->setMotoNeuronParameters(map01To(genome[I+1],lim.weight), map01To(genome[I+1],lim.weight));
+        I += 2;
+      }
+      else
+      {
+        m_arm->getReflex(0)->setMotoNeuronParameters(map01To(genome[I+0],lim.weight), map01To(genome[I+1],lim.weight)); 
+        m_arm->getReflex(1)->setMotoNeuronParameters(map01To(genome[I+2],lim.weight), map01To(genome[I+3],lim.weight));
+        I += 4;    
+      }
     }
   }  
   
   // Range for neural parameters
   float maxW = 10.0;
   float maxB = 10.0;
-  float maxT = 100.0;  
+  float maxT = 200.0;  
   
   // IaIn parameters  
   if(m_evolveIAIN)
   {
-    if(m_symmetricMuscles)
+    const int numIaParams = m_evolveIAINsimple ? 4 : 7;
+    if(m_evolveIAINsym)
     {
-      m_arm->getReflex(0)->setIaInParameters(genome[I+0] * maxW, genome[I+0] * maxW,        // spindle->ia
-                                             genome[I+1] * maxW, genome[I+1] * maxW,        // ia->ia
-                                             genome[I+2] * maxW, genome[I+2] * maxW,        // desired contr->ia
-                                             genome[I+3] * maxW, genome[I+3] * maxW,        // rn->ia
-                                             genome[I+4] * maxW, genome[I+4] * maxW,        // ia->mn
-                                             10 + genome[I+5] * maxT, 10 + genome[I+5] * maxT,        // time constants
-                                             -maxB + (genome[I+6] * 2 * maxB), -maxB + (genome[I+6] * 2 * maxB));       // biases
-      I += 7;
-      
-      m_arm->getReflex(1)->setIaInParameters(genome[I+0] * maxW, genome[I+0] * maxW,        // spindle->ia
-                                             genome[I+1] * maxW, genome[I+1] * maxW,        // ia->ia
-                                             genome[I+2] * maxW, genome[I+2] * maxW,        // desired contr->ia
-                                             genome[I+3] * maxW, genome[I+3] * maxW,        // rn->ia
-                                             genome[I+4] * maxW, genome[I+4] * maxW,        // ia->mn
-                                             10 + genome[I+5] * maxT, 10 + genome[I+5] * maxT,        // time constants
-                                             -maxB + (genome[I+6] * 2 * maxB), -maxB + (genome[I+6] * 2 * maxB));       // biases
-      I += 7;
+      if(m_evolveIAINsimple)
+      {
+        // Symmetric and simple
+        m_arm->getReflex(0)->setIaInParametersMinimal(genome[I+0] * maxW, genome[I+0] * maxW,        // spindle->ia
+                                               genome[I+1] * maxW, genome[I+1] * maxW,        // ia->ia
+                                               genome[I+2] * maxW, genome[I+2] * maxW,        // ia->mn
+                                               10 + genome[I+3] * maxT, 10 + genome[I+3] * maxT);  // time constants
+        I += numIaParams;
+        
+        m_arm->getReflex(1)->setIaInParametersMinimal(genome[I+0] * maxW, genome[I+0] * maxW,        // spindle->ia
+                                               genome[I+1] * maxW, genome[I+1] * maxW,        // ia->ia
+                                               genome[I+4] * maxW, genome[I+4] * maxW,        // ia->mn
+                                               10 + genome[I+3] * maxT, 10 + genome[I+3] * maxT);  // time constants
+        I += numIaParams;
+      }
+      else 
+      {
+        // Symmetric and complex
+        m_arm->getReflex(0)->setIaInParameters(genome[I+0] * maxW, genome[I+0] * maxW,        // spindle->ia
+                                               genome[I+1] * maxW, genome[I+1] * maxW,        // ia->ia
+                                               genome[I+2] * maxW, genome[I+2] * maxW,        // desired contr->ia
+                                               genome[I+3] * maxW, genome[I+3] * maxW,        // rn->ia
+                                               genome[I+4] * maxW, genome[I+4] * maxW,        // ia->mn
+                                               10 + genome[I+5] * maxT, 10 + genome[I+5] * maxT,        // time constants
+                                               -maxB + (genome[I+6] * 2 * maxB), -maxB + (genome[I+6] * 2 * maxB));       // biases
+        I += numIaParams;
+        
+        m_arm->getReflex(1)->setIaInParameters(genome[I+0] * maxW, genome[I+0] * maxW,        // spindle->ia
+                                               genome[I+1] * maxW, genome[I+1] * maxW,        // ia->ia
+                                               genome[I+2] * maxW, genome[I+2] * maxW,        // desired contr->ia
+                                               genome[I+3] * maxW, genome[I+3] * maxW,        // rn->ia
+                                               genome[I+4] * maxW, genome[I+4] * maxW,        // ia->mn
+                                               10 + genome[I+5] * maxT, 10 + genome[I+5] * maxT,        // time constants
+                                               -maxB + (genome[I+6] * 2 * maxB), -maxB + (genome[I+6] * 2 * maxB));       // biases
+        I += numIaParams;
+      }
     }
     else 
     {
-      m_arm->getReflex(0)->setIaInParameters(genome[I+0] * maxW, genome[I+7] * maxW,        // spindle->ia
-                                             genome[I+1] * maxW, genome[I+8] * maxW,        // ia->ia
-                                             genome[I+2] * maxW, genome[I+9] * maxW,        // desired contr->ia
-                                             genome[I+3] * maxW, genome[I+10] * maxW,        // rn->ia
-                                             genome[I+4] * maxW, genome[I+11] * maxW,        // ia->mn
-                                             10 + genome[I+5] * maxT, 10 + genome[I+12] * maxT,        // time constants
-                                             -maxB + (genome[I+6] * 2 * maxB), -maxB + (genome[I+13] * 2 * maxB));       // biases
-      I += 14;
-      
-      m_arm->getReflex(1)->setIaInParameters(genome[I+0] * maxW, genome[I+7] * maxW,        // spindle->ia
-                                             genome[I+1] * maxW, genome[I+8] * maxW,        // ia->ia
-                                             genome[I+2] * maxW, genome[I+9] * maxW,        // desired contr->ia
-                                             genome[I+3] * maxW, genome[I+10] * maxW,        // rn->ia
-                                             genome[I+4] * maxW, genome[I+11] * maxW,        // ia->mn
-                                             10 + genome[I+5] * maxT, 10 + genome[I+12] * maxT,        // time constants
-                                             -maxB + (genome[I+6] * 2 * maxB), -maxB + (genome[I+13] * 2 * maxB));       // biases
-      I += 14;      
+      if(m_evolveIAINsimple)
+      {
+        // Non-symmetric and simple
+        m_arm->getReflex(0)->setIaInParametersMinimal(genome[I+0] * maxW, genome[I+4] * maxW,        // spindle->ia
+                                               genome[I+1] * maxW, genome[I+5] * maxW,        // ia->ia
+                                               genome[I+2] * maxW, genome[I+6] * maxW,        // ia->mn
+                                               10 + genome[I+3] * maxT, 10 + genome[I+7] * maxT);  // time constants
+        I += 2 * numIaParams;
+        
+        m_arm->getReflex(1)->setIaInParametersMinimal(genome[I+0] * maxW, genome[I+4] * maxW,        // spindle->ia
+                                               genome[I+1] * maxW, genome[I+5] * maxW,        // ia->ia
+                                               genome[I+2] * maxW, genome[I+6] * maxW,        // ia->mn
+                                               10 + genome[I+3] * maxT, 10 + genome[I+7] * maxT);  // time constants
+        I += 2 * numIaParams;         
+      }
+      else
+      {
+        // Non-symmetric and complex
+        m_arm->getReflex(0)->setIaInParameters(genome[I+0] * maxW, genome[I+7] * maxW,        // spindle->ia
+                                               genome[I+1] * maxW, genome[I+8] * maxW,        // ia->ia
+                                               genome[I+2] * maxW, genome[I+9] * maxW,        // desired contr->ia
+                                               genome[I+3] * maxW, genome[I+10] * maxW,        // rn->ia
+                                               genome[I+4] * maxW, genome[I+11] * maxW,        // ia->mn
+                                               10 + genome[I+5] * maxT, 10 + genome[I+12] * maxT,        // time constants
+                                               -maxB + (genome[I+6] * 2 * maxB), -maxB + (genome[I+13] * 2 * maxB));       // biases
+        I += 2 * numIaParams;
+        
+        m_arm->getReflex(1)->setIaInParameters(genome[I+0] * maxW, genome[I+7] * maxW,        // spindle->ia
+                                               genome[I+1] * maxW, genome[I+8] * maxW,        // ia->ia
+                                               genome[I+2] * maxW, genome[I+9] * maxW,        // desired contr->ia
+                                               genome[I+3] * maxW, genome[I+10] * maxW,        // rn->ia
+                                               genome[I+4] * maxW, genome[I+11] * maxW,        // ia->mn
+                                               10 + genome[I+5] * maxT, 10 + genome[I+12] * maxT,        // time constants
+                                               -maxB + (genome[I+6] * 2 * maxB), -maxB + (genome[I+13] * 2 * maxB));       // biases
+        I += 2 * numIaParams;     
+      }
     }
   }
   
@@ -326,22 +411,35 @@ void EvoArmCoCon::decodeGenome(const double* genome)
   {
     m_openLoopParams.clear(); // This instance could repeatedly be decoded!
     
-    const int N = m_symmetricMuscles ? (m_numMoves * numReflexes) : (m_numMoves * numMuscles);
-    for (int i = 0; i < N; ++i)
+    int numDecoded = m_numMoves * numMuscles;
+    int numEncoded = m_numMoves;
+    if(m_openLoopSymmetry == 1) 
     {
-      m_openLoopParams.push_back(m_maxOpenLoop * genome[I + i]);
+      numEncoded *= numReflexes;
+    }
+    else if(m_openLoopSymmetry == 0)
+    {
+      numEncoded *= numMuscles;
+    }
+       
+    int numCopies = numDecoded / numEncoded;
+
+    for (int i = 0; i < numEncoded; ++i)
+    {
+      double olParam = m_maxOpenLoop * genome[I + i];
       
-      if(m_symmetricMuscles)
+      for(int j = 0; j < numCopies; j++)
       {
-        // We have to duplicate each muscle activation (one encoded, but two identical needed for symmetry)
-        m_openLoopParams.push_back(m_maxOpenLoop * genome[I + i]);
+        m_openLoopParams.push_back(olParam);        
       }
     }
-    I += N;
+    
+    I += numEncoded;
   }
   
   // Duration of commanded ramp as proportion of desired movement time
-  m_rampDurationFactor = 0.4 + 0.6 * genome[I++];
+  if(m_evolveRampDuration)  
+    m_rampDurationFactor = 0.4 + 0.6 * genome[I++];
   
   // Minimum co-contraction
   if(m_enableCoconIncrease)
@@ -395,10 +493,12 @@ int EvoArmCoCon::getNumGenes()
   const int numMuscles = m_arm->getNumMuscles();
   
   // Ramp durationfactor: duration of commanded ramp as proportion of desired movement time
-  numGenes += 1;
+  if(m_evolveRampDuration)
+    numGenes += 1;
   
   // 2 x friction
-  numGenes += 2;
+  if(m_evolveFriction)
+    numGenes += 2;
   
   // 5 muscle params (L0, Fmax, vmax, origin, insertion)
   if(m_evolveMuscles)
@@ -423,31 +523,44 @@ int EvoArmCoCon::getNumGenes()
   
   if(m_evolveSpindles)
   {
-    // Spindle gains: p,v,d, exponent
-    const int numSpindleParams = m_evolveVelRef ? 4 : 3;
-    if(m_evolveUniformSpindles)
+    // Spindle gains: p,v,d, exponent1, exp 2
+    const int numSpindleParams = m_evolveVelRef ? 5 : 3;
+    
+    if(m_evolveUniformSpindles == 1)
       numGenes += numReflexes * numSpindleParams; // Spindles differ only between elbow and shoulder
+    else if (m_evolveUniformSpindles == 2)
+      numGenes += 1 * numSpindleParams;
     else
       numGenes += numMuscles * numSpindleParams;
     
     // Weights to aMN
     if(m_symmetricMuscles)
+    {
       numGenes += numReflexes;
+    }
     else
-      numGenes += numMuscles;
+    {
+      if(m_evolveUniformSpindleWeights)
+        numGenes += numReflexes;
+      else
+        numGenes += numMuscles;
+    }
   }
   
   // Min cocontraction throughout rest and movement periods
   if(m_enableCoconIncrease)
     numGenes += 1;
   
-  // Parameters for IaIn neurons: Bias, tau, weights from ia, rn, sp, amn. Plus input to MN.
+  // Parameters for single IaIn neurons
+  // Complex: Bias, tau, weights from ia, rn, sp, amn and input to MN.
+  // Simple: tau, weights from ia, sp, and input to MN.  
   if(m_evolveIAIN)
   {
-    if(m_symmetricMuscles)
-      numGenes += numReflexes * 7;
+    const int numIaParams = m_evolveIAINsimple ? 4 : 7;
+    if(m_evolveIAINsym)
+      numGenes += numReflexes * numIaParams;
     else
-      numGenes += numMuscles * 7;
+      numGenes += numMuscles * numIaParams;
   }
   
   // Renshaw neurons: Bias, tau, weights from mn, rn. Plus input to MN.
@@ -480,8 +593,10 @@ int EvoArmCoCon::getNumGenes()
   // Open-loop activation (one set for each target pose)
   if(m_evolveOpenLoop)
   {
-    if(m_symmetricMuscles)
+    if(m_openLoopSymmetry == 1)
       numGenes += numReflexes * m_numMoves;
+    else if(m_openLoopSymmetry == 2)
+      numGenes += 1 * m_numMoves;
     else
       numGenes += numMuscles * m_numMoves;  
   }

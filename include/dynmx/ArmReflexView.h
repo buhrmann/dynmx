@@ -68,26 +68,30 @@ inline void ArmReflexView::setupScene()
   m_reflexGains[2] = m_armRx->getReflex(m_selectedReflex)->m_Kspd[0];
   
   // Create a plot for reflex data
-  m_reflexPlot1 = new dmx::Plot(300.0, 180, 6, m_numPointsPerPlot);
+  m_reflexPlot1 = new dmx::Plot(300.0, 180, 8, m_numPointsPerPlot);
   m_reflexPlot1->translate(ci::Vec4f(0, 180 + 20, 0, 1));   
   m_reflexPlot1->setTitle("Reflex Elbow");
   m_reflexPlot1->setLabel(0, "aMN");
   m_reflexPlot1->setLabel(1, "pErr");
   m_reflexPlot1->setLabel(2, "vErr");
-  m_reflexPlot1->setLabel(3, "aMN");
-  m_reflexPlot1->setLabel(4, "pErr");
-  m_reflexPlot1->setLabel(5, "vErr");  
+  m_reflexPlot1->setLabel(3, "X");    
+  m_reflexPlot1->setLabel(4, "aMN");
+  m_reflexPlot1->setLabel(5, "pErr");
+  m_reflexPlot1->setLabel(6, "vErr");  
+  m_reflexPlot1->setLabel(7, "X");  
   m_uiColumn->m_children.push_back(m_reflexPlot1);
   
-  m_reflexPlot2 = new dmx::Plot(300.0, 180, 6, m_numPointsPerPlot);
+  m_reflexPlot2 = new dmx::Plot(300.0, 180, 8, m_numPointsPerPlot);
   m_reflexPlot2->translate(ci::Vec4f(0, 400, 0, 1));   
   m_reflexPlot2->setTitle("Reflex Shoulder");
   m_reflexPlot2->setLabel(0, "aMN");
   m_reflexPlot2->setLabel(1, "pErr");
   m_reflexPlot2->setLabel(2, "vErr");
-  m_reflexPlot2->setLabel(3, "aMN");
-  m_reflexPlot2->setLabel(4, "pErr");
-  m_reflexPlot2->setLabel(5, "vErr");    
+  m_reflexPlot2->setLabel(3, "X");  
+  m_reflexPlot2->setLabel(4, "aMN");
+  m_reflexPlot2->setLabel(5, "pErr");
+  m_reflexPlot2->setLabel(6, "vErr");    
+  m_reflexPlot2->setLabel(7, "X");  
   m_uiColumn->m_children.push_back(m_reflexPlot2);  
   
   m_jointTrajPlot = new dmx::Plot(300.0, 180, 6, m_numPointsPerPlot);
@@ -134,19 +138,24 @@ inline void ArmReflexView::update(float dt)
   m_reflexPlot1->addPoint(m_armRx->getReflex(0)->getAlphaOutput(0), 0);
   m_reflexPlot1->addPoint(m_armRx->getReflex(0)->m_Kspp[0] * m_armRx->getReflex(0)->getPositionError(0), 1);  
   m_reflexPlot1->addPoint(m_armRx->getReflex(0)->m_Kspd[0] * std::max(-m_armRx->getReflex(0)->getContractionVelocity(0), 0.0), 2);
+  m_reflexPlot1->addPoint(m_armRx->getReflex(0)->m_IaInOut[0], 3);  
   
-  m_reflexPlot1->addPoint(m_armRx->getReflex(0)->getAlphaOutput(1), 3);
-  m_reflexPlot1->addPoint(m_armRx->getReflex(0)->m_Kspp[1] * m_armRx->getReflex(0)->getPositionError(1), 4);
-  m_reflexPlot1->addPoint(m_armRx->getReflex(0)->m_Kspd[1] * std::max(-m_armRx->getReflex(0)->getContractionVelocity(1), 0.0), 5);
+  m_reflexPlot1->addPoint(m_armRx->getReflex(0)->getAlphaOutput(1), 4);
+  m_reflexPlot1->addPoint(m_armRx->getReflex(0)->m_Kspp[1] * m_armRx->getReflex(0)->getPositionError(1), 5);
+  m_reflexPlot1->addPoint(m_armRx->getReflex(0)->m_Kspd[1] * std::max(-m_armRx->getReflex(0)->getContractionVelocity(1), 0.0), 6);
+  m_reflexPlot1->addPoint(m_armRx->getReflex(0)->m_IaInOut[1], 7);  
+
   
   m_reflexPlot2->addPoint(m_armRx->getReflex(1)->getAlphaOutput(0), 0);
   m_reflexPlot2->addPoint(m_armRx->getReflex(1)->m_Kspp[0] * m_armRx->getReflex(1)->getPositionError(0), 1);  
   m_reflexPlot2->addPoint(m_armRx->getReflex(1)->m_Kspd[0] * std::max(-m_armRx->getReflex(1)->getContractionVelocity(0), 0.0), 2);
-
-  m_reflexPlot2->addPoint(m_armRx->getReflex(1)->getAlphaOutput(1), 3);
-  m_reflexPlot2->addPoint(m_armRx->getReflex(1)->m_Kspp[1] * m_armRx->getReflex(1)->getPositionError(1), 4);
-  m_reflexPlot2->addPoint(m_armRx->getReflex(1)->m_Kspd[1] * std::max(-m_armRx->getReflex(1)->getContractionVelocity(1), 0.0), 5);
+  m_reflexPlot2->addPoint(m_armRx->getReflex(1)->m_IaInOut[0], 3);  
   
+  m_reflexPlot2->addPoint(m_armRx->getReflex(1)->getAlphaOutput(1), 4);
+  m_reflexPlot2->addPoint(m_armRx->getReflex(1)->m_Kspp[1] * m_armRx->getReflex(1)->getPositionError(1), 5);
+  m_reflexPlot2->addPoint(m_armRx->getReflex(1)->m_Kspd[1] * std::max(-m_armRx->getReflex(1)->getContractionVelocity(1), 0.0), 6);
+  m_reflexPlot2->addPoint(m_armRx->getReflex(1)->m_IaInOut[1], 7);    
+
   
   // Add desired muscle length to existing plot of actual length 
   m_musclePlot->addPoint(m_armRx->getReflex(0)->getDesiredLength(0), 4);

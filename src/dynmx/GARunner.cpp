@@ -87,7 +87,9 @@ void GARunner::init()
       std::string fnm = ga.getChild("LoadFrom").getAttributeValue<std::string>("Value");
       ci::XmlTree prevResults(ci::loadFile(fnm));
       m_ga->fromXml(prevResults);
+      m_ga->randomise(0, 0.1);
       reset(false);
+      
     }
     else
     {
