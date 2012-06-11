@@ -14,36 +14,28 @@
 	<GA>
 		<Evolvable Name="EvoArmCoCon">
           <DesiredTrajectory InDegrees="1" ResetEachMove="1"> 
-            <Move Duration="0.3" LeadIn="0.1" LeadOut="0.2">
+            <Move Duration="0.3" LeadIn="0.1" LeadOut="0.3">
               <From x="90" y="60"/>
               <To x="60" y="40"/>
-            </Move>              
-            <Move Duration="0.3" LeadIn="0.1" LeadOut="0.2">
+            </Move>          
+            <Move Duration="0.3" LeadIn="0.1" LeadOut="0.3">
               <From x="90" y="60"/>
               <To x="60" y="80"/>
-            </Move> 
-            <Move Duration="0.3" LeadIn="0.1" LeadOut="0.2">
-              <From x="70" y="40"/>
-              <To x="40" y="20"/>
-            </Move>              
-            <Move Duration="0.3" LeadIn="0.1" LeadOut="0.2">
-              <From x="70" y="40"/>
-              <To x="40" y="60"/>
-            </Move>                                                                                          
+            </Move>                                                                                 
           </DesiredTrajectory>
           <EvoFlags>
-            <Muscles symmetric="0" hillParams="1">0</muscles>
-            <Spindles velRef="1" symmetric="0" symmetricWeights="0" perMove="1">1</spindles>
-            <Iain simple="1" symmetric="0">1</Iain>
-            <Ibin symmetric="0">1</Ibin>
-            <Renshaw>0</Renshaw>
-            <Ifv>0</Ifv>
-            <Sfv>0</Sfv>
-            <OpenLoop max="0.3" symmetric="0" tauMaxAct="0.05" tauMaxDeact="0.2">1</OpenLoop>
-            <InterSegmentInput max="1.0">1</InterSegmentInput>
+            <Muscles symmetric="0" hillParams="0">0</muscles>
+            <Spindles velRef="1" uniform="0" uniformWeights="0">0</spindles>
+            <iain simple="1" symmetric="0">0</iain>
+            <renshaw>0</renshaw>
+            <ibin>0</ibin>
+            <ifv>0</ifv>
+            <sfv>0</sfv>
+            <openLoop max="0.3" symmetric="0">1</openLoop>
+            <interSegmentInput max="0.01">0</interSegmentInput>
             <DistalCommandDelay max="0.05" perMove="1">0</DistalCommandDelay>
-            <RampDuration perMove="0">1</RampDuration>
-            <Friction>1</Friction>
+            <RampDuration perMove="1">0</RampDuration>
+            <Friction>0</Friction>
             <DecodeLimits>
               <ArmLimits>
                 <jointRadius min="0.01" max="0.05" />
@@ -52,7 +44,7 @@
               <MuscleLimits>
                 <attach min="0.06" max="0.26" />
                 <force min="100" max="2000" />
-                <optLength min="0.01" max="1.25"/>
+                <optLength min="0.75" max="1.25"/>
                 <maxVel min="8.0" max="12.0" />
               </MuscleLimits>
               <SpindleLimits>
@@ -64,23 +56,23 @@
               </SpindleLimits>
             </DecodeLimits>
           </EvoFlags>
-          <CommandTrajSmooth>1</CommandTrajSmooth>
-          <UseMuscleCoords>0</UseMuscleCoords>
+          <commandTrajSmooth>1</commandTrajSmooth>
+          <useMuscleCoords>0</useMuscleCoords>
           <FitnessFunction>
             <EndPointOnly>0</EndPointOnly>
             <Velocity>0</Velocity>
-            <Coactivation>1</Coactivation>
+            <Coactivation>0</Coactivation>
           </FitnessFunction>            
           <recordIsometric>0</recordIsometric>     
 		</Evolvable>	
-		<Incremental initialMutation="0.001">1</Incremental>
-		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/Output/12_06_09__01_34_37/GA_Result.xml" />
-		<PopulationSize Value="500"/>
-		<DemeSize Value="20"/>
-		<NumGenerations Value="5000"/>
-		<MutationMax Value="0.001"/>
+		<Incremental Value="0"/>
+		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/Output/12_05_29__11_53_26/GA_Result.xml" />
+		<PopulationSize Value="100"/>
+		<DemeSize Value="10"/>
+		<NumGenerations Value="150"/>
+		<MutationMax Value="0.005"/>
         <MutationMaxReduced Value="0.0001"/>
-        <MutationMaxReduceAt Value="3000"/>
+        <MutationMaxReduceAt Value="100"/>
 		<RecombinationRate Value="0.5"/>
         <RecombinationRateReduced Value="0.5"/>
         <AvoidReevaluation Value="1"/>
@@ -90,25 +82,25 @@
         <Eval Run="0">
             <NumTrials Value="1"/>
             <RecordState Value="1"/>
-            <LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/Output/12_06_08__13_40_42/GA_BestGenome.xml"/>
+            <LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/Output/12_05_31__13_17_05/GA_BestGenome.xml"/>
         </Eval>        
 	</GA>    
     <Arm Gravity="0.0" Integrator="euler" InteractionTorques="1">
             <BestFitnessMatchDelay>0</BestFitnessMatchDelay>    
-            <TorqueFeedback Measured="0" PosMod="1"/> 
-            <CoContraction AsCCommand="1"/>  
+            <TorqueFeedback Measured="1"/> 
+            <CoContraction AsCCommand="0"/>  
             <RampDurations>
                 <Value>0.44</Value>
             </RampDurations>
             <OpenLoopActivations>
-                <Value>0.143879</Value>
-                <Value>0.261984</Value>
-                <Value>0.178489</Value>
-                <Value>0.225332</Value>
-                <Value>0.162038</Value>
-                <Value>0.295942</Value>
-                <Value>0.296808</Value>
-                <Value>0.199225</Value>
+                <Value>0.297308</Value>
+                <Value>0.299957</Value>
+                <Value>0.171326</Value>
+                <Value>0.299996</Value>
+                <Value>0.100012</Value>
+                <Value>0.0996912</Value>
+                <Value>0.299924</Value>
+                <Value>0.203611</Value>
             </OpenLoopActivations>
             <IntersegmentalParams>
                 <Value>0.0</Value>
@@ -122,9 +114,9 @@
             </IntersegmentalParams> 
 			<UpperArm Length="0.33000000000000002" Mass="2.52" Inertia="0.022869"/>
 			<LowerArm Length="0.32000000000000001" Mass="1.3" Inertia="0.011093333333333334"/>
-			<Shoulder Friction="0.15" UpperLimit="159.99993985352407" LowerLimit="0" Locked="0" Radius="0.0489810891"/>
-			<Elbow Friction="0.15" UpperLimit="159.99993985352407" LowerLimit="0" Locked="0" Radius="0.0330761373"/>
-            <Muscle Joint="Elbow" Name="ElbowFlexor" IsFlexor="1" IsMono="1">
+			<Shoulder Friction="0.2" UpperLimit="159.99993985352407" LowerLimit="0" Locked="0" Radius="0.0489810891"/>
+			<Elbow Friction="0.2" UpperLimit="159.99993985352407" LowerLimit="0" Locked="0" Radius="0.0330761373"/>
+			<Muscle Joint="Elbow" Name="ElbowFlexor" IsFlexor="1" IsMono="1">
 				<Attachment Origin="0.25657536745071413" Insertion="0.094352526068687437"/>
 				<MaxIsoForce>832.304</MaxIsoForce>
 				<MaxVelocity>9.56712</MaxVelocity>

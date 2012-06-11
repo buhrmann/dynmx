@@ -1,7 +1,7 @@
 #!/bin/bash
 # Executes binary with specified argument N times
 
-N=6
+N=7
 CFG="Configs/EvoArmOplpInterSegMv12.xml"
 
 # Copy exe here, so one can keep coding and building the original exe

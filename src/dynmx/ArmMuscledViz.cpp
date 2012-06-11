@@ -212,6 +212,11 @@ void ArmMuscledViz::update()
   for(size_t i = 0; i < m_arm->getNumMuscles(); ++i)
   {
     Muscle* muscle = m_arm->getMuscle(i);
+    double act = muscle->getActivation();
+    
+    // Muscle line width dependent on activation
+    float lineWidth = act * 32.0;
+    glLineWidth(lineWidth);
 
     // Muscle colour dependent on length
     float l = muscle->getNormalisedLength() - 1;
@@ -355,6 +360,8 @@ void ArmMuscledViz::update()
       glPopAttrib();
     }
   } // for all muscles
+  
+  glLineWidth(1.0);
   
   glPopMatrix();
   glEnable(GL_DEPTH_TEST);    

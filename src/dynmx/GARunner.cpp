@@ -81,13 +81,14 @@ void GARunner::init()
     }
     
     // Pick up from previous run
-    bool incremental = ga.getChild("Incremental").getAttributeValue<bool>("Value"); 
+    bool incremental = ga.getChild("Incremental").getValue<bool>();
     if (incremental)
     {
+      double initialMutMax = ga.getChild("Incremental").getAttributeValue<double>("initialMutation"); 
       std::string fnm = ga.getChild("LoadFrom").getAttributeValue<std::string>("Value");
       ci::XmlTree prevResults(ci::loadFile(fnm));
       m_ga->fromXml(prevResults);
-      m_ga->randomise(0, 0.1);
+      m_ga->randomise(0, initialMutMax);
       reset(false);
       
     }

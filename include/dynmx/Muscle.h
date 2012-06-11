@@ -69,6 +69,7 @@ public:
   
   double getForce() const { return m_force; };
   double getForceMax() const { return m_maxForce; };
+  double getNormalisedForce() { return m_force / m_maxForce; };
   double getActiveForce() const { return m_activeForceNorm; };
   double getPassiveForce() const { return m_passiveForceNorm; };
   double getVelocityForce() const { return m_velocityForceNorm; };

@@ -126,11 +126,23 @@ float EvoArmCoCon::getFitness()
     return m_fitness;
   }
   
-  float fitness;
+  float fitness = 1;
+  
+  // Muscle geometry
+  if(m_evolveMuscles) 
+  {
+    const double maxLengthRatio = 2.2;
+    for(int i = 0; i < 4; i++)
+    {
+      double lengthRatio = m_arm->getMuscle(i)->getLengthMax() / m_arm->getMuscle(i)->getLengthMin();
+      fitness *= 1.0 - std::min(1.0, std::max(lengthRatio - maxLengthRatio, 0.0));
+    }
+  }  
+  
+  
   if(m_resetEachMove)
   {
     // We evaluate fitness over each movement separately
-    fitness = 1.0;
     for(int i = 0; i < m_numMoves; i++)
     {
       // Assumes each move consists of 4 trajectory points            
@@ -147,21 +159,34 @@ float EvoArmCoCon::getFitness()
         fitness *= 1.0 - desEnd.distance(actEnd);     
         // Minimise velocity at end
         const ci::Vec2f& prevActEnd = m_actualPositions[i - 1];
-        fitness *= 1.0 - actEnd.distance(prevActEnd); 
+        double endVelFitness = 1.0 - (actEnd.distance(prevActEnd) / dt); 
+        double fac = ((sign(fitness) < 0) && sign(endVelFitness) < 0) ? -1 : 1;
+        fitness = fac * (fitness * endVelFitness);
         
         // Minimise position error at start
         i = (start / dt) + 1;        
         const ci::Vec2f& desStart = m_desiredPositions[i];
         const ci::Vec2f& actStart = m_actualPositions[i];
-        fitness *= 1.0 - desStart.distance(actStart);     
+        double startPosFitness = 1.0 - desStart.distance(actStart);     
+        fac = ((sign(fitness) < 0) && sign(startPosFitness) < 0) ? -1 : 1;
+        fitness = fac * (fitness * startPosFitness);
+        
         // Minimise velocity at start
         const ci::Vec2f& prevAct = m_actualPositions[i - 1];
-        fitness *= 1.0 - actStart.distance(prevAct); 
-        
+        double startVelFitness = 1.0 - actStart.distance(prevAct); 
+        fac = ((sign(fitness) < 0) && sign(startVelFitness) < 0) ? -1 : 1;
+        fitness = fac * (fitness * startVelFitness);
       }
       else
       {
-        float moveFitness = getFitness(start, end);
+        const bool evalEndOnly = false;
+        if(evalEndOnly)
+        {
+          const double endPeriod = 0.3;          
+          start = end - endPeriod;
+        }
+
+        float  moveFitness = getFitness(start, end);
         fitness *= moveFitness;
         if(moveFitness < 0)
         {
@@ -177,19 +202,6 @@ float EvoArmCoCon::getFitness()
     fitness = getFitness(0, m_actualPositions.size());
   }
 
-  
-  if(m_enableCoconIncrease)
-  {
-    float coconFit = 0;
-    int N = m_coconIncrements.size();
-    for(int i = 0; i < N; i++)
-    {
-      coconFit += std::max(m_coconIncrements[i], 0.0f);
-    }
-    coconFit /= N;
-    fitness *= coconFit;
-  }
-  
   m_fitness = fitness;
   return m_fitness;
 };
@@ -265,29 +277,33 @@ void EvoArmCoCon::init()
     m_evolveHillParams = xmlFlags.getChild("Muscles").getAttributeValue<bool>("hillParams");
     m_evolveFriction = xmlFlags.getChild("Friction").getValue<bool>();
     m_evolveRampDuration = xmlFlags.getChild("RampDuration").getValue<bool>();    
+    m_evolveRampDurationPerMove = xmlFlags.getChild("RampDuration").getAttributeValue<bool>("perMove");    
     m_evolveSpindles = xmlFlags.getChild("Spindles").getValue<bool>();
-    m_evolveUniformSpindles = xmlFlags.getChild("Spindles").getAttributeValue<int>("uniform");    
-    m_evolveUniformSpindleWeights = xmlFlags.getChild("Spindles").getAttributeValue<int>("uniformWeights");
+    m_evolveSymmetricSpindles = xmlFlags.getChild("Spindles").getAttributeValue<int>("symmetric");    
+    m_evolveSymmetricSpindleWeights = xmlFlags.getChild("Spindles").getAttributeValue<int>("symmetricWeights");
+    m_evolveSpindlesPerMove = xmlFlags.getChild("Spindles").getAttributeValue<int>("perMove");
     m_evolveVelRef = xmlFlags.getChild("Spindles").getAttributeValue<bool>("velRef");
-    m_evolveIAIN = xmlFlags.getChild("iain").getValue<bool>();
-    m_evolveIAINsimple = xmlFlags.getChild("iain").getAttributeValue<bool>("simple");
-    m_evolveIAINsym = xmlFlags.getChild("iain").getAttributeValue<bool>("symmetric");    
-    m_evolveRenshaw = xmlFlags.getChild("renshaw").getValue<bool>();
-    m_evolveIBIN = xmlFlags.getChild("ibin").getValue<bool>();
-    m_evolveIFV = xmlFlags.getChild("ifv").getValue<bool>();
-    m_evolveSFV = xmlFlags.getChild("sfv").getValue<bool>();
-    m_evolveOpenLoop = xmlFlags.getChild("openLoop").getValue<bool>();
-    m_openLoopSymmetry = xmlFlags.getChild("openLoop").getAttributeValue<int>("symmetric");
-    m_maxOpenLoop = xmlFlags.getChild("openLoop").getAttributeValue<float>("max");    
-    m_evolveIntersegmentInputs = xmlFlags.getChild("interSegmentInput").getValue<bool>();
-    m_maxInterseg = xmlFlags.getChild("interSegmentInput").getAttributeValue<double>("max");
+    m_evolveIAIN = xmlFlags.getChild("Iain").getValue<bool>();
+    m_evolveIAINsimple = xmlFlags.getChild("Iain").getAttributeValue<bool>("simple");
+    m_evolveIAINsym = xmlFlags.getChild("Iain").getAttributeValue<bool>("symmetric");    
+    m_evolveRenshaw = xmlFlags.getChild("Renshaw").getValue<bool>();
+    m_evolveIBIN = xmlFlags.getChild("Ibin").getValue<bool>();
+    m_evolveIBINsym = xmlFlags.getChild("Ibin").getAttributeValue<bool>("symmetric");
+    m_evolveIFV = xmlFlags.getChild("Ifv").getValue<bool>();
+    m_evolveSFV = xmlFlags.getChild("Sfv").getValue<bool>();
+    m_evolveOpenLoop = xmlFlags.getChild("OpenLoop").getValue<bool>();
+    m_openLoopSymmetry = xmlFlags.getChild("OpenLoop").getAttributeValue<int>("symmetric");
+    m_maxOpenLoop = xmlFlags.getChild("OpenLoop").getAttributeValue<float>("max");    
+    m_openLoopTauMaxAct = xmlFlags.getChild("OpenLoop").getAttributeValue<float>("tauMaxAct");
+    m_openLoopTauMaxDeact = xmlFlags.getChild("OpenLoop").getAttributeValue<float>("tauMaxDeact");    
+    m_evolveIntersegmentInputs = xmlFlags.getChild("InterSegmentInput").getValue<bool>();
+    m_maxInterseg = xmlFlags.getChild("InterSegmentInput").getAttributeValue<double>("max");
+    m_evolveDistalCommandDelay = xmlFlags.getChild("DistalCommandDelay").getValue<bool>();    
+    m_maxDistalDelay = xmlFlags.getChild("DistalCommandDelay").getAttributeValue<double>("max");    
         
     const ci::XmlTree& xml = SETTINGS->getChild("Config/GA/Evolvable");
-    m_enableCoconIncrease = xml.getChild("enableCoconInc").getValue<bool>();
-    m_minCocontraction = xml.getChild("enableCoconInc").getAttributeValue<float>("min");
-    m_maxCocontraction = xml.getChild("enableCoconInc").getAttributeValue<float>("max");
-    m_commandTrajSmooth = xml.getChild("commandTrajSmooth").getValue<bool>();    
-    m_useMuscleCoords = xml.getChild("useMuscleCoords").getValue<bool>();    
+    m_commandTrajSmooth = xml.getChild("CommandTrajSmooth").getValue<bool>();    
+    m_useMuscleCoords = xml.getChild("UseMuscleCoords").getValue<bool>();    
 
     m_fitnessEndPointOnly = xml.getChild("FitnessFunction/EndPointOnly").getValue<bool>();    
     m_fitnessEvalVel = xml.getChild("FitnessFunction/Velocity").getValue<bool>();
@@ -322,13 +338,35 @@ void EvoArmCoCon::init()
         double v = val->getValue<double>();
         m_intersegParams.push_back(v);
       }
-    }      
+    }     
     
-    // Ramp duration factor
-    if (SETTINGS->hasChild("Config/Arm/RampDurationFactor")) 
+    // Distal (elbow) command delays
+    if (SETTINGS->hasChild("Config/Arm/DistalDelays")) 
     {   
-      m_rampDurationFactor = SETTINGS->getChild("Config/Arm/RampDurationFactor").getValue<double>();    
-    }    
+      m_distalDelays.clear();
+      
+      ci::XmlTree& params = SETTINGS->getChild("Config/Arm/DistalDelays");    
+      ci::XmlTree::Iter val = params.begin("Value");
+      for (; val != params.end(); ++val)
+      {
+        double v = val->getValue<double>();
+        m_distalDelays.push_back(v);
+      }
+    }         
+    
+    // Ramp durations
+    if (SETTINGS->hasChild("Config/Arm/RampDurations")) 
+    {   
+      m_rampDurations.clear();
+      
+      ci::XmlTree& params = SETTINGS->getChild("Config/Arm/RampDurations");    
+      ci::XmlTree::Iter val = params.begin("Value");
+      for (; val != params.end(); ++val)
+      {
+        double v = val->getValue<double>();
+        m_rampDurations.push_back(v);
+      }
+    }             
         
     // Read trajectory from settings file    
     // Requires arm to be setup to do FK, but that's already done in init() above, so should be fine.
@@ -386,13 +424,9 @@ void EvoArmCoCon::init()
     m_evolveSFV = false;
     m_evolveOpenLoop = false;
     m_maxOpenLoop = 0.25;
-    m_evolveUniformSpindles = 1;
-    m_evolveHillParams = false;
-    
-    m_enableCoconIncrease = false;
-    m_minCocontraction = 0.05;
-    m_maxCocontraction = 0.25;
-    
+    m_evolveSymmetricSpindles = 1;
+    m_evolveSymmetricSpindleWeights = 1;
+    m_evolveHillParams = false;    
     m_useMuscleCoords = false;
   }
   
@@ -404,9 +438,7 @@ void EvoArmCoCon::createTrajectories()
 {   
   // First clear existing trajectories, as below we will append
   m_commandedTrajectory.clear();
-  m_targetJointAngles.clear();
-  m_targetElbLengths.clear();
-  m_targetShdLengths.clear();
+  m_commandedJointAngles.clear();
   
   Trajectory<ci::Vec2f>::BlendType commandBlend;
   if (m_commandTrajSmooth) 
@@ -425,9 +457,10 @@ void EvoArmCoCon::createTrajectories()
     m_commandedTrajectory.add(m_desiredTrajectory[m + 1]); 
 
     // Duration of move is shorter
+    double rampDurationFactor = m_rampDurations.size() > 1 ? m_rampDurations[i] : m_rampDurations[0]; // Per move or not?
     float duration = m_desiredTrajectory[m + 2].time - m_desiredTrajectory[m + 1].time;
     Target<ci::Vec2f> comMoveTarget = m_desiredTrajectory[m + 2];
-    comMoveTarget.time = m_desiredTrajectory[m + 1].time + m_rampDurationFactor * duration;
+    comMoveTarget.time = m_desiredTrajectory[m + 1].time + rampDurationFactor * duration;
     m_commandedTrajectory.add(comMoveTarget);
     
     // End time of move is the same
@@ -440,31 +473,10 @@ void EvoArmCoCon::createTrajectories()
     int elbDir = i < ELB_SWITCH_TRIAL ? 1 : -1;
     double desiredAngles[2];
     m_arm->inverseKinematics(m_commandedTrajectory[i].position, elbDir, desiredAngles[JT_elbow], desiredAngles[JT_shoulder]);  
-    m_targetJointAngles.add(m_commandedTrajectory[i]);
-    m_targetJointAngles[i].position = Pos(desiredAngles[JT_elbow], desiredAngles[JT_shoulder]);
+    m_commandedJointAngles.add(m_commandedTrajectory[i]);
+    m_commandedJointAngles[i].position = Pos(desiredAngles[JT_elbow], desiredAngles[JT_shoulder]);
   }
-  m_targetJointAngles.setBlend(commandBlend);
-  
-  
-  // Transform joint angle targets into muscle length targets
-  for(int i = 0; i < m_commandedTrajectory.size(); i++)
-  {
-    Target<Pos> jointTarget = m_targetJointAngles[i];
-    
-    // Elbow muscles
-    double desLength0 = m_arm->getReflex(0)->getMuscle(0)->getLengthFromJointAngles(jointTarget.position.x, jointTarget.position.y);
-    double desLength1 = m_arm->getReflex(0)->getMuscle(1)->getLengthFromJointAngles(jointTarget.position.x, jointTarget.position.y);
-    m_targetElbLengths.add(jointTarget);
-    m_targetElbLengths[i].position = Pos(desLength0, desLength1);
-    
-    // Shoulder muscles
-    desLength0 = m_arm->getReflex(1)->getMuscle(0)->getLengthFromJointAngles(jointTarget.position.x, jointTarget.position.y);
-    desLength1 = m_arm->getReflex(1)->getMuscle(1)->getLengthFromJointAngles(jointTarget.position.x, jointTarget.position.y);
-    m_targetShdLengths.add(jointTarget);
-    m_targetShdLengths[i].position = Pos(desLength0, desLength1);
-  }
-  m_targetElbLengths.setBlend(commandBlend);  
-  m_targetShdLengths.setBlend(commandBlend);    
+  m_commandedJointAngles.setBlend(commandBlend);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -482,16 +494,13 @@ void EvoArmCoCon::reset()
   m_actualPositions.clear();
   m_actualCoactivationsElb.clear();
   m_actualCoactivationsShd.clear();
-  m_coconIncrements.clear();
-  
-  m_coconStarted = false;
 
   // If possible set arm to initial position 
   float elbStart = 0, shdStart = 0;  
-  if(m_targetJointAngles.size() > 0)
+  if(m_commandedJointAngles.size() > 0)
   {
-    elbStart = m_targetJointAngles[0].position.x;
-    shdStart = m_targetJointAngles[0].position.y;
+    elbStart = m_commandedJointAngles[0].position.x;
+    shdStart = m_commandedJointAngles[0].position.y;
   }
   
   m_arm->resetTo(elbStart, shdStart);
@@ -500,16 +509,14 @@ void EvoArmCoCon::reset()
 //----------------------------------------------------------------------------------------------------------------------
 void EvoArmCoCon::update(float dt)
 { 
-  // Blend linearly not in target position, as that would lead to asymmetric profiles in joint and muscle space,
-  // but blend linearly in joint angle space
-  // Get position first
+  // Blends linearly not in cartesian target position
   Target<Pos> desired = m_desiredTrajectory.atTime(m_time);
   Target<Pos> command = m_commandedTrajectory.atTime(m_time);
   
   // Current move and phase
   int prevMove = m_currentMove;
-  m_currentMove = desired.name;   
   int prevPhase = m_currentPhase;
+  m_currentMove = desired.name;   
   m_currentPhase = desired.id % kMvPh_numPhases;
   
 #if 0 // DEBUGGING
@@ -524,25 +531,9 @@ void EvoArmCoCon::update(float dt)
   if(m_resetEachMove && (m_currentMove != prevMove))
   {
     m_arm->resetTo(m_currentDesiredAngles.x, m_currentDesiredAngles.y);
+    decodeSpindles(m_currentMove);
   }  
-  
-  // Incremental increase in cocontraction at target position
-  const Target<Pos>& coconTarget = desired;
-  if(m_enableCoconIncrease)
-  {
-    m_cocontraction = m_minCocontraction;
-    
-    if (coconTarget.id % 2 == 0)
-    {     
-      // Determine how far proportionally we're through with this target
-      float duration = m_desiredTrajectory[coconTarget.id + 1].time - coconTarget.time;
-      m_cocontraction += m_maxCocontraction * ((m_time - coconTarget.time) / duration);
-    } 
-    
-    // Apply
-    m_arm->getReflex(0)->setOpenLoop(m_cocontraction, m_cocontraction);
-    m_arm->getReflex(1)->setOpenLoop(m_cocontraction, m_cocontraction);    
-  }
+
   
   // Set open-loop parameters for the current movement
   // Vector of open-loop is arranged like this: [mv1m1 mv1m2 mv1m3 ... mv1mM | mv2m1 ... | mvNmM],
@@ -556,6 +547,7 @@ void EvoArmCoCon::update(float dt)
       m_arm->getReflex(0)->setOpenLoop(m_openLoopParams[i+0], m_openLoopParams[i+1]);
       m_arm->getReflex(1)->setOpenLoop(m_openLoopParams[i+2], m_openLoopParams[i+3]);
     }
+    
     else if(m_currentPhase == kMvPh_leadOut)
     {
       m_arm->getReflex(0)->setOpenLoop(0, 0);
@@ -567,67 +559,38 @@ void EvoArmCoCon::update(float dt)
   if(m_intersegParams.size() > 0)
   {
     // We set interseg. params at beginning of each move, even in leadIn phase these should be fine to use
-    //if(m_currentMove != prevMove)
-    if(m_currentPhase == kMvPh_move)
+    if(m_currentMove != prevMove)
+    //if(m_currentPhase == kMvPh_move)
     {
       int i = m_currentMove * 4; // 4 muscles x 1 param each 
       m_arm->getReflex(0)->setIntersegmentalParameters(m_intersegParams[i+0], m_intersegParams[i+1]);
       m_arm->getReflex(1)->setIntersegmentalParameters(m_intersegParams[i+2], m_intersegParams[i+3]);      
     }
-    else 
+    /*else 
     {
       m_arm->getReflex(0)->setIntersegmentalParameters(0, 0);
       m_arm->getReflex(1)->setIntersegmentalParameters(0, 0);      
+    }*/
+  }
+  
+  // Distal (elbow) command delay
+  if(m_distalDelays.size() > 0)
+  {
+    if(m_currentMove != prevMove)
+    {
+      m_arm->getReflex(0)->setCommandDelay(m_distalDelays[m_currentMove]);
     }
-
   }
   
   
   // Update arm simulation
   if(m_useMuscleCoords)
   {
-    Pos commandedElbLengths = m_targetElbLengths.atTime(m_time).position;
-    Pos commandedShdLengths = m_targetShdLengths.atTime(m_time).position;  
-    m_arm->update(commandedElbLengths.x, commandedElbLengths.y, commandedShdLengths.x, commandedShdLengths.y, dt);  
     //m_arm->update(desiredAngles.x, desiredAngles.y, dt);  
   }
   else
   {
     m_arm->update(command.position, dt, command.id < ELB_SWITCH_TRIAL ? 1 : -1);    
-  }
-  
-  
-  // Measure real co-contraction increment between beginning and end of commanded increase
-  if(m_enableCoconIncrease)
-  {
-    if(coconTarget.id % 2 == 0)
-    {
-      // At start of increase
-      if(!m_coconStarted)
-      {
-        // Cache average activation at start of increase
-        m_coconAtStart[0] = 0.5 * (m_arm->getReflex(0)->getAlphaOutput(0) + m_arm->getReflex(0)->getAlphaOutput(1));
-        m_coconAtStart[1] = 0.5 * (m_arm->getReflex(1)->getAlphaOutput(0) + m_arm->getReflex(1)->getAlphaOutput(1));
-        assert(m_coconAtStart[0] == m_coconAtStart[0]);
-        assert(m_coconAtStart[1] == m_coconAtStart[1]);
-        m_coconStarted = true;
-      }
-      
-      // End of increase
-      float coconTargetStop = m_desiredTrajectory[coconTarget.id + 1].time;
-      if((coconTargetStop - m_time) <= dt)
-      {
-        double coconAtEnd [2];
-        coconAtEnd[0] = 0.5 * (m_arm->getReflex(0)->getAlphaOutput(0) + m_arm->getReflex(0)->getAlphaOutput(1));
-        coconAtEnd[1] = 0.5 * (m_arm->getReflex(1)->getAlphaOutput(0) + m_arm->getReflex(1)->getAlphaOutput(1));
-        double totalInc = 0.5 * ((coconAtEnd[0] - m_coconAtStart[0]) + (coconAtEnd[1] - m_coconAtStart[1]));
-        assert(totalInc == totalInc);
-        
-        //m_coconIncrements[coconTarget.id/2-1] = totalInc; // Normalise to [0,1]. Can be 1 at max per reflex, so 2 in total.
-        m_coconIncrements.push_back(totalInc); // Normalise to [0,1]. Can be 1 at max per reflex, so 2 in total.
-        m_coconStarted = false;
-      }
-    }
   }
   
   // Store for fitness evaluation  
@@ -684,9 +647,6 @@ void EvoArmCoCon::toXml(ci::XmlTree& xml)
   ci::XmlTree evolvable ("EvoArmCoCon", "");
   evolvable.setAttribute("Fitness", getFitness());
   
-  ci::XmlTree rampDur ("RampDurationFactor", toString(m_rampDurationFactor));
-  evolvable.push_back(rampDur);
-  
   ci::XmlTree bestFitDelay ("BestFitnessMatchDelay", toString(m_bestFitDelay));
   evolvable.push_back(bestFitDelay);  
   
@@ -705,6 +665,23 @@ void EvoArmCoCon::toXml(ci::XmlTree& xml)
     interseg.push_back(isP);
   }
   evolvable.push_back(interseg);  
+  
+  ci::XmlTree delays("DistalDelays", "");
+  for(int i = 0; i < m_distalDelays.size(); i++)
+  {
+    ci::XmlTree delay ("Value", toString(m_distalDelays[i]));
+    delays.push_back(delay);
+  }
+  evolvable.push_back(delays);    
+  
+  ci::XmlTree rampDurs("RampDurations", "");
+  for(int i = 0; i < m_rampDurations.size(); i++)
+  {
+    ci::XmlTree duration ("Value", toString(m_rampDurations[i]));
+    rampDurs.push_back(duration);
+  }
+  evolvable.push_back(rampDurs);      
+  
   
   // Add ArmMuscled xml data
   m_arm->toXml(evolvable);  

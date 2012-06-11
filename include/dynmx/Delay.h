@@ -36,9 +36,27 @@ protected:
   double m_initial;
   std::queue<double> m_history;
 };
+  
+//----------------------------------------------------------------------------------------------------------------------
+// 
+//----------------------------------------------------------------------------------------------------------------------  
+class Derivative
+{
+public:
+  Derivative(double initial=0);
+  ~Derivative() {};
+  
+  void reset(double initial=0);
+  double update(double val, float dt);
+  double get() { return m_dVal; };
+  
+protected:;
+  double m_prevVal;
+  double m_dVal;
+};  
 
 //----------------------------------------------------------------------------------------------------------------------    
-// Inlines
+// Inlines for Delay
 //----------------------------------------------------------------------------------------------------------------------    
 inline Delay::Delay()
 {
@@ -75,6 +93,30 @@ inline double Delay::update(double val)
   // Return oldest value
   return m_history.front(); 
 }
+  
+  
+//----------------------------------------------------------------------------------------------------------------------    
+// Inlines for Derivative
+//----------------------------------------------------------------------------------------------------------------------    
+inline Derivative::Derivative(double initial)
+{
+  reset(initial);
+}
+
+//----------------------------------------------------------------------------------------------------------------------    
+inline void Derivative::reset(double initial)
+{
+  m_prevVal = initial;
+  m_dVal = 0.0;  
+}
+
+//----------------------------------------------------------------------------------------------------------------------    
+inline double Derivative::update(double val, float dt)
+{
+  m_dVal = (val - m_prevVal) / dt;
+  m_prevVal = val;
+  return m_dVal;
+}  
   
 } // namespace
 

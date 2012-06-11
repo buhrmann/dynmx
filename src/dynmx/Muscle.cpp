@@ -76,6 +76,7 @@ void Muscle::reset()
   m_passiveForceNorm = 0.0;
   m_activeForceNorm = 0.0;
   m_velocityForceNorm = 0.0;  
+  m_force = 0.0;
   
   m_velocity = 0.0; 
   m_excitation = 0.0;  
@@ -196,7 +197,7 @@ double Muscle::calcVelocityForceNorm(double velocityNorm)
 double Muscle::calcActivation(double activation, double excitation, float dt)
 {
   const double tau = excitation >= activation ? m_tauAct : m_tauDeact;
-  return activation + ((excitation - activation) / tau) * dt;	// else if activity decreasing
+  return activation + ((excitation - activation) / tau) * dt;
 }
   
 // Will be called from subclasses, as is virtual function

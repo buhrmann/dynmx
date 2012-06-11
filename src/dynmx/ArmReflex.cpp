@@ -38,6 +38,11 @@ void ArmReflex::init()
   bool coconAsCCommand = false; 
   if (SETTINGS->hasChild("Config/Arm/CoContraction"))
     coconAsCCommand = SETTINGS->getChild("Config/Arm/CoContraction").getAttributeValue<bool>("AsCCommand");  
+
+  bool torqueFbkPosMod = true; 
+  if (SETTINGS->hasChild("Config/Arm/TorqueFeedback"))
+    torqueFbkPosMod = SETTINGS->getChild("Config/Arm/TorqueFeedback").getAttributeValue<bool>("PosMod");  
+  
   
   if (SETTINGS->hasChild("Config/Arm/Reflex"))
   {
@@ -58,6 +63,7 @@ void ArmReflex::init()
       reflex->fromXml(*refxml);
       
       reflex->setCoconAsCCommand(coconAsCCommand);
+      reflex->setTorqueFeedbackPosMod(torqueFbkPosMod);
       
       m_reflexes.push_back(reflex);
     }
@@ -92,8 +98,8 @@ void ArmReflex::update(Pos pos, float dt, int elbPos)
   // Get desired joint angles from desired position
   m_desiredPos = pos;
   inverseKinematics(m_desiredPos, elbPos, m_desiredAngles[JT_elbow], m_desiredAngles[JT_shoulder]);
-  m_desiredAngles[JT_elbow] = clamp(m_desiredAngles[JT_elbow], getJointLimitLower(JT_elbow), getJointLimitUpper(JT_elbow));  
-  m_desiredAngles[JT_shoulder] = clamp(m_desiredAngles[JT_shoulder], getJointLimitLower(JT_shoulder), getJointLimitUpper(JT_shoulder));  
+  setDesiredJointAngle(JT_elbow, m_desiredAngles[JT_elbow]);
+  setDesiredJointAngle(JT_shoulder, m_desiredAngles[JT_shoulder]); 
   
   // Set reflex desired state  
   for(int i = 0; i < m_reflexes.size(); i++)
@@ -171,8 +177,19 @@ void ArmReflex::update(float dt)
   }
   else
   {
-    m_reflexes[0]->setIntersegmentInput(m_state.torques[JT_shoulder], m_state.torques[JT_shoulder]);
-    m_reflexes[1]->setIntersegmentInput(m_state.torques[JT_elbow], m_state.torques[JT_elbow]);    
+    const bool inclMomemtArm = false;
+    if(inclMomemtArm)
+    {
+      m_reflexes[0]->setIntersegmentInput(m_state.torques[JT_shoulder], m_state.torques[JT_shoulder]);
+      m_reflexes[1]->setIntersegmentInput(m_state.torques[JT_elbow], m_state.torques[JT_elbow]);    
+    }
+    else 
+    {
+      double totalShdForce = 0.5 * (m_reflexes[1]->getMuscle(0)->getNormalisedForce() + m_reflexes[1]->getMuscle(1)->getNormalisedForce());
+      double totalElbForce = 0.5 * (m_reflexes[0]->getMuscle(0)->getNormalisedForce() + m_reflexes[0]->getMuscle(1)->getNormalisedForce());      
+      m_reflexes[0]->setIntersegmentInput(totalShdForce, totalShdForce);
+      m_reflexes[1]->setIntersegmentInput(totalElbForce, totalElbForce);    
+    }
   }
 }
 

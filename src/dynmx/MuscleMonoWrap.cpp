@@ -13,7 +13,7 @@
 namespace dmx
 {
   
-#define TEST_CONST_MOMEMT_ARM 0
+#define TEST_CONST_MOMEMT_ARM 1
 
 //----------------------------------------------------------------------------------------------------------------------  
 MuscleMonoWrap::MuscleMonoWrap(ArmMuscled* arm, float originDist, float insertDist, Joint jointId, bool isFlex) :

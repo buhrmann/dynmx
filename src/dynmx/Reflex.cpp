@@ -14,9 +14,6 @@
 
 namespace dmx
 {
-
-#define REFLEX_USE_CONTRACTION_COORDS 1
-#define REFLEX_USE_OWN_IAIN_IMPL 1
   
 //----------------------------------------------------------------------------------------------------------------------      
 Reflex::Reflex() 
@@ -82,6 +79,9 @@ void Reflex::init()
   m_Wisep[0] = m_Wisep[1] = 0.0;
 
   m_coconAsCCommand = false;
+  m_trqFeedbackPosMod = true;
+  m_feedbackDelay = 0.0;
+  m_commandDelay = 0.0;
                      
   reset();
 }
@@ -101,14 +101,20 @@ void Reflex::reset()
   m_sfv[0] = m_sfv[1] = 0.0;  
   m_ifv[0] = m_ifv[1] = 0.0;
   m_alpha[0] = m_alpha[1] = 0.0;
+  m_alphaState[0] = m_alphaState[1] = 0.0;  
   m_ofpv[0] = m_ofpv[1] = 0.0;
   
   // State in length coordinates
-  m_posDelay[0] = Delay(0.05, 0.001, m_muscles[0]->getUnitLength());
-  m_posDelay[1] = Delay(0.05, 0.001, m_muscles[1]->getUnitLength());
+  // Sensory feedback delay
+  m_posDelay[0] = Delay(m_feedbackDelay, 0.001, m_muscles[0]->getUnitLength());
+  m_posDelay[1] = Delay(m_feedbackDelay, 0.001, m_muscles[1]->getUnitLength());
+  
+  // Delay of commanded trajectory (elbow is empirically found to start later than shoulder)
+  m_commandDelayed[0] = Delay(m_commandDelay, 0.001, m_muscles[0]->getUnitLength());
+  m_commandDelayed[1] = Delay(m_commandDelay, 0.001, m_muscles[1]->getUnitLength());  
                      
-  m_length[0] = m_muscles[0]->getUnitLength();
-  m_length[1] = m_muscles[1]->getUnitLength();
+  m_length[0] = m_posDelay[0].get();
+  m_length[1] = m_posDelay[1].get();
   m_lengthPrev[0] = m_length[0];
   m_lengthPrev[1] = m_length[1];      
   m_desiredLength[0] = m_length[0];
@@ -130,9 +136,21 @@ void Reflex::reset()
   
   m_spindleVelRes[0] = m_spindleVelRes[1] = 0.0;
   
-  // Input state
-  m_openLoop[0] = m_openLoop[1] = 0.0;
-  m_interSegmentInput[0] = m_interSegmentInput[1] = 0.0;
+  // Input state 
+  m_openLoopPreFilter[0] = m_openLoopPreFilter[1] = 0.0;
+  m_openLoopFiltered[0] = m_openLoopFiltered[1] = 0.0;
+  
+  // Intersegment feedback delay
+  m_interSegDelay[0] = Delay(m_feedbackDelay, 0.001, 0.0);
+  m_interSegDelay[1] = Delay(m_feedbackDelay, 0.001, 0.0);  
+  m_interSegmentInput[0] = m_interSegDelay[0].get();
+  m_interSegmentInput[1] = m_interSegDelay[1].get();
+
+  // Force sensor
+  m_forceDelay[0] = Delay(m_feedbackDelay, 0.001, m_muscles[0]->getNormalisedForce());
+  m_forceDelay[1] = Delay(m_feedbackDelay, 0.001, m_muscles[1]->getNormalisedForce());  
+  m_golgi[0] = m_forceDelay[0].get();
+  m_golgi[1] = m_forceDelay[1].get();
 }
 
 //----------------------------------------------------------------------------------------------------------------------    
@@ -155,9 +173,13 @@ void Reflex::setDesiredLength(double l0, double l1)
   
   if(m_coconAsCCommand)
   {
-    m_desiredLength[0] = clamp(m_desiredLength[0] - m_openLoop[0], 0.0, 1.0);
-    m_desiredLength[1] = clamp(m_desiredLength[1] - m_openLoop[1], 0.0, 1.0);
+    m_desiredLength[0] = clamp(m_desiredLength[0] - m_openLoopFiltered[0], 0.0, 1.0);
+    m_desiredLength[1] = clamp(m_desiredLength[1] - m_openLoopFiltered[1], 0.0, 1.0);
   }
+  
+  // Delay the onset of the commanded trajectory
+  m_desiredLength[0] = m_commandDelayed[0].update(m_desiredLength[0]);
+  m_desiredLength[1] = m_commandDelayed[1].update(m_desiredLength[1]);
   
   // Contraction coordinates
   m_desiredContractionPrev[0] = m_desiredContraction[0]; 
@@ -170,6 +192,13 @@ void Reflex::setDesiredLength(double l0, double l1)
 //----------------------------------------------------------------------------------------------------------------------  
 void Reflex::update(float dt)
 {   
+  // Filter open-loop signals
+  double filterConst [2];
+  filterConst[0] = m_openLoopPreFilter[0] > m_openLoopFiltered[0] ? m_openLoopTimeConstants[0] : m_openLoopTimeConstants[1];
+  filterConst[1] = m_openLoopPreFilter[1] > m_openLoopFiltered[1] ? m_openLoopTimeConstants[0] : m_openLoopTimeConstants[1];
+  m_openLoopFiltered[0] += ((m_openLoopPreFilter[0] - m_openLoopFiltered[0]) / filterConst[0]) * dt;
+  m_openLoopFiltered[1] += ((m_openLoopPreFilter[1] - m_openLoopFiltered[1]) / filterConst[1]) * dt;   
+  
   // Store original commands before internal modification
   m_commandedLength[0] = m_desiredLength[0];
   m_commandedLength[1] = m_desiredLength[1];
@@ -177,11 +206,15 @@ void Reflex::update(float dt)
   m_commandedContraction[1] = m_desiredContraction[1];
   
   // Intersegmental torque feedback modifies virtual (desired) EP
-  m_desiredLength[0] -= m_Wisep[0] * m_interSegmentInput[0];  // +
-  m_desiredLength[1] += m_Wisep[1] * m_interSegmentInput[1];  // +
-  
-  m_desiredContraction[0] += m_Wisep[0] * m_interSegmentInput[0]; // -
-  m_desiredContraction[1] -= m_Wisep[1] * m_interSegmentInput[1]; // -
+  if(m_trqFeedbackPosMod)
+  {
+    double iseg0 = m_interSegDelay[0].update(m_interSegmentInput[0]);
+    double iseg1 = m_interSegDelay[1].update(m_interSegmentInput[1]);
+    m_desiredLength[0] -= m_Wisep[0] * iseg0;  // +
+    m_desiredLength[1] += m_Wisep[1] * iseg1;  // +
+    m_desiredContraction[0] += m_Wisep[0] * iseg0; // -
+    m_desiredContraction[1] -= m_Wisep[1] * iseg1; // -
+  }
   
   // Calculate desired velocities
   m_desiredVelocity[0] = (m_desiredLength[0] - m_desiredLengthPrev[0]) / dt;
@@ -195,8 +228,8 @@ void Reflex::update(float dt)
   m_contractionPrev[0] = m_contraction[0];
   m_contractionPrev[1] = m_contraction[1];    
   
-  m_length[0] = m_muscles[0]->getUnitLength();
-  m_length[1] = m_muscles[1]->getUnitLength();
+  m_length[0] = m_posDelay[0].update(m_muscles[0]->getUnitLength());
+  m_length[1] = m_posDelay[1].update(m_muscles[1]->getUnitLength());
   m_contraction[0] = 1.0 - m_length[0];
   m_contraction[1] = 1.0 - m_length[1];
   
@@ -206,134 +239,14 @@ void Reflex::update(float dt)
   m_contractionVel[1] = (m_contraction[1] - m_contractionPrev[1]) / dt;
   
   // Normalised force sensor
-  double f = m_muscles[0]->getForce();
-  double fmax = m_muscles[0]->getForceMax();  
-  m_golgi[0] =  f / fmax;
-  f = m_muscles[1]->getForce();
-  fmax = m_muscles[1]->getForceMax();  
-  m_golgi[1] =  f / fmax;
+  m_golgi[0] =  m_forceDelay[0].update(m_muscles[0]->getNormalisedForce());
+  m_golgi[1] =  m_forceDelay[1].update(m_muscles[1]->getNormalisedForce());  
   
-#if REFLEX_USE_CONTRACTION_COORDS  
+  m_golgiDt[0].update(m_golgi[0], dt);
+  m_golgiDt[1].update(m_golgi[1], dt);
+  
   updateInContractionCoords(dt);
-#else
-  updateInLengthCoords(dt);
-#endif
-}
- 
-//----------------------------------------------------------------------------------------------------------------------  
-void Reflex::updateInLengthCoords(float dt)
-{
-  const double gsGain[2] = {1.0, 1.0}; // Static gamma neuron gain (Big Xi)
-  const double gdGain[2] = {1.0, 1.0}; // Dynamic gamma neuron gain (ro)
-  
-  double gammaStatic[2];  
-  gammaStatic[0] = m_desiredLength[0] * gsGain[0];
-  gammaStatic[1] = m_desiredLength[1] * gsGain[1];
-  
-  double gammaDyn[2];
-  gammaDyn[0] = m_desiredVelocity[0] * gdGain[0];
-  gammaDyn[1] = m_desiredVelocity[1] * gdGain[1];
-  
-  // Spindle-calculated errors in length and velocity
-  m_posErr[0] = m_length[0] - gammaStatic[0];
-  m_posErr[1] = m_length[1] - gammaStatic[1];
-  m_posErr[0] = std::max(m_posErr[0], 0.0);    
-  m_posErr[1] = std::max(m_posErr[1], 0.0);
-  
-  // TODO: Temporary, until the desired velocity always changes smoothly
-  m_velErr[0] = m_vel[0] - gammaDyn[0];
-  m_velErr[1] = m_vel[1] - gammaDyn[1];
-  m_velErr[0] = std::max(m_velErr[0], 0.0);  
-  m_velErr[1] = std::max(m_velErr[1], 0.0);
-  
-  m_spindleSec[0] = spindleActivation(m_Kspp[0] * m_posErr[0]);
-  m_spindleSec[1] = spindleActivation(m_Kspp[1] * m_posErr[1]);
-  
-  m_spindlePri[0] = spindleActivation((m_Kspp[0] * m_posErr[0]) + 
-                                      (m_Kspv[0] * powf(m_velErr[0], m_Espv[0])) + 
-                                      (m_Kspd[0] * powf(std::max(m_vel[0], 0.0), m_Espv[0])));
-  
-  m_spindlePri[1] = spindleActivation((m_Kspp[1] * m_posErr[1]) + 
-                                      (m_Kspv[1] * powf(m_velErr[1], m_Espv[1])) + 
-                                      (m_Kspd[1] * powf(std::max(m_vel[1], 0.0), m_Espv[1])));
-  
-  // Ia inhibitory interneurons
-  double dIaIn [2];
-  double dRn [2];
-  double dIbIn [2];
-#if REFLEX_USE_OWN_IAIN_IMPL
-  dIaIn[0] = -m_IaIn[0] + (m_Wspia[0] * m_spindlePri[0]) + (m_Waia[0] * (1.0 - m_desiredLength[0])) - (m_Wiaia[0] * m_IaInOut[1]) - (m_Wrnia[0] * m_RnOut[0]);
-  dIaIn[1] = -m_IaIn[1] + (m_Wspia[1] * m_spindlePri[1]) + (m_Waia[1] * (1.0 - m_desiredLength[1])) - (m_Wiaia[1] * m_IaInOut[0]) - (m_Wrnia[1] * m_RnOut[1]);
-  m_IaIn[0] += dt * m_Tiain[0] * dIaIn[0];
-  m_IaIn[1] += dt * m_Tiain[1] * dIaIn[1];  
-  m_IaInOut[0] = neuronActivation(m_IaIn[0] + m_Biain[0]);
-  m_IaInOut[1] = neuronActivation(m_IaIn[1] + m_Biain[1]);
-  
-  dRn[0] = -m_Rn[0] + (m_Wmnrn[0] * m_alpha[0]) - (m_Wrnrn[0] * m_RnOut[1]);
-  dRn[1] = -m_Rn[1] + (m_Wmnrn[1] * m_alpha[1]) - (m_Wrnrn[1] * m_RnOut[0]);
-  m_Rn[0] += dt * m_Trn[0] * dRn[0];
-  m_Rn[1] += dt * m_Trn[1] * dRn[1];
-  m_RnOut[0] = neuronActivation(m_Rn[0] + m_Brn[0]);
-  m_RnOut[1] = neuronActivation(m_Rn[1] + m_Brn[1]);    
-  
-  dIbIn[0] = - m_IbIn[0];
-  dIbIn[1] = - m_IbIn[1];
-  m_IbIn[0] += dt * m_Tib[0] * dIbIn[0];
-  m_IbIn[1] += dt * m_Tib[1] * dIbIn[1];
-  m_IbInOut[0] = neuronActivation(m_IbIn[0] + m_Bib[0]);
-  m_IbInOut[1] = neuronActivation(m_IbIn[1] + m_Bib[1]);  
-#else
-  dIaIn[0] = ((m_Kiain[0] - m_IaIn[0]) * ((1-m_desiredLength[0]-m_openLoop[0]) + m_spindlePri[0])) - ((m_IaIn[0] + m_Kiari[0]) * (m_Kiari[0] + max(0.0, m_IaIn[1])));
-  dIaIn[1] = ((m_Kiain[1] - m_IaIn[1]) * ((1-m_desiredLength[1]-m_openLoop[1]) + m_spindlePri[1])) - ((m_IaIn[1] + m_Kiari[1]) * (m_Kiari[1] + max(0.0, m_IaIn[0])));
-  //dIaIn[0] = ((10.0 - m_IaIn[0]) * (m_desiredContraction[0] + m_cocontraction[0] + m_spindlePri[0])) - ((m_IaIn[0] + 1.0) * (1.0 + max(0.0, m_IaIn[1])));
-  //dIaIn[1] = ((10.0 - m_IaIn[1]) * (m_desiredContraction[1] + m_cocontraction[1] + m_spindlePri[1])) - ((m_IaIn[1] + 1.0) * (1.0 + max(0.0, m_IaIn[0])));    
-  m_IaIn[0] += dt * dIaIn[0];
-  m_IaIn[1] += dt * dIaIn[1];  
-#endif
-  
-  
-  // Inertial force vector: adds extra impulse to overcome inertia based on velocity error
-  // (mostly at beginning and end of trajectory)
-  m_ifv[0] = - m_Bifv[0] + spindleActivation(m_Kspv[0] * powf(m_velErr[0], m_Espv[0])); // or k * (spindlePri - spindleSec) ?
-  m_ifv[1] = - m_Bifv[1] + spindleActivation(m_Kspv[1] * powf(m_velErr[1], m_Espv[1])); // or k * (spindlePri - spindleSec) ?
-  m_ifv[0] = std::max(m_ifv[0], 0.0) * m_Kifv[0];  
-  m_ifv[1] = std::max(m_ifv[1], 0.0) * m_Kifv[1];
-  
-  
-  // Static force vector: adds force to overcome gravity based on integration of position error
-  double dSfv [2];
-  dSfv[0] = -m_Ksfi[0] * m_sfv[0] * (m_sfv[1] + m_spindlePri[1]) + (1.0 - m_sfv[0]) * m_Ksfv[0] * m_spindlePri[0];
-  dSfv[1] = -m_Ksfi[1] * m_sfv[1] * (m_sfv[0] + m_spindlePri[0]) + (1.0 - m_sfv[1]) * m_Ksfv[1] * m_spindlePri[1];  
-  m_sfv[0] += dt * dSfv[0];
-  m_sfv[1] += dt * dSfv[1];
-  
-  
-  // Outflow force and position vector: desired contraction (alpha-activation) + static and inertial forces
-  m_ofpv[0] = m_ifv[0] + m_sfv[0];// + (m_length[0] - m_desiredLength[0]); 
-  m_ofpv[1] = m_ifv[1] + m_sfv[1];// + (m_length[1] - m_desiredLength[1]);
-  
-  
-  // Alpha motor neuron
-#if REFLEX_USE_OWN_IAIN_IMPL  
-  m_alpha[0] = m_openLoop[0] + m_ofpv[0] + m_Wspmn[0] * m_spindlePri[0] 
-  - (m_Wrnmn[0] * m_RnOut[0]) 
-  - (m_Wiamn[0] * m_IaInOut[1]) 
-  - (m_Wibmn[0] * m_IbInOut[0]);
-  
-  m_alpha[1] = m_openLoop[1] + m_ofpv[1] + m_Wspmn[1] * m_spindlePri[1] 
-  - (m_Wrnmn[1] * m_RnOut[1]) 
-  - (m_Wiamn[1] * m_IaInOut[0]) 
-  - (m_Wibmn[1] * m_IbInOut[1]);  
-#else
-  m_alpha[0] = m_openLoop[0] + m_ofpv[0] + m_Wspmn[0] * m_spindlePri[0] - max(0.0, m_IaIn[1]);
-  m_alpha[1] = m_openLoop[1] + m_ofpv[1] + m_Wspmn[1] * m_spindlePri[1] - max(0.0, m_IaIn[0]);  
-#endif  
-  m_alpha[0] = clamp(m_alpha[0], 0.0, 1.0);
-  m_alpha[1] = clamp(m_alpha[1], 0.0, 1.0);
-  
-  m_muscles[0]->setExcitation(m_alpha[0]);
-  m_muscles[1]->setExcitation(m_alpha[1]);    
-}
+} 
 
 //----------------------------------------------------------------------------------------------------------------------  
 void Reflex::updateInContractionCoords(float dt)
@@ -380,9 +293,6 @@ void Reflex::updateInContractionCoords(float dt)
   m_spindlePri[1] = spindleActivation(m_spindlePosRes[1] + m_spindleVelRes[1] + m_spindleDmpRes[1]);
   
   // Ia inhibitory interneurons
-
-  
-#if REFLEX_USE_OWN_IAIN_IMPL
   double dIaIn [2];
   dIaIn[0] = -m_IaIn[0] + (m_Wspia[0] * m_spindlePri[0]) + (m_Waia[0] * m_desiredContraction[0]) - (m_Wiaia[0] * m_IaInOut[1]) - (m_Wrnia[0] * m_RnOut[0]);
   dIaIn[1] = -m_IaIn[1] + (m_Wspia[1] * m_spindlePri[1]) + (m_Waia[1] * m_desiredContraction[1]) - (m_Wiaia[1] * m_IaInOut[0]) - (m_Wrnia[1] * m_RnOut[1]); 
@@ -399,6 +309,7 @@ void Reflex::updateInContractionCoords(float dt)
   m_Rn[1] += dt * m_Trn[1] * dRn[1];
   m_RnOut[0] = neuronActivation(m_Rn[0] + m_Brn[0]);
   m_RnOut[1] = neuronActivation(m_Rn[1] + m_Brn[1]);  
+#endif
   
   double dIbIn[2];  
   dIbIn[0] = - m_IbIn[0] + (m_Wglib[0] * m_golgi[0]) - (m_Wibib[0] * m_IbInOut[1]);
@@ -406,17 +317,15 @@ void Reflex::updateInContractionCoords(float dt)
   m_IbIn[0] += dt * m_Tib[0] * dIbIn[0];
   m_IbIn[1] += dt * m_Tib[1] * dIbIn[1];
   m_IbInOut[0] = neuronActivation(m_IbIn[0] + m_Bib[0]);
-  m_IbInOut[1] = neuronActivation(m_IbIn[1] + m_Bib[1]);  
-#endif  
-#else
-  dIaIn[0] = ((m_Kiain[0] - m_IaIn[0]) * (m_desiredContraction[0] + m_openLoop[0] + m_spindlePri[0])) - ((m_IaIn[0] + m_Kiari[0]) * (m_Kiari[0] + max(0.0, m_IaIn[1])));
-  dIaIn[1] = ((m_Kiain[1] - m_IaIn[1]) * (m_desiredContraction[1] + m_openLoop[1] + m_spindlePri[1])) - ((m_IaIn[1] + m_Kiari[1]) * (m_Kiari[1] + max(0.0, m_IaIn[0])));
-  //dIaIn[0] = ((10.0 - m_IaIn[0]) * (m_desiredContraction[0] + m_cocontraction[0] + m_spindlePri[0])) - ((m_IaIn[0] + 1.0) * (1.0 + max(0.0, m_IaIn[1])));
-  //dIaIn[1] = ((10.0 - m_IaIn[1]) * (m_desiredContraction[1] + m_cocontraction[1] + m_spindlePri[1])) - ((m_IaIn[1] + 1.0) * (1.0 + max(0.0, m_IaIn[0])));  
-  m_IaIn[0] += dt * dIaIn[0];
-  m_IaIn[1] += dt * dIaIn[1];
-#endif
+  m_IbInOut[1] = neuronActivation(m_IbIn[1] + m_Bib[1]);   
   
+  // Intersegmental torque feedback to motor neurons directly
+  double interSegDelayed[2] = {0,0};
+  if(!m_trqFeedbackPosMod)
+  {
+    interSegDelayed[0] = m_interSegDelay[0].update(m_interSegmentInput[0]);
+    interSegDelayed[1] = m_interSegDelay[1].update(m_interSegmentInput[1]);
+  }
 
   
 #if 0  
@@ -441,33 +350,42 @@ void Reflex::updateInContractionCoords(float dt)
   m_ofpv[1] = m_ifv[1] + m_sfv[1];// + (m_length[1] - m_desiredLength[1]);
 #endif
   
-  // Alpha motor neuron
-#if REFLEX_USE_OWN_IAIN_IMPL  
-  m_alpha[0] =  m_ofpv[0] 
+  // Alpha motor neuron 
+  double aMNinput0 =  m_ofpv[0] 
   + (m_Wspmn[0] * m_spindlePri[0])
   - (m_Wrnmn[0] * m_RnOut[0]) 
   - (m_Wiamn[0] * m_IaInOut[1]) 
-  - (m_Wibmn[0] * m_IbInOut[0]);
+  - (m_Wibmn[0] * m_IbInOut[0])
+  + (m_Wisep[0] * interSegDelayed[0]);
   
-  if(!m_coconAsCCommand)
-    m_alpha[0] += m_openLoop[0];
-  
-  m_alpha[1] = m_ofpv[1] 
+  double aMNinput1 = m_ofpv[1] 
   + (m_Wspmn[1] * m_spindlePri[1])
   - (m_Wrnmn[1] * m_RnOut[1]) 
   - (m_Wiamn[1] * m_IaInOut[0]) 
-  - (m_Wibmn[1] * m_IbInOut[1]);    
+  - (m_Wibmn[1] * m_IbInOut[1])
+  + (m_Wisep[1] * interSegDelayed[1]);
   
   if(!m_coconAsCCommand)
-    m_alpha[1] += m_openLoop[1];
+  {
+    aMNinput0 += m_openLoopFiltered[0];    
+    aMNinput1 += m_openLoopFiltered[1];
+  }
 
-#else
-  m_alpha[0] = m_openLoop[0] + m_ofpv[0] + m_Wspmn[0] * m_spindlePri[0] - max(0.0, m_IaIn[1]);
-  m_alpha[1] = m_openLoop[1] + m_ofpv[1] + m_Wspmn[1] * m_spindlePri[1] - max(0.0, m_IaIn[0]);  
-#endif
-  
-  m_alpha[0] = clamp(m_alpha[0], 0.0, 1.0);
-  m_alpha[1] = clamp(m_alpha[1], 0.0, 1.0);
+  const bool aMNasNeuron = false;
+  if(aMNasNeuron)
+  {
+    const double aTau = 500.0;    
+    m_alphaState[0] += dt * aTau * (-m_alphaState[0] + aMNinput0);
+    m_alpha[0] = neuronActivation(m_alphaState[0]);
+    
+    m_alphaState[1] += dt * aTau * (-m_alphaState[1] + aMNinput1);
+    m_alpha[1] = neuronActivation(m_alphaState[1]);
+  }
+  else
+  {
+    m_alpha[0] = clamp(aMNinput0, 0.0, 1.0);
+    m_alpha[1] = clamp(aMNinput1, 0.0, 1.0);
+  }
   
   m_muscles[0]->setExcitation(m_alpha[0]);
   m_muscles[1]->setExcitation(m_alpha[1]);    
@@ -499,6 +417,8 @@ void Reflex::toXml(ci::XmlTree& xml)
   ci::XmlTree reflex ("Reflex", "");
   reflex.setAttribute("Agonist", m_muscles[0]->getName());
   reflex.setAttribute("Antagonist", m_muscles[1]->getName());
+  reflex.setAttribute("FeedbackDelay", m_feedbackDelay);  
+  reflex.setAttribute("CommandDelay", m_commandDelay);
 
   // Spindle
   ci::XmlTree spindle("Spindle", "");
@@ -562,6 +482,9 @@ void Reflex::toXml(ci::XmlTree& xml)
 //----------------------------------------------------------------------------------------------------------------------        
 void Reflex::fromXml(const ci::XmlTree& xml)
 {
+  m_feedbackDelay = xml.getAttributeValue<double>("FeedbackDelay", 0.0);
+  m_commandDelay = xml.getAttributeValue<double>("CommandDelay", 0.0);
+  
   // Spindle
   if(xml.hasChild("Spindle"))
   {
@@ -657,7 +580,7 @@ void Reflex::record(Recorder& recorder)
   recordStatePair(recorder, prefix + "VelRes", &m_spindleVelRes[0]);
   recordStatePair(recorder, prefix + "DmpRes", &m_spindleDmpRes[0]);
   recordStatePair(recorder, prefix + "SpRes", &m_spindlePri[0]);
-  recordStatePair(recorder, prefix + "OpenLoop", &m_openLoop[0]);
+  recordStatePair(recorder, prefix + "OpenLoop", &m_openLoopFiltered[0]);
   recordStatePair(recorder, prefix + "InterSeg", &m_interSegmentInput[0]);
   recordStatePair(recorder, prefix + "ComContraction", &m_commandedContraction[0]);  
   recordStatePair(recorder, prefix + "DesContraction", &m_desiredContraction[0]);
@@ -665,7 +588,52 @@ void Reflex::record(Recorder& recorder)
   recordStatePair(recorder, prefix + "DesContractionVel", &m_desiredContractionVel[0]);
   recordStatePair(recorder, prefix + "ActContractionVel", &m_contractionVel[0]);
   recordStatePair(recorder, prefix + "MN", &m_alpha[0]);
+  recordStatePair(recorder, prefix + "IaIn", &m_IaInOut[0]);  
+  recordStatePair(recorder, prefix + "IbIn", &m_IbInOut[0]);  
 }
+  
+//----------------------------------------------------------------------------------------------------------------------    
+  int Reflex::decodeSpindleParams(const std::vector<double>& genome, int I, bool symmetric, bool velRef, const SpindleLimits& lim)
+{
+  int pI = 0;
+  int dI = 1;
+  int edI = 2;
+  int vI = 3;
+  int evI = 4;
+  
+  const int numSpindleParams = velRef ? 5 : 3;   
+  
+  // 1: identical for antagonists. 2: identical for all muscles.
+  if(symmetric)
+  {      
+    double kp = map01To(genome[I + pI], lim.pos);
+    double kd = map01To(genome[I + dI], lim.dmp);
+    double expD = map01To(genome[I + edI], lim.exp);
+    double kv = velRef ? map01To(genome[I + vI], lim.vel) : 0.0;      
+    double expV = velRef ? map01To(genome[I + evI], lim.exp) : 1.0;
+    
+    setSpindleParameters(kp, kp, kv, kv, kd, kd, expV, expV, expD, expD);
+    return numSpindleParams;
+  }
+  else 
+  {
+    int ofs = numSpindleParams;
+    double kp[2] = { map01To(genome[I + pI], lim.pos), map01To(genome[I + ofs + pI], lim.pos) };
+    double kd[2] = { map01To(genome[I + dI], lim.dmp), map01To(genome[I + ofs + dI], lim.dmp) };
+    double expD[2] = { map01To(genome[I + edI], lim.exp), map01To(genome[I + ofs + edI], lim.exp) };
+    double kv[2] = {0,0};
+    double expV[2] = {1,1};
+    if(velRef)
+    {
+      kv[0] = map01To(genome[I + vI], lim.vel); kv[1] = map01To(genome[I + ofs + vI], lim.vel);        
+      expV[0] = map01To(genome[I + evI], lim.exp); expV[1] = map01To(genome[I + ofs + evI], lim.exp);;        
+    }      
+    
+    setSpindleParameters(kp[0], kp[1], kv[0], kv[1], kd[0], kd[1], expV[0], expV[1], expD[0], expD[1]);
+    return 2 * numSpindleParams;
+  }
+}
+  
   
 } // namespace dmx
 

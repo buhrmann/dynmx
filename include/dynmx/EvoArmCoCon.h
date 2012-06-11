@@ -67,9 +67,7 @@ public:
   
   Trajectory<ci::Vec2f> m_desiredTrajectory;
   Trajectory<ci::Vec2f> m_commandedTrajectory;
-  Trajectory<ci::Vec2f> m_targetJointAngles;     // same targets but in joint angle space
-  Trajectory<ci::Vec2f> m_targetElbLengths;      // same targets but in muscle length space
-  Trajectory<ci::Vec2f> m_targetShdLengths;  
+  Trajectory<ci::Vec2f> m_commandedJointAngles;     // same targets but in joint angle space
   
   ci::Vec2f m_currentDesiredPos;
   ci::Vec2f m_currentCommandPos;
@@ -87,28 +85,28 @@ protected:
   void createTrajectories();
   void updateCurrentCommand(Target<Pos>& command, Target<Pos>& desired);
   int decodeMuscle(int mId, const double* genome, int start);
+  void decodeSpindles(int move=0);
   void readDecodeLimits();
   void readRange(Range& range, const std::string& xmlElem);
   float getFitness(float t0, float tmax);
   
   // Holds data constraining the decoding of a genome into this model
+  struct ArmLimits
+  {
+    Range jointRadius;
+    Range jointFriction;
+  };
+  
+  struct MuscleLimits
+  { 
+    Range attach, force, optLength, maxVel;
+  };
+  
   struct DecodeLimits 
   {
-    struct ArmLimits
-    {
-      Range jointRadius;
-      Range jointFriction;
-    } arm;
-    
-    struct MuscleLimits
-    { 
-      Range attach, force, optLength, maxVel;
-    } muscle;
-    
-    struct SpindleLimits
-    {
-      Range pos, vel, dmp, exp, weight;
-    } spindle;
+    ArmLimits arm;
+    MuscleLimits muscle;
+    Reflex::SpindleLimits spindle;
   };
   
   DecodeLimits m_decodeLimits;
@@ -118,15 +116,13 @@ protected:
   double m_cocontraction;
   
   float m_minJerkTrajDelay;     // Time between start of commanded ramp and min jerk trajectory used for fitness
-  float m_rampDurationFactor;   // Scales the duration of the commanded ramp as proportion of desired movement time
-  
-  std::vector<float> m_coconIncrements;  // At three different positions
-  double m_coconAtStart[2];              // For two reflexes
-  bool m_coconStarted;
   
   // Size of these depend on the number of moves specified in config file
   std::vector<double> m_openLoopParams;  
   std::vector<double> m_intersegParams;
+  std::vector<double> m_distalDelays;
+  std::vector<double> m_rampDurations;
+  std::vector<double> m_spindleParams;
   
   // Fitness related
   bool m_resetEachMove;
@@ -145,32 +141,37 @@ protected:
   bool m_evolveMuscles;
   bool m_evolveFriction;
   bool m_evolveRampDuration;
+  bool m_evolveRampDurationPerMove;
   bool m_symmetricMuscles;
   bool m_evolveSpindles;
+  bool m_evolveSpindlesPerMove;  
+  int m_evolveSymmetricSpindles;
+  int m_evolveSymmetricSpindleWeights;  
   bool m_evolveIAIN;
   bool m_evolveIAINsimple;
   bool m_evolveIAINsym;  
   bool m_evolveRenshaw;
   bool m_evolveIBIN;
+  bool m_evolveIBINsym;
   bool m_evolveIFV;
   bool m_evolveSFV;
   bool m_evolveOpenLoop;
   int m_openLoopSymmetry;
   bool m_evolveIntersegmentInputs;
-  int m_evolveUniformSpindles;
-  int m_evolveUniformSpindleWeights;
+
   bool m_evolveHillParams;
   bool m_evolveMinJerkDelay;
   bool m_evolveVelRef;
+  bool m_evolveDistalCommandDelay;
   
   bool m_commandTrajSmooth;
-  bool m_enableCoconIncrease;
   bool m_useMuscleCoords;
   
   float m_maxOpenLoop;
+  float m_openLoopTauMaxAct;
+  float m_openLoopTauMaxDeact;    
   float m_maxInterseg;
-  float m_minCocontraction;
-  float m_maxCocontraction;
+  float m_maxDistalDelay;
 };
   
 } // namespace dmx

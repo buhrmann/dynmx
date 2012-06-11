@@ -17,7 +17,7 @@
 
 namespace dmx
 {
-   
+  
 //----------------------------------------------------------------------------------------------------------------------
 /// A VITE/FLETE reflex network
 //----------------------------------------------------------------------------------------------------------------------
@@ -27,6 +27,12 @@ class Reflex : public Model
 friend class ArmReflexView;
 
 public:
+  
+  struct SpindleLimits
+  {
+    Range pos, vel, dmp, exp, weight;
+  };    
+  
   
   Reflex();
   Reflex(Muscle* ag, Muscle* an);
@@ -55,10 +61,19 @@ public:
   void setMotoNeuronParameters(double Wspmn0, double Wspmn1);
   void setIntersegmentalParameters(double Wisep0, double Wisep1);
   void setCoconAsCCommand(bool b) { m_coconAsCCommand = b; };
+  void setTorqueFeedbackPosMod(bool b) { m_trqFeedbackPosMod = b; };
+  void setOpenLoopTimeConstant(double act, double deact) { m_openLoopTimeConstants[0] = act; m_openLoopTimeConstants[1] = deact; };
+  void setCommandDelay(double delay) 
+  { 
+    m_commandDelayed[0] = Delay(delay, 0.001, m_muscles[0]->getUnitLength());
+    m_commandDelayed[1] = Delay(delay, 0.001, m_muscles[1]->getUnitLength());
+  };
+  
+  int decodeSpindleParams(const std::vector<double>& genome, int startIndex,  bool symmetric, bool velRef, const SpindleLimits& spindleLim);
   
   // Getters
   double getAlphaOutput(int i) { return m_alpha[i]; };
-  double getOpenLoop(int i) { return m_openLoop[i]; };
+  double getOpenLoop(int i) { return m_openLoopFiltered[i]; };
   double getIntersegmentInput(int i) { return m_interSegmentInput[i]; };
   double getLength(int i) { return m_length[i]; };
   double getDesiredLength(int i) { return m_desiredLength[i]; };
@@ -100,7 +115,15 @@ protected:
   void paramFromXml(const ci::XmlTree& xml, const std::string& str, double* p); 
   
   // Delay lines
+  double m_feedbackDelay;
+  double m_commandDelay;
   Delay m_posDelay [2];
+  Delay m_interSegDelay [2];
+  Delay m_forceDelay [2];
+  Delay m_commandDelayed[2];
+  
+  // Derivative
+  Derivative m_golgiDt[2];
   
   // Parameters
   //-------------------------------------------------
@@ -143,10 +166,13 @@ protected:
   double m_Wisep [2];  // intersegmental influence on desired position
   
   bool m_coconAsCCommand;
+  bool m_trqFeedbackPosMod;
   
   // Inputs
   //-------------------------------------------------  
-  double m_openLoop[2];
+  double m_openLoopPreFilter[2];
+  double m_openLoopFiltered[2];
+  double m_openLoopTimeConstants[2];
   double m_interSegmentInput[2]; 
   
   // State
@@ -174,6 +200,7 @@ protected:
   double m_ofpv [2];              // Outflow position
   
   double m_alpha [2];             // Alpha motor neuron outputs
+  double m_alphaState[2];
   double m_opv [2];               // y in Bullock et al
   double m_ppv [2];               // x
   double m_dv [2];                // r
@@ -210,8 +237,8 @@ inline void Reflex::setIntersegmentInput(double i0, double i1)
 //----------------------------------------------------------------------------------------------------------------------      
 inline void Reflex::setOpenLoop(double c0, double c1) 
 { 
-  m_openLoop[0] = c0; 
-  m_openLoop[1] = c1; 
+  m_openLoopPreFilter[0] = c0; 
+  m_openLoopPreFilter[1] = c1;  
 };
 
 //----------------------------------------------------------------------------------------------------------------------    
