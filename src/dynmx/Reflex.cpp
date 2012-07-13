@@ -164,6 +164,8 @@ void Reflex::setDesiredAngles(double elbAng, double shdAng)
 //----------------------------------------------------------------------------------------------------------------------    
 void Reflex::setDesiredLength(double l0, double l1)  
 { 
+  assert(l0==l0 && l1==l1);
+  
   // Length coordinates
   m_desiredLengthPrev[0] = m_desiredLength[0]; 
   m_desiredLength[0] = m_muscles[0]->lengthToUnitLength(l0);
@@ -198,6 +200,7 @@ void Reflex::update(float dt)
   filterConst[1] = m_openLoopPreFilter[1] > m_openLoopFiltered[1] ? m_openLoopTimeConstants[0] : m_openLoopTimeConstants[1];
   m_openLoopFiltered[0] += ((m_openLoopPreFilter[0] - m_openLoopFiltered[0]) / filterConst[0]) * dt;
   m_openLoopFiltered[1] += ((m_openLoopPreFilter[1] - m_openLoopFiltered[1]) / filterConst[1]) * dt;   
+  assert(m_openLoopFiltered[0]==m_openLoopFiltered[0]);
   
   // Store original commands before internal modification
   m_commandedLength[0] = m_desiredLength[0];
@@ -593,7 +596,7 @@ void Reflex::record(Recorder& recorder)
 }
   
 //----------------------------------------------------------------------------------------------------------------------    
-  int Reflex::decodeSpindleParams(const std::vector<double>& genome, int I, bool symmetric, bool velRef, const SpindleLimits& lim)
+int Reflex::decodeSpindleParams(const std::vector<double>& genome, int I, bool symmetric, bool velRef, const SpindleLimits& lim)
 {
   int pI = 0;
   int dI = 1;
@@ -626,7 +629,7 @@ void Reflex::record(Recorder& recorder)
     if(velRef)
     {
       kv[0] = map01To(genome[I + vI], lim.vel); kv[1] = map01To(genome[I + ofs + vI], lim.vel);        
-      expV[0] = map01To(genome[I + evI], lim.exp); expV[1] = map01To(genome[I + ofs + evI], lim.exp);;        
+      expV[0] = map01To(genome[I + evI], lim.exp); expV[1] = map01To(genome[I + ofs + evI], lim.exp);      
     }      
     
     setSpindleParameters(kp[0], kp[1], kv[0], kv[1], kd[0], kd[1], expV[0], expV[1], expD[0], expD[1]);

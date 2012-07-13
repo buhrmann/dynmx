@@ -15,10 +15,25 @@
 #include <math.h>
 #include "MathUtils.h"
 #include "cinder/Vector.h"
+#include "SMCEnvironment.h"
 
 namespace dmx
 {
+  
+//----------------------------------------------------------------------------------------------------------------------  
+static inline float pointToGaussianDist(ci::Vec2f& res, const ci::Vec2f& p, const Gaussian& g)
+{
+  float projection = (p - g.getPosition()).dot(g.getDir());
+  float y = g.getValueAt(projection);
+  if (y > 0.0)
+  {
+    res = g.getPointFromCoords(projection, y);
+    return (res - p).length();
+  }
 
+  return -1;
+}
+  
 // Returns whether intersection occured in return argument and intersection point in first argument
 // For details see http://paulbourke.net/geometry/lineline2d/
 //----------------------------------------------------------------------------------------------------------------------

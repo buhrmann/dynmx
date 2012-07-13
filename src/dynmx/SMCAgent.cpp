@@ -13,12 +13,13 @@ namespace dmx
 {
   
 //----------------------------------------------------------------------------------------------------------------------
-SMCAgent::SMCAgent(int numNeurons) : 
+SMCAgent::SMCAgent(const Topology& top) : 
+  m_topology(top),
   m_maxSpeed(5.0f), 
   m_maxAngularSpeed(TWO_PI), // rad/s
   m_radius(0.03f)
 {
-  m_ctrnn = new CTRNN(numNeurons);
+  m_ctrnn = new CTRNN(top.getSize());
   
   init();
 }
@@ -41,56 +42,72 @@ void SMCAgent::reset()
   m_time = 0.0f;
   m_angle = 0.0f;
   m_angularVelocity = 0.0;
-  m_position = ci::Vec2f(0.0f, 0.0f);
-  m_velocity = ci::Vec2f(0.0f, 0.0f);
-  
-  updateSensor(0.0f);
+  setPosition(ci::Vec2f(0,0));
 }  
+
+//----------------------------------------------------------------------------------------------------------------------
+void SMCAgent::setPosition(const ci::Vec2f& pos)
+{
+  m_position = pos;
+  m_velocity = ci::Vec2f(0.0f, 0.0f);
+  m_distanceSensor.reset();
+  updateSensor(0.001f);
+}
   
 //----------------------------------------------------------------------------------------------------------------------
 void SMCAgent::update(float dt)
-{
-  static const int motTrans2 = m_ctrnn->getSize() - 1; // last one
-  static const int motTrans1 = motTrans2 - 3;  
-  static const int motRot1 = motTrans2 - 2;  
-  static const int motRot2 = motTrans2 - 1;
-
-  
+{  
   // Sense environment
   updateSensor(dt);
   m_sensedValue = m_distanceSensor.getActivation();  
+  m_sensedValueDerivative = m_distanceSensor.getDerivative();  
 
-  const bool angleDependentSensor = false;
-  if(angleDependentSensor)
+  switch(m_sensorMode)
   {
-    m_sensedValue = sign(m_angle) * m_distanceSensor.getActivation();
-  }
-  
-  // Update neural network
-  if(m_angle < 0)
-  {
-    m_ctrnn->setExternalInput(0, m_sensedValue);    
-    m_ctrnn->setExternalInput(1, 0.0);    
-  }
-  else 
-  {
-    m_ctrnn->setExternalInput(0, 0.0);    
-    m_ctrnn->setExternalInput(1, m_sensedValue);
+    case kSensorMode_Absolute:
+    default:
+      m_ctrnn->setExternalInput(0, m_sensedValue / dt);
+      break;
+    case kSensorMode_Derivative:
+      m_ctrnn->setExternalInput(0, m_sensedValueDerivative);
+      break;
   }
 
   m_ctrnn->updateDynamic(dt);
   
+#if 0  
   // Update agent movement
-  m_angularVelocity = m_maxAngularSpeed * (m_ctrnn->getOutput(motRot1) - m_ctrnn->getOutput(motRot2));
-  m_angularVelocity += UniformRandom(-m_maxAngularSpeed / 100.0, m_maxAngularSpeed / 100.0);
-  m_angle += m_angularVelocity * dt; 
-  if(m_angleWraps)
-    m_angle = wrap(m_angle, -m_maxAngle, m_maxAngle);
-  else 
-    m_angle = clamp(m_angle, -m_maxAngle, m_maxAngle);
+  static int motTrans1, motTrans2;  
+  if(m_topology.getNumOutputs() >= 4)
+  {
+    motTrans1 = m_topology.getSize() - 4;
+    motTrans2 = m_topology.getSize() - 1;
+    static const int motRot1 = m_topology.getSize() - 3;  
+    static const int motRot2 = m_topology.getSize() - 2;    
+    m_angularVelocity = m_maxAngularSpeed * (m_ctrnn->getOutput(motRot1) - m_ctrnn->getOutput(motRot2));
+    m_angularVelocity += UniformRandom(-m_maxAngularSpeed / 100.0, m_maxAngularSpeed / 100.0);
+    m_angle += m_angularVelocity * dt; 
+    if(m_angleWraps)
+      m_angle = wrap(m_angle, -m_maxAngle, m_maxAngle);
+    else 
+      m_angle = clamp(m_angle, -m_maxAngle, m_maxAngle);
+  }
+#endif
 
   // Update positions 
-  m_velocity = m_maxSpeed * (m_ctrnn->getOutput(motTrans1) - m_ctrnn->getOutput(motTrans2)) * ci::Vec2f(0, 1);
+  if(m_topology.getNumOutputs() == 2)
+  {
+    float motTrans1 = m_topology.getSize() - 2;
+    float motTrans2 = m_topology.getSize() - 1;    
+    m_velocity = m_maxSpeed * (m_ctrnn->getOutput(motTrans1) - m_ctrnn->getOutput(motTrans2)) * ci::Vec2f(0, 1);    
+  }
+  else if(m_topology.getNumOutputs() == 1)
+  {
+    float motTrans1 = m_topology.getSize() - 1;
+    m_velocity = m_maxSpeed * ((-1.0 + 2.0 * m_ctrnn->getOutput(motTrans1)) * ci::Vec2f(0, 1));    
+  }
+  
+
   m_position += m_velocity * dt;
   if(m_positionWraps)
     m_position.y = wrap(m_position.y, -m_maxPosition, m_maxPosition);
@@ -105,7 +122,7 @@ void SMCAgent::updateSensor(float dt)
 {
   m_distanceSensor.setPosition(m_position);
   m_distanceSensor.setDirection(ci::Vec2f(cos(m_angle), sin(m_angle)));
-  m_distanceSensor.senseEnvironment(m_environment);
+  m_distanceSensor.senseEnvironment(m_environment, dt);
 }
 
 //----------------------------------------------------------------------------------------------------------------------  
@@ -113,6 +130,17 @@ float SMCAgent::getAngleWithHeading(ci::Vec2f pos)
 {
   ci::Vec2f agentRelPos  = pos - getPosition();
   return atan2(agentRelPos.y, agentRelPos.x);
+}
+
+//----------------------------------------------------------------------------------------------------------------------  
+void SMCAgent::setSensorMode(const std::string& mode)
+{
+  if(mode == "Absolute")
+    m_sensorMode = kSensorMode_Absolute;
+  else if (mode == "Derivative")
+    m_sensorMode = kSensorMode_Derivative;
+  else if (mode == "AbsAndDelayed")
+    m_sensorMode == kSensorMode_AbsAndDelayed;
 }
   
 //----------------------------------------------------------------------------------------------------------------------  
@@ -134,16 +162,17 @@ void SMCAgent::toXml(ci::XmlTree& xml)
 //----------------------------------------------------------------------------------------------------------------------  
 void SMCAgent::record(Recorder& recorder)
 {
-  /*
-  ci::Vec2f m_position;
-  ci::Vec2f m_velocity;
-  float m_angle;  
-  float m_angularVelocity;  
-  float m_sensedValue;
-   */
+  recorder.push_back("PosX", m_position[0]);  
+  recorder.push_back("PosY", m_position[1]);
+  recorder.push_back("VelX", m_velocity[0]);  
+  recorder.push_back("VelY", m_velocity[1]);  
+  recorder.push_back("Angle", m_angle);  
+  recorder.push_back("AngularVel", m_angularVelocity);  
+  recorder.push_back("Sensor", m_sensedValue);  
+  recorder.push_back("SensorDer", m_sensedValueDerivative);    
   
-  // sensor 
   // ctrnn
+  m_ctrnn->record(recorder);
 }  
                                 
 } // namespace

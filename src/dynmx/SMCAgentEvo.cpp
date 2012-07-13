@@ -8,7 +8,6 @@
  */
 
 #include "SMCAgentEvo.h"
-#include "CTRNNFactory.h"
 
 namespace dmx
 {
@@ -34,12 +33,17 @@ void SMCAgentEvo::init()
     // Use setting from globals file
     const ci::XmlTree& xml = settings->getChild("Config/GA/Evolvable");
   
-    m_topology.fromXml(xml.getChild("Topology"));
+    Topology topology; 
+    topology.fromXml(xml.getChild("Topology"));
     
-    m_agent = new SMCAgent(m_topology.getSize());
+    m_netLimits.fromXml(xml.getChild("NetLimits"));
     
-    m_agent->setMaxSensorDistance(xml.getChild("MaxSensorDist").getValue<double>(1.0));
-    m_agent->getDistanceSensor().setTransferFunction(xml.getChild("SensorTransferFunc").getValue<std::string>("Binary"));
+    m_agent = new SMCAgent(topology);
+    
+    m_agent->getDistanceSensor().setMaxDistance(xml.getChild("DistanceSensor").getAttributeValue<double>("MaxDist", 1.0));
+    m_agent->getDistanceSensor().setTransferFunction(xml.getChild("DistanceSensor").getAttributeValue<std::string>("TransferFunc", "Binary"));
+    m_agent->getDistanceSensor().setNoiseLevel(xml.getChild("DistanceSensor").getAttributeValue<float>("NoiseLevel", 0.0));
+    m_agent->setSensorMode(xml.getChild("DistanceSensor").getAttributeValue<std::string>("Mode", "Absolute"));
     m_agent->setMaxSpeed(xml.getChild("MaxSpeed").getValue<double>(1.0));
     m_agent->setMaxAngularSpeed(degreesToRadians(xml.getChild("MaxAngularSpeed").getValue<double>(180)));
     m_agent->setMaxAngle(degreesToRadians(xml.getChild("MaxAngle").getValue<double>(90)));
@@ -84,16 +88,13 @@ void SMCAgentEvo::update(float dt)
 //----------------------------------------------------------------------------------------------------------------------
 int SMCAgentEvo::getNumGenes()
 {
-  return m_topology.getNumParameters();
+  return m_agent->getTopology().getNumParameters();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 void SMCAgentEvo::decodeGenome(const double* genome)
 {
-  // Todo: add to xml!
-  CTRNNFactory::DecodeLimits limits;
-  limits.tau.set(0.2, 2.0);
-  CTRNNFactory::decode(m_agent->getCTRNN(), genome, limits, m_topology);
+  m_agent->getTopology().decode(m_agent->getCTRNN(), genome, m_netLimits);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -114,7 +115,9 @@ void SMCAgentEvo::toXml(ci::XmlTree& xml)
   evolvable.push_back(ci::XmlTree("TrialDuration", toString(m_trialDuration)));
   evolvable.push_back(ci::XmlTree("FitnessEvalDelay", toString(m_fitnessEvalDelay)));  
                       
-  m_topology.toXml(evolvable);
+  m_agent->getTopology().toXml(evolvable);
+  
+  m_netLimits.toXml(evolvable);
   
   xml.push_back(evolvable);
 }

@@ -31,6 +31,7 @@ public:
   virtual void decodeGenome(const double* genome) = 0;
   virtual float getFitness() = 0;
   virtual void nextTrial(int trial = 0) {};
+  virtual void endOfEvaluation(float fit) {};
 
   // Inherited from Model
   // An evolvable can just return  its fitness explicitly, so doesn't necessarily need an update etc...
@@ -70,6 +71,8 @@ public:
   
   Evolvable* getEvolvable() { return m_evolvable; };
   GA* getGA() { return m_ga; };
+  
+  int getNumTrials() { return m_numTrials; };
   
   void setVerbosity(GAVerbosity v) { m_verbosity = v; };
   

@@ -50,8 +50,8 @@ protected:
   
   float m_time;
   float m_accFitness;
-  uint16_t m_trial;
-  uint16_t m_numTrials;
+  uint32_t m_trial;
+  uint32_t m_numTrials;
   
   int m_verbosity;
   bool m_record;

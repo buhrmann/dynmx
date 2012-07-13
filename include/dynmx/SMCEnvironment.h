@@ -13,6 +13,7 @@
 #include "Dynmx.h"
 #include "Model.h"
 #include "cinder/Vector.h"
+#include "MathUtils.h"
 
 namespace dmx
 {
@@ -29,6 +30,7 @@ public:
     kObj_Line,
     kObj_Triangle,
     kObj_Circle,
+    kObj_Gaussian,
     kObj_NumTypes
   };
   
@@ -38,6 +40,8 @@ public:
   
   virtual const ci::Vec2f& getPosition() const { return m_position; };
   virtual ci::Vec2f getPosition() { return m_position; };
+  virtual const ci::Vec2f& getPositionVar() const { return m_positionVar; };
+  virtual ci::Vec2f getPositionVar() { return m_positionVar; };  
   virtual void setPosition(const ci::Vec2f& pos) { m_position = pos; };
   virtual void setPositionMean(const ci::Vec2f& pos) { m_positionMean = pos; };
   void setPositionVariance(const ci::Vec2f& var) { m_positionVar = var; };
@@ -112,6 +116,42 @@ public:
 protected:
   float m_radius;
 };
+  
+//----------------------------------------------------------------------------------------------------------------------
+// A gaussian centered around pos
+//----------------------------------------------------------------------------------------------------------------------  
+class Gaussian : public Positionable
+{
+public:
+  virtual ~Gaussian(){};
+  Gaussian(const ci::Vec2f& pos, float w, float h, const ci::Vec2f& dir) : Positionable(pos), m_w(w), m_wSq(2*w*w), m_h(h) 
+  { 
+    m_type = kObj_Gaussian; 
+    m_dir = dir;
+    m_ortho = dir;
+    m_ortho.rotate(dmx::PI_OVER_TWO);
+    m_cutoff = 3.0 * m_w;
+  };
+  
+  void setW(float w) { m_w = w; m_wSq = 2*w*w; m_cutoff = 10.0 * m_w;};
+  void setH(float h) { m_h = h; };
+  
+  float getW() const { return m_w; };
+  float getH() const { return m_h; };
+  const ci::Vec2f& getDir() const { return m_dir; };
+  float getValueAt(float x) const { return std::fabs(x) > m_cutoff ? 0.0 : m_h * exp(-(x*x) / m_wSq); };
+  ci::Vec2f getPointAt(float x) const { return m_position + (m_dir * x) + m_ortho * getValueAt(x); };
+  ci::Vec2f getPointFromCoords(float x, float y) const { return m_position + (m_dir * x) + (m_ortho * y); };
+  void randomise(bool w, bool h);
+  
+protected:
+  float m_w;
+  float m_wSq;
+  float m_cutoff;
+  float m_h;
+  ci::Vec2f m_dir;
+  ci::Vec2f m_ortho;
+};  
 
 //----------------------------------------------------------------------------------------------------------------------
 // A circle

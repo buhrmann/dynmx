@@ -306,6 +306,35 @@ void CTRNN::setCenterCrossing(void)
       setBias(i, ThetaStar);
   }
 }
+
+//----------------------------------------------------------------------------------------------------------------------  
+double CTRNN:: getWeightSum() const 
+{
+  double sum = 0;
+  for (int i = 0; i < size; i++) 
+  {
+    for (int j = 0; j < size; j++)
+    {
+      sum += weights[i][j];
+    }
+  }
+  return std::fabs(sum);
+}
+  
+//----------------------------------------------------------------------------------------------------------------------  
+double CTRNN:: getLargestWeight() const 
+{
+  double w = -666;
+  for (int i = 0; i < size; i++) 
+  {
+    for (int j = 0; j < size; j++)
+    {
+      if(weights[i][j] > w)
+        w = weights[i][j];
+    }
+  }
+  return w;
+}  
   
 //----------------------------------------------------------------------------------------------------------------------  
 void CTRNN::toXml(ci::XmlTree& xml)
@@ -358,6 +387,17 @@ void CTRNN::fromXml(const ci::XmlTree& xml)
         weights[from][i] = w;
       }
     }    
+  }
+}
+  
+//----------------------------------------------------------------------------------------------------------------------    
+void CTRNN::record(Recorder& recorder)
+{
+  for(int i = 0; i < size; ++i)
+  {
+    recorder.push_back("NeuralState" + toString(i), states[i]);
+    recorder.push_back("NeuralOutput" + toString(i), outputs[i]);
+    recorder.push_back("NeuralExtInput" + toString(i), externalinputs[i]);
   }
 }
   

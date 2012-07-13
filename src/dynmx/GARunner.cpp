@@ -178,6 +178,7 @@ void GARunner::update(float dt)
 #endif      
       
       // Set the fitness ...
+      m_evolvable->endOfEvaluation(m_accFitness);
       m_ga->setFitness(m_accFitness);
       
       // ... and get a new genome to evaluate

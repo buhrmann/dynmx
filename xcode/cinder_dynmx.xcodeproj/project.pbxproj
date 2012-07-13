@@ -48,7 +48,6 @@
 		D68CFC961428DAEF003CA32E /* Reflex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D68CFC951428DAEF003CA32E /* Reflex.cpp */; };
 		D696B7B214A3685F00580D3C /* SMCAgentEvo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D696B7B114A3685F00580D3C /* SMCAgentEvo.cpp */; };
 		D69FBB4B13B222C300D5F6F0 /* Simulation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D69FBB4A13B222C300D5F6F0 /* Simulation.cpp */; };
-		D6B4E820151886D700C42D0D /* CTRNNFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6B4E81F151886D700C42D0D /* CTRNNFactory.cpp */; };
 		D6B4EADB151B27C900C42D0D /* Topology.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6B4EADA151B27C900C42D0D /* Topology.cpp */; };
 		D6B7EAF413B791800019114A /* Registry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6B7EAF313B791800019114A /* Registry.cpp */; };
 		D6BA379B13BA249900CFED09 /* Muscle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6BA379A13BA249900CFED09 /* Muscle.cpp */; };
@@ -87,6 +86,7 @@
 		D60CB06A13E8362F00AAF10C /* EPController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EPController.h; path = ../include/dynmx/EPController.h; sourceTree = SOURCE_ROOT; };
 		D6108AD213D047F800680AD5 /* Recorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Recorder.h; path = ../include/dynmx/Recorder.h; sourceTree = SOURCE_ROOT; };
 		D6108AD313D0481000680AD5 /* Recorder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Recorder.cpp; sourceTree = "<group>"; };
+		D617EE15158F83260066A30F /* SMCAgentGaussian.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCAgentGaussian.h; path = ../include/dynmx/SMCAgentGaussian.h; sourceTree = SOURCE_ROOT; };
 		D61BAD9B143A05960007E5A1 /* EvoArmCoCon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EvoArmCoCon.h; path = ../include/dynmx/EvoArmCoCon.h; sourceTree = SOURCE_ROOT; };
 		D628908D13B4D16000653F04 /* SimulationFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SimulationFactory.cpp; sourceTree = "<group>"; };
 		D628908F13B4D18200653F04 /* SimulationFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SimulationFactory.h; path = ../include/dynmx/SimulationFactory.h; sourceTree = SOURCE_ROOT; };
@@ -150,11 +150,9 @@
 		D696B7B114A3685F00580D3C /* SMCAgentEvo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SMCAgentEvo.cpp; sourceTree = "<group>"; };
 		D69FBB4A13B222C300D5F6F0 /* Simulation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Simulation.cpp; sourceTree = "<group>"; };
 		D69FBB4C13B222DA00D5F6F0 /* Simulation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Simulation.h; path = ../include/dynmx/Simulation.h; sourceTree = SOURCE_ROOT; };
-		D6B4E81F151886D700C42D0D /* CTRNNFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CTRNNFactory.cpp; sourceTree = "<group>"; };
-		D6B4EAD3151B26E700C42D0D /* CTRNNFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CTRNNFactory.h; path = ../include/dynmx/CTRNNFactory.h; sourceTree = SOURCE_ROOT; };
 		D6B4EADA151B27C900C42D0D /* Topology.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Topology.cpp; sourceTree = "<group>"; };
 		D6B4EADC151B27DD00C42D0D /* Topology.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Topology.h; path = ../include/dynmx/Topology.h; sourceTree = SOURCE_ROOT; };
-		D6B6BCF6156BFD0500D5A957 /* Delay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Delay.h; path = ../include/dynmx/Delay.h; sourceTree = SOURCE_ROOT; };
+		D6B6BCF6156BFD0500D5A957 /* Signal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Signal.h; path = ../include/dynmx/Signal.h; sourceTree = SOURCE_ROOT; };
 		D6B7EAF313B791800019114A /* Registry.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Registry.cpp; sourceTree = "<group>"; };
 		D6B7EAF513B791B00019114A /* Registry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Registry.h; path = ../include/dynmx/Registry.h; sourceTree = SOURCE_ROOT; };
 		D6BA379A13BA249900CFED09 /* Muscle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Muscle.cpp; sourceTree = "<group>"; };
@@ -312,6 +310,7 @@
 				D64F209312ECE1640014F069 /* Render.h */,
 				D64F20E112ECE4340014F069 /* Random.h */,
 				D64F20C312ECE4050014F069 /* Random.cpp */,
+				D6B6BCF6156BFD0500D5A957 /* Signal.h */,
 			);
 			name = dynmx;
 			path = ../src/dynmx;
@@ -353,6 +352,7 @@
 				D696B7AF14A3684C00580D3C /* SMCAgentEvo.h */,
 				D696B7B114A3685F00580D3C /* SMCAgentEvo.cpp */,
 				D6D2122F150E3CEC0054A059 /* SMCAgentLineDis.h */,
+				D617EE15158F83260066A30F /* SMCAgentGaussian.h */,
 				D67358F4149E73E4008C7541 /* SMCAgentViz.h */,
 				D67358F5149E73F7008C7541 /* SMCAgentViz.cpp */,
 				D6735901149E751A008C7541 /* SMCEnvironment.h */,
@@ -438,8 +438,6 @@
 			children = (
 				D64F209712ECE1640014F069 /* CTRNN.h */,
 				D64F20A212ECE1720014F069 /* CTRNN.cpp */,
-				D6B4EAD3151B26E700C42D0D /* CTRNNFactory.h */,
-				D6B4E81F151886D700C42D0D /* CTRNNFactory.cpp */,
 				D64F209812ECE1640014F069 /* CTRNNViz.h */,
 				D64F20A312ECE1720014F069 /* CTRNNViz.cpp */,
 				D6B4EADC151B27DD00C42D0D /* Topology.h */,
@@ -463,7 +461,6 @@
 				D6BA381713BA32E000CFED09 /* ArmMuscled.cpp */,
 				D6C3A1D01448500700E89616 /* ArmReflex.h */,
 				D6C3A1D11448501B00E89616 /* ArmReflex.cpp */,
-				D6B6BCF6156BFD0500D5A957 /* Delay.h */,
 				D6BA379C13BA24B000CFED09 /* Muscle.h */,
 				D6BA379A13BA249900CFED09 /* Muscle.cpp */,
 				D62AB6F113D73354003020F7 /* MuscleMonoWrap.h */,
@@ -623,7 +620,6 @@
 				D6D7FB9D14DED8C9005FC21D /* Spin.cpp in Sources */,
 				D62DE3B014ED20F800DEEECE /* EvoArmCoConDecoder.cpp in Sources */,
 				D650865F150A7CC500E8D94F /* SMCEnvironment.cpp in Sources */,
-				D6B4E820151886D700C42D0D /* CTRNNFactory.cpp in Sources */,
 				D6B4EADB151B27C900C42D0D /* Topology.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

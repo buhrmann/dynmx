@@ -427,7 +427,7 @@ class MatrixView : public Node
 {
 public:
 
-  MatrixView(const Type* const* d, int n, int m, float s = 1.0f, float maxVal = 1) : 
+  MatrixView(const Type* const* d, int n, int m, float s = 1.0f, float maxVal = -1) : 
     m_data(d), m_N(n), m_M(m), m_scale(s/n), m_maxVal(maxVal), m_iSel(-1), m_jSel(-1) { init(); };
 
   virtual Node* getNode(int pickID){ if(m_uniqueID == pickID) return this; else return 0;};
@@ -519,6 +519,20 @@ protected:
   #ifdef _DEBUG
     print();
   #endif
+    
+    // Find max value
+    if(m_maxVal == -1)
+    {
+      double m_maxVal = -666;
+      for (int i = 0; i < m_N; i++) 
+      {
+        for (int j = 0; j < m_M; j++)
+        {
+          if(m_data[i][j] > m_maxVal)
+            m_maxVal = m_data[i][j];
+        }
+      }
+    }
   };
 
   const Type* const* m_data;

@@ -30,6 +30,7 @@ public:
 protected:
   
   virtual void init() { NodeGroup::init(); };
+  void drawGaussian(const Gaussian& g) const;
   
   SMCEnvironment* m_environment;
   

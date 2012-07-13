@@ -11,6 +11,7 @@
 #include "App.h"
 #include "Simulation.h"
 #include "SimulationFactory.h"
+#include "Random.h"
 
 // Individual models and view used by the factory
 #include "GARunner.h"
@@ -39,6 +40,7 @@
 #include "SMCAgent.h"
 #include "SMCAgentEvo.h"
 #include "SMCAgentLineDis.h"
+#include "SMCAgentGaussian.h"
 #include "SMCView.h"
 
 #include "Spin.h"
@@ -49,6 +51,9 @@ namespace dmx
 //----------------------------------------------------------------------------------------------------------------------
 Simulation* SimulationFactory::create()
 {
+  
+  SetRandomSeed((long)-time(0));
+  
   Model* model  = 0;
   App* app = 0;
   
@@ -104,7 +109,17 @@ Simulation* SimulationFactory::create()
         View* view = new SMCView((SMCAgentEvo*)evolvable);
         app = new App(model, view);
       }
-    }    
+    } 
+    else if ("SMCAgentGaussian" == evolvableName)
+    {    
+      evolvable = new SMCAgentGaussian();
+      model = evaluateOnly ? (Model*) new GATester(evolvable) : (Model*) new GARunner (evolvable);
+      if(visual)
+      {
+        View* view = new SMCView((SMCAgentEvo*)evolvable);
+        app = new App(model, view);
+      }
+    }     
     else if ("TestEvolvable" == evolvableName)
     {
       // Doesn't have a visualisation

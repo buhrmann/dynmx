@@ -11,9 +11,23 @@
 #define DMX_TOPOLOGY_H
 
 #include "Dynmx.h"
+#include "MathUtils.h"
 
 namespace dmx
 {
+  
+class CTRNN;  
+  
+// Helper for storing the ranges of CTRNN parameters
+//--------------------------------------------------------------------------------------------------------------------
+struct NetLimits
+{
+  NetLimits() : weight(-10,10), bias(-10,10), gain(-10,10), tau(0.2,2.0) {};
+  void toXml(ci::XmlTree& xml) const;
+  void fromXml(const ci::XmlTree& xml);  
+  
+  Range weight, bias, tau, gain;
+};  
 
 //----------------------------------------------------------------------------------------------------------------------  
 // Defines a topology for decoding a neural network
@@ -42,6 +56,7 @@ public:
   int getSize() const { int s = size[1] + size[2]; return (inputsAreNeurons ? s + size[0] : s); };
   bool isSymmetric() const { return symmetric; };
   bool getInputsAreNeurons() const { return inputsAreNeurons; };
+  bool getOutputsAreLaterallyConnected() const { return outputsLaterallyConnected; };
   
   // Returns number of parameters required to encode the given topology
   int getNumInputs() const { return size[kLyr_Input]; };
@@ -51,13 +66,16 @@ public:
   
   int getNumUniqueNeurons(LayerName layer) const;
   
-  void toXml(ci::XmlTree& xml);
+  void toXml(ci::XmlTree& xml) const;
   void fromXml(const ci::XmlTree& xml);
+  
+  bool decode(CTRNN& ctrnn, const double* params, const NetLimits& limits) const;  
   
 protected:
   int size[3];
   bool symmetric;
   bool inputsAreNeurons;
+  bool outputsLaterallyConnected;
 };  
   
 } // namespace

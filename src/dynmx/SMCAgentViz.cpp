@@ -64,6 +64,7 @@ void SMCAgentViz::update()
   ci::gl::drawLine(trackEnd + vertOff, trackEnd - vertOff);
   ci::gl::drawLine(-trackEnd + vertOff, -trackEnd - vertOff);
   
+  glColor3f(1,0,0);
   if(sensedDistance < sensor.getMaxDistance())
   {  
     drawPoint(ci::Vec3f(sensor.getCollision()), 5.0f);

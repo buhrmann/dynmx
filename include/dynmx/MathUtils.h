@@ -44,7 +44,24 @@ static const float asinh(float v)
 struct Range
 {
   Range(double mi = 0.0, double ma = 1.0) : min(mi), max(ma) {};
+
   void set(double mi, double ma) { min = mi; max = ma; };
+  void toXml(ci::XmlTree& xml, const char* name) const 
+  {  
+    ci::XmlTree r (name, "");
+    r.setAttribute("min", min);
+    r.setAttribute("max", max); 
+    xml.push_back(r);
+  };
+  void fromXml(const ci::XmlTree& parent, const char* name)
+  {
+    if(parent.hasChild(name))
+    {
+      min = parent.getChild(name).getAttributeValue<double>("min");
+      max = parent.getChild(name).getAttributeValue<double>("max");
+    }
+  }
+  
   double min, max;
 };
 
@@ -348,6 +365,10 @@ static const void secondsToTime(int time, int& hours, int& min, int& sec)
 #define EPS 1.2e-7
 #define RNMX (1.0-EPS)
 
+// “Minimal” random number generator of Park and Miller with Bays-Durham shuffle and added safeguards. Returns a uniform 
+// random deviate between 0.0 and 1.0 (exclusive of the endpoint values). Call with idum a negative integer to initialize; 
+// thereafter, do not alter idum between successive deviates in a sequence. RNMX should approximate the largest floating 
+// value that is less than 1.
 //----------------------------------------------------------------------------------------------------------------------
 static double ran1(long *idum)
 {

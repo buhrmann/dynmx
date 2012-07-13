@@ -12,6 +12,7 @@
 
 #include "Dynmx.h"
 #include "Random.h"
+#include "Recorder.h"
 #include "MathUtils.h"
 #include <iostream>
 
@@ -128,6 +129,8 @@ public:
   double getExternalInput(int i) const { return externalinputs[i]; };
   double getWeight(int from, int to) const { return weights[from][to]; };
   const double* const* getWeights() const { return weights; };
+  double getWeightSum() const;
+  double getLargestWeight() const;
   
   void setState(int i, double value) { states[i] = value; outputs[i] = sigmoid(gains[i] * (states[i] + biases[i])); };
   void setOutput(int i, double value) { outputs[i] = value; states[i] = InverseSigmoid(value)/gains[i] - biases[i]; };
@@ -156,6 +159,8 @@ public:
   
   void toXml(ci::XmlTree& xml);
   void fromXml(const ci::XmlTree& xml);
+  
+  void record(Recorder& recorder);    
   
 protected:  
   

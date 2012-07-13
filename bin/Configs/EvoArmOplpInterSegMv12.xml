@@ -73,16 +73,16 @@
           </FitnessFunction>            
           <recordIsometric>0</recordIsometric>     
 		</Evolvable>	
-		<Incremental initialMutation="0.001">1</Incremental>
+		<Incremental initialMutation="0.001">0</Incremental>
 		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/Output/12_06_09__01_34_37/GA_Result.xml" />
-		<PopulationSize Value="500"/>
+		<PopulationSize Value="200"/>
 		<DemeSize Value="20"/>
 		<NumGenerations Value="5000"/>
-		<MutationMax Value="0.001"/>
-        <MutationMaxReduced Value="0.0001"/>
+		<MutationMax Value="0.01"/>
+        <MutationMaxReduced Value="0.001"/>
         <MutationMaxReduceAt Value="3000"/>
 		<RecombinationRate Value="0.5"/>
-        <RecombinationRateReduced Value="0.5"/>
+        <RecombinationRateReduced Value="0.75"/>
         <AvoidReevaluation Value="1"/>
 		<NumTrials Value="1"/>
         <SaveBestEachGeneration Value="0"/>

@@ -104,7 +104,7 @@ void CTRNNNeuronViz::update()
     drawDisk(outerRadius, 0.0, 32, 1);    
     ci::gl::color(col);
     // disk size indicating output value
-    drawDisk(neuronRadius * m_ctrnn->getOutput(i), 0.0, 32, 1);
+    drawDisk(neuronRadius * clamp(m_ctrnn->getOutput(i),0.0,1.0), 0.0, 32, 1);
     // ring size indicating external input value
     glColor3f(181.0/255.0, 206.0/255.0, 26.0/255.0);    
     float width = radiansToDegrees(m_ctrnn->getExternalInput(i) * TWO_PI);
@@ -376,7 +376,7 @@ void CTRNNViz::drawNeuron(int i, const CTRNN* ctrnn, float inner, float outer)
   // disk size indicating output value
   ci::Color col = ctrnn->getState(i) > 0 ? ci::Color(0,0,0) : ci::Color(235.0/255.0, 0.0/255.0, 103.0/255.0);    
   ci::gl::color(col);    
-  drawDisk(inner * getOutputNorm(i, ctrnn), 0.0, 32, 1);
+  drawDisk(inner * clamp(getOutputNorm(i, ctrnn),0.0,1.0), 0.0, 32, 1);
   
   // ring size indicating external input value
   glColor3f(181.0/255.0, 206.0/255.0, 26.0/255.0);    
@@ -420,7 +420,7 @@ void CTRNNViz::init()
   m_children.push_back(m_outputs);
   
   // weight matrix
-  m_weights = new MatrixView<double>(m_ctrnn->getWeights(), N, N, m_width, 10.0);
+  m_weights = new MatrixView<double>(m_ctrnn->getWeights(), N, N, m_width, 20.0);
   m_weights->translate(Vec4f(0, m_label2y + m_labelHeight + m_padding , 0, 1));
   m_children.push_back(m_weights);  
   

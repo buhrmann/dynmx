@@ -385,10 +385,14 @@ void GA::setNFitnessPairs(const std::vector<float>& fitnesses)
 }
 
 // --------------------------------------------------------------------------------------------
-// mutate loser with features from winner (genotype must stay within [0,1] boundaries)
+// Mutate loser with features from winner (genotype must stay within [0,1] boundaries)
+// Mutations come from a random vector in a unit hypersphere, whose length is chosen from
+// a gaussian, and its direction from a uniform distribution.
 // --------------------------------------------------------------------------------------------
 void GA::mutate(uint16_t winner, uint16_t loser)
 {
+  double randGausLength = gasdev(&m_idum) * m_maxMutation;
+  
   for (int i = 0; i < m_genomeLength; i++)
   {      
     // recombination/genetic infection (some genes are copied from winner to loser)
@@ -397,8 +401,10 @@ void GA::mutate(uint16_t winner, uint16_t loser)
       m_genomes[loser][i] = m_genomes[winner][i];
     }
 
-    // gaussian mutation
-    const float mutation = (float) (gasdev(&m_idum) * m_maxMutation);
+    // Gaussian mutation
+    //const double mutation = gasdev(&m_idum) * m_maxMutation;
+    const double mutation = (-1.0 + 2.0 * ran1(&m_idum)) * randGausLength;
+
     m_genomes[loser][i] += mutation;
 
     // ensure values stay in [0,1] range
@@ -503,6 +509,11 @@ bool GA::fromXml(const ci::XmlTree& parent, bool includeGenomes)
     }
     return true;
   }
+  else 
+  {
+    std::cout << "Warning: GA has not been reloaded! Genome lengths or population sizes are not identical." << std::endl;
+  }
+
   
   return false;
 }

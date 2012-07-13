@@ -65,8 +65,9 @@ void EvoArmCoCon::decodeSpindles(int move/*=0*/)
 {
   const int numSpindleParams = m_evolveVelRef ? 5 : 3;
   const int symMult = (m_evolveSymmetricSpindles == 0) ? m_arm->getNumMuscles() : (m_evolveSymmetricSpindles == 1) ? m_arm->getNumReflexes() : 1;
+  const int moveMult = m_evolveSpindlesPerMove ? move : 0;
   
-  int startId = move * symMult * numSpindleParams;    
+  int startId = moveMult * symMult * numSpindleParams;    
   bool symmetric = m_evolveSymmetricSpindles >= 1;
   int numDecoded = m_arm->getReflex(0)->decodeSpindleParams(m_spindleParams, startId, symmetric, m_evolveVelRef, m_decodeLimits.spindle);
   
@@ -392,8 +393,8 @@ void EvoArmCoCon::decodeGenome(const double* genome)
     
     if(m_openLoopTauMaxAct > 0)
     {
-      const double tauAct = m_openLoopTauMaxAct * genome[I];
-      const double tauDeact = m_openLoopTauMaxDeact * genome[I + 1];
+      const double tauAct = std::max(0.01, m_openLoopTauMaxAct * genome[I]);
+      const double tauDeact = std::max(0.01, m_openLoopTauMaxDeact * genome[I + 1]);
       m_arm->getReflex(0)->setOpenLoopTimeConstant(tauAct, tauDeact);
       m_arm->getReflex(1)->setOpenLoopTimeConstant(tauAct, tauDeact);      
       I += 2;

@@ -12,7 +12,6 @@
 
 #include "GARunner.h"
 #include "Topology.h"
-#include "CTRNNFactory.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------
@@ -58,9 +57,9 @@ int TestEvolvableCTRNN::getNumGenes()
 //----------------------------------------------------------------------------------------------------------------------
 void TestEvolvableCTRNN::decodeGenome(const double* g)
 {
-  dmx::CTRNNFactory::DecodeLimits limits;
+  dmx::NetLimits limits;
   limits.tau.set(0.2, 2.0);
-  dmx::CTRNNFactory::decode(*m_ctrnn, g, limits, m_topology);
+  m_topology.decode(*m_ctrnn, g, limits);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

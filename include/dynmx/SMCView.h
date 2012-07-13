@@ -115,7 +115,7 @@ inline void SMCView::setupScene()
   column->translate(ci::Vec4f(left, columnMargin, 0, 1));
 
   // Add ctrnnViz to column
-  m_ctrnnViz = new CTRNNViz(&m_agent->getAgent()->getCTRNN(), 150, &m_agent->getTopology());  
+  m_ctrnnViz = new CTRNNViz(&m_agent->getAgent()->getCTRNN(), 150, &m_agent->getAgent()->getTopology());  
   column->m_children.push_back(m_ctrnnViz);
 
   // Add plots to column
@@ -148,7 +148,9 @@ inline void SMCView::update(float dt)
   
   // Add data to plot
   double val = m_agent->getAgent()->getSensedValue();
+  double der = m_agent->getAgent()->getDistanceSensor().getDerivative();
   m_plot->addPoint(val, 0);
+  m_plot->addPoint(der, 1);
   
   // Update fitness-related data
   m_fitnessPlot->addPoint(m_agent->getAgent()->getAngle(), 0);

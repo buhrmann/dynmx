@@ -13,6 +13,7 @@
 #include "Dynmx.h"
 #include "CollisionDetection.h"
 #include "SMCEnvironment.h"
+#include "Signal.h"
 #include "cinder/Vector.h"
 
 namespace dmx
@@ -46,15 +47,17 @@ public:
   ~DistanceSensor() {};
   
   void init();
+  void reset() { m_activationDt.reset(); m_activationDelayed.reset(); };
   
   void setMaxDistance(float maxDist) { m_maxDistance = maxDist; };
+  void setNoiseLevel(float level) { m_noiseLevel = level; };
   void setPosition(const ci::Vec2f& pos) { m_position = pos; };
   void setDirection(const ci::Vec2f& dir) { m_direction = dir; };
   void setTransferFunction(double (*pt2Func)(double)) { m_transferFunction = pt2Func; };
   void setTransferFunction(int actFuncName);
   void setTransferFunction(const std::string& name);
   
-  float senseEnvironment(SMCEnvironment& environment);
+  float senseEnvironment(SMCEnvironment& environment, float dt);
   
   const ci::Vec2f& getPosition() const { return m_position; };
   const ci::Vec2f& getDirection() const { return m_direction; };
@@ -62,6 +65,8 @@ public:
   float getDistance() const { return m_distance; };
   float getDistanceProportional() const { return m_distance / m_maxDistance; };
   float getActivation() const { return m_activation; };
+  float getDerivative() const { return m_activationDt.get(); };
+  float getDelayed() const { return m_activationDelayed.get(); };
   float getMaxDistance() const { return m_maxDistance; };
   bool isColliding() const { return m_distance < m_maxDistance; };
   const std::string& getTransferFunctionName() const;
@@ -81,6 +86,10 @@ protected:
   float m_maxDistance;
   float m_distance;
   float m_activation;
+  Derivative m_activationDt; 
+  Delay m_activationDelayed;
+  
+  float m_noiseLevel;
   
   TransferFunction m_transferFunction;
   

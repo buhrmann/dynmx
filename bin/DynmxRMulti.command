@@ -3,6 +3,7 @@
 
 N=7
 CFG="Configs/EvoArmOplpInterSegMv12.xml"
+#CFG="Configs/SMCAgentEvo.xml"
 
 # Copy exe here, so one can keep coding and building the original exe
 cd `dirname $0`

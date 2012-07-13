@@ -12,7 +12,7 @@
 
 #include "Dynmx.h"
 #include "Muscle.h"
-#include "Delay.h"
+#include "Signal.h"
 #include "MathUtils.h"
 
 namespace dmx

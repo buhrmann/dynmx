@@ -29,6 +29,9 @@ public:
   static Simulation* create(Model* model, App* app);
   void start();
   
+  App* getApp() { return m_app; };
+  Model* getModel() { return m_model; };
+  
 protected:
   
   Simulation(Model* model, App* app = 0) : m_model(model), m_app(app) {};

@@ -31,7 +31,7 @@ void Positionable::randomiseAngle()
 { 
   const float randAngle = UniformRandom(-m_angleVar, m_angleVar);
   setAngle(m_angleMean + randAngle);
-}  
+}
   
 //----------------------------------------------------------------------------------------------------------------------    
 // Environment  
@@ -58,6 +58,11 @@ void SMCEnvironment::fromXml(const ci::XmlTree& xml)
       Triangle* t = new Triangle (pos, obj["Size"].as<float>());
       m_objects.push_back(t);      
     }
+    else if (obj.getTag() == "Gaussian")
+    {
+      Gaussian* g = new Gaussian (pos, obj["Width"].as<float>(), obj["Height"].as<float>(), ci::Vec2f(obj["DirX"].as<float>(), obj["DirY"].as<float>()));
+      m_objects.push_back(g);      
+    }    
     else 
     {
       // Not recognized as supported object

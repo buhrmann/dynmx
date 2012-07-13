@@ -3,7 +3,7 @@
 	<Globals>
 		<Visual Value="0"/>
         <WindowSize Width="1000" Height="800"/>    
-		<FrameRate Value="50"/>    
+		<FrameRate Value="200"/>    
         <FullScreen Value="0"/>   
         <VSync Value="0"/>               	
 		<Model Value="GA"/>	   
@@ -12,50 +12,55 @@
         <OutputFolder Name="/Users/thomasbuhrmann/Experiments/eSMCs/Output"/>     
 	</Globals>
 	<GA>
-		<Evolvable Name="SMCAgentLineDis">
-            <MaxSensorDist>0.4</MaxSensorDist>
-            <SensorTransferFunc>Inverse</SensorTransferFunc>
-            <MaxSpeed>0.5</MaxSpeed>
+		<Evolvable Name="SMCAgentGaussian">
+            <DistanceSensor MaxDist="0.4" TransferFunc="Inverse" NoiseLevel="0.0" Mode="Derivative"/>
+            <MaxSpeed>1.0</MaxSpeed>
             <MaxAngularSpeed>360</MaxAngularSpeed>
             <MaxPosition>0.5</TrackLength>            
-            <PositionWraps>0</PositionWraps>
+            <PositionWraps>1</PositionWraps>
             <MaxAngle>90</MaxSensorAngle>            
-            <AngleWraps>0</PositionWraps>
-            <TrialDuration>8</TrialDuration>
-            <FitnessEvalDelay>7</FitnessEvalDelay>
-            <Topology Symmetric="1" InputsAreNeurons="1">
-              <Inputs>2</Inputs>
-              <Hidden>3</Hidden>
-              <Outputs>4</Outputs>
+            <AngleWraps>1</PositionWraps>
+            <TrialDuration>10</TrialDuration>
+            <FitnessEvalDelay>8</FitnessEvalDelay>
+            <Topology symmetric="0">
+              <Inputs asNeurons="1">1</Inputs>
+              <Hidden>1</Hidden>
+              <Outputs laterallyConnected="0">1</Outputs>
             </Topology>
+            <NetLimits>
+              <Weight min="-10.0" max="10.0"/>
+              <Bias min="-10.0" max="10.0"/>
+              <Gain min="-10.0" max="10.0"/>              
+              <TimeConstant min="0.06" max="10.0"/>
+            </NetLimits>
             <Environment Name="LinesLeftRight">
-              <Line PosX="0.3" PosY="0.0" Length="0.1" Angle="-45" PosVarX="0.05" PosVarY="0.05" AngleVar="1" Visible="1"/>
-              <Line PosX="0.3" PosY="0.0" Length="0.1" Angle="45" PosVarX="0.05" PosVarY="0.05" AngleVar="1" Visible="0"/>
+              <Gaussian PosX="0.4" PosY="0.0" PosVarX="0.0" PosVarY="0.4" Width="0.03" Height="0.15" DirX="0" DirY="1" Visible="1"/>
+              <Gaussian PosX="0.4" PosY="0.0" PosVarX="0.0" PosVarY="0.4" Width="0.08" Height="0.15" DirX="0" DirY="1" Visible="1"/>            
+              <UnLine PosX="0.3" PosY="0.0" Length="0.1" Angle="-45" PosVarX="0.05" PosVarY="0.05" AngleVar="1" Visible="1"/>
+              <UnLine PosX="0.3" PosY="0.0" Length="0.1" Angle="45" PosVarX="0.05" PosVarY="0.05" AngleVar="1" Visible="0"/>
               <UnLine PosX="0.3" PosY="0.0" Length="0.1" Angle="90" PosVarX="0.05" PosVarY="0.05" AngleVar="1" Visible="0"/>
               <UnCircle PosX="0.2" PosY="0.2" Radius="0.05" PosVar="0.1" Visible="1"/>
               <UnTriangle PosX="0.2" PosY="-0.2" Size="0.1" PosVar="0.1"/>
             </Environment>
 		</Evolvable>	
-		<Incremental Value="0"/>
-		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/eSMCs/Output/12_03_27__12_26_40/GA_Result.xml"/>
-		<PopulationSize Value="100"/>
+		<Incremental initialMutation="0.001">1</Incremental>
+		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/eSMCs/Output/12_06_25__14_58_12/GA_Result.xml"/>
+		<PopulationSize Value="200"/>
 		<DemeSize Value="10"/>
-		<NumGenerations Value="500"/>
-		<MutationMax Value="0.01"/>
-        <MutationMaxReduced Value="0.001"/>
-        <MutationMaxReduceAt Value="400"/>        
+		<NumGenerations Value="250"/>
+		<MutationMax Value="0.001"/>
+        <MutationMaxReduced Value="0.0001"/>
+        <MutationMaxReduceAt Value="150"/>        
 		<RecombinationRate Value="0.5"/>
-        <RecombinationRateReduced Value="0.2"/>        
-		<NumTrials Value="50"/>
+        <RecombinationRateReduced Value="0.75"/>        
+		<NumTrials Value="100"/>
         <AvoidReevaluation Value="0"/>
-        <SaveBestEachGeneration Value="1"/>
+        <SaveBestEachGeneration Value="0"/>
         <AutoEval Run="1"/>
-        <Eval Run="0">
-            <NumTrials Value="10"/>
-            <RecordState Value="0"/>
-            <LoadFrom Value="/Users/thomasbuhrmann/Experiments/eSMCs/Output/12_03_27__13_11_27/GA_BestGenome.xml"/>            
-            <LoadFromOld Value="/Users/thomasbuhrmann/Experiments/eSMCs/Output/12_03_13__21_57_53/GA_BestGenome.xml"/>
-            <LoadFromOld Value="/Users/thomasbuhrmann/Experiments/Output/12_03_13__13_41_31/GA_BestGenome.xml"/>
+        <Eval Run="1" mode="Trajectories">
+            <NumTrials Value="20"/>
+            <RecordState Value="1"/>
+            <LoadFrom Value="/Users/thomasbuhrmann/Experiments/eSMCs/Output/12_07_05__18_03_56/GA_BestGenome.xml"/>            
         </Eval>         
 	</GA>    
 </Config>

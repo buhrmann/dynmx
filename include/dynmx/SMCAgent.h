@@ -15,6 +15,7 @@
 #include "DistanceSensor.h"
 #include "SMCEnvironment.h"
 #include "CTRNN.h"
+#include "Topology.h"
 #include "Recorder.h"
 
 #include "cinder/Vector.h"
@@ -30,7 +31,15 @@ class SMCAgent : public Model
   
 public:
   
-  SMCAgent(int numNeurons = 3);
+  enum SMCSensorMode
+  {
+    kSensorMode_Absolute = 0,
+    kSensorMode_Derivative,
+    kSensorMode_AbsAndDelayed,
+    kNumSensorModes
+  };
+  
+  SMCAgent(const Topology& top);
   ~SMCAgent();
   
   // Inherited from class Model
@@ -46,10 +55,14 @@ public:
   void setMaxPosition(float p) { m_maxPosition = p; };
   void setPositionWraps(bool w) { m_positionWraps = w; };
   void setAngleWraps(bool w) { m_angleWraps = w; };
+  void setSensorMode(int mode) { m_sensorMode = mode; };
+  void setSensorMode(const std::string& mode);
+  void setPosition(const ci::Vec2f& pos);
   
   // Getters
   SMCEnvironment& getEnvironment() { return m_environment; };
   CTRNN& getCTRNN() { return *m_ctrnn; };  
+  const Topology& getTopology() const { return m_topology; };  
   const DistanceSensor& getDistanceSensor() const { return m_distanceSensor; };
   DistanceSensor& getDistanceSensor() { return m_distanceSensor; };
   const ci::Vec2f& getPosition() { return m_position; };
@@ -59,6 +72,8 @@ public:
   float getTime() { return m_time; };  
   float getAngleWithHeading(ci::Vec2f pos);
   float getMaxPosition() { return m_maxPosition; };
+  float getMaxSpeed() { return m_maxSpeed; };  
+  const ci::Vec2f& getVelocity() const { return m_velocity; };
   
   virtual void toXml(ci::XmlTree& xml);
   virtual void record(Recorder& recorder);  
@@ -69,7 +84,9 @@ protected:
   
   SMCEnvironment m_environment;
   CTRNN* m_ctrnn;
+  Topology m_topology;  
   DistanceSensor m_distanceSensor;
+  int m_sensorMode;
 
   // States
   ci::Vec2f m_position;
@@ -77,6 +94,7 @@ protected:
   float m_angle;  
   float m_angularVelocity;  
   float m_sensedValue;
+  float m_sensedValueDerivative;
     
   // Params
   float m_maxSpeed;

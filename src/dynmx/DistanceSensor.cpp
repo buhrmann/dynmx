@@ -8,6 +8,7 @@
  */
 
 #include "DistanceSensor.h"
+#include "Random.h"
 
 namespace dmx
 {
@@ -22,6 +23,8 @@ void DistanceSensor::init()
   setTransferFunction(kTF_Inverse);
   m_distance = m_maxDistance;
   m_activation = m_transferFunction(m_distance);
+  
+  m_activationDelayed = Delay(0.06, 0.02, m_activation);
 }
   
 //----------------------------------------------------------------------------------------------------------------------        
@@ -64,7 +67,7 @@ const std::string& DistanceSensor::getTransferFunctionName() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------      
-float DistanceSensor::senseEnvironment(SMCEnvironment& environment)
+float DistanceSensor::senseEnvironment(SMCEnvironment& environment, float dt)
 {
   ci::Vec2f end = m_position + m_direction * m_maxDistance;  
   m_distance = m_maxDistance;  
@@ -94,6 +97,11 @@ float DistanceSensor::senseEnvironment(SMCEnvironment& environment)
         const Circle& circle = (Circle&)obj;        
         distance = lineSegmentCircleClosestIntersect(collision, m_position, end, circle.getPosition(), circle.getRadius());
       }
+      else if(obj.getType() == Positionable::kObj_Gaussian)
+      {
+        const Gaussian& gaussian = (Gaussian&)obj;
+        distance = pointToGaussianDist(collision, m_position, gaussian);  
+      }
       
       // Check if closer than previously found collision
       if(distance > 0 && distance < m_distance)
@@ -104,7 +112,17 @@ float DistanceSensor::senseEnvironment(SMCEnvironment& environment)
     }
   }    
 
+  // Set activation level
   m_activation = m_transferFunction(m_distance / m_maxDistance);
+  m_activation = clamp(m_activation + UniformRandom(-m_noiseLevel, m_noiseLevel), 0.0, 1.0);
+
+  // Update derivative 
+  m_activationDt.update(m_activation, dt);
+  
+  // Update delayed activation
+  m_activationDelayed.update(m_activation);
+  
+  assert(m_activationDt.get() == m_activationDt.get());
   return m_activation;
 }
   

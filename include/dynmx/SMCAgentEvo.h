@@ -12,7 +12,6 @@
 
 #include "SMCAgent.h"
 #include "GARunner.h"
-#include "Topology.h"
 
 namespace dmx
 {
@@ -46,14 +45,13 @@ public:
   
   // Custom
   SMCAgent* getAgent() { return m_agent; };
-  const Topology& getTopology() const { return m_topology; };
   
 protected:
   
   virtual void updateFitness() {};
   
   SMCAgent* m_agent;
-  Topology m_topology;
+  NetLimits m_netLimits;
   float m_fitness;
   float m_trialDuration;
   float m_fitnessEvalDelay;
