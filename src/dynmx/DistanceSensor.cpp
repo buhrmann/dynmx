@@ -78,7 +78,7 @@ float DistanceSensor::senseEnvironment(SMCEnvironment& environment, float dt)
     const Positionable& obj = *environment.getObjects()[i];
     if(obj.isVisible())
     {
-      float distance;
+      float distance = -1;
       
       // Object specific collision detection
       if(obj.getType() == Positionable::kObj_Line)

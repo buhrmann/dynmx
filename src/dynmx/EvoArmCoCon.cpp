@@ -13,7 +13,7 @@
 namespace dmx
 {
   
-#define ELB_SWITCH_TRIAL 99
+float ELB_SWITCH_TRIAL = 99;
 
 //----------------------------------------------------------------------------------------------------------------------  
 const std::string EvoArmCoCon::PhaseNames [kMvPh_numPhases] = 
@@ -42,6 +42,7 @@ struct DiffSq
 struct VecDist
 {
   double operator() (ci::Vec2f t1, ci::Vec2f t2) { return (t1-t2).lengthSquared(); };
+  //double operator() (ci::Vec2f t1, ci::Vec2f t2) { return (t1-t2).length(); };
 };  
   
 struct VecNorm
@@ -90,7 +91,7 @@ float EvoArmCoCon::getFitness(float start, float end)
     std::vector<double> velCorr = crossCorrelation(desTangentialVels, tangentialVels, DiffSq(), minDelay, maxDelay);
     optElem = min_element(velCorr.begin(), velCorr.end());  
     double optVelVal = *optElem / numSteps;
-    double velFitness = 1.0 - sqrt(optVelVal);
+    double velFitness = 1.0 - sqrt(optVelVal) / 10.0;
     assert(velFitness <= 1.0);    
     
     // Store what time delay lead to best fitness (for later plotting).
@@ -105,11 +106,10 @@ float EvoArmCoCon::getFitness(float start, float end)
   // Minimise coactivation
   if(m_fitnessEvalCoact)
   {
-    double maxCoact = 0.2;
     double avgElbCoact = max(m_actualCoactivationsElb, t0, tmax);
     double avgShdCoact = max(m_actualCoactivationsShd, t0, tmax);
-    double elbCoactFit = 1.0 - std::max(avgElbCoact - maxCoact, 0.0);
-    double shdCoactFit = 1.0 - std::max(avgShdCoact - maxCoact, 0.0);
+    double elbCoactFit = 1.0 - std::max(avgElbCoact - m_fitnessEvalCoactMax, 0.0);
+    double shdCoactFit = 1.0 - std::max(avgShdCoact - m_fitnessEvalCoactMax, 0.0);
 
     fitness *= elbCoactFit * shdCoactFit;
   }
@@ -128,17 +128,28 @@ float EvoArmCoCon::getFitness()
   
   float fitness = 1;
   
+  if(m_hasHitLimit)
+  {
+    return 0;
+  }
+  
   // Muscle geometry
   if(m_evolveMuscles) 
   {
     const double maxLengthRatio = 2.2;
     for(int i = 0; i < 4; i++)
     {
-      double lengthRatio = m_arm->getMuscle(i)->getLengthMax() / m_arm->getMuscle(i)->getLengthMin();
+      const double lengthOpt = m_arm->getMuscle(i)->getOptimalLength();
+      const double lengthMinNorm = m_arm->getMuscle(i)->getLengthMin() / lengthOpt;
+      const double lengthMaxNorm = m_arm->getMuscle(i)->getLengthMax() / lengthOpt;
+      if((lengthMinNorm < 0.5) || (lengthMaxNorm > 1.5))
+      {
+        return 0;
+      }
+      double lengthRatio = lengthMaxNorm / lengthMinNorm;
       fitness *= 1.0 - std::min(1.0, std::max(lengthRatio - maxLengthRatio, 0.0));
     }
-  }  
-  
+  }
   
   if(m_resetEachMove)
   {
@@ -153,26 +164,26 @@ float EvoArmCoCon::getFitness()
         const double dt = 1.0 / (double)SETTINGS->getChild("Config/Globals/FrameRate").getAttributeValue<int>("Value");        
 
         // Minimise position error at end
-        int i = (end / dt) - 1;        
-        const ci::Vec2f& desEnd = m_desiredPositions[i];
-        const ci::Vec2f& actEnd = m_actualPositions[i];
+        int j = (end / dt) - 1;
+        const ci::Vec2f& desEnd = m_desiredPositions[j];
+        const ci::Vec2f& actEnd = m_actualPositions[j];
         fitness *= 1.0 - desEnd.distance(actEnd);     
         // Minimise velocity at end
-        const ci::Vec2f& prevActEnd = m_actualPositions[i - 1];
+        const ci::Vec2f& prevActEnd = m_actualPositions[j - 1];
         double endVelFitness = 1.0 - (actEnd.distance(prevActEnd) / dt); 
         double fac = ((sign(fitness) < 0) && sign(endVelFitness) < 0) ? -1 : 1;
         fitness = fac * (fitness * endVelFitness);
         
         // Minimise position error at start
-        i = (start / dt) + 1;        
-        const ci::Vec2f& desStart = m_desiredPositions[i];
-        const ci::Vec2f& actStart = m_actualPositions[i];
+        j = (start / dt) + 1;
+        const ci::Vec2f& desStart = m_desiredPositions[j];
+        const ci::Vec2f& actStart = m_actualPositions[j];
         double startPosFitness = 1.0 - desStart.distance(actStart);     
         fac = ((sign(fitness) < 0) && sign(startPosFitness) < 0) ? -1 : 1;
         fitness = fac * (fitness * startPosFitness);
         
         // Minimise velocity at start
-        const ci::Vec2f& prevAct = m_actualPositions[i - 1];
+        const ci::Vec2f& prevAct = m_actualPositions[j - 1];
         double startVelFitness = 1.0 - actStart.distance(prevAct); 
         fac = ((sign(fitness) < 0) && sign(startVelFitness) < 0) ? -1 : 1;
         fitness = fac * (fitness * startVelFitness);
@@ -182,7 +193,7 @@ float EvoArmCoCon::getFitness()
         const bool evalEndOnly = false;
         if(evalEndOnly)
         {
-          const double endPeriod = 0.3;          
+          const double endPeriod = 0.4;
           start = end - endPeriod;
         }
 
@@ -192,6 +203,10 @@ float EvoArmCoCon::getFitness()
         {
           // Ensure a single negative multiplier always leads to negative fitness
           fitness = -std::abs(fitness);
+        }
+        if(SETTINGS->getChild("Config/Globals/DebugLevel").getAttributeValue<int>("Value",0) >= 3)
+        {
+          std::cout << "Fitness Mv " << i << ": " << moveFitness << ". AccFit: " << fitness << std::endl;
         }
       }
     }
@@ -256,7 +271,6 @@ void EvoArmCoCon::readDecodeLimits()
       readRange(m_decodeLimits.spindle.vel, nm + "vel");    
     else 
       m_decodeLimits.spindle.vel = Range(0,0);
-
   }
 }
 
@@ -287,27 +301,37 @@ void EvoArmCoCon::init()
     m_evolveIAINsimple = xmlFlags.getChild("Iain").getAttributeValue<bool>("simple");
     m_evolveIAINsym = xmlFlags.getChild("Iain").getAttributeValue<bool>("symmetric");    
     m_evolveRenshaw = xmlFlags.getChild("Renshaw").getValue<bool>();
+    m_evolveRenshawSym = xmlFlags.getChild("Renshaw").getAttributeValue<bool>("symmetric", 0);
     m_evolveIBIN = xmlFlags.getChild("Ibin").getValue<bool>();
     m_evolveIBINsym = xmlFlags.getChild("Ibin").getAttributeValue<bool>("symmetric");
+    m_evolveIBINderiv = xmlFlags.getChild("Ibin").getAttributeValue<bool>("derivative");
+    m_evolveIBInterSeg = xmlFlags.getChild("Ibin").getAttributeValue<bool>("interseg");
+    m_evolveIBRecExcIa = xmlFlags.getChild("Ibin").getAttributeValue<bool>("recExcIa");
     m_evolveIFV = xmlFlags.getChild("Ifv").getValue<bool>();
     m_evolveSFV = xmlFlags.getChild("Sfv").getValue<bool>();
     m_evolveOpenLoop = xmlFlags.getChild("OpenLoop").getValue<bool>();
     m_openLoopSymmetry = xmlFlags.getChild("OpenLoop").getAttributeValue<int>("symmetric");
     m_maxOpenLoop = xmlFlags.getChild("OpenLoop").getAttributeValue<float>("max");    
     m_openLoopTauMaxAct = xmlFlags.getChild("OpenLoop").getAttributeValue<float>("tauMaxAct");
-    m_openLoopTauMaxDeact = xmlFlags.getChild("OpenLoop").getAttributeValue<float>("tauMaxDeact");    
+    m_openLoopTauMaxDeact = xmlFlags.getChild("OpenLoop").getAttributeValue<float>("tauMaxDeact");
     m_evolveIntersegmentInputs = xmlFlags.getChild("InterSegmentInput").getValue<bool>();
+    m_evolveIntersegPerMove = xmlFlags.getChild("InterSegmentInput").getAttributeValue<bool>("perMove");
+    m_evolveIntersegSym = xmlFlags.getChild("InterSegmentInput").getAttributeValue<bool>("symmetric");
     m_maxInterseg = xmlFlags.getChild("InterSegmentInput").getAttributeValue<double>("max");
     m_evolveDistalCommandDelay = xmlFlags.getChild("DistalCommandDelay").getValue<bool>();    
     m_maxDistalDelay = xmlFlags.getChild("DistalCommandDelay").getAttributeValue<double>("max");    
-        
+    m_evolveMNAsNeuron = xmlFlags.getChild("MN").getValue<bool>(0);
+    m_evolveMNsym = xmlFlags.getChild("MN").getAttributeValue<bool>("symmetric");
+    m_evolveSigmoidSlope = xmlFlags.getChild("Neurons").getAttributeValue<bool>("sigSlope");
+    
     const ci::XmlTree& xml = SETTINGS->getChild("Config/GA/Evolvable");
-    m_commandTrajSmooth = xml.getChild("CommandTrajSmooth").getValue<bool>();    
+    m_commandTrajSmooth = xml.getChild("CommandTrajSmooth").getValue<int>();
     m_useMuscleCoords = xml.getChild("UseMuscleCoords").getValue<bool>();    
 
     m_fitnessEndPointOnly = xml.getChild("FitnessFunction/EndPointOnly").getValue<bool>();    
     m_fitnessEvalVel = xml.getChild("FitnessFunction/Velocity").getValue<bool>();
     m_fitnessEvalCoact = xml.getChild("FitnessFunction/Coactivation").getValue<bool>();
+    m_fitnessEvalCoactMax = xml.getChild("FitnessFunction/Coactivation").getAttributeValue<float>("max", 0.5);
     
     // Following function may depend on some of above variables
     readDecodeLimits(); 
@@ -321,7 +345,7 @@ void EvoArmCoCon::init()
       ci::XmlTree::Iter val = oplp.begin("Value");
       for (; val != oplp.end(); ++val)
       {
-        double v = val->getValue<double>();
+        const double v = val->getValue<double>();
         m_openLoopParams.push_back(v);
       }
     }
@@ -335,7 +359,7 @@ void EvoArmCoCon::init()
       ci::XmlTree::Iter val = params.begin("Value");
       for (; val != params.end(); ++val)
       {
-        double v = val->getValue<double>();
+        const double v = val->getValue<double>();
         m_intersegParams.push_back(v);
       }
     }     
@@ -349,7 +373,7 @@ void EvoArmCoCon::init()
       ci::XmlTree::Iter val = params.begin("Value");
       for (; val != params.end(); ++val)
       {
-        double v = val->getValue<double>();
+        const double v = val->getValue<double>();
         m_distalDelays.push_back(v);
       }
     }         
@@ -363,7 +387,7 @@ void EvoArmCoCon::init()
       ci::XmlTree::Iter val = params.begin("Value");
       for (; val != params.end(); ++val)
       {
-        double v = val->getValue<double>();
+        const double v = val->getValue<double>();
         m_rampDurations.push_back(v);
       }
     }             
@@ -407,7 +431,12 @@ void EvoArmCoCon::init()
         m_desiredTrajectory.add(to, duration, m_numMoves);
         m_desiredTrajectory.add(to, leadOut, -1); // past this doesn't belong to this move 
         
+        // HACKY!!!!
+        if(elbAngleTo < 0 && ELB_SWITCH_TRIAL == 99)
+          ELB_SWITCH_TRIAL = m_numMoves * 4;
+        
         m_numMoves++;
+        
       }
       
       m_desiredTrajectory.setBlend(Trajectory<ci::Vec2f>::kTr_BlendMinJerk);
@@ -441,10 +470,13 @@ void EvoArmCoCon::createTrajectories()
   m_commandedJointAngles.clear();
   
   Trajectory<ci::Vec2f>::BlendType commandBlend;
-  if (m_commandTrajSmooth) 
+  if (m_commandTrajSmooth == 0)
+    commandBlend = Trajectory<ci::Vec2f>::kTr_BlendLinear;
+  else if(m_commandTrajSmooth == 1)
     commandBlend = Trajectory<ci::Vec2f>::kTr_BlendMinJerk;
   else
-    commandBlend = Trajectory<ci::Vec2f>::kTr_BlendLinear;
+    commandBlend = Trajectory<ci::Vec2f>::kTr_BlendSmoothStep;
+    
   
   // Translate desired into commanded trajectory, based on ramp duration factor
   m_commandedTrajectory.setBlend(commandBlend);
@@ -489,6 +521,7 @@ void EvoArmCoCon::reset()
   m_time = 0.0f;
   
   m_fitness = MAX_NEG_FLOAT;
+  m_hasHitLimit = false;
   
   m_desiredPositions.clear();
   m_actualPositions.clear();
@@ -531,8 +564,12 @@ void EvoArmCoCon::update(float dt)
   if(m_resetEachMove && (m_currentMove != prevMove))
   {
     m_arm->resetTo(m_currentDesiredAngles.x, m_currentDesiredAngles.y);
-    decodeSpindles(m_currentMove);
-  }  
+    
+    if(m_evolveSpindlesPerMove)
+    {
+      decodeSpindles(m_currentMove);
+    }
+  }
 
   
   // Set open-loop parameters for the current movement
@@ -547,7 +584,6 @@ void EvoArmCoCon::update(float dt)
       m_arm->getReflex(0)->setOpenLoop(m_openLoopParams[i+0], m_openLoopParams[i+1]);
       m_arm->getReflex(1)->setOpenLoop(m_openLoopParams[i+2], m_openLoopParams[i+3]);
     }
-    
     else if(m_currentPhase == kMvPh_leadOut)
     {
       m_arm->getReflex(0)->setOpenLoop(0, 0);
@@ -555,14 +591,14 @@ void EvoArmCoCon::update(float dt)
     }
   }  
   
-  // Set open-loop parameters for the current movement
+  // Set intersegmental parameters for the current movement
   if(m_intersegParams.size() > 0)
   {
     // We set interseg. params at beginning of each move, even in leadIn phase these should be fine to use
     if(m_currentMove != prevMove)
     //if(m_currentPhase == kMvPh_move)
     {
-      int i = m_currentMove * 4; // 4 muscles x 1 param each 
+      int i = m_evolveIntersegPerMove ? m_currentMove * 4 : 0; // 4 muscles x 1 param each
       m_arm->getReflex(0)->setIntersegmentalParameters(m_intersegParams[i+0], m_intersegParams[i+1]);
       m_arm->getReflex(1)->setIntersegmentalParameters(m_intersegParams[i+2], m_intersegParams[i+3]);      
     }
@@ -611,6 +647,16 @@ void EvoArmCoCon::updateCurrentCommand(Target<Pos>& command, Target<Pos>& desire
 {
   m_currentDesiredPos = desired.position;
   m_currentCommandPos = command.position;
+  
+  // Check whether any joint has hit its limit
+  float eps = 0.001;
+  if(fabs(m_arm->getJointAngle(JT_elbow) - m_arm->getJointLimitLower(JT_elbow)) < eps ||
+     fabs(m_arm->getJointAngle(JT_elbow) - m_arm->getJointLimitUpper(JT_elbow)) < eps ||
+     fabs(m_arm->getJointAngle(JT_shoulder) - m_arm->getJointLimitLower(JT_shoulder)) < eps ||
+     fabs(m_arm->getJointAngle(JT_shoulder) - m_arm->getJointLimitUpper(JT_shoulder)) < eps)
+  {
+    m_hasHitLimit = true;
+  }
   
   // Transform desired position to joint angles (IK) and muscle lengths
   double currentDesiredAngles[2];

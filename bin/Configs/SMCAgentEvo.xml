@@ -7,7 +7,7 @@
         <FullScreen Value="0"/>   
         <VSync Value="0"/>               	
 		<Model Value="GA"/>	   
-		<DebugLevel Value="1"/>
+		<DebugLevel Value="0"/>
         <PlotDuration Value="0.5"/>                
         <OutputFolder Name="/Users/thomasbuhrmann/Experiments/eSMCs/Output"/>     
 	</Globals>
@@ -20,8 +20,8 @@
             <PositionWraps>1</PositionWraps>
             <MaxAngle>90</MaxSensorAngle>            
             <AngleWraps>1</PositionWraps>
-            <TrialDuration>10</TrialDuration>
-            <FitnessEvalDelay>8</FitnessEvalDelay>
+            <TrialDuration>20</TrialDuration>
+            <FitnessEvalDelay>18</FitnessEvalDelay>
             <Topology symmetric="0">
               <Inputs asNeurons="1">1</Inputs>
               <Hidden>1</Hidden>
@@ -49,18 +49,18 @@
 		<DemeSize Value="10"/>
 		<NumGenerations Value="250"/>
 		<MutationMax Value="0.001"/>
-        <MutationMaxReduced Value="0.0001"/>
-        <MutationMaxReduceAt Value="150"/>        
+    <MutationMaxReduced Value="0.0001"/>
+    <MutationMaxReduceAt Value="150"/>        
 		<RecombinationRate Value="0.5"/>
-        <RecombinationRateReduced Value="0.75"/>        
+    <RecombinationRateReduced Value="0.75"/>        
 		<NumTrials Value="100"/>
-        <AvoidReevaluation Value="0"/>
-        <SaveBestEachGeneration Value="0"/>
-        <AutoEval Run="1"/>
-        <Eval Run="1" mode="Trajectories">
-            <NumTrials Value="20"/>
-            <RecordState Value="1"/>
-            <LoadFrom Value="/Users/thomasbuhrmann/Experiments/eSMCs/Output/12_07_05__18_03_56/GA_BestGenome.xml"/>            
-        </Eval>         
+    <AvoidReevaluation Value="0"/>
+    <SaveBestEachGeneration Value="0"/>
+    <AutoEval Run="1"/>
+    <Eval Run="1" mode="Generalization">
+        <NumTrials Value="100000"/>
+        <RecordState Value="0"/>
+        <LoadFrom Value="/Users/thomasbuhrmann/Experiments/eSMCs/Output/12_07_05__18_03_56/GA_BestGenome.xml"/>            
+    </Eval>         
 	</GA>    
 </Config>

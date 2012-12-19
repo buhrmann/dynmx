@@ -98,7 +98,8 @@ public:
   {
     kTr_BlendNone,
     kTr_BlendLinear,
-    kTr_BlendMinJerk
+    kTr_BlendMinJerk,
+    kTr_BlendSmoothStep
   };
   
   Trajectory() : m_loop(false), m_blend(kTr_BlendNone), m_duration(0.0) {};
@@ -193,7 +194,13 @@ Target<T> Trajectory<T>::atTime(float time)
             float timeProp = (time - target.time) / duration;
             target.position = target.position + timeProp * (nextTarget.position - target.position);
           }
-          else 
+          else if(m_blend == kTr_BlendSmoothStep)
+          {
+            float timeProp = (time - target.time) / duration;
+            float smoothed = smoothStepUnitInterval(timeProp);
+            target.position = target.position + smoothed * (nextTarget.position - target.position);
+          }
+          else
           {
             // Create minimum jerk trajectory
             float t = time - target.time;

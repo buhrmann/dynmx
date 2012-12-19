@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Config>
+	<Globals>
+		<Visual Value="0"/>      
+        <WindowSize Width="1200" Height="1000"/>    
+		<FrameRate Value="1000"/>      
+        <FullScreen Value="0"/>    
+        <VSync Value="0"/>    
+		<Model Value ="GA"/>		
+		<DebugLevel Value="1"/>
+        <PlotDuration Value="0.5"/>
+        <OutputFolder Name="/Users/thomasbuhrmann/Experiments/Arm/Output"/>
+	</Globals>
+	<GA>
+		<Evolvable Name="EvoArmCoCon">
+          <DesiredTrajectory InDegrees="1" ResetEachMove="1"> 
+            <Move Duration="0.3" LeadIn="0.1" LeadOut="0.2">
+              <From x="90" y="60"/>
+              <To x="60" y="40"/>
+            </Move> 
+	         <Move Duration="0.3" LeadIn="0.1" LeadOut="0.2">
+              <From x="90" y="60"/>
+              <To x="60" y="80"/>
+            </Move> 
+            <Move Duration="0.3" LeadIn="0.1" LeadOut="0.2">
+              <From x="70" y="40"/>
+              <To x="40" y="20"/>
+            </Move> 
+            <Move Duration="0.3" LeadIn="0.1" LeadOut="0.2">
+              <From x="70" y="40"/>
+              <To x="40" y="60"/>
+            </Move>             
+          </DesiredTrajectory>
+          <EvoFlags>
+            <Muscles symmetric="1" hillParams="0">0</muscles>
+            <Spindles velRef="1" symmetric="1" symmetricWeights="1" perMove="0">0</spindles>
+            <Iain simple="0" symmetric="1">0</Iain>
+            <Ibin derivative="1" symmetric="1">1</Ibin>
+            <Renshaw>1</Renshaw>
+            <Ifv>0</Ifv>
+            <Sfv>0</Sfv>
+            <OpenLoop max="0.3" symmetric="0" tauMaxAct="0.05" tauMaxDeact="0.5">0</OpenLoop>
+            <InterSegmentInput max="1.0" perMove="0">1</InterSegmentInput>
+            <DistalCommandDelay max="0.05" perMove="0">0</DistalCommandDelay>
+            <RampDuration perMove="0">0</RampDuration>
+            <Friction>0</Friction>
+            <DecodeLimits>
+              <ArmLimits>
+                <jointRadius min="0.01" max="0.05"/>
+                <jointFriction min="0.01" max="0.2"/>
+              </ArmLimits>
+              <MuscleLimits>
+                <attach min="0.06" max="0.26" />
+                <force min="100" max="2000" />
+                <optLength min="0.01" max="1.25"/>
+                <maxVel min="8.0" max="12.0" />
+              </MuscleLimits>
+              <SpindleLimits>
+                <pos max="6.0" />
+                <dmp max="1.0" />                
+                <vel max="0.5" />
+                <exp min="0.25" max="4.0" />                
+                <weight min="0.1" max="1.0" />
+              </SpindleLimits>
+            </DecodeLimits>
+          </EvoFlags>
+          <CommandTrajSmooth>1</CommandTrajSmooth>
+          <UseMuscleCoords>0</UseMuscleCoords>
+          <FitnessFunction>
+            <EndPointOnly>0</EndPointOnly>
+            <Velocity>0</Velocity>
+            <Coactivation>1</Coactivation>
+          </FitnessFunction>            
+          <recordIsometric>0</recordIsometric>     
+		</Evolvable>	
+		<Incremental initialMutation="0.0" seedOnly="1">0</Incremental>
+		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/Output/12_11_12__13_07_03/GA_Result.xml" />
+		<PopulationSize Value="250"/>
+		<DemeSize Value="10"/>
+		<NumGenerations Value="3500"/>
+		<MutationMax Value="0.01"/>
+        <MutationMaxReduced Value="0.001"/>
+        <MutationMaxReduceAt Value="2000"/>
+		<RecombinationRate Value="0.5"/>
+        <RecombinationRateReduced Value="0.75"/>
+        <AvoidReevaluation Value="1"/>
+		<NumTrials Value="1"/>
+        <SaveBestEachGeneration Value="0"/>
+        <AutoEval Run="1"/>
+        <Eval Run="0">
+            <NumTrials Value="1"/>
+            <RecordState Value="1"/>
+            <LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/Output/12_10_17__15_14_34/GA_BestGenome.xml"/>
+        </Eval>        
+	</GA>    
+    <Arm Gravity="0.0" Integrator="euler" InteractionTorques="1">
+            <BestFitnessMatchDelay>0</BestFitnessMatchDelay>    
+            <TorqueFeedback Measured="0" PosMod="1"/> 
+            <CoContraction AsCCommand="1"/>  
+            <RampDurations>
+                <Value>0.500423</Value>
+            </RampDurations>
+            <OpenLoopActivations>
+				<Value>0.219477</Value>
+				<Value>0.279198</Value>
+				<Value>0.108835</Value>
+				<Value>0.192098</Value>
+				<Value>0.00633371</Value>
+				<Value>0.117405</Value>
+				<Value>0.100788</Value>
+				<Value>0.0487071</Value>
+				<Value>0.0726625</Value>
+				<Value>0.127392</Value>
+				<Value>0.0683451</Value>
+				<Value>0.255429</Value>
+				<Value>0.0173356</Value>
+				<Value>0.0537308</Value>
+				<Value>0.0965681</Value>
+				<Value>0.0837775</Value>
+            </OpenLoopActivations>
+            <IntersegmentalParams>
+                <Value>0.0</Value>
+                <Value>0.0</Value>
+                <Value>0.0</Value>
+                <Value>0.0</Value>
+                <Value>0.0</Value>
+                <Value>0.0</Value>
+                <Value>0.0</Value>
+                <Value>0.0</Value>
+            </IntersegmentalParams> 
+			<UpperArm Length="0.33000000000000002" Mass="2.52" Inertia="0.022869"/>
+			<LowerArm Length="0.32000000000000001" Mass="1.3" Inertia="0.011093333333333335"/>
+			<Shoulder Friction="0.19482526150492357" UpperLimit="159.99991980470381" LowerLimit="0" Locked="0" Radius="0.0432988703"/>
+			<Elbow Friction="0.13305779102246729" UpperLimit="159.99991980470381" LowerLimit="0" Locked="0" Radius="0.0469451062"/>
+			<Muscle Joint="Elbow" Name="ElbowFlexor" IsFlexor="1" IsMono="1">
+				<Attachment Origin="0.23912510572138851" Insertion="0.078117459025431699"/>
+				<MaxIsoForce>138.388</MaxIsoForce>
+				<MaxVelocity>11.5859</MaxVelocity>
+				<Length Optimal="0.31050603769120022" Min="0.16785870037155931" Max="0.33645146216902366"/>
+				<HillParameters Shortening="0.12348158394868416" Lengthening="0.40435470135401974" Asymptote="1.4472938369670554" Slope="2"/>
+			</Muscle>
+			<Muscle Joint="Elbow" Name="ElbowExtensor" IsFlexor="0" IsMono="1">
+				<Attachment Origin="0.23912510572138851" Insertion="0.078117459025431699"/>
+				<MaxIsoForce>138.388</MaxIsoForce>
+				<MaxVelocity>11.5859</MaxVelocity>
+				<Length Optimal="0.44737206647359873" Min="0.33645146216902366" Max="0.46754687110784293"/>
+				<HillParameters Shortening="0.12348158394868416" Lengthening="0.40435470135401974" Asymptote="1.4472938369670554" Slope="2"/>
+			</Muscle>
+			<Muscle Joint="Shoulder" Name="ShoulderFlexor" IsFlexor="1" IsMono="1">
+				<Attachment Origin="0.2536625653204998" Insertion="0.060526256007267819"/>
+				<MaxIsoForce>1522.92</MaxIsoForce>
+				<MaxVelocity>11.1522</MaxVelocity>
+				<Length Optimal="0.35897747161543797" Min="0.19787237059712567" Max="0.33417538194641222"/>
+				<HillParameters Shortening="0.44491483368135509" Lengthening="0.13569431903118098" Asymptote="1.1392938854717083" Slope="2"/>
+			</Muscle>
+			<Muscle Joint="Shoulder" Name="ShoulderExtensor" IsFlexor="0" IsMono="1">
+				<Attachment Origin="0.2536625653204998" Insertion="0.060526256007267819"/>
+				<MaxIsoForce>1522.92</MaxIsoForce>
+				<MaxVelocity>11.1522</MaxVelocity>
+				<Length Optimal="0.47709029941041681" Min="0.33417538194641222" Max="0.45508858391178242"/>
+				<HillParameters Shortening="0.44491483368135509" Lengthening="0.13569431903118098" Asymptote="1.1392938854717083" Slope="2"/>
+			</Muscle>
+			<Reflex Agonist="ElbowFlexor" Antagonist="ElbowExtensor" FeedbackDelay="0.01" CommandDelay="0.0" OpenLoopTauAct="0.047138016942686677" OpenLoopTauDeact="0.31468155306102835">
+				<Spindle>
+					<PosGain Ag="3.0294349364373394" An="3.0294349364373394"/>
+					<VelGain Ag="0.38709120056776841" An="0.38709120056776841"/>
+					<VelExp Ag="0.71941471540672142" An="0.71941471540672142"/>
+					<DmpGain Ag="0.37342897172705641" An="0.37342897172705641"/>
+					<DmpExp Ag="2.1048528727243205" An="2.1048528727243205"/>
+					<Wspmn Ag="0.26979631765491041" An="0.26979631765491041"/>
+				</Spindle>
+				<Sfv>
+					<Gain Ag="0" An="0"/>
+					<RecInh Ag="0" An="0"/>
+				</Sfv>
+				<Ifv>
+					<Gain Ag="0" An="0"/>
+					<Bias Ag="0" An="0"/>
+				</Ifv>
+				<IaIn>
+					<Wiaia Ag="8.8265109799511805" An="8.8265109799511805"/>
+					<Wspia Ag="8.0518436696298217" An="8.0518436696298217"/>
+					<Wrnia Ag="6.7442169539985244" An="6.7442169539985244"/>
+					<Waia Ag="3.67161334050882" An="3.67161334050882"/>
+					<Wiamn Ag="2.5343446881339275" An="2.5343446881339275"/>
+					<Bias Ag="7.0944019451415059" An="7.0944019451415059"/>
+					<Tau Ag="209.78440196193068" An="209.78440196193068"/>
+				</IaIn>
+				<Renshaw>
+					<Wmnrn Ag="0" An="0"/>
+					<Wrnrn Ag="0" An="0"/>
+					<Wrnmn Ag="0" An="0"/>
+					<Bias Ag="0" An="0"/>
+					<Tau Ag="100" An="100"/>
+				</Renshaw>
+				<IbIn>
+					<Wibib Ag="0" An="0"/>
+					<Wglib Ag="0" An="0"/>
+					<Wibmn Ag="0" An="0"/>
+					<Bias Ag="0" An="0"/>
+					<Tau Ag="100" An="100"/>
+				</IbIn>
+				<IsIn>
+					<Wisep Ag="0" An="0"/>
+				</IsIn>
+			</Reflex>
+			<Reflex Agonist="ShoulderFlexor" Antagonist="ShoulderExtensor" FeedbackDelay="0.01" CommandDelay="0.0" OpenLoopTauAct="0.047138016942686677" OpenLoopTauDeact="0.31468155306102835">
+				<Spindle>
+					<PosGain Ag="2.0268216670819408" An="2.0268216670819408"/>
+					<VelGain Ag="0.22095780918335531" An="0.22095780918335531"/>
+					<VelExp Ag="1.2628585577778324" An="1.2628585577778324"/>
+					<DmpGain Ag="0.66566421316407776" An="0.66566421316407776"/>
+					<DmpExp Ag="2.2682917665580145" An="2.2682917665580145"/>
+					<Wspmn Ag="0.29005321699561187" An="0.29005321699561187"/>
+				</Spindle>
+				<Sfv>
+					<Gain Ag="0" An="0"/>
+					<RecInh Ag="0" An="0"/>
+				</Sfv>
+				<Ifv>
+					<Gain Ag="0" An="0"/>
+					<Bias Ag="0" An="0"/>
+				</Ifv>
+				<IaIn>
+					<Wiaia Ag="5.0280141121592514" An="5.0280141121592514"/>
+					<Wspia Ag="3.3131594490494463" An="3.3131594490494463"/>
+					<Wrnia Ag="7.8740264844872101" An="7.8740264844872101"/>
+					<Waia Ag="7.0445416713046942" An="7.0445416713046942"/>
+					<Wiamn Ag="5.7792137983878362" An="5.7792137983878362"/>
+					<Bias Ag="-9.50717650962501" An="-9.50717650962501"/>
+					<Tau Ag="53.700441001238453" An="53.700441001238453"/>
+				</IaIn>
+				<Renshaw>
+					<Wmnrn Ag="0" An="0"/>
+					<Wrnrn Ag="0" An="0"/>
+					<Wrnmn Ag="0" An="0"/>
+					<Bias Ag="0" An="0"/>
+					<Tau Ag="100" An="100"/>
+				</Renshaw>
+				<IbIn>
+					<Wibib Ag="0" An="0"/>
+					<Wglib Ag="0" An="0"/>
+					<Wibmn Ag="0" An="0"/>
+					<Bias Ag="0" An="0"/>
+					<Tau Ag="100" An="100"/>
+				</IbIn>
+				<IsIn>
+					<Wisep Ag="0" An="0"/>
+				</IsIn>
+			</Reflex>                 
+    </Arm>
+</Config>

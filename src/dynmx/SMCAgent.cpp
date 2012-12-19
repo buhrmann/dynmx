@@ -8,6 +8,7 @@
  */
 
 #include "SMCAgent.h"
+#include "MathUtils.h"
 
 namespace dmx
 {
@@ -111,9 +112,9 @@ void SMCAgent::update(float dt)
   m_position += m_velocity * dt;
   if(m_positionWraps)
     m_position.y = wrap(m_position.y, -m_maxPosition, m_maxPosition);
-  else 
+  /*else 
     m_position.y = clamp(m_position.y, -m_maxPosition, m_maxPosition);
-  
+  */
   m_time += dt;
 }
 
@@ -140,7 +141,7 @@ void SMCAgent::setSensorMode(const std::string& mode)
   else if (mode == "Derivative")
     m_sensorMode = kSensorMode_Derivative;
   else if (mode == "AbsAndDelayed")
-    m_sensorMode == kSensorMode_AbsAndDelayed;
+    m_sensorMode = kSensorMode_AbsAndDelayed;
 }
   
 //----------------------------------------------------------------------------------------------------------------------  
@@ -149,10 +150,12 @@ void SMCAgent::toXml(ci::XmlTree& xml)
   m_distanceSensor.toXml(xml);
   
   xml.push_back(ci::XmlTree("MaxSpeed", toString(m_maxSpeed)));
-  xml.push_back(ci::XmlTree("MaxAngularSpeed", toString(radiansToDegrees(m_maxAngularSpeed))));
+  float maxAngSpeed = radiansToDegrees(m_maxAngularSpeed);
+  xml.push_back(ci::XmlTree("MaxAngularSpeed", toString(maxAngSpeed)));
   xml.push_back(ci::XmlTree("MaxPosition", toString(m_maxPosition)));
   xml.push_back(ci::XmlTree("PositionWraps", toString(m_positionWraps)));
-  xml.push_back(ci::XmlTree("MaxAngle", toString(radiansToDegrees(m_maxAngle))));
+  float maxAngle = radiansToDegrees(m_maxAngle);
+  xml.push_back(ci::XmlTree("MaxAngle", toString(maxAngle)));
   xml.push_back(ci::XmlTree("AngleWraps", toString(m_angleWraps)));
     
   // ctrnn

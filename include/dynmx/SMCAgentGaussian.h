@@ -18,12 +18,12 @@
 namespace dmx
 {
   
-#define GENERALIZATION_WIDTH_MIN 0.01
+#define GENERALIZATION_WIDTH_MIN 0.01 // 0.01
 #define GENERALIZATION_WIDTH_MAX 0.12
-#define GENERALIZATION_HEIGHT_MIN 0.01
+#define GENERALIZATION_HEIGHT_MIN 0.01 // 0.01
 #define GENERALIZATION_HEIGHT_MAX 0.25
-#define GENERALIZATION_POS_MIN -0.4
-#define GENERALIZATION_POS_MAX 0.4 
+#define GENERALIZATION_POS_MIN -0.4 
+#define GENERALIZATION_POS_MAX -0.3
 
 //----------------------------------------------------------------------------------------------------------------------
 // A minimal agent scanning the encironment with a distance sensor
@@ -105,9 +105,13 @@ inline void SMCAgentGaussian::init()
       m_startPos = GENERALIZATION_POS_MIN; 
       m_accFitness = 0.0;
       ((Gaussian*)objects[1])->setVisibility(false);
-      ((Gaussian*)objects[0])->setPosition(ci::Vec2f(0.4, m_startPos));
+      //((Gaussian*)objects[0])->setPosition(ci::Vec2f(0.4, m_startPos));
+      ((Gaussian*)objects[0])->setPosition(ci::Vec2f(0.4, 0.0));
       ((Gaussian*)objects[0])->setH(m_height);
       ((Gaussian*)objects[0])->setW(m_width);      
+      
+      m_agent->setPositionWraps(false);
+      m_agent->setPosition(ci::Vec2f(0.0, m_startPos));
 
       const std::string fnm = DATA_DIR + "Generalization.txt";
       m_file.open (fnm.c_str()); 
@@ -138,7 +142,7 @@ inline void SMCAgentGaussian::reset()
 {
   SMCAgentEvo::reset();
   
-  if(m_evalMode == kEvalMode_Trajectories)
+  if(m_evalMode == kEvalMode_Trajectories || m_evalMode == kEvalMode_Generalization)
   {
     m_agent->setPosition(ci::Vec2f(0.0, m_startPos));  
   }
@@ -176,7 +180,7 @@ inline void SMCAgentGaussian::nextTrial(int trial)
       // Average fitness over starting positions
       float avgFit = m_accFitness / 10.0;
       m_accFitness = 0.0;
-      std::cout << "W " << m_width << " H " << m_height << ": Avg fitness = " << avgFit << std::endl;
+      //std::cout << "W " << m_width << " H " << m_height << ": Avg fitness = " << avgFit << std::endl;
       m_file << avgFit << "\t";
       
       m_startPos = GENERALIZATION_POS_MIN;
@@ -191,7 +195,7 @@ inline void SMCAgentGaussian::nextTrial(int trial)
     }
     
     // Apply values
-    ((Gaussian*)objects[0])->setPosition(ci::Vec2f(0.4, m_startPos));
+    //((Gaussian*)objects[0])->setPosition(ci::Vec2f(0.4, m_startPos));
     ((Gaussian*)objects[0])->setH(m_height);
     ((Gaussian*)objects[0])->setW(m_width);
   }
@@ -255,7 +259,8 @@ inline void SMCAgentGaussian::updateFitness()
   { 
     const std::vector<Positionable*>& objects = m_agent->getEnvironment().getObjects(); 
     float desPos = objects[0]->getPosition().y;    
-    float diff = sqr(m_agent->getPosition().y - desPos);    
+    float actPos = clamp(m_agent->getPosition().y, -1.0f, 1.0f);
+    float diff = sqr(actPos - desPos);    
     m_fitness += diff;
   } 
 }  

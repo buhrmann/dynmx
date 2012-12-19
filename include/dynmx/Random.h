@@ -31,7 +31,7 @@ int ProbabilisticChoice(double prob);
 class RandomState 
 {
 public:
-  RandomState(long seedIn = 0) {SetRandomSeed(seedIn); gaussian_flag = 0;};
+  RandomState(long seedIn = 0) {SetRandomSeed(seedIn); gaussian_flag = 0; };
   ~RandomState() {};
   
   // Accessors

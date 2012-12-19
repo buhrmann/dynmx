@@ -17,47 +17,54 @@ namespace dmx
 int EvoArmCoCon::decodeMuscle(int mId, const double* genome, int I)  
 {
   Muscle* m = m_arm->getMuscle(mId);
+  int numDecoded = 0;
   
-  // Elbow muscles should be weaker than shoulder muscles
-  bool isElbowMuscle = false;
-  if(m->isMonoArticulate())
+  if(m_evolveMuscles)
   {
-    isElbowMuscle = ((MuscleMonoWrap*)m)->getJoint() == JT_elbow;
-  }
-  const float forceScalar = isElbowMuscle ? 0.75f : 1.0f;
+    // Elbow muscles should be weaker than shoulder muscles
+    bool isElbowMuscle = false;
+    if(m->isMonoArticulate())
+    {
+      isElbowMuscle = ((MuscleMonoWrap*)m)->getJoint() == JT_elbow;
+    }
+    const float forceScalar = isElbowMuscle ? 0.75f : 1.0f;
     
-  const MuscleLimits& limits = m_decodeLimits.muscle;
-  const double origin = map01To(genome[I + 0], limits.attach);
-  const double insertion =  map01To(genome[I + 1], limits.attach);
-  const double maxIsoForce = map01To(forceScalar * genome[I + 2], limits.force); 
-  const double optimalLength = map01To(genome[I + 3], limits.optLength);
-  const double maxVel = map01To(genome[I + 4], limits.maxVel);
-  m_arm->setMuscleParams(mId, origin, insertion, maxIsoForce, optimalLength, maxVel); 
-  
-  // Muscles need to be reinitialized so that correct values can be precalculated from new parameters
-  if(m->isMonoArticulate())
-  {
-    ((MuscleMonoWrap*)m)->init();
+    const MuscleLimits& limits = m_decodeLimits.muscle;
+    const double origin = map01To(genome[I + 0], limits.attach);
+    const double insertion =  map01To(genome[I + 1], limits.attach);
+    const double maxIsoForce = map01To(forceScalar * genome[I + 2], limits.force); 
+    const double optimalLength = map01To(genome[I + 3], limits.optLength);
+    const double maxVel = map01To(genome[I + 4], limits.maxVel);
+    m_arm->setMuscleParams(mId, origin, insertion, maxIsoForce, optimalLength, maxVel); 
+    
+    // Muscles need to be reinitialized so that correct values can be precalculated from new parameters
+    if(m->isMonoArticulate())
+    {
+      ((MuscleMonoWrap*)m)->init();
+    }
+    else 
+    {
+      ((MuscleBiWrap*)m)->init();
+    }
+    
+    // Need to set length again after initialisation of muscle to be able to use min, max lengths !
+    double lOpt0 = m->unitLengthToLength(optimalLength);
+    m->setParameters(maxIsoForce, lOpt0, maxVel);
+    
+    numDecoded += 5;
   }
-  else 
-  {
-    ((MuscleBiWrap*)m)->init();
-  }
-  
-  // Need to set length again after initialisation of muscle to be able to use min, max lengths !
-  double lOpt0 = m->unitLengthToLength(optimalLength);
-  m->setParameters(maxIsoForce, lOpt0, maxVel);
   
   if(m_evolveHillParams)
   {
-    double hSh = 0.1 + 0.4 * genome[I + 5];
-    double hLn = 0.1 + 0.4 * genome[I + 6];
-    double hMax = 1.1 + 0.7 * genome[I + 7];
+    double hSh = 0.1 + 0.4 * genome[I + numDecoded + 0]; // Was 0.9
+    double hLn = 0.1 + 0.4 * genome[I + numDecoded + 1]; // Was 0.9
+    double hMax = 1.1 + 0.7 * genome[I + numDecoded + 2];
     double hSlp = 2.0;
     m->setHillParameters(hSh, hLn, hMax, hSlp);
+    numDecoded += 3;
   }
   
-  return m_evolveHillParams ? 8 : 5;
+  return numDecoded;
 }
   
 //----------------------------------------------------------------------------------------------------------------------  
@@ -103,27 +110,29 @@ void EvoArmCoCon::decodeGenome(const double* genome)
     double elbRad = map01To(genome[I++], m_decodeLimits.arm.jointRadius);
     double shdRad = map01To(genome[I++], m_decodeLimits.arm.jointRadius);  
     m_arm->setJointRadii(elbRad, shdRad);  
-    
-    if(m_symmetricMuscles)
+  }
+  
+  if(m_symmetricMuscles)
+  {
+    // The two muscles in each reflex share the same parameters
+    for(int i = 0; i < numReflexes; ++i)
     {
-      // The two muscles in each reflex share the same parameters
-      for(int i = 0; i < numReflexes; ++i)
-      {
-        int numDecoded = decodeMuscle(i*2, genome, I);
-        decodeMuscle(i*2+1, genome, I);
-        I += numDecoded;
-      }
-    }
-    else
-    {
-      // Each muscles has its own parameters    
-      for(int i = 0; i < numMuscles; ++i)
-      {
-        int numDecoded = decodeMuscle(i, genome, I);
-        I += numDecoded;
-      }
+      int numDecoded = decodeMuscle(i*2, genome, I);
+      decodeMuscle(i*2+1, genome, I);
+      I += numDecoded;
     }
   }
+  else
+  {
+    // Each muscles has its own parameters    
+    for(int i = 0; i < numMuscles; ++i)
+    {
+      int numDecoded = decodeMuscle(i, genome, I);
+      I += numDecoded;
+    }
+  }
+  
+  
 //  else 
 //  {
 //    // Need to init, as otherwise the new jointRadii are not compatible with precalculated values
@@ -171,7 +180,8 @@ void EvoArmCoCon::decodeGenome(const double* genome)
   // Range for neural parameters
   float maxW = 10.0;
   float maxB = 10.0;
-  float maxT = 200.0;  
+  float maxT = 100.0;  // These really encode 1/tau, i.e. tau in [1/(minT+maxt), 1/minT]. Was 90.0 and 10.0;
+  float minT = 1.0;
   
   // IaIn parameters  
   if(m_evolveIAIN)
@@ -182,38 +192,29 @@ void EvoArmCoCon::decodeGenome(const double* genome)
       if(m_evolveIAINsimple)
       {
         // Symmetric and simple
-        m_arm->getReflex(0)->setIaInParametersMinimal(genome[I+0] * maxW, genome[I+0] * maxW,        // spindle->ia
-                                               genome[I+1] * maxW, genome[I+1] * maxW,        // ia->ia
-                                               genome[I+2] * maxW, genome[I+2] * maxW,        // ia->mn
-                                               10 + genome[I+3] * maxT, 10 + genome[I+3] * maxT);  // time constants
-        I += numIaParams;
-        
-        m_arm->getReflex(1)->setIaInParametersMinimal(genome[I+0] * maxW, genome[I+0] * maxW,        // spindle->ia
-                                               genome[I+1] * maxW, genome[I+1] * maxW,        // ia->ia
-                                               genome[I+4] * maxW, genome[I+4] * maxW,        // ia->mn
-                                               10 + genome[I+3] * maxT, 10 + genome[I+3] * maxT);  // time constants
-        I += numIaParams;
+        for(int i = 0; i <= 1; ++i)
+        {
+          m_arm->getReflex(i)->setIaInParametersMinimal(genome[I+0] * maxW, genome[I+0] * maxW,        // spindle->ia
+                                                 genome[I+1] * maxW, genome[I+1] * maxW,        // ia->ia
+                                                 genome[I+2] * maxW, genome[I+2] * maxW,        // ia->mn
+                                                 minT + genome[I+3] * maxT, minT + genome[I+3] * maxT);  // time constants
+          I += numIaParams;
+        }
       }
       else 
       {
         // Symmetric and complex
-        m_arm->getReflex(0)->setIaInParameters(genome[I+0] * maxW, genome[I+0] * maxW,        // spindle->ia
-                                               genome[I+1] * maxW, genome[I+1] * maxW,        // ia->ia
-                                               genome[I+2] * maxW, genome[I+2] * maxW,        // desired contr->ia
-                                               genome[I+3] * maxW, genome[I+3] * maxW,        // rn->ia
-                                               genome[I+4] * maxW, genome[I+4] * maxW,        // ia->mn
-                                               10 + genome[I+5] * maxT, 10 + genome[I+5] * maxT,        // time constants
-                                               -maxB + (genome[I+6] * 2 * maxB), -maxB + (genome[I+6] * 2 * maxB));       // biases
-        I += numIaParams;
-        
-        m_arm->getReflex(1)->setIaInParameters(genome[I+0] * maxW, genome[I+0] * maxW,        // spindle->ia
-                                               genome[I+1] * maxW, genome[I+1] * maxW,        // ia->ia
-                                               genome[I+2] * maxW, genome[I+2] * maxW,        // desired contr->ia
-                                               genome[I+3] * maxW, genome[I+3] * maxW,        // rn->ia
-                                               genome[I+4] * maxW, genome[I+4] * maxW,        // ia->mn
-                                               10 + genome[I+5] * maxT, 10 + genome[I+5] * maxT,        // time constants
-                                               -maxB + (genome[I+6] * 2 * maxB), -maxB + (genome[I+6] * 2 * maxB));       // biases
-        I += numIaParams;
+        for(int i = 0; i <= 1; ++i)
+        {
+          m_arm->getReflex(i)->setIaInParameters(genome[I+0] * maxW, genome[I+0] * maxW,        // spindle->ia
+                                                 genome[I+1] * maxW, genome[I+1] * maxW,        // ia->ia
+                                                 genome[I+2] * maxW, genome[I+2] * maxW,        // desired contr->ia
+                                                 genome[I+3] * maxW, genome[I+3] * maxW,        // rn->ia
+                                                 genome[I+4] * maxW, genome[I+4] * maxW,        // ia->mn
+                                                 minT + genome[I+5] * maxT, minT + genome[I+5] * maxT,        // time constants
+                                                 -maxB + (genome[I+6] * 2 * maxB), -maxB + (genome[I+6] * 2 * maxB));       // biases
+          I += numIaParams;
+        }
       }
     }
     else 
@@ -221,38 +222,29 @@ void EvoArmCoCon::decodeGenome(const double* genome)
       if(m_evolveIAINsimple)
       {
         // Non-symmetric and simple
-        m_arm->getReflex(0)->setIaInParametersMinimal(genome[I+0] * maxW, genome[I+4] * maxW,        // spindle->ia
-                                               genome[I+1] * maxW, genome[I+5] * maxW,        // ia->ia
-                                               genome[I+2] * maxW, genome[I+6] * maxW,        // ia->mn
-                                               10 + genome[I+3] * maxT, 10 + genome[I+7] * maxT);  // time constants
-        I += 2 * numIaParams;
-        
-        m_arm->getReflex(1)->setIaInParametersMinimal(genome[I+0] * maxW, genome[I+4] * maxW,        // spindle->ia
-                                               genome[I+1] * maxW, genome[I+5] * maxW,        // ia->ia
-                                               genome[I+2] * maxW, genome[I+6] * maxW,        // ia->mn
-                                               10 + genome[I+3] * maxT, 10 + genome[I+7] * maxT);  // time constants
-        I += 2 * numIaParams;         
+        for(int i = 0; i <= 1; ++i)
+        {
+          m_arm->getReflex(i)->setIaInParametersMinimal(genome[I+0] * maxW, genome[I+4] * maxW,        // spindle->ia
+                                                 genome[I+1] * maxW, genome[I+5] * maxW,        // ia->ia
+                                                 genome[I+2] * maxW, genome[I+6] * maxW,        // ia->mn
+                                                 minT + genome[I+3] * maxT, minT + genome[I+7] * maxT);  // time constants
+          I += 2 * numIaParams;
+        }
       }
       else
       {
         // Non-symmetric and complex
-        m_arm->getReflex(0)->setIaInParameters(genome[I+0] * maxW, genome[I+7] * maxW,        // spindle->ia
-                                               genome[I+1] * maxW, genome[I+8] * maxW,        // ia->ia
-                                               genome[I+2] * maxW, genome[I+9] * maxW,        // desired contr->ia
-                                               genome[I+3] * maxW, genome[I+10] * maxW,        // rn->ia
-                                               genome[I+4] * maxW, genome[I+11] * maxW,        // ia->mn
-                                               10 + genome[I+5] * maxT, 10 + genome[I+12] * maxT,        // time constants
-                                               -maxB + (genome[I+6] * 2 * maxB), -maxB + (genome[I+13] * 2 * maxB));       // biases
-        I += 2 * numIaParams;
-        
-        m_arm->getReflex(1)->setIaInParameters(genome[I+0] * maxW, genome[I+7] * maxW,        // spindle->ia
-                                               genome[I+1] * maxW, genome[I+8] * maxW,        // ia->ia
-                                               genome[I+2] * maxW, genome[I+9] * maxW,        // desired contr->ia
-                                               genome[I+3] * maxW, genome[I+10] * maxW,        // rn->ia
-                                               genome[I+4] * maxW, genome[I+11] * maxW,        // ia->mn
-                                               10 + genome[I+5] * maxT, 10 + genome[I+12] * maxT,        // time constants
-                                               -maxB + (genome[I+6] * 2 * maxB), -maxB + (genome[I+13] * 2 * maxB));       // biases
-        I += 2 * numIaParams;     
+        for(int i = 0; i <= 1; ++i)
+        {
+          m_arm->getReflex(i)->setIaInParameters(genome[I+0] * maxW, genome[I+7] * maxW,        // spindle->ia
+                                                 genome[I+1] * maxW, genome[I+8] * maxW,        // ia->ia
+                                                 genome[I+2] * maxW, genome[I+9] * maxW,        // desired contr->ia
+                                                 genome[I+3] * maxW, genome[I+10] * maxW,        // rn->ia
+                                                 genome[I+4] * maxW, genome[I+11] * maxW,        // ia->mn
+                                                 minT + genome[I+5] * maxT, minT + genome[I+12] * maxT,        // time constants
+                                                 -maxB + (genome[I+6] * 2 * maxB), -maxB + (genome[I+13] * 2 * maxB));       // biases
+          I += 2 * numIaParams;
+        }
       }
     }
   }
@@ -261,40 +253,30 @@ void EvoArmCoCon::decodeGenome(const double* genome)
   // Renshaw param
   if(m_evolveRenshaw)
   {
-    if(m_symmetricMuscles)
+    if(m_evolveRenshawSym)
     {
-      m_arm->getReflex(0)->setRenshawParameters(genome[I+0], genome[I+0], 
-                                                genome[I+1], genome[I+1], 
-                                                genome[I+2], genome[I+2], 
-                                                10 + genome[I+3] * maxT, 10 + genome[I+3] * maxT,
-                                                -maxB + (genome[I+4] * 2 * maxB), -maxB + (genome[I+4] * 2 * maxB));  
-      I += 5;
-      
-      m_arm->getReflex(1)->setRenshawParameters(genome[I+0], genome[I+0], 
-                                                genome[I+1], genome[I+1], 
-                                                genome[I+2], genome[I+2], 
-                                                10 + genome[I+3] * maxT, 10 + genome[I+3] * maxT,
-                                                -maxB + (genome[I+4] * 2 * maxB), -maxB + (genome[I+4] * 2 * maxB));  
-      I += 5;  
+      for(int i = 0; i <= 1; ++i)
+      {
+        m_arm->getReflex(i)->setRenshawParameters(genome[I+0] * maxW, genome[I+0] * maxW,
+                                                  genome[I+1] * maxW, genome[I+1] * maxW,
+                                                  genome[I+2] * maxW, genome[I+2] * maxW,
+                                                  minT + genome[I+3] * maxT, minT + genome[I+3] * maxT,
+                                                  -maxB + (genome[I+4] * 2 * maxB), -maxB + (genome[I+4] * 2 * maxB));  
+        I += 5;
+      }
     }
     else 
-    {      
-      m_arm->getReflex(0)->setRenshawParameters(genome[I+0], genome[I+5], 
-                                                genome[I+1], genome[I+6], 
-                                                genome[I+2], genome[I+7], 
-                                                10 + genome[I+3] * maxT, 10 + genome[I+8] * maxT,
-                                                -maxB + (genome[I+4] * 2 * maxB), -maxB + (genome[I+9] * 2 * maxB));  
-      I += 10;
-      
-      m_arm->getReflex(1)->setRenshawParameters(genome[I+0], genome[I+5], 
-                                                genome[I+1], genome[I+6], 
-                                                genome[I+2], genome[I+7], 
-                                                10 + genome[I+3] * maxT, 10 + genome[I+8] * maxT,
-                                                -maxB + (genome[I+4] * 2 * maxB), -maxB + (genome[I+9] * 2 * maxB));  
-      I += 10;
-      
+    {
+      for(int i = 0; i <= 1; ++i)
+      {
+        m_arm->getReflex(i)->setRenshawParameters(genome[I+0] * maxW, genome[I+5] * maxW,
+                                                  genome[I+1] * maxW, genome[I+6] * maxW,
+                                                  genome[I+2] * maxW, genome[I+7] * maxW,
+                                                  minT + genome[I+3] * maxT, minT + genome[I+8] * maxT,
+                                                  -maxB + (genome[I+4] * 2 * maxB), -maxB + (genome[I+9] * 2 * maxB));  
+        I += 10;
+      }
     }
-
   }
   
   // IbIn params
@@ -302,38 +284,182 @@ void EvoArmCoCon::decodeGenome(const double* genome)
   {
     if(m_evolveIBINsym)
     {
-      m_arm->getReflex(0)->setIbInParameters(genome[I+0] * maxW, genome[I+0] * maxW, 
-                                             genome[I+1] * maxW, genome[I+1] * maxW, 
-                                             genome[I+2] * maxW, genome[I+2] * maxW, 
-                                             10 + genome[I+3] * maxT, 10 + genome[I+3] * maxT,
-                                             -maxB + (genome[I+4] * 2 * maxB), -maxB + (genome[I+4] * 2 * maxB)); 
-      I += 5;
-      
-      m_arm->getReflex(1)->setIbInParameters(genome[I+0], genome[I+0], 
-                                             genome[I+1], genome[I+1], 
-                                             genome[I+2], genome[I+2], 
-                                             10 + genome[I+3] * maxT, 10 + genome[I+3] * maxT,
-                                             -maxB + (genome[I+4] * 2 * maxB), -maxB + (genome[I+4] * 2 * maxB));
-      I += 5;    
+      if(m_evolveIBINderiv)
+      {
+        // Symmetric and with derivative
+        for(int i = 0; i <= 1; ++i)
+        {
+          m_arm->getReflex(i)->setIbInParametersDeriv(genome[I+0] * maxW, genome[I+0] * maxW,
+                                                 genome[I+1] * maxW, genome[I+1] * maxW,
+                                                 genome[I+2] * maxW, genome[I+2] * maxW,
+                                                 genome[I+3] * maxW, genome[I+3] * maxW,
+                                                 minT + genome[I+4] * maxT, minT + genome[I+4] * maxT,
+                                                 -maxB + (genome[I+5] * 2 * maxB), -maxB + (genome[I+5] * 2 * maxB));
+          I += 6;
+        }
+        
+      }
+      else
+      {
+        // Symmetric and without derivative
+        for(int i = 0; i <= 1; ++i)
+        {
+          m_arm->getReflex(i)->setIbInParameters(genome[I+0] * maxW, genome[I+0] * maxW,
+                                                 genome[I+1] * maxW, genome[I+1] * maxW, 
+                                                 genome[I+2] * maxW, genome[I+2] * maxW,
+                                                 minT + genome[I+3] * maxT, minT + genome[I+3] * maxT,
+                                                 -maxB + (genome[I+4] * 2 * maxB), -maxB + (genome[I+4] * 2 * maxB)); 
+          I += 5;
+        }
+      }
     }
     else
     {
-      m_arm->getReflex(0)->setIbInParameters(genome[I+0], genome[I+5], 
-                                             genome[I+1], genome[I+6], 
-                                             genome[I+2], genome[I+7], 
-                                             10 + genome[I+3] * maxT, 10 + genome[I+8] * maxT,
-                                             -maxB + (genome[I+4] * 2 * maxB), -maxB + (genome[I+9] * 2 * maxB)); 
-      I += 10;
-
-      m_arm->getReflex(1)->setIbInParameters(genome[I+0], genome[I+5], 
-                                             genome[I+1], genome[I+6], 
-                                             genome[I+2], genome[I+7], 
-                                             10 + genome[I+3] * maxT, 10 + genome[I+8] * maxT,
-                                             -maxB + (genome[I+4] * 2 * maxB), -maxB + (genome[I+9] * 2 * maxB)); 
-      I += 10;
-      
+      if(m_evolveIBINderiv)
+      {
+        // Non-symmetric and with derivative
+        for(int i = 0; i <= 1; ++i)
+        {
+          m_arm->getReflex(i)->setIbInParametersDeriv(genome[I+0] * maxW, genome[I+6] * maxW,
+                                                 genome[I+1] * maxW, genome[I+7] * maxW,
+                                                 genome[I+2] * maxW, genome[I+8] * maxW,
+                                                 genome[I+3] * maxW, genome[I+9] * maxW,
+                                                 minT + genome[I+4] * maxT, minT + genome[I+10] * maxT,
+                                                 -maxB + (genome[I+5] * 2 * maxB), -maxB + (genome[I+11] * 2 * maxB));
+          I += 12;
+        }
+      }
+      else
+      {
+        // Non-symmetric and without derivative
+        for(int i = 0; i <= 1; ++i)
+        {
+          m_arm->getReflex(i)->setIbInParameters(genome[I+0] * maxW, genome[I+5] * maxW,
+                                                 genome[I+1] * maxW, genome[I+6] * maxW,
+                                                 genome[I+2] * maxW, genome[I+7] * maxW,
+                                                 minT + genome[I+3] * maxT, minT + genome[I+8] * maxT,
+                                                 -maxB + (genome[I+4] * 2 * maxB), -maxB + (genome[I+9] * 2 * maxB)); 
+          I += 10;
+        }
+      }
     }
   }
+  
+  // IBIn intersegmental connections
+  if(m_evolveIBInterSeg)
+  {
+   if(m_evolveIBINsym)
+   {
+     for(int i = 0; i <= 1; ++i)
+     {
+       m_arm->getReflex(i)->setIbIntersegParameters(map01To(genome[I+0],-maxW, maxW),
+                                                    map01To(genome[I+1],-maxW, maxW),
+                                                    map01To(genome[I+1],-maxW, maxW),
+                                                    map01To(genome[I+0],-maxW, maxW),
+                                                    map01To(genome[I+2],-maxW, maxW),
+                                                    map01To(genome[I+3],-maxW, maxW),
+                                                    map01To(genome[I+3],-maxW, maxW),
+                                                    map01To(genome[I+2],-maxW, maxW));
+       I += 4;
+     }
+   }
+   else
+   {
+     for(int i = 0; i <= 1; ++i)
+     {
+       m_arm->getReflex(i)->setIbIntersegParameters(map01To(genome[I+0],-maxW, maxW),
+                                                    map01To(genome[I+1],-maxW, maxW),
+                                                    map01To(genome[I+2],-maxW, maxW),
+                                                    map01To(genome[I+3],-maxW, maxW),
+                                                    map01To(genome[I+4],-maxW, maxW),
+                                                    map01To(genome[I+5],-maxW, maxW),
+                                                    map01To(genome[I+6],-maxW, maxW),
+                                                    map01To(genome[I+7],-maxW, maxW));
+       I += 8;
+     }
+   }
+  }
+  
+  // Reciprocal excitation of autogenic inhibition reflex (+IbAgMnAn) and Ia to IbIn
+  if(m_evolveIBRecExcIa)
+  {
+    if(m_evolveIBINsym)
+    {
+      for(int i = 0; i <= 1; ++i)
+      {
+        m_arm->getReflex(i)->setIbRecExcIaParameters(genome[I+0] * maxW, genome[I+0] * maxW,
+                                                     genome[I+1] * maxW, genome[I+1] * maxW);
+        I += 2;
+      }
+    }
+    else
+    {
+      for(int i = 0; i <= 1; ++i)
+      {
+        m_arm->getReflex(i)->setIbRecExcIaParameters(genome[I+0] * maxW, genome[I+1] * maxW,
+                                                     genome[I+2] * maxW, genome[I+3] * maxW);
+        I += 4;
+      }
+    }
+  }
+
+  
+  // Bias and tau for aMN if simulated as neuron
+  if(m_evolveMNAsNeuron)
+  {
+    if(m_evolveMNsym)
+    {
+      for(int i = 0; i <= 1; ++i)
+      {
+        m_arm->getReflex(i)->setMNAsNeuron(minT + genome[I+0] * maxT, minT + genome[I+0] * maxT,
+                                           -maxB + (genome[I+1] * 2 * maxB), -maxB + (genome[I+1] * 2 * maxB));
+        I += 2;
+      }
+    }
+    else
+    {
+      for(int i = 0; i <= 1; ++i)
+      {
+        m_arm->getReflex(i)->setMNAsNeuron(minT + genome[I+0] * maxT, minT + genome[I+2] * maxT,
+                                           -maxB + (genome[I+1] * 2 * maxB), -maxB + (genome[I+3] * 2 * maxB));
+        I += 4;
+      }
+    }
+      
+  }
+  
+  // Slopes of neural activation function
+  if(m_evolveSigmoidSlope)
+  {
+    double kia[2] = {1, 1};
+    double kib[2] = {1, 1};
+    double krn[2] = {1, 1};
+    double kmn[2] = {1, 1};
+    double minK = 0.1;
+    double maxK = 10.0;
+    
+    for(int i = 0; i <= 1; ++i)
+    {
+      kia[0] = map01To(genome[I++], minK, maxK);
+      kia[1] = m_evolveIAINsym ? kia[0] : map01To(genome[I++], minK, maxK);
+
+      kib[0] = map01To(genome[I++], minK, maxK);
+      kib[1] = m_evolveIBINsym ? kib[0] : map01To(genome[I++], minK, maxK);
+      
+      krn[0] = map01To(genome[I++], minK, maxK);
+      krn[1] = m_evolveRenshawSym ? krn[0] : map01To(genome[I++], minK, maxK);
+
+      if(m_evolveMNAsNeuron)
+      {
+        kmn[0] = map01To(genome[I++], minK, maxK);
+        kmn[1] = m_evolveMNsym ? kmn[0] : map01To(genome[I++], minK, maxK);
+      }
+      
+      m_arm->getReflex(i)->setSigmoidSlopes(kia[0], kia[1], kib[0], kib[1], krn[0], krn[1], kmn[0], kmn[1]);
+      
+    } // for all reflexes
+  } // if evolve slopes
+  
   
   // IFV gains
   if(m_evolveIFV)
@@ -419,14 +545,15 @@ void EvoArmCoCon::decodeGenome(const double* genome)
   { 
     m_intersegParams.clear(); // This instance could repeatedly be decoded!
     
-    int N = m_symmetricMuscles ? (m_numMoves * numReflexes) : (m_numMoves * numMuscles);
+    int moveMult = m_evolveIntersegPerMove ? m_numMoves : 1;
+    int N = m_evolveIntersegSym ? (moveMult * numReflexes) : (moveMult * numMuscles);
     for(int i = 0; i < N; ++i)
     {
       double Wisep = map01To(genome[I + i], -m_maxInterseg, m_maxInterseg);
       m_intersegParams.push_back(Wisep);
       
       // We have to duplicate each muscle activation (one encoded, but two identical needed for symmetry)
-      if(m_symmetricMuscles)
+      if(m_evolveIntersegSym)
       {
         m_intersegParams.push_back(Wisep);
       }
@@ -487,15 +614,15 @@ int EvoArmCoCon::getNumGenes()
       numGenes += numReflexes * 5;
     else
       numGenes += numMuscles * 5;
+  }
   
-    // Muscle hill parameters (hSh, hLn, hMax)
-    if(m_evolveHillParams)
-    {
-      if(m_symmetricMuscles)
-        numGenes += numReflexes * 3;  
-      else
-        numGenes += numMuscles * 3;
-    }
+  // Muscle hill parameters (hSh, hLn, hMax)
+  if(m_evolveHillParams)
+  {
+    if(m_symmetricMuscles)
+      numGenes += numReflexes * 3;
+    else
+      numGenes += numMuscles * 3;
   }
   
   if(m_evolveSpindles)
@@ -537,19 +664,63 @@ int EvoArmCoCon::getNumGenes()
   // Renshaw neurons: Bias, tau, weights from mn, rn. Plus input to MN.
   if(m_evolveRenshaw)
   {
-    if(m_symmetricMuscles)
+    if(m_evolveRenshawSym)
       numGenes += numReflexes * 5;
     else
       numGenes += numMuscles * 5;
   }
   
   // IbIn neurons: Bias, tau, weights from golgi, ib. Plus input to MN.
+  // If derivative is used, one more param per neuron.
   if(m_evolveIBIN)
   {
+    int numIbParams = m_evolveIBINderiv ? 6 : 5;
     if(m_evolveIBINsym)
-      numGenes += numReflexes * 5;
+      numGenes += numReflexes * numIbParams;
     else
-      numGenes += numMuscles * 5;
+      numGenes += numMuscles * numIbParams;
+  }
+  
+  // Ib intersegmental connections
+  if(m_evolveIBInterSeg)
+  {
+    const int numIbIs = 4; // 2 to each MN and 2 to each IbIn
+    if(m_evolveIBINsym)
+      numGenes += numReflexes * numIbIs;
+    else
+      numGenes += numMuscles * numIbIs;
+  }
+  
+  // Reciprocal excitation of autogenic inhibition reflex (+IbInAgMnAn) and Ia to IbIn
+  if(m_evolveIBInterSeg)
+  {
+    const int numCons = 2; // +IbInAgMnAn, +IbAgIaAg
+    if(m_evolveIBINsym)
+      numGenes += numReflexes * numCons;
+    else
+      numGenes += numMuscles * numCons;
+  }
+  
+  // Neural transfer function slopes
+  if(m_evolveSigmoidSlope)
+  {
+    int numSlopes = 0;
+    numSlopes += m_evolveIBINsym ? 1 : 2;
+    numSlopes += m_evolveIAINsym ? 1 : 2;
+    numSlopes += m_evolveRenshawSym ? 1 : 2;
+    numSlopes += m_evolveMNAsNeuron ? (m_evolveMNsym ? 1 : 2) : 0;
+    
+    numGenes += numReflexes * numSlopes; // 2 reflexes
+  }
+  
+  // motor neurons as neuron (or just rectified sum of inputs)
+  if(m_evolveMNAsNeuron)
+  {
+    const int numMNparams = 2; // bias and tau
+    if(m_evolveMNsym)
+      numGenes += numReflexes * numMNparams;
+    else
+      numGenes += numMuscles * numMNparams;
   }
   
   // Parameters of ifv neurons
@@ -580,10 +751,11 @@ int EvoArmCoCon::getNumGenes()
   // Intersegmental inputs (weight to mn)
   if(m_evolveIntersegmentInputs)
   {
-    if(m_symmetricMuscles)
-      numGenes += m_numMoves * numReflexes;
+    int moveMult = m_evolveIntersegPerMove ? m_numMoves : 1;
+    if(m_evolveIntersegSym)
+      numGenes += moveMult * numReflexes;
     else
-      numGenes += m_numMoves * numMuscles;
+      numGenes += moveMult * numMuscles;
   }
   
   if(m_evolveDistalCommandDelay)

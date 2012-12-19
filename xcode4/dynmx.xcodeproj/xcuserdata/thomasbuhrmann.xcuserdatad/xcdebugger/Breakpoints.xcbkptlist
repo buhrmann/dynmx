@@ -2,6 +2,60 @@
 <Bucket
    type = "1"
    version = "1.0">
+   <FileBreakpoints>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../src/dynmx/GA.cpp"
+         timestampString = "374404137.934595"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "495"
+         endingLineNumber = "495"
+         landmarkName = "GA::fromXml(const ci::XmlTree&amp; parent, bool includeGenomes)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../src/dynmx/EvoArmCoConDecoder.cpp"
+         timestampString = "377099159.750118"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "362"
+         endingLineNumber = "362"
+         landmarkName = "EvoArmCoCon::decodeGenome(const double* genome)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../src/dynmx/Reflex.cpp"
+         timestampString = "377456127.795687"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "316"
+         endingLineNumber = "316"
+         landmarkName = "Reflex::updateInContractionCoords(float dt)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "../src/dynmx/Reflex.cpp"
+         timestampString = "377456284.722232"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "269"
+         endingLineNumber = "269"
+         landmarkName = "Reflex::updateInContractionCoords(float dt)"
+         landmarkType = "5">
+      </FileBreakpoint>
+   </FileBreakpoints>
    <SymbolicBreakpoints>
       <SymbolicBreakpoint
          shouldBeEnabled = "Yes"

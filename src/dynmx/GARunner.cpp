@@ -33,7 +33,6 @@ GARunner::GARunner(Evolvable* evolvable) : m_evolvable(evolvable)
 //----------------------------------------------------------------------------------------------------------------------
 void GARunner::init()
 {
-  
   m_reducedMutationMax = 0.001;
   m_reduceMutationMaxAt = -1;  // Indicates no automatic reduction of mutation rate
 
@@ -84,13 +83,44 @@ void GARunner::init()
     bool incremental = ga.getChild("Incremental").getValue<bool>();
     if (incremental)
     {
-      double initialMutMax = ga.getChild("Incremental").getAttributeValue<double>("initialMutation"); 
       std::string fnm = ga.getChild("LoadFrom").getAttributeValue<std::string>("Value");
-      ci::XmlTree prevResults(ci::loadFile(fnm));
-      m_ga->fromXml(prevResults);
-      m_ga->randomise(0, initialMutMax);
-      reset(false);
-      
+      if(ga.getChild("Incremental").getAttributeValue<bool>("seedOnly", 0))
+      {
+        // Read in best individual from last run
+        // Convert from path to GA_Result.xml to Best_Genome.xml
+        std::string bestFnm = fnm.substr(0, fnm.rfind("/") + 1) + "GA_BestGenome.xml";
+        double bestGenome [numGenes];
+        readBestGenome(bestFnm, &bestGenome[0], numGenes);
+        
+        if(ga.getChild("Incremental").getAttributeValue<bool>("seedAll", 1))
+        {
+          // Randomly distribute population around previous best
+          for (int i = 0; i < populationSize; ++i)
+          {
+            m_ga->setGenome(i, &bestGenome[0], MAX_NEG_FLOAT);
+            double initialMutMax = ga.getChild("Incremental").getAttributeValue<double>("initialMutation");
+            m_ga->randomise(0, initialMutMax);
+          }
+          // elitist: keep best unmutated
+          m_ga->setGenome(0, &bestGenome[0], MAX_NEG_FLOAT);
+          reset(false);
+        }
+        else
+        {
+          // Random population with best previous genome as single elitist seed
+          reset(true);
+          m_ga->setGenome(0, &bestGenome[0], MAX_NEG_FLOAT);
+        }
+      }
+      else
+      {
+        // Pick up from previous run with whole population and some initial jitter
+        double initialMutMax = ga.getChild("Incremental").getAttributeValue<double>("initialMutation");
+        ci::XmlTree prevResults(ci::loadFile(fnm));
+        m_ga->fromXml(prevResults);
+        m_ga->randomise(0, initialMutMax);
+        reset(false);
+      }
     }
     else
     {

@@ -80,7 +80,7 @@ public:
   bool fromXml(const ci::XmlTree& xml, bool includeGenomes = true);
 
   /// Allow manual setting of the genomes in the population
-  void setGenome(int iGenome, const double *genome, float fitness);
+  void setGenome(int iGenome, const double *genome, float fitness=MAX_NEG_FLOAT);
 
   void randomise(bool absolute, double maxAmount);
 

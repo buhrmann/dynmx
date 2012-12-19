@@ -104,6 +104,7 @@ void GA::randomise(bool absolute, double maxAmount)
 {
   if(absolute)
   {
+    // Set to new random values in [0,1]
     for (int i = 0; i < m_popSize; i++)
     {
       for (int j = 0; j < m_genomeLength; j++)
@@ -115,11 +116,12 @@ void GA::randomise(bool absolute, double maxAmount)
   }
   else 
   {
+    // Jitter values by +- maxAmount
     for (int i = 0; i < m_popSize; i++)
     {
       for (int j = 0; j < m_genomeLength; j++)
       {
-        m_genomes[i][j] += maxAmount * ran1(&m_idum);
+        m_genomes[i][j] += (2 * maxAmount * ran1(&m_idum)) - maxAmount;
         m_genomes[i][j] = clamp(m_genomes[i][j], 0.0, 1.0);        
       }
     }   

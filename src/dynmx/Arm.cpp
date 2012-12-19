@@ -408,6 +408,7 @@ void Arm::toXml(ci::XmlTree& xml)
   ci::XmlTree arm ("Arm", "");
   arm.setAttribute("Gravity", m_gravity);
   arm.setAttribute("Integrator", m_integrator == kInteg_heun ? "heun" : "euler");
+  arm.setAttribute("InteractionTorques", m_interactionTorques ? 1 : 0);
   
   // Skeleton
   ci::XmlTree upperArm("UpperArm", "");
@@ -457,7 +458,9 @@ void Arm::record(Recorder& recorder)
     recorder.push_back("torque" + jointNames[i], m_state.torques[i]); 
   }
   recorder.push_back("x", m_effectorPos.x); 
-  recorder.push_back("y", m_effectorPos.y); 
+  recorder.push_back("y", m_effectorPos.y);
+  recorder.push_back("elbX", m_elbowPos.x);
+  recorder.push_back("elbY", m_elbowPos.y);
 }
   
   

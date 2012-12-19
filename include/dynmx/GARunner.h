@@ -43,6 +43,28 @@ public:
   virtual void record(Recorder& recorder) {};
 };
 
+//----------------------------------------------------------------------------------------------------------------------
+static void readBestGenome(const std::string& fnm, double* retGenome, int genomeLength)
+{
+  ci::XmlTree bestGenomeXml(ci::loadFile(fnm));
+  assert(bestGenomeXml.hasChild("GABestGenome"));
+  
+  // Extract the genome
+  const ci::XmlTree& genome = bestGenomeXml / "GABestGenome/Genome";
+  
+  // Convert to double array
+  int numGenes = genome["NumGenes"].as<int>();
+  assert(numGenes == genomeLength);
+  int i = 0;
+  for (ci::XmlTree::ConstIter gene = genome.begin(); gene != genome.end(); ++gene)
+  {
+    const double d = gene->getAttributeValue<float>("Value");
+    retGenome[i] = d;
+    i++;
+  }
+
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // Interface for apps running a GA

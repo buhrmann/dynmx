@@ -306,6 +306,7 @@ static inline std::vector<T> crossCorrelationNormalised(std::vector<T>& v1, std:
 }
 
 // Smooth step according to Perlin (http://en.wikipedia.org/wiki/Smoothstep)
+// Zero 1st and 2nd derivative at beginning and end
 //----------------------------------------------------------------------------------------------------------------------
 static const float smoothStep(float min, float max, float x)
 {

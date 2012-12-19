@@ -18,6 +18,7 @@
 		5323E6B60EAFCA7E003A9687 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5323E6B50EAFCA7E003A9687 /* QTKit.framework */; };
 		53E3CDFC0E86099300238D2B /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53E3CDFB0E86099300238D2B /* Carbon.framework */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		D630C7951645396700F2ABE5 /* Topology.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D630C7941645396700F2ABE5 /* Topology.cpp */; };
 		D6D9F12314DC62D6009C0C95 /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10014DC62D6009C0C95 /* App.cpp */; };
 		D6D9F12414DC62D6009C0C95 /* Arm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10114DC62D6009C0C95 /* Arm.cpp */; };
 		D6D9F12514DC62D6009C0C95 /* ArmMuscled.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10214DC62D6009C0C95 /* ArmMuscled.cpp */; };
@@ -81,6 +82,10 @@
 		53E3CDFB0E86099300238D2B /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* dynmx.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dynmx.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D630C7941645396700F2ABE5 /* Topology.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Topology.cpp; path = ../src/dynmx/Topology.cpp; sourceTree = "<group>"; };
+		D630C7961645397F00F2ABE5 /* SMCAgentGaussian.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCAgentGaussian.h; path = ../include/dynmx/SMCAgentGaussian.h; sourceTree = "<group>"; };
+		D630C7971645397F00F2ABE5 /* SMCAgentLineDis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCAgentLineDis.h; path = ../include/dynmx/SMCAgentLineDis.h; sourceTree = "<group>"; };
+		D630C7981645397F00F2ABE5 /* Topology.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Topology.h; path = ../include/dynmx/Topology.h; sourceTree = "<group>"; };
 		D6D9F0C614DC62A4009C0C95 /* App.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = App.h; path = ../include/dynmx/App.h; sourceTree = "<group>"; };
 		D6D9F0C714DC62A4009C0C95 /* Arm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Arm.h; path = ../include/dynmx/Arm.h; sourceTree = "<group>"; };
 		D6D9F0C814DC62A4009C0C95 /* ArmMuscled.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmMuscled.h; path = ../include/dynmx/ArmMuscled.h; sourceTree = "<group>"; };
@@ -256,6 +261,8 @@
 				D6D9F0EA14DC62A4009C0C95 /* Simulation.h */,
 				D6D9F11C14DC62D6009C0C95 /* SimulationFactory.cpp */,
 				D6D9F0EB14DC62A4009C0C95 /* SimulationFactory.h */,
+				D630C7981645397F00F2ABE5 /* Topology.h */,
+				D630C7941645396700F2ABE5 /* Topology.cpp */,
 				D6D9F12214DC62D6009C0C95 /* View.cpp */,
 				D6D9F0F314DC62A4009C0C95 /* View.h */,
 			);
@@ -465,6 +472,8 @@
 				D6D9F0ED14DC62A4009C0C95 /* SMCAgentEvo.h */,
 				D6D9F11F14DC62D6009C0C95 /* SMCAgentViz.cpp */,
 				D6D9F0EE14DC62A4009C0C95 /* SMCAgentViz.h */,
+				D630C7961645397F00F2ABE5 /* SMCAgentGaussian.h */,
+				D630C7971645397F00F2ABE5 /* SMCAgentLineDis.h */,
 				D6D9F12014DC62D6009C0C95 /* SMCEnvironment.cpp */,
 				D6D9F0EF14DC62A4009C0C95 /* SMCEnvironment.h */,
 				D6D9F12114DC62D6009C0C95 /* SMCEnvironmentViz.cpp */,
@@ -536,7 +545,7 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0450;
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "dynmx" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -611,6 +620,7 @@
 				D6D9F1FB14DC64A9009C0C95 /* SimpleGUI.cpp in Sources */,
 				D6E6E57014E15C2E00FE6B07 /* Spin.cpp in Sources */,
 				D6FFB99D14F860900057C7AD /* EvoArmCoConDecoder.cpp in Sources */,
+				D630C7951645396700F2ABE5 /* Topology.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -620,9 +630,11 @@
 		C01FCF4B08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CINDER_PATH = ../../Cinder;
-				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
-				CLANG_CXX_LIBRARY = "compiler-default";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libstdc++";
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -635,7 +647,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = dynmx_Prefix.pch;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_VERSION = "";
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
@@ -652,9 +664,11 @@
 		C01FCF4C08A954540054247B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CINDER_PATH = ../../Cinder;
-				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
-				CLANG_CXX_LIBRARY = "compiler-default";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libstdc++";
+				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -669,7 +683,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = dynmx_Prefix.pch;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_VERSION = "";
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
@@ -688,13 +702,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = i386;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CINDER_PATH = ../../../Cinder;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
-				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				GCC_CHECK_RETURN_VALUE_OF_OPERATOR_NEW = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_VERSION = "";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -707,9 +722,9 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/boost\"";
 				MACH_O_TYPE = mh_execute;
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				RUN_CLANG_STATIC_ANALYZER = YES;
-				SDKROOT = macosx10.6;
+				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\" ../include";
 			};
 			name = Debug;
@@ -718,12 +733,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = i386;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CINDER_PATH = ../../../Cinder;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
-				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_VERSION = "";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -735,8 +752,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/boost\"";
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
-				SDKROOT = macosx10.6;
+				MACOSX_DEPLOYMENT_TARGET = "";
+				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\" ../include";
 			};
 			name = Release;

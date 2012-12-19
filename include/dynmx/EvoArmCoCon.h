@@ -129,6 +129,7 @@ protected:
   bool m_fitnessEndPointOnly;
   bool m_fitnessEvalVel;
   bool m_fitnessEvalCoact;
+  float m_fitnessEvalCoactMax;
   double m_trialFitness;
   double m_fitness;
   
@@ -151,20 +152,29 @@ protected:
   bool m_evolveIAINsimple;
   bool m_evolveIAINsym;  
   bool m_evolveRenshaw;
+  bool m_evolveRenshawSym;
   bool m_evolveIBIN;
   bool m_evolveIBINsym;
+  bool m_evolveIBINderiv;
+  bool m_evolveIBInterSeg;
+  bool m_evolveIBRecExcIa;
   bool m_evolveIFV;
   bool m_evolveSFV;
   bool m_evolveOpenLoop;
   int m_openLoopSymmetry;
   bool m_evolveIntersegmentInputs;
+  bool m_evolveIntersegPerMove;
+  bool m_evolveIntersegSym;
+  bool m_evolveSigmoidSlope;
+  bool m_evolveMNAsNeuron;
+  bool m_evolveMNsym;
 
   bool m_evolveHillParams;
   bool m_evolveMinJerkDelay;
   bool m_evolveVelRef;
   bool m_evolveDistalCommandDelay;
   
-  bool m_commandTrajSmooth;
+  int m_commandTrajSmooth;
   bool m_useMuscleCoords;
   
   float m_maxOpenLoop;
@@ -172,6 +182,8 @@ protected:
   float m_openLoopTauMaxDeact;    
   float m_maxInterseg;
   float m_maxDistalDelay;
+  
+  bool m_hasHitLimit;
 };
   
 } // namespace dmx

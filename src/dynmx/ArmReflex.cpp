@@ -69,6 +69,10 @@ void ArmReflex::init()
     }
   }
   
+  // HACKY!!!
+  m_reflexes[0]->setOtherReflex(m_reflexes[1]);
+  m_reflexes[1]->setOtherReflex(m_reflexes[0]);
+  
   if (SETTINGS->hasChild("Config/Arm/TorqueFeedback"))
     m_torqueFdbIsMeasured = SETTINGS->getChild("Config/Arm/TorqueFeedback").getAttributeValue<bool>("Measured");
   else
