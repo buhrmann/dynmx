@@ -44,7 +44,7 @@ public:
 };
 
 //----------------------------------------------------------------------------------------------------------------------
-static void readBestGenome(const std::string& fnm, double* retGenome, int genomeLength)
+static double readBestGenome(const std::string& fnm, double* retGenome, int genomeLength)
 {
   ci::XmlTree bestGenomeXml(ci::loadFile(fnm));
   assert(bestGenomeXml.hasChild("GABestGenome"));
@@ -63,6 +63,7 @@ static void readBestGenome(const std::string& fnm, double* retGenome, int genome
     i++;
   }
 
+  return genome.getAttributeValue<double>("Fitness", MAX_NEG_FLOAT);
 }
 
 

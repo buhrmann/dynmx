@@ -46,6 +46,7 @@ public:
   void setOtherReflex(Reflex* r) { m_otherReflex = r; };
   void setDesiredAngles(double elbAngle, double shdAngle); // Get desired length from arm's desired joint angles    
   void setDesiredLength(double l0, double l1); // Will also update desired velocity, contraction etc...
+  void setGoSignal(double go) { m_go = go; };
   void setOpenLoop(double c0, double c1);  
   void setIntersegmentInput(double i1, double i2);
   void setSigmoidSlopes(double ia0, double ia1, double ib0, double ib1, double rn0, double rn1, double mn0, double mn1);
@@ -65,9 +66,9 @@ public:
   void setMotoNeuronParameters(double Wspmn0, double Wspmn1);
   void setMNAsNeuron(double t0, double t1, double b0, double b1);
   void setIntersegmentalParameters(double Wisep0, double Wisep1);
-  void setIbIntersegParameters(double ib0Ib0, double ib1Ib0, double ib0Ib1, double ib1Ib1,
-                               double ib0Mn0, double ib1Mn0, double ib0Mn1, double ib1Mn1);
+  void setIbIntersegParameters(const std::vector<double>& weights, int I);
   void setIbRecExcIaParameters(double IbIn1Mn0, double IbIn0Mn1, double Ia0IbIn0, double Ia1IbIn1);
+  void flipIbIntersegSigns(const std::vector<int>& signs, int start);
   void setCoconAsCCommand(bool b) { m_coconAsCCommand = b; };
   void setTorqueFeedbackPosMod(bool b) { m_trqFeedbackPosMod = b; };
   void setOpenLoopTimeConstant(double act, double deact) { m_openLoopTimeConstants[0] = act; m_openLoopTimeConstants[1] = deact; };
@@ -247,6 +248,8 @@ protected:
   double m_commandedLength[2];
   double m_commandedContraction[2];
   
+  double m_go;
+  
   Muscle* m_muscles [2];
   Reflex* m_otherReflex;
 };
@@ -262,18 +265,30 @@ inline void Reflex::setIbRecExcIaParameters(double IbIn1Mn0, double IbIn0Mn1, do
   m_Wiaibin[1] = Ia1IbIn1;
 }
   
-inline void Reflex::setIbIntersegParameters(double ib0Ib0, double ib1Ib0, double ib0Ib1, double ib1Ib1,
-                                            double ib0Mn0, double ib1Mn0, double ib0Mn1, double ib1Mn1)
+inline void Reflex::setIbIntersegParameters(const std::vector<double>& weights, int I)
 {
-  m_WisibAg[0] = ib0Ib0;
-  m_WisibAg[1] = ib0Ib1;
-  m_WisibAn[0] = ib1Ib0;
-  m_WisibAn[1] = ib1Ib1;
+  m_WisibAg[0] = weights[I+0];
+  m_WisibAn[0] = weights[I+1];
+  m_WisibAg[1] = weights[I+2];
+  m_WisibAn[1] = weights[I+3];
   
-  m_WisibAgMn[0] = ib0Mn0;
-  m_WisibAgMn[1] = ib0Mn1;
-  m_WisibAnMn[0] = ib1Mn0;
-  m_WisibAnMn[1] = ib1Mn1;
+  m_WisibAgMn[0] = weights[I+4];
+  m_WisibAnMn[0] = weights[I+5];
+  m_WisibAgMn[1] = weights[I+6];
+  m_WisibAnMn[1] = weights[I+7];
+}
+  
+inline void Reflex::flipIbIntersegSigns(const std::vector<int>& signs, int start)
+{
+  m_WisibAg[0] *= signs[start+0];
+  m_WisibAg[1] *= signs[start+1];
+  m_WisibAn[0] *= signs[start+2];
+  m_WisibAn[1] *= signs[start+3];
+  
+  m_WisibAgMn[0] *= signs[start+4];
+  m_WisibAgMn[1] *= signs[start+5];
+  m_WisibAnMn[0] *= signs[start+6];
+  m_WisibAnMn[1] *= signs[start+7];
 }
   
 //----------------------------------------------------------------------------------------------------------------------

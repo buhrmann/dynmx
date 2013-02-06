@@ -90,26 +90,26 @@ void GARunner::init()
         // Convert from path to GA_Result.xml to Best_Genome.xml
         std::string bestFnm = fnm.substr(0, fnm.rfind("/") + 1) + "GA_BestGenome.xml";
         double bestGenome [numGenes];
-        readBestGenome(bestFnm, &bestGenome[0], numGenes);
+        double bestFit = readBestGenome(bestFnm, &bestGenome[0], numGenes);
         
         if(ga.getChild("Incremental").getAttributeValue<bool>("seedAll", 1))
         {
           // Randomly distribute population around previous best
+          double initialMutMax = ga.getChild("Incremental").getAttributeValue<double>("initialMutation");
           for (int i = 0; i < populationSize; ++i)
           {
             m_ga->setGenome(i, &bestGenome[0], MAX_NEG_FLOAT);
-            double initialMutMax = ga.getChild("Incremental").getAttributeValue<double>("initialMutation");
-            m_ga->randomise(0, initialMutMax);
           }
-          // elitist: keep best unmutated
-          m_ga->setGenome(0, &bestGenome[0], MAX_NEG_FLOAT);
+          m_ga->randomise(false, initialMutMax);
           reset(false);
+          // elitist: keep best unmutated
+          m_ga->setGenome(0, &bestGenome[0], bestFit);
         }
         else
         {
           // Random population with best previous genome as single elitist seed
           reset(true);
-          m_ga->setGenome(0, &bestGenome[0], MAX_NEG_FLOAT);
+          m_ga->setGenome(0, &bestGenome[0], bestFit);
         }
       }
       else
@@ -118,7 +118,7 @@ void GARunner::init()
         double initialMutMax = ga.getChild("Incremental").getAttributeValue<double>("initialMutation");
         ci::XmlTree prevResults(ci::loadFile(fnm));
         m_ga->fromXml(prevResults);
-        m_ga->randomise(0, initialMutMax);
+        m_ga->randomise(false, initialMutMax);
         reset(false);
       }
     }

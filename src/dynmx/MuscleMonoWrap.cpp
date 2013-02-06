@@ -16,7 +16,7 @@ namespace dmx
 #define TEST_CONST_MOMEMT_ARM 1
 
 //----------------------------------------------------------------------------------------------------------------------  
-MuscleMonoWrap::MuscleMonoWrap(ArmMuscled* arm, float originDist, float insertDist, Joint jointId, bool isFlex) :
+MuscleMonoWrap::MuscleMonoWrap(ArmMuscled* arm, double originDist, double insertDist, Joint jointId, bool isFlex) :
   m_joint(jointId)
 {
   m_arm = arm;

@@ -101,11 +101,16 @@ void App::prepareSettings( Settings *settings )
   }
   
   // VSync
+  bool vsync;
   if (SETTINGS->hasChild("Config/Globals/VSync"))
   {
-    bool vsync = SETTINGS->getChild("Config/Globals/VSync")["Value"].as<bool>();
-    m_view->setVSync(vsync);
+    vsync = SETTINGS->getChild("Config/Globals/VSync")["Value"].as<bool>();
   }
+  else
+  {
+    vsync = false;
+  }
+  m_view->setVSync(vsync);
 }
 
 //--------------------------------------------------------------------------------------------------------------------

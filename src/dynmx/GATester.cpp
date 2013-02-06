@@ -81,7 +81,7 @@ void GATester::init()
       }
       
       // Decode
-      m_evolvable->decodeGenome(&genes[0]);  
+      m_evolvable->decodeGenome(&genes[0]);
       
       // Store genome in xml file, even if not read here. It could have been decoded pre
       m_modelXml->push_back(ci::XmlTree(genome));

@@ -374,7 +374,7 @@ void CTRNN::fromXml(const ci::XmlTree& xml)
     for (; neuron != xml.end(); ++neuron)
     {
       const ci::XmlTree& n = *neuron;
-      int i = n.getAttributeValue<double>("Index");
+      int i = n.getAttributeValue<int>("Index");
       biases[i] = n.getAttributeValue<double>("Bias");
       taus[i] = n.getAttributeValue<double>("TimeConstant");
       gains[i] = n.getAttributeValue<double>("Gain");
@@ -382,7 +382,7 @@ void CTRNN::fromXml(const ci::XmlTree& xml)
       ci::XmlTree::ConstIter weight = n.begin("Weight");
       for (; weight != n.end(); ++weight)
       {
-        int from = weight->getAttributeValue<double>("From");
+        int from = weight->getAttributeValue<int>("From");
         double w = weight->getValue<double>();
         weights[from][i] = w;
       }

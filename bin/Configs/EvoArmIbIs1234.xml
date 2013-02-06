@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Config>
 	<Globals>
-		<Visual Value="0"/>
+		<Visual Value="1"/>
 		<WindowSize Width="1200" Height="1000"/>
 		<FrameRate Value="1000"/>
 		<FullScreen Value="0"/>
 		<VSync Value="0"/>
 		<Model Value="GA"/>
-		<DebugLevel Value="1"/>
+		<DebugLevel Value="3"/>
 		<PlotDuration Value="0.5"/>
 		<OutputFolder Name="/Users/thomasbuhrmann/Experiments/Arm/Output"/>
 	</Globals>
@@ -21,7 +21,7 @@
 				<Move Duration="0.3" LeadIn="0.1" LeadOut="0.2">
 					<From x="90" y="60"/>
 					<To x="60" y="80"/>
-				</Move>
+				</Move>				
 				<Move Duration="0.3" LeadIn="0.1" LeadOut="0.2">
 					<From x="70" y="40"/>
 					<To x="40" y="20"/>
@@ -29,23 +29,23 @@
 				<Move Duration="0.3" LeadIn="0.1" LeadOut="0.2">
 					<From x="70" y="40"/>
 					<To x="40" y="60"/>
-				</Move>				
+				</Move>
 			</DesiredTrajectory>
 			<EvoFlags>
 				<Muscles symmetric="0" hillParams="0">0</Muscles>
 				<Spindles velRef="1" symmetric="1" symmetricWeights="1" perMove="0">1</Spindles>
-				<Iain simple="0" symmetric="0">1</Iain>
-				<Ibin derivative="0" symmetric="0" interseg="1" recExcIa="1">1</Ibin>
-				<Renshaw symmetric="0">1</Renshaw>
+				<Iain simple="0" symmetric="1">1</Iain>
+				<Ibin derivative="0" symmetric="0" interseg="1" flipIntersegWeights="0" recExcIa="1">1</Ibin>
+				<Renshaw symmetric="1">1</Renshaw>
 				<MN symmetric="1">0</MN>
 				<Neurons sigSlope="1"/>
 				<Ifv>0</Ifv>
 				<Sfv>0</Sfv>
-				<OpenLoop max="0.3" symmetric="0" tauMaxAct="0.05" tauMaxDeact="0.5">1</OpenLoop>
+				<OpenLoop max="0.3" symmetric="0" tauMaxAct="0.05" tauMaxDeact="0.5" cutoff="0">1</OpenLoop>
 				<InterSegmentInput symmetric="0" max="1.0" perMove="0">0</InterSegmentInput>
 				<DistalCommandDelay max="0.05" perMove="0">0</DistalCommandDelay>
 				<RampDuration perMove="0">1</RampDuration>
-				<Friction>0</Friction>
+				<Friction>1</Friction>
 				<DecodeLimits>
 					<ArmLimits>
 						<jointRadius min="0.01" max="0.05"/>
@@ -75,24 +75,24 @@
 			</FitnessFunction>
 			<recordIsometric>0</recordIsometric>
 		</Evolvable>
-		<Incremental initialMutation="0.1" seedOnly="1" seedAll="1">1</Incremental>
-		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/Output/12_12_18__18_25_50/GA_Result.xml"/>
-		<PopulationSize Value="400"/>
-		<DemeSize Value="10"/>
-		<NumGenerations Value="2000"/>
-		<MutationMax Value="0.01"/>
-		<MutationMaxReduced Value="0.005"/>
-		<MutationMaxReduceAt Value="1500"/>
-		<RecombinationRate Value="0.5"/>
+		<Incremental initialMutation="0.0" seedOnly="1" seedAll="1">1</Incremental>
+		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/Output/13_01_16__12_26_42/GA_Result.xml"/>
+		<PopulationSize Value="300"/>
+		<DemeSize Value="20"/>
+		<NumGenerations Value="10"/>
+		<MutationMax Value="0.0"/>
+		<MutationMaxReduced Value="0.0001"/>
+		<MutationMaxReduceAt Value="350"/>
+		<RecombinationRate Value="1.0"/>
 		<RecombinationRateReduced Value="0.75"/>
 		<AvoidReevaluation Value="1"/>
 		<NumTrials Value="1"/>
 		<SaveBestEachGeneration Value="0"/>
 		<AutoEval Run="1"/>
-		<Eval Run="0">
-			<NumTrials Value="1"/>
-			<RecordState Value="0"/>
-			<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/Output/12_12_17__17_18_17/GA_BestGenome.xml"/>
+		<Eval Run="1">
+			<NumTrials Value="2"/>
+			<RecordState Value="1"/>
+			<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/Output/13_01_16__12_26_42/GA_BestGenome.xml"/>
 		</Eval>
 	</GA>
 	<Arm Gravity="0.0" Integrator="euler" InteractionTorques="1">
@@ -182,7 +182,7 @@
 				<Bias Ag="-0.96505928455390588" An="-8.6163306319025637"/>
 				<Tau Ag="85.026511649748016" An="60.860349773738854"/>
 			</IbIn>
-			<aMN asNeuron="1">
+			<aMN asNeuron="0">
 				<Slope Ag="1" An="1"/>
 				<Bias Ag="0" An="0"/>
 				<Tau Ag="100" An="100"/>
@@ -235,7 +235,7 @@
 				<Bias Ag="-5.5174254153241602" An="-9.921036775999351"/>
 				<Tau Ag="59.448470359344462" An="72.25760708773376"/>
 			</IbIn>
-			<aMN asNeuron="1">
+			<aMN asNeuron="0">
 				<Slope Ag="1" An="1"/>
 				<Bias Ag="0" An="0"/>
 				<Tau Ag="100" An="100"/>

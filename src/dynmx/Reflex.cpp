@@ -35,6 +35,8 @@ Reflex::Reflex(Muscle* ag, Muscle* an)
 //----------------------------------------------------------------------------------------------------------------------  
 void Reflex::init()
 {
+  m_go = 1.0;
+  
   // Spindle 
   m_Kspp[0] = m_Kspp[1] = 1.0;  // positional gain
   m_Kspv[0] = m_Kspv[1] = 0.0;  // velocity gain
@@ -52,13 +54,15 @@ void Reflex::init()
   m_Wrnia[0] = m_Wrnia[1] = 0.0;    // Renshaw input  
   m_Waia[0]  = m_Waia[1]  = 0.0;    // Desired contraction input
   m_Biain[0] = m_Biain[1] = 0.0;    // Ia Biases
+  m_Kiain[0] = m_Kiain[1] = 1.0;
   m_Tiain[0] = m_Tiain[1] = 100.0;  // Integration time constant (really 1/t)  
   
   // Renshaw
   m_Wmnrn[0] = m_Wmnrn[1] = 0.0f;  
   m_Wrnrn[0] = m_Wrnrn[1] = 0.0f;  
   m_Brn[0] = m_Brn[1] = 0.0;
-  m_Trn[0] = m_Trn[1] = 100.0;  
+  m_Trn[0] = m_Trn[1] = 100.0;
+  m_Krn[0] = m_Krn[1] = 1.0;
   
   // IbIn
   m_Wglib[0] = m_Wglib[1] = 0.0;   // Golgi force input
@@ -67,7 +71,8 @@ void Reflex::init()
   m_Wibib[0] = m_Wibib[1] = 0.0;   // Reciprocal inhibition
   m_WisibAg[0] = m_WisibAg[1] = m_WisibAn[0] = m_WisibAn[1] = 0.0; // Intersegmental connections
   m_Bib[0] = m_Bib[1] = 0.0;
-  m_Tib[0] = m_Tib[1] = 100.0;  
+  m_Tib[0] = m_Tib[1] = 100.0;
+  m_Kib[0] = m_Kib[1] = 1.0;
   
   // Alpha motor neuron
   m_Wiamn[0] = m_Wiamn[1] = 0.0f;
@@ -78,6 +83,7 @@ void Reflex::init()
   m_WeIbinMn[0] = m_WeIbinMn[1] = 0.0;
   m_Bmn[0] = m_Bmn[1] = 0.0;
   m_Tmn[0] = m_Tmn[1] = 100.0;
+  m_Kmn[0] = m_Kmn[1] = 1.0;
 
   // Inertial force compensation (velocity error)
   m_Kifv[0] = m_Kifv[1] = 0.0;
@@ -100,6 +106,8 @@ void Reflex::init()
 //----------------------------------------------------------------------------------------------------------------------      
 void Reflex::reset()
 {
+  m_go = 1.0;
+  
   m_IaIn[0] = m_IaIn[1] = 0.0;
   m_IaInOut[0] = neuronActivation(m_IaIn[0] + m_Biain[0], m_Kiain[0]);
   m_IaInOut[1] = neuronActivation(m_IaIn[1] + m_Biain[1], m_Kiain[1]);
@@ -117,6 +125,10 @@ void Reflex::reset()
   {
     m_alpha[0] = neuronActivation(m_alphaState[0] + m_Bmn[0], m_Kmn[0]);
     m_alpha[1] = neuronActivation(m_alphaState[1] + m_Bmn[1], m_Kmn[1]);
+  }
+  else
+  {
+    m_alpha[0] = m_alpha[1] = 0.0;
   }
 
   m_sfv[0] = m_sfv[1] = 0.0;
@@ -290,7 +302,7 @@ void Reflex::updateInContractionCoords(float dt)
   currentVelErrRes0 = velErrSign0 * powf(fabs(currentVelErrRes0), m_Espv[0]);
   currentVelErrRes1 = velErrSign1 * powf(fabs(currentVelErrRes1), m_Espv[1]);  
   // Filter out fast oscillations
-  const float filterGain = 0.7;  
+  const float filterGain = 0.7f;
   m_spindleVelRes[0] = filterGain * m_spindleVelRes[0] + (1 - filterGain) * currentVelErrRes0;
   m_spindleVelRes[1] = filterGain * m_spindleVelRes[1] + (1 - filterGain) * currentVelErrRes1;  
   
@@ -377,26 +389,39 @@ void Reflex::updateInContractionCoords(float dt)
   m_ofpv[1] = m_ifv[1] + m_sfv[1];// + (m_length[1] - m_desiredLength[1]);
 #endif
   
+  // Go signal
+  double go0 = m_go;
+  double go1 = m_go;
+  
+  const bool useErrorGoSignal = false;
+  if(useErrorGoSignal)
+  {
+    const double inhThresh = 0.1;
+    go0 = 1.0 - (std::max(inhThresh - m_posErr[0], 0.0) / inhThresh); // [0,0.1] -> [0,1]
+    go1 = 1.0 - (std::max(inhThresh - m_posErr[1], 0.0) / inhThresh); // [0,0.1] -> [0,1]
+  }
+  
+  
   // Alpha motor neuron 
   double aMNinput0 =  m_ofpv[0] 
   + (m_Wspmn[0] * m_spindlePri[0])
-  - (m_Wrnmn[0] * m_RnOut[0]) 
-  - (m_Wiamn[0] * m_IaInOut[1]) 
-  - (m_Wibmn[0] * m_IbInOut[0])
-  + (m_WeIbinMn[0] * m_IbInOut[1])
-  + (m_WisibAgMn[0] * m_otherReflex->getIbInOutput(0))
-  + (m_WisibAnMn[0] * m_otherReflex->getIbInOutput(1))
-  + (m_Wisep[0] * interSegDelayed[0]);
+  - (m_Wrnmn[0] * m_RnOut[0] * go0)
+  - (m_Wiamn[0] * m_IaInOut[1] * go0)
+  - (m_Wibmn[0] * m_IbInOut[0] * go0)
+  + (m_WeIbinMn[0] * m_IbInOut[1] * go0)
+  + (m_WisibAgMn[0] * m_otherReflex->getIbInOutput(0) * go0)
+  + (m_WisibAnMn[0] * m_otherReflex->getIbInOutput(1) * go0)
+  + (m_Wisep[0] * interSegDelayed[0] * go0);
   
   double aMNinput1 = m_ofpv[1] 
   + (m_Wspmn[1] * m_spindlePri[1])
-  - (m_Wrnmn[1] * m_RnOut[1]) 
-  - (m_Wiamn[1] * m_IaInOut[0]) 
-  - (m_Wibmn[1] * m_IbInOut[1])
-  + (m_WeIbinMn[1] * m_IbInOut[0])
-  + (m_WisibAgMn[1] * m_otherReflex->getIbInOutput(0))
-  + (m_WisibAnMn[1] * m_otherReflex->getIbInOutput(1))
-  + (m_Wisep[1] * interSegDelayed[1]);
+  - (m_Wrnmn[1] * m_RnOut[1] * go1)
+  - (m_Wiamn[1] * m_IaInOut[0] * go1)
+  - (m_Wibmn[1] * m_IbInOut[1] * go1)
+  + (m_WeIbinMn[1] * m_IbInOut[0] * go1)
+  + (m_WisibAgMn[1] * m_otherReflex->getIbInOutput(0) * go1)
+  + (m_WisibAnMn[1] * m_otherReflex->getIbInOutput(1) * go1)
+  + (m_Wisep[1] * interSegDelayed[1] * go1);
   
   if(!m_coconAsCCommand)
   {
@@ -515,6 +540,9 @@ void Reflex::toXml(ci::XmlTree& xml)
   paramToXml(amn, "Bias", &m_Bmn[0]);
   paramToXml(amn, "Tau", &m_Tmn[0]);
   paramToXml(amn, "Slope", &m_Kmn[0]);
+  paramToXml(amn, "WeIbinMn", &m_WeIbinMn[0]);
+  paramToXml(amn, "WisibAgMn", &m_WisibAgMn[0]);
+  paramToXml(amn, "WisibAnMn", &m_WisibAnMn[0]);
   amn.setAttribute("asNeuron", m_MNasNeuron);
   reflex.push_back(amn);
 
@@ -610,6 +638,9 @@ void Reflex::fromXml(const ci::XmlTree& xml)
     paramFromXml(amn, "Bias", &m_Bmn[0]);
     paramFromXml(amn, "Tau", &m_Tmn[0]);
     paramFromXml(amn, "Slope", &m_Kmn[0]);
+    paramFromXml(amn, "WeIbinMn", &m_WeIbinMn[0]);
+    paramFromXml(amn, "WisibAgMn", &m_WisibAgMn[0]);
+    paramFromXml(amn, "WisibAnMn", &m_WisibAnMn[0]);
     m_MNasNeuron = amn.getAttributeValue<bool>("asNeuron");
   }
   

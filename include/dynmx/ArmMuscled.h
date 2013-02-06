@@ -37,7 +37,7 @@ public:
   void resetTo(double elbAngle, double shdAngle);  
   
   // Setters
-  inline void setJointRadii(float elbRad, float shdRad) 
+  inline void setJointRadii(double elbRad, double shdRad)
   { 
     m_jointRadius[JT_elbow] = elbRad; 
     m_jointRadius[JT_shoulder] = shdRad; 
@@ -48,7 +48,7 @@ public:
   // Getters
   int getNumMuscles() const { return m_muscles.size(); };
   Muscle* getMuscle(int i) { assert(i < m_muscles.size()); return m_muscles[i]; };
-  float getJointRadius(int joint) const { return m_jointRadius[joint]; }; 
+  double getJointRadius(int joint) const { return m_jointRadius[joint]; };
   double getDesiredJointAngle(Joint j) const { assert(j==JT_elbow || j==JT_shoulder); return m_desiredAngles[j]; };
   
   // Store output in human readable format
@@ -64,7 +64,7 @@ protected:
 
   // Six muscles: 2 per joint and two biarticulated.
   std::vector<Muscle*> m_muscles;
-  float m_jointRadius[2];
+  double m_jointRadius[2];
   double m_desiredAngles[2];
  
 }; // class ArmPD

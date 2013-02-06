@@ -26,7 +26,7 @@ friend class ArmMuscledViz;
   
 public:
   
-  MuscleBiWrap(ArmMuscled* arm, float originDist, float insertDist, bool isFlexor);
+  MuscleBiWrap(ArmMuscled* arm, double originDist, double insertDist, bool isFlexor);
   
   virtual void init();  
   virtual void reset();

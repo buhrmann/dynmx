@@ -137,7 +137,62 @@ static inline int even(int i)
 static inline int odd(int i)
 {
   return i % 2 != 0;
-}  
+}
+  
+//----------------------------------------------------------------------------------------------------------------------
+template <class T>
+static inline std::string toString (T& t)
+{
+  std::stringstream ss;
+  ss << t;
+  return ss.str();
+}
+ 
+// Serialising of std::vec from and to ci::XmlTree
+//----------------------------------------------------------------------------------------------------------------------
+// Write vec to xml
+template<class T>
+void vecToXml(ci::XmlTree& xml, const std::vector<T>& vec, const std::string childName="Value")
+{
+  for(int i = 0; i < vec.size(); i++)
+  {
+    ci::XmlTree val (childName, toString(vec[i]));
+    xml.push_back(val);
+  }
+}
+  
+// Add a std::vector to an xml tree
+template<class T>
+void vecToXml(ci::XmlTree& xml, const std::string vecName, const std::vector<T>& vec, const std::string childName="Value")
+{
+  ci::XmlTree newTree(vecName, "");
+  vecToXml(newTree, vec, childName);
+  xml.push_back(newTree);
+}
+
+// Read vec from given subtree of xml file
+template<class T>
+void vecFromXml(const ci::XmlTree& xml, std::vector<T>& vec, const std::string childName="Value")
+{
+  vec.clear();
+  ci::XmlTree::ConstIter val = xml.begin(childName);
+  for (; val != xml.end(); ++val)
+  {
+    const double v = val->getValue<T>();
+    vec.push_back(v);
+  }
+}
+  
+// Read vec from xml given subtree name
+template<class T>
+void vecFromXml(const ci::XmlTree& xml, const std::string& name, std::vector<T>& vec, const std::string& childName="Value")
+{
+  if (xml.hasChild(name))
+  {
+    ci::XmlTree& subTree = SETTINGS->getChild(name);
+    vecFromXml(subTree, vec, childName);
+  }
+}
 
 // Vector sum
 //----------------------------------------------------------------------------------------------------------------------
@@ -232,7 +287,7 @@ static inline std::vector<double> crossCorrelation(std::vector<T>& v1, std::vect
                                                    int minDelay, int maxDelay, 
                                                    int i0 = 0, int iN = 0)
 {
-  assert(maxDelay > minDelay);
+  assert(maxDelay >= minDelay);
   assert(i0 >= 0);
   
   const int v1Size = v1.size();
@@ -244,7 +299,7 @@ static inline std::vector<double> crossCorrelation(std::vector<T>& v1, std::vect
   
   // Calculate the correlation series
   std::vector<double> crossCor;
-  for (int delay = minDelay; delay < maxDelay; ++delay) 
+  for (int delay = minDelay; delay <= maxDelay; ++delay)
   {
     double corr = 0;
     for (int i = i0; i < iN; ++i) 
@@ -332,15 +387,6 @@ static const double smoothStep(double min, double max, double x)
 static const double smoothStepUnitInterval(double x)
 {
   return x*x*x*(x*(x*6 - 15) + 10);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-template <class T>
-static inline std::string toString (T& t)
-{
-  std::stringstream ss;
-  ss << t;
-  return ss.str();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

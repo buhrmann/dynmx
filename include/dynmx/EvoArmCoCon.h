@@ -48,6 +48,7 @@ public:
   virtual int getNumGenes();
   virtual void decodeGenome(const double* genome);
   virtual float getFitness();
+  virtual void nextTrial(int trial = 0) { m_trial = trial; };
   
   // Implementation of dmx::Model functions
   virtual void init(); 
@@ -84,6 +85,7 @@ protected:
   
   void createTrajectories();
   void updateCurrentCommand(Target<Pos>& command, Target<Pos>& desired);
+
   int decodeMuscle(int mId, const double* genome, int start);
   void decodeSpindles(int move=0);
   void readDecodeLimits();
@@ -123,6 +125,8 @@ protected:
   std::vector<double> m_distalDelays;
   std::vector<double> m_rampDurations;
   std::vector<double> m_spindleParams;
+  std::vector<double> m_IbIntersegWeights;
+  std::vector<int> m_IbIntersegSwitches;
   
   // Fitness related
   bool m_resetEachMove;
@@ -137,6 +141,7 @@ protected:
   int m_numMoves;
   int m_currentMove;
   int m_currentPhase;
+  int m_trial;
   
   // Flags and params
   bool m_evolveMuscles;
@@ -157,6 +162,7 @@ protected:
   bool m_evolveIBINsym;
   bool m_evolveIBINderiv;
   bool m_evolveIBInterSeg;
+  int m_flipIBIntersegWeights;
   bool m_evolveIBRecExcIa;
   bool m_evolveIFV;
   bool m_evolveSFV;
@@ -179,7 +185,8 @@ protected:
   
   float m_maxOpenLoop;
   float m_openLoopTauMaxAct;
-  float m_openLoopTauMaxDeact;    
+  float m_openLoopTauMaxDeact;
+  bool m_openLoopCutoff;
   float m_maxInterseg;
   float m_maxDistalDelay;
   

@@ -42,7 +42,7 @@ void ArmMuscled::init()
     // Use setting from globals file
     const ci::XmlTree& xml = settings->getChild("Config/Arm");
     m_jointRadius[JT_elbow] = xml.getChild("Elbow").getAttributeValue<double>("Radius");
-    m_jointRadius[JT_shoulder] = xml.getChild("Shoulder").getAttributeValue<double>("Radius");    
+    m_jointRadius[JT_shoulder] = xml.getChild("Shoulder").getAttributeValue<double>("Radius");
     
     ci::XmlTree::Iter muscle = settings->begin("Config/Arm/Muscle");
     for (; muscle != settings->end(); ++muscle)
@@ -207,7 +207,7 @@ void ArmMuscled::record(Recorder& recorder)
 //----------------------------------------------------------------------------------------------------------------------
 void ArmMuscled::recordIsometric(Recorder& recorder, const std::vector<float>& muscleAct, float jointIncDeg)
 {
-  const float dt = 0.01; // Arbitrary really
+  const float dt = 0.01f; // Arbitrary really
   float jointIncRad = degreesToRadians(jointIncDeg);
   
   // Updating muscle with same dt as time constant means activation will instantly be same as excitation, 

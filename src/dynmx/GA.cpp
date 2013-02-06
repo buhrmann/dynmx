@@ -39,7 +39,9 @@ void GA::init()
     std::fill(m_genomes[i], m_genomes[i] + m_genomeLength, 0.0);
   }
 
-  m_fitnesses = new float[m_popSize];     
+  m_fitnesses = new float[m_popSize];
+  std::fill(m_fitnesses, m_fitnesses + m_popSize, MAX_NEG_FLOAT);
+
   m_weightedAverageGenome = new double[m_popSize]; 
   
   // Some defaults, though should be set externally and not subsequently reset to these defaults
@@ -86,13 +88,9 @@ void GA::reset(bool randomizeGenomes)
       {
         m_genomes[i][j] = ran1(&m_idum);
       }
+      
+      m_fitnesses[i] = MAX_NEG_FLOAT;
     }
-  }
-  
-  // Fitness
-  for(int i = 0; i < m_popSize; i++)
-  {
-    m_fitnesses[i] = MAX_NEG_FLOAT;
   }
   
   // select first pair of genomes for tournament

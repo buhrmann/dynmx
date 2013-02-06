@@ -40,6 +40,8 @@ void View::init()
   
   m_font = ci::Font(ci::app::loadResource("pf_tempesta_seven.ttf"), 24);  
   
+  ci::gl::disableVerticalSync();
+  
   // setup openGL modes
   glEnable(GL_LIGHTING);
   glEnable(GL_LIGHT0);

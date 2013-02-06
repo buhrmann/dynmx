@@ -26,7 +26,7 @@ friend class ArmMuscledViz;
   
 public:
   
-  MuscleMonoWrap(ArmMuscled* arm, float originDist, float insertDist, Joint jointId, bool isFlexor);
+  MuscleMonoWrap(ArmMuscled* arm, double originDist, double insertDist, Joint jointId, bool isFlexor);
   
   virtual void init();
   virtual void reset();

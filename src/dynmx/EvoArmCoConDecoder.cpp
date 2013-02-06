@@ -178,8 +178,8 @@ void EvoArmCoCon::decodeGenome(const double* genome)
   }  
   
   // Range for neural parameters
-  float maxW = 10.0;
-  float maxB = 10.0;
+  float maxW = 1.0;
+  float maxB = 0.1;
   float maxT = 100.0;  // These really encode 1/tau, i.e. tau in [1/(minT+maxt), 1/minT]. Was 90.0 and 10.0;
   float minT = 1.0;
   
@@ -348,37 +348,101 @@ void EvoArmCoCon::decodeGenome(const double* genome)
   // IBIn intersegmental connections
   if(m_evolveIBInterSeg)
   {
-   if(m_evolveIBINsym)
-   {
+    m_IbIntersegWeights.clear();
+    if(m_evolveIBINsym)
+    {
      for(int i = 0; i <= 1; ++i)
      {
-       m_arm->getReflex(i)->setIbIntersegParameters(map01To(genome[I+0],-maxW, maxW),
-                                                    map01To(genome[I+1],-maxW, maxW),
-                                                    map01To(genome[I+1],-maxW, maxW),
-                                                    map01To(genome[I+0],-maxW, maxW),
-                                                    map01To(genome[I+2],-maxW, maxW),
-                                                    map01To(genome[I+3],-maxW, maxW),
-                                                    map01To(genome[I+3],-maxW, maxW),
-                                                    map01To(genome[I+2],-maxW, maxW));
+       m_IbIntersegWeights.push_back(map01To(genome[I+0],-maxW, maxW));
+       m_IbIntersegWeights.push_back(map01To(genome[I+1],-maxW, maxW));
+       m_IbIntersegWeights.push_back(map01To(genome[I+1],-maxW, maxW));
+       m_IbIntersegWeights.push_back(map01To(genome[I+0],-maxW, maxW));
+       
+       m_IbIntersegWeights.push_back(map01To(genome[I+2],-maxW, maxW));
+       m_IbIntersegWeights.push_back(map01To(genome[I+3],-maxW, maxW));
+       m_IbIntersegWeights.push_back(map01To(genome[I+3],-maxW, maxW));
+       m_IbIntersegWeights.push_back(map01To(genome[I+2],-maxW, maxW));
+       
+       m_arm->getReflex(i)->setIbIntersegParameters(m_IbIntersegWeights, i*8);
+       
        I += 4;
      }
-   }
-   else
-   {
+    }
+    else
+    {
      for(int i = 0; i <= 1; ++i)
      {
-       m_arm->getReflex(i)->setIbIntersegParameters(map01To(genome[I+0],-maxW, maxW),
-                                                    map01To(genome[I+1],-maxW, maxW),
-                                                    map01To(genome[I+2],-maxW, maxW),
-                                                    map01To(genome[I+3],-maxW, maxW),
-                                                    map01To(genome[I+4],-maxW, maxW),
-                                                    map01To(genome[I+5],-maxW, maxW),
-                                                    map01To(genome[I+6],-maxW, maxW),
-                                                    map01To(genome[I+7],-maxW, maxW));
-       I += 8;
+       for(int j = 0; j < 8; ++j)
+       {
+          m_IbIntersegWeights.push_back(map01To(genome[I++],-maxW, maxW));
+       }
+       
+       m_arm->getReflex(i)->setIbIntersegParameters(m_IbIntersegWeights, i*8);
      }
-   }
+    }
   }
+  
+  if(m_flipIBIntersegWeights == 1)
+  {
+    if(m_evolveIBINsym)
+    {
+      for(int i = 0; i <= 1; ++i)
+      {
+        m_IbIntersegSwitches.push_back(genome[I+0] > 0.5 ? 1 : -1);
+        m_IbIntersegSwitches.push_back(genome[I+1] > 0.5 ? 1 : -1);
+        m_IbIntersegSwitches.push_back(genome[I+1] > 0.5 ? 1 : -1);
+        m_IbIntersegSwitches.push_back(genome[I+0] > 0.5 ? 1 : -1);
+        
+        m_IbIntersegSwitches.push_back(genome[I+2] > 0.5 ? 1 : -1);
+        m_IbIntersegSwitches.push_back(genome[I+3] > 0.5 ? 1 : -1);
+        m_IbIntersegSwitches.push_back(genome[I+3] > 0.5 ? 1 : -1);
+        m_IbIntersegSwitches.push_back(genome[I+2] > 0.5 ? 1 : -1);
+        
+        I += 4;
+      }
+    }
+    else
+    {
+      for(int i = 0; i <= 1; ++i)
+      {
+        for(int j = 0; j <= 7; ++j)
+        {
+          m_IbIntersegSwitches.push_back(genome[I++] > 0.5 ? 1 : -1);
+        }
+      }
+    }
+  }
+  else if (m_flipIBIntersegWeights == 2)
+  {
+    if(m_evolveIBINsym)
+    {
+      for(int i = 0; i <= 1; ++i)
+      {
+        m_IbIntersegWeights.push_back(map01To(genome[I+0],-maxW, maxW));
+        m_IbIntersegWeights.push_back(map01To(genome[I+1],-maxW, maxW));
+        m_IbIntersegWeights.push_back(map01To(genome[I+1],-maxW, maxW));
+        m_IbIntersegWeights.push_back(map01To(genome[I+0],-maxW, maxW));
+        
+        m_IbIntersegWeights.push_back(map01To(genome[I+2],-maxW, maxW));
+        m_IbIntersegWeights.push_back(map01To(genome[I+3],-maxW, maxW));
+        m_IbIntersegWeights.push_back(map01To(genome[I+3],-maxW, maxW));
+        m_IbIntersegWeights.push_back(map01To(genome[I+2],-maxW, maxW));
+        
+        I += 4;
+      }
+    }
+    else
+    {
+      for(int i = 0; i <= 1; ++i)
+      {
+        for(int j = 0; j < 8; ++j)
+        {
+          m_IbIntersegWeights.push_back(map01To(genome[I++],-maxW, maxW));
+        }
+      }
+    }
+  }
+
   
   // Reciprocal excitation of autogenic inhibition reflex (+IbAgMnAn) and Ia to IbIn
   if(m_evolveIBRecExcIa)
@@ -685,14 +749,19 @@ int EvoArmCoCon::getNumGenes()
   if(m_evolveIBInterSeg)
   {
     const int numIbIs = 4; // 2 to each MN and 2 to each IbIn
-    if(m_evolveIBINsym)
-      numGenes += numReflexes * numIbIs;
-    else
-      numGenes += numMuscles * numIbIs;
+    const int numParams = m_evolveIBINsym ? numReflexes * numIbIs : numMuscles * numIbIs;
+    numGenes += numParams;
+    if(m_flipIBIntersegWeights > 0)
+    {
+      // Second set of weight, one for each move type
+      // It's either going to be decoded as sign flips only, or as full weights
+      numGenes += numParams;
+    }
   }
   
+  
   // Reciprocal excitation of autogenic inhibition reflex (+IbInAgMnAn) and Ia to IbIn
-  if(m_evolveIBInterSeg)
+  if(m_evolveIBRecExcIa)
   {
     const int numCons = 2; // +IbInAgMnAn, +IbAgIaAg
     if(m_evolveIBINsym)

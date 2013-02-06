@@ -103,6 +103,20 @@ float EvoArmCoCon::getFitness(float start, float end)
     fitness = fac * (fitness * velFitness);
   }
   
+  const bool punishNonStationaryStart = true;
+  if(punishNonStationaryStart)
+  {
+    int tInit = 0.1 / dt;
+    double rmse = 0;
+    for (int i = 0; i < tInit; ++i)
+    {
+      rmse += (m_desiredPositions[i] - m_actualPositions[i]).lengthSquared();
+    }
+    rmse = std::sqrt(rmse / tInit);
+    if (rmse > 0.005)
+      fitness = 0.0;
+  }
+  
   // Minimise coactivation
   if(m_fitnessEvalCoact)
   {
@@ -208,9 +222,9 @@ float EvoArmCoCon::getFitness()
         {
           std::cout << "Fitness Mv " << i << ": " << moveFitness << ". AccFit: " << fitness << std::endl;
         }
-      }
-    }
-  }
+      } // else
+    } // for each move
+  } // if reset each move
   else
   {
     // We evaluate fitness over the whole run
@@ -306,11 +320,13 @@ void EvoArmCoCon::init()
     m_evolveIBINsym = xmlFlags.getChild("Ibin").getAttributeValue<bool>("symmetric");
     m_evolveIBINderiv = xmlFlags.getChild("Ibin").getAttributeValue<bool>("derivative");
     m_evolveIBInterSeg = xmlFlags.getChild("Ibin").getAttributeValue<bool>("interseg");
+    m_flipIBIntersegWeights = xmlFlags.getChild("Ibin").getAttributeValue<int>("flipIntersegWeights");
     m_evolveIBRecExcIa = xmlFlags.getChild("Ibin").getAttributeValue<bool>("recExcIa");
     m_evolveIFV = xmlFlags.getChild("Ifv").getValue<bool>();
     m_evolveSFV = xmlFlags.getChild("Sfv").getValue<bool>();
     m_evolveOpenLoop = xmlFlags.getChild("OpenLoop").getValue<bool>();
     m_openLoopSymmetry = xmlFlags.getChild("OpenLoop").getAttributeValue<int>("symmetric");
+    m_openLoopCutoff = xmlFlags.getChild("OpenLoop").getAttributeValue<bool>("cutoff");
     m_maxOpenLoop = xmlFlags.getChild("OpenLoop").getAttributeValue<float>("max");    
     m_openLoopTauMaxAct = xmlFlags.getChild("OpenLoop").getAttributeValue<float>("tauMaxAct");
     m_openLoopTauMaxDeact = xmlFlags.getChild("OpenLoop").getAttributeValue<float>("tauMaxDeact");
@@ -336,61 +352,13 @@ void EvoArmCoCon::init()
     // Following function may depend on some of above variables
     readDecodeLimits(); 
     
-    // Open-loop activations
-    if (SETTINGS->hasChild("Config/Arm/OpenLoopActivations")) 
-    {   
-      m_openLoopParams.clear();
-      
-      ci::XmlTree& oplp = SETTINGS->getChild("Config/Arm/OpenLoopActivations");    
-      ci::XmlTree::Iter val = oplp.begin("Value");
-      for (; val != oplp.end(); ++val)
-      {
-        const double v = val->getValue<double>();
-        m_openLoopParams.push_back(v);
-      }
-    }
-    
-    // Intersegmental parameters    
-    if (SETTINGS->hasChild("Config/Arm/IntersegmentalParams")) 
-    {   
-      m_intersegParams.clear();
-      
-      ci::XmlTree& params = SETTINGS->getChild("Config/Arm/IntersegmentalParams");    
-      ci::XmlTree::Iter val = params.begin("Value");
-      for (; val != params.end(); ++val)
-      {
-        const double v = val->getValue<double>();
-        m_intersegParams.push_back(v);
-      }
-    }     
-    
-    // Distal (elbow) command delays
-    if (SETTINGS->hasChild("Config/Arm/DistalDelays")) 
-    {   
-      m_distalDelays.clear();
-      
-      ci::XmlTree& params = SETTINGS->getChild("Config/Arm/DistalDelays");    
-      ci::XmlTree::Iter val = params.begin("Value");
-      for (; val != params.end(); ++val)
-      {
-        const double v = val->getValue<double>();
-        m_distalDelays.push_back(v);
-      }
-    }         
-    
-    // Ramp durations
-    if (SETTINGS->hasChild("Config/Arm/RampDurations")) 
-    {   
-      m_rampDurations.clear();
-      
-      ci::XmlTree& params = SETTINGS->getChild("Config/Arm/RampDurations");    
-      ci::XmlTree::Iter val = params.begin("Value");
-      for (; val != params.end(); ++val)
-      {
-        const double v = val->getValue<double>();
-        m_rampDurations.push_back(v);
-      }
-    }             
+    vecFromXml(*SETTINGS, "Config/Arm/OpenLoopActivations", m_openLoopParams);
+    vecFromXml(*SETTINGS, "Config/Arm/IntersegmentalParams", m_intersegParams);
+    vecFromXml(*SETTINGS, "Config/Arm/DistalDelays", m_distalDelays);
+    vecFromXml(*SETTINGS, "Config/Arm/RampDurations", m_rampDurations);
+    vecFromXml(*SETTINGS, "Config/Arm/SpindleParams", m_spindleParams);
+    vecFromXml(*SETTINGS, "Config/Arm/IbIntersegWeights", m_IbIntersegWeights);
+    vecFromXml(*SETTINGS, "Config/Arm/IbIntersegSwitches", m_IbIntersegSwitches);
         
     // Read trajectory from settings file    
     // Requires arm to be setup to do FK, but that's already done in init() above, so should be fine.
@@ -459,6 +427,7 @@ void EvoArmCoCon::init()
     m_useMuscleCoords = false;
   }
   
+  m_trial = 0;
   reset();
 }
 
@@ -537,6 +506,12 @@ void EvoArmCoCon::reset()
   }
   
   m_arm->resetTo(elbStart, shdStart);
+
+#if 0
+  ci::XmlTree testXml ("Evolvable", "");
+  toXml(testXml);
+  testXml.write(ci::writeFile(dmx::DATA_DIR + "EvolvableTrial" + toString(m_trial) + ".xml"));
+#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -584,12 +559,13 @@ void EvoArmCoCon::update(float dt)
       m_arm->getReflex(0)->setOpenLoop(m_openLoopParams[i+0], m_openLoopParams[i+1]);
       m_arm->getReflex(1)->setOpenLoop(m_openLoopParams[i+2], m_openLoopParams[i+3]);
     }
-    else if(m_currentPhase == kMvPh_leadOut)
+    else if((m_openLoopCutoff && m_currentPhase == kMvPh_leadOut) ||
+            (!m_openLoopCutoff && m_currentPhase == kMvPh_end))
     {
       m_arm->getReflex(0)->setOpenLoop(0, 0);
       m_arm->getReflex(1)->setOpenLoop(0, 0);
     }
-  }  
+  }
   
   // Set intersegmental parameters for the current movement
   if(m_intersegParams.size() > 0)
@@ -609,6 +585,22 @@ void EvoArmCoCon::update(float dt)
     }*/
   }
   
+  // Switch Ib interseg weights for type of movement
+  if(m_currentMove != prevMove)
+  {
+    if(m_flipIBIntersegWeights == 2)
+    {
+      const int startId = (m_currentMove % 2) * 16;
+      m_arm->getReflex(0)->setIbIntersegParameters(m_IbIntersegWeights, startId + 0);
+      m_arm->getReflex(1)->setIbIntersegParameters(m_IbIntersegWeights, startId + 8);
+    }
+    else if(m_flipIBIntersegWeights == 1 && m_currentMove != 0)
+    {
+      m_arm->getReflex(0)->flipIbIntersegSigns(m_IbIntersegSwitches, 0);
+      m_arm->getReflex(1)->flipIbIntersegSigns(m_IbIntersegSwitches, 8);
+    }
+  }
+  
   // Distal (elbow) command delay
   if(m_distalDelays.size() > 0)
   {
@@ -618,6 +610,14 @@ void EvoArmCoCon::update(float dt)
     }
   }
   
+  // Go signal
+  const bool useGoSignal = true;
+  if(useGoSignal)
+  {
+    double go = m_currentPhase == kMvPh_leadOut ? 0.0 : 1.0;
+    m_arm->getReflex(0)->setGoSignal(go);
+    m_arm->getReflex(1)->setGoSignal(go);
+  }
   
   // Update arm simulation
   if(m_useMuscleCoords)
@@ -691,43 +691,18 @@ void EvoArmCoCon::finish()
 void EvoArmCoCon::toXml(ci::XmlTree& xml)
 {
   ci::XmlTree evolvable ("EvoArmCoCon", "");
-  evolvable.setAttribute("Fitness", getFitness());
+  evolvable.setAttribute("Fitness", m_fitness);
   
   ci::XmlTree bestFitDelay ("BestFitnessMatchDelay", toString(m_bestFitDelay));
   evolvable.push_back(bestFitDelay);  
   
-  ci::XmlTree openLoop("OpenLoopActivations", "");
-  for(int i = 0; i < m_openLoopParams.size(); i++)
-  {
-    ci::XmlTree act ("Value", toString(m_openLoopParams[i]));
-    openLoop.push_back(act);
-  }
-  evolvable.push_back(openLoop);
-  
-  ci::XmlTree interseg("IntersegmentalParams", "");
-  for(int i = 0; i < m_intersegParams.size(); i++)
-  {
-    ci::XmlTree isP ("Value", toString(m_intersegParams[i]));
-    interseg.push_back(isP);
-  }
-  evolvable.push_back(interseg);  
-  
-  ci::XmlTree delays("DistalDelays", "");
-  for(int i = 0; i < m_distalDelays.size(); i++)
-  {
-    ci::XmlTree delay ("Value", toString(m_distalDelays[i]));
-    delays.push_back(delay);
-  }
-  evolvable.push_back(delays);    
-  
-  ci::XmlTree rampDurs("RampDurations", "");
-  for(int i = 0; i < m_rampDurations.size(); i++)
-  {
-    ci::XmlTree duration ("Value", toString(m_rampDurations[i]));
-    rampDurs.push_back(duration);
-  }
-  evolvable.push_back(rampDurs);      
-  
+  vecToXml(evolvable, "OpenLoopActivations", m_openLoopParams);
+  vecToXml(evolvable, "IntersegmentalParams", m_intersegParams);
+  vecToXml(evolvable, "DistalDelays", m_distalDelays);
+  vecToXml(evolvable, "RampDurations", m_rampDurations);
+  vecToXml(evolvable, "SpindleParams", m_spindleParams);
+  vecToXml(evolvable, "IbIntersegWeights", m_IbIntersegWeights);
+  vecToXml(evolvable, "IbIntersegSwitches", m_IbIntersegSwitches);
   
   // Add ArmMuscled xml data
   m_arm->toXml(evolvable);  

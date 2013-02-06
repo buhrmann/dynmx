@@ -14,7 +14,7 @@ namespace dmx
 {
 
 //----------------------------------------------------------------------------------------------------------------------  
-MuscleBiWrap::MuscleBiWrap(ArmMuscled* arm, float originDist, float insertDist, bool isFlex)
+MuscleBiWrap::MuscleBiWrap(ArmMuscled* arm, double originDist, double insertDist, bool isFlex)
 {
   m_arm = arm;
   m_originJointDist = originDist;
