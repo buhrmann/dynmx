@@ -113,7 +113,7 @@ void Muscle::update(float dt)
   assert(lengthOK);
 #endif
          
-  m_velocity = (m_length - prevLength) / dt;
+  m_velocity = (m_length - prevLength) / dt; // lengthening(!) velocity.
   
   // Dimensionless variables for Hill-model
   m_lengthNorm = m_length /  m_lengthOpt;

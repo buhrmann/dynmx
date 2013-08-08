@@ -350,15 +350,22 @@ void Sphere::init()
 //----------------------------------------------------------------------------------------------------------------------
 void Disk::createGeometry()
 {
+  // Delete if we had one previously
+  if(m_dl != -1)
+  {
+    std::cout << "Recreating disk geometry!" << std::endl;
+    glDeleteLists(m_dl, 1);
+  }
+  
   m_dl = glGenLists(1);
   glNewList(m_dl,GL_COMPILE);
   if(m_sweepAngle > 0)
   {
-    drawPartialDisk(m_radius2, m_radius1, m_resolution, 2, m_startAngle, m_sweepAngle);
+    drawPartialDisk(m_radius2, m_radius1, m_resolution, 2, m_startAngle, m_sweepAngle, m_mode);
   }
   else 
   {
-    drawDisk(m_radius1, m_radius2, m_resolution, 2);  
+    drawDisk(m_radius1, m_radius2, m_resolution, 2, m_mode);
   }
 
   glEndList();
@@ -367,6 +374,7 @@ void Disk::createGeometry()
 void Disk::init()
 {
   m_type = NODE_DISK;
+  createGeometry();
 #ifdef _DEBUG
   print();
 #endif
@@ -431,6 +439,9 @@ void Grid::init()
 #ifdef _DEBUG
   print();
 #endif
+  
+  m_isSelectable = false;
+  m_outlineWidth = 0;
 }
 
 

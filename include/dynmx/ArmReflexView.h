@@ -138,12 +138,12 @@ inline void ArmReflexView::update(float dt)
   m_reflexPlot1->addPoint(m_armRx->getReflex(0)->getAlphaOutput(0), 0);
   m_reflexPlot1->addPoint(m_armRx->getReflex(0)->m_Kspp[0] * m_armRx->getReflex(0)->getPositionError(0), 1);  
   m_reflexPlot1->addPoint(m_armRx->getReflex(0)->m_Kspd[0] * std::max(-m_armRx->getReflex(0)->getContractionVelocity(0), 0.0), 2);
-  m_reflexPlot1->addPoint(m_armRx->getReflex(0)->m_IbInOut[0], 3);
+  m_reflexPlot1->addPoint(m_armRx->getReflex(0)->getGoSignal(), 3);
   
   m_reflexPlot1->addPoint(m_armRx->getReflex(0)->getAlphaOutput(1), 4);
   m_reflexPlot1->addPoint(m_armRx->getReflex(0)->m_Kspp[1] * m_armRx->getReflex(0)->getPositionError(1), 5);
   m_reflexPlot1->addPoint(m_armRx->getReflex(0)->m_Kspd[1] * std::max(-m_armRx->getReflex(0)->getContractionVelocity(1), 0.0), 6);
-  m_reflexPlot1->addPoint(m_armRx->getReflex(0)->m_IbInOut[1], 7);
+  m_reflexPlot1->addPoint(m_armRx->getReflex(0)->getGoSignal(), 7);
   
   m_reflexPlot2->addPoint(m_armRx->getReflex(1)->getAlphaOutput(0), 0);
   m_reflexPlot2->addPoint(m_armRx->getReflex(1)->m_Kspp[0] * m_armRx->getReflex(1)->getPositionError(0), 1);  
@@ -165,15 +165,16 @@ inline void ArmReflexView::update(float dt)
   
   // Todo: HACK
   // Retrieve desired trajectory
+  /*
   EvoArmCoCon* evoArmCC =  (EvoArmCoCon*) ((GATester*) ((dmx::App*)ci::app::App::get())->m_model)->getEvolvable();
   ci::Vec2f desiredAng = evoArmCC->m_currentDesiredAngles;
 
   // Desired angle, Commanded angle, Actual angle
-  m_jointTrajPlot->addPoint(desiredAng.x, 0); 
+  m_jointTrajPlot->addPoint(desiredAng.x, 0);
   m_jointTrajPlot->addPoint(m_armRx->getDesiredJointAngle(JT_elbow), 1);
   m_jointTrajPlot->addPoint(m_armRx->getJointAngle(JT_elbow), 2);
   
-  m_jointTrajPlot->addPoint(desiredAng.y, 3);  
+  m_jointTrajPlot->addPoint(desiredAng.y, 3);
   m_jointTrajPlot->addPoint(m_armRx->getDesiredJointAngle(JT_shoulder), 4);
   m_jointTrajPlot->addPoint(m_armRx->getJointAngle(JT_shoulder), 5);
   
@@ -183,7 +184,8 @@ inline void ArmReflexView::update(float dt)
   m_armEffPlot->addPoint(desiredPos.x, 2);
   m_armEffPlot->addPoint(desiredPos.y, 3);
   m_armEffPlot->addPoint(commandPos.x, 4);
-  m_armEffPlot->addPoint(commandPos.y, 5);  
+  m_armEffPlot->addPoint(commandPos.y, 5);
+   */
 }
 
 //----------------------------------------------------------------------------------------------------------------------      

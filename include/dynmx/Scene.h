@@ -12,6 +12,7 @@
 
 #include <vector>
 #include "Dynmx.h" 
+#include "MathUtils.h"
 
 //#include "ofx3DModelLoader.h"
 #include "cinder/Matrix.h"
@@ -112,6 +113,7 @@ public:
 
   // only effective when not externally driven !
   virtual void translate(const cinder::Vec4f& p) { m_TM.translate(p); };
+  virtual void setTranslate(const cinder::Vec4f& p) { m_TM.setTranslate(p); };
   virtual void rotate(const cinder::Vec4f& axis, float radians) { m_TM.rotate(axis, radians); };
 
   void attachDriver(cinder::Matrix44f* m) { m_pTM = m; m_isDriven = true; };
@@ -258,9 +260,9 @@ class Disk : public NodeGeometry
 {
 public:
   
-  Disk() : m_radius1(1), m_radius2(0), m_resolution(16) { init(); };
-  Disk(float r1, float r2, int resolution = 16) : m_radius1(r1), m_radius2(r2), m_startAngle(0), m_sweepAngle(0), m_resolution(resolution) { init(); };
-  Disk(float r1, float r2, float a1, float a2, int resolution = 16) : m_radius1(r1), m_radius2(r2), m_startAngle(a1), m_sweepAngle(a2), m_resolution(resolution) { init(); };
+  Disk() : m_radius1(1), m_radius2(0), m_startAngle(0), m_sweepAngle(0), m_resolution(16), m_mode(GLU_FILL) { init(); };
+  Disk(float r1, float r2, GLenum mode = GLU_FILL, int resolution = 16) : m_radius1(r1), m_radius2(r2), m_mode(mode), m_startAngle(0), m_sweepAngle(0), m_resolution(resolution) { init(); };
+  Disk(float r1, float r2, float a1, float a2, GLenum mode = GLU_FILL, int resolution = 16) : m_radius1(r1), m_radius2(r2), m_startAngle(a1), m_sweepAngle(a2), m_mode(mode), m_resolution(resolution) { init(); };
   virtual void createGeometry();
   
   float m_radius1;
@@ -268,6 +270,7 @@ public:
   float m_startAngle;
   float m_sweepAngle;
   int m_resolution;
+  GLenum m_mode;
   
 protected:
   virtual void init();
@@ -454,7 +457,7 @@ public:
         glPushMatrix();
         glTranslatef(i, j, 0.0);
         
-        float w = m_data[i][j] / m_maxVal;
+        float w = clamp(m_data[i][j] / m_maxVal, -1.0, 1.0);
         
         if(w > 0)
         {
@@ -465,7 +468,7 @@ public:
         else if (w < 0)
         {
           glColor3f(235.0/255.0, 0.0/255.0, 103.0/255.0);
-          drawFrame(w*0.98, w*0.98);
+          drawRectangle(w*0.98, w*0.98);
         }
         else
         {
@@ -572,7 +575,8 @@ public:
     glLineWidth(2.0);
     for(int i = 0; i < m_N; i++)
     {   
-      float w = m_data[i] / m_maxVal;        
+      float w = m_data[i] / m_maxVal;
+      w = w < -1.0 ? -1.0 : w > 1.0 ? 1.0 : w;
       drawRectangle(w*0.98, w*0.98);       
       if(i == m_iSel)
       {

@@ -43,6 +43,8 @@ void SMCAgent::reset()
   m_time = 0.0f;
   m_angle = 0.0f;
   m_angularVelocity = 0.0;
+  m_energy = 3.0f;
+  m_food = 0.0f;
   setPosition(ci::Vec2f(0,0));
 }  
 
@@ -73,6 +75,11 @@ void SMCAgent::update(float dt)
       m_ctrnn->setExternalInput(0, m_sensedValueDerivative);
       break;
   }
+  
+  // Metabolise
+  m_food = m_sensedValue * 10;
+  float dA = (-0.075*m_energy*m_energy*m_energy) + (0.5*m_food*m_energy*m_energy) - m_energy;
+  m_energy += dA * dt;
 
   m_ctrnn->updateDynamic(dt);
   

@@ -127,7 +127,7 @@ void Arm::init()
   }    
     
   resetTo(0.0, 0.0);
-}  
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 void Arm::resetTo(double elbAngle, double shdAngle)
@@ -332,8 +332,9 @@ void Arm::update(float timeStep, double torqElb, double torqShd)
 #define CHECK_ROUND_TRIP 0
 #if CHECK_ROUND_TRIP
   double elbAngle, shdAngle;
-  double elbDir = m_angles[JT_elbow] > 0 ? 1 : -1;
-  inverseKinematics(m_effectorPos[0], m_effectorPos[1], elbDir, elbAngle, shdAngle);
+  double elbDir = m_state.angles[JT_elbow] > 0 ? 1 : -1;
+  inverseKinematics(m_effectorPos, elbDir, elbAngle, shdAngle);
+  std::cout << m_state.angles[JT_elbow] << " " << elbAngle << ", " << m_state.angles[JT_shoulder] << " " << shdAngle << std::endl;
 #endif
 }
 

@@ -31,7 +31,16 @@ public:
   struct SpindleLimits
   {
     Range pos, vel, dmp, exp, weight;
-  };    
+  };
+  
+  enum GoMode
+  {
+    kGo_none = 0,
+    kGo_weighted, // as weighted input to interneurons (and MN)
+    kGo_external, // input to MN is scaled by externally specified amount
+    kGo_error,     // input to MN is scaled by current positional error
+    kGo_fixed
+  };
   
   
   Reflex();
@@ -47,8 +56,10 @@ public:
   void setDesiredAngles(double elbAngle, double shdAngle); // Get desired length from arm's desired joint angles    
   void setDesiredLength(double l0, double l1); // Will also update desired velocity, contraction etc...
   void setGoSignal(double go) { m_go = go; };
+  void setGoMode(int mode) { m_goMode = mode; };
   void setOpenLoop(double c0, double c1);  
   void setIntersegmentInput(double i1, double i2);
+  void setGoParameters(double Wgoia, double Wgorn, double Wgoib, double Wgomn);
   void setSigmoidSlopes(double ia0, double ia1, double ib0, double ib1, double rn0, double rn1, double mn0, double mn1);
   void setSpindleParameters(double Kp0, double Kp1, double Kv0, double Kv1, double Kd0, double Kd1, double E0, double E1, double Ed0=1, double Ed1=1);
   void setLoadCompensationParameters(double g0, double g1, double inh0, double inh1);
@@ -84,6 +95,7 @@ public:
   double getAlphaOutput(int i) { return m_alpha[i]; };
   double getIbInOutput(int i) { return m_IbInOut[i]; };
   double getGolgi(int i) { return m_golgi[i]; };
+  double getGoSignal() { return m_go; };
   double getOpenLoop(int i) { return m_openLoopFiltered[i]; };
   double getIntersegmentInput(int i) { return m_interSegmentInput[i]; };
   double getLength(int i) { return m_length[i]; };
@@ -153,6 +165,7 @@ protected:
   double m_Wspia [2];  // Weight of spindle input  
   double m_Wrnia [2];  // Weight of renshaw input    
   double m_Waia  [2];  // Weight for desired contraction
+  double m_Wgoia;
   double m_Biain [2];  // Bias of Ia neurons
   double m_Tiain [2];  // Time constant (really 1/t)
   double m_Kiain [2];  // Sigmoid slope
@@ -160,6 +173,7 @@ protected:
   // Renshaw
   double m_Wmnrn [2];  // Input from motor neuron
   double m_Wrnrn [2];  // Reciprocal inhibition
+  double m_Wgorn;
   double m_Brn [2];
   double m_Trn [2];
   double m_Krn [2];
@@ -171,6 +185,7 @@ protected:
   double m_Wibib [2];   // Reciprocal inhibition
   double m_WisibAg [2]; // Interjoint connections between other joint and agonist
   double m_WisibAn [2]; // Interjoint connections between other joint and antagonist
+  double m_Wgoib;
   double m_Bib [2];     // Bias
   double m_Tib [2];     // Tau
   double m_Kib [2];
@@ -183,6 +198,7 @@ protected:
   double m_WisibAgMn [2]; // Interjoint connections between other joint and agonist
   double m_WisibAnMn [2]; // Interjoint connections between other joint and antagonist
   double m_Wspmn [2];   // Stretch reflex (monosynaptic spindle input)
+  double m_Wgomn;
   double m_Bmn [2];
   double m_Tmn [2];
   double m_Kmn [2];
@@ -193,6 +209,7 @@ protected:
   bool m_MNasNeuron;
   bool m_coconAsCCommand;
   bool m_trqFeedbackPosMod;
+  int m_goMode;
   
   // Inputs
   //-------------------------------------------------  
@@ -256,6 +273,15 @@ protected:
   
 //----------------------------------------------------------------------------------------------------------------------
 /// Inline implementations
+//----------------------------------------------------------------------------------------------------------------------
+inline void Reflex::setGoParameters(double Wgoia, double Wgorn, double Wgoib, double Wgomn)
+{
+  m_Wgoia = Wgoia;
+  m_Wgorn = Wgorn;
+  m_Wgoib = Wgoib;
+  m_Wgomn = Wgomn;
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 inline void Reflex::setIbRecExcIaParameters(double IbIn1Mn0, double IbIn0Mn1, double Ia0IbIn0, double Ia1IbIn1)
 {

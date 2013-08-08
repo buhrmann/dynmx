@@ -55,7 +55,8 @@ protected:
   float m_gravity;
   
   Plot* m_plot;
-  Plot* m_ctrnnPlot; 
+  Plot* m_ctrnnPlot;
+  Plot* m_energyPlot;
   Plot* m_fitnessPlot;
   
 }; // class
@@ -134,6 +135,11 @@ inline void SMCView::setupScene()
   m_fitnessPlot->setTitle("Fitness");
   column->m_children.push_back(m_fitnessPlot);
   
+  m_energyPlot = new dmx::Plot(columnWidth, plotHeight, 2, 200);
+  m_energyPlot->translate(ci::Vec4f(0, m_ctrnnViz->getHeight() + 16 + (3 * plotHeight) + (3 * 32), 0, 1));
+  m_energyPlot->setTitle("Energy");
+  column->m_children.push_back(m_energyPlot);
+  
   m_scene2d.m_children.push_back(column);  
 }
 
@@ -155,6 +161,10 @@ inline void SMCView::update(float dt)
   // Update fitness-related data
   m_fitnessPlot->addPoint(m_agent->getAgent()->getAngle(), 0);
   //m_fitnessPlot->addPoint(m_agent->getAngleWithHeading(m_agent->getEnvironment().getObjects()[0]->getPosition()), 1);
+  
+  // Energy
+  m_energyPlot->addPoint(m_agent->getAgent()->getEnergy(), 0);
+  m_energyPlot->addPoint(m_agent->getAgent()->getSensedFood(), 1);
 }
 
 //---------------------------------------------------------------------------------------------------------------------

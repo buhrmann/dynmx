@@ -80,6 +80,7 @@ public:
   std::vector<ci::Vec2f> m_actualPositions;
   std::vector<double> m_actualCoactivationsElb;
   std::vector<double> m_actualCoactivationsShd;
+  std::vector<double> m_totalMuscleForce;
   
 protected:
   
@@ -116,6 +117,8 @@ protected:
   float m_time;
   float m_bestFitDelay;
   double m_cocontraction;
+  
+  double m_go;
   
   float m_minJerkTrajDelay;     // Time between start of commanded ramp and min jerk trajectory used for fitness
   
@@ -179,6 +182,10 @@ protected:
   bool m_evolveMinJerkDelay;
   bool m_evolveVelRef;
   bool m_evolveDistalCommandDelay;
+  
+  bool m_useGo;
+  bool m_invertGo;
+  int m_goMode;
   
   int m_commandTrajSmooth;
   bool m_useMuscleCoords;

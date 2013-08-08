@@ -110,11 +110,20 @@ float EvoArmCoCon::getFitness(float start, float end)
     double rmse = 0;
     for (int i = 0; i < tInit; ++i)
     {
-      rmse += (m_desiredPositions[i] - m_actualPositions[i]).lengthSquared();
+      //rmse += (m_desiredPositions[i] - m_actualPositions[i]).lengthSquared();
+      //rmse += m_actualCoactivationsElb[t0+i] + m_actualCoactivationsShd[t0+i] + m_actualCoactivationsElb[tmax-i] + m_actualCoactivationsShd[tmax-i];
+      //rmse += m_actualCoactivationsElb[last - i] + m_actualCoactivationsShd[last - i];
+      rmse += m_totalMuscleForce[t0+i] + m_totalMuscleForce[tmax - i];
     }
-    rmse = std::sqrt(rmse / tInit);
-    if (rmse > 0.005)
-      fitness = 0.0;
+    //rmse = std::sqrt(rmse / tInit);
+    rmse = rmse / (2*tInit);
+    //std::cout << "RMSE: " << rmse << std::endl;
+    if (rmse > 0.01)
+      fitness *=  0.01 / rmse;
+    
+    //float endVel = (m_actualPositions[tmax] - m_actualPositions[tmax - 1]).length();
+    //std::cout << "End vel: " << endVel << std::endl;
+    //fitness *= clamp(1 - endVel * 10.f, 0.0f, 1.0f);
   }
   
   // Minimise coactivation
@@ -126,6 +135,21 @@ float EvoArmCoCon::getFitness(float start, float end)
     double shdCoactFit = 1.0 - std::max(avgShdCoact - m_fitnessEvalCoactMax, 0.0);
 
     fitness *= elbCoactFit * shdCoactFit;
+  }
+  
+  const std::string forceNm = "Config/GA/Evolvable/FitnessFunction/ForceMin";
+  bool minForce = SETTINGS->hasChild(forceNm) && SETTINGS->getChild(forceNm).getValue<bool>();
+  if(minForce)
+  {
+    float thresh = SETTINGS->getChild(forceNm).getAttributeValue<float>("threshold", 0);
+    if(fitness > thresh)
+    {
+      // normalised by #steps and #muscles, so maximum should be 1.
+      float meanForce = sum(m_totalMuscleForce, t0, tmax) / (numSteps * 4);
+      fitness += 1 - meanForce;
+      if(SETTINGS->getChild("Config/Globals/DebugLevel").getAttributeValue<int>("Value",0) >= 3)
+        std::cout << "Force fit: " << 1-meanForce << std::endl;
+    }
   }
   
   return fitness;
@@ -340,6 +364,36 @@ void EvoArmCoCon::init()
     m_evolveMNsym = xmlFlags.getChild("MN").getAttributeValue<bool>("symmetric");
     m_evolveSigmoidSlope = xmlFlags.getChild("Neurons").getAttributeValue<bool>("sigSlope");
     
+    // Configure go signal
+    m_useGo = xmlFlags.getChild("Go").getValue<bool>(0);
+    m_invertGo = xmlFlags.getChild("Go").getAttributeValue<bool>("invert", 0);
+    if(m_useGo)
+    {
+      std::string modeStr = xmlFlags.getChild("Go").getAttributeValue<std::string>("mode", "external");
+      if(modeStr == "evolve")
+        m_goMode = Reflex::kGo_weighted;
+      else if(modeStr == "error")
+        m_goMode = Reflex::kGo_error;
+      else if(modeStr == "external")
+        m_goMode = Reflex::kGo_external;
+      else if(modeStr == "fixed"){
+        m_goMode = Reflex::kGo_fixed;
+        m_arm->getReflex(0)->setGoParameters(-10, -10, -10, -10);
+        m_arm->getReflex(1)->setGoParameters(-10, -10, -10, -10);
+      }
+      else{
+        m_goMode = Reflex::kGo_none;
+      }
+    }
+    else
+    {
+      m_goMode = Reflex::kGo_none;
+    }
+    
+    m_arm->getReflex(0)->setGoMode(m_goMode);
+    m_arm->getReflex(1)->setGoMode(m_goMode);
+    
+    // Initialize defaults
     const ci::XmlTree& xml = SETTINGS->getChild("Config/GA/Evolvable");
     m_commandTrajSmooth = xml.getChild("CommandTrajSmooth").getValue<int>();
     m_useMuscleCoords = xml.getChild("UseMuscleCoords").getValue<bool>();    
@@ -429,6 +483,30 @@ void EvoArmCoCon::init()
   
   m_trial = 0;
   reset();
+  
+  // Temp.
+#define CALC_TGTSx
+#ifdef CALC_TGTS
+  ci::Vec2f ctr, tgt, tmp;
+  double ctrElb = degreesToRadians(85.0);
+  double ctrShd = degreesToRadians(70.0);
+  double tgtElb = 0.0;
+  double tgtShd = 0.0;
+  float d = 0.1; // m
+  m_arm->forwardKinematics(ctrElb, ctrShd, tmp, ctr);
+  m_arm->inverseKinematics(ctr, 1, ctrElb, ctrShd);
+  std::cout << "Centre: " << ctr << " elb: " << radiansToDegrees(ctrElb) << " shd: " << radiansToDegrees(ctrShd) << std::endl;
+  
+  int numMoves = 6;
+  float offset = degreesToRadians(20.f);
+  for(int i=0; i < numMoves; i++)
+  {
+    float a = offset + i * (TWO_PI / numMoves);
+    tgt.set(ctr.x + cos(a) * d, ctr.y + sin(a) * d);
+    m_arm->inverseKinematics(tgt, 1, tgtElb, tgtShd);
+    std::cout << "Target " << radiansToDegrees(a) << " = " << tgt << " <To x=\"" << radiansToDegrees(tgtElb) << "\" y=\"" << radiansToDegrees(tgtShd) << "\" />" << std::endl;
+  }
+#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -478,6 +556,7 @@ void EvoArmCoCon::createTrajectories()
     m_commandedJointAngles[i].position = Pos(desiredAngles[JT_elbow], desiredAngles[JT_shoulder]);
   }
   m_commandedJointAngles.setBlend(commandBlend);
+  
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -489,6 +568,8 @@ void EvoArmCoCon::reset()
   
   m_time = 0.0f;
   
+  m_go = 1.0;
+  
   m_fitness = MAX_NEG_FLOAT;
   m_hasHitLimit = false;
   
@@ -496,6 +577,7 @@ void EvoArmCoCon::reset()
   m_actualPositions.clear();
   m_actualCoactivationsElb.clear();
   m_actualCoactivationsShd.clear();
+  m_totalMuscleForce.clear();
 
   // If possible set arm to initial position 
   float elbStart = 0, shdStart = 0;  
@@ -611,10 +693,25 @@ void EvoArmCoCon::update(float dt)
   }
   
   // Go signal
-  const bool useGoSignal = true;
-  if(useGoSignal)
+  if(m_useGo)
   {
-    double go = m_currentPhase == kMvPh_leadOut ? 0.0 : 1.0;
+    // Reset at start of move
+    if(m_currentMove != prevMove)
+      m_go = 1.0;
+    
+    // Drop in last phase
+    if(m_currentPhase == kMvPh_leadOut)
+      m_go *= 0.95;
+    
+    // Invert?
+    double go = m_invertGo ? 1.0 - m_go : m_go;
+    
+    if(m_goMode == Reflex::kGo_external)
+    {
+      const double weight = -10.0;
+      go *= weight;
+    }
+    
     m_arm->getReflex(0)->setGoSignal(go);
     m_arm->getReflex(1)->setGoSignal(go);
   }
@@ -637,6 +734,12 @@ void EvoArmCoCon::update(float dt)
   const double shdCoact = std::min(m_arm->getReflex(1)->getAlphaOutput(0), m_arm->getReflex(1)->getAlphaOutput(1));
   m_actualCoactivationsElb.push_back(elbCoact);
   m_actualCoactivationsShd.push_back(shdCoact);
+  
+  double force = m_arm->getReflex(0)->getMuscle(0)->getNormalisedForce() +
+                 m_arm->getReflex(0)->getMuscle(1)->getNormalisedForce() +
+                 m_arm->getReflex(1)->getMuscle(0)->getNormalisedForce() +
+                 m_arm->getReflex(1)->getMuscle(1)->getNormalisedForce();
+  m_totalMuscleForce.push_back(force);
   
   m_time += dt;
 };

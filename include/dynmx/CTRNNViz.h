@@ -25,8 +25,9 @@ class CTRNNBasicViz : public Node
 public:
 
   CTRNNBasicViz(const CTRNN* ctrnn, float width, bool text = true) : 
-    m_ctrnn(ctrnn), m_width(width), m_renderText(text) { init(); };  
+    m_ctrnn(ctrnn), m_width(width), m_renderText(text), m_renderConnections(true) { init(); };
 
+  void renderConnections(bool r) { m_renderConnections = r; };
   void setCTRNN(const CTRNN* ctrnn) { m_ctrnn = ctrnn; };  
   int getSelectedNeuron() { return m_selected; };
 
@@ -38,6 +39,7 @@ protected:
   float m_width;
   int m_selected;
   bool m_renderText;
+  bool m_renderConnections;
 };
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -43,9 +43,14 @@ public:
   
   void enableRecording(bool record) { m_record = record; };
   
-protected:  
+protected:
+  
+  void mutate(double* genome, int numGenes, double maxMut);
+
   
   // An instance of the model to evaluate
+  double* m_genome;
+  int m_numGenes;
   Evolvable* m_evolvable;
   
   float m_time;
@@ -58,6 +63,15 @@ protected:
   
   ci::XmlTree* m_modelXml;  
   Recorder m_recorder;
+  Recorder m_fitnessLog;
+  
+  bool m_mutate;
+  double m_mutateMin;
+  double m_mutateMax;
+  double m_mutateStep;
+  int m_numEvalsPerMutation;
+  
+  long m_idum;                // seed for random number generator
 };
 
 } // namespace dmx

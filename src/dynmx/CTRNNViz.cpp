@@ -24,6 +24,12 @@ namespace dmx
 //----------------------------------------------------------------------------------------------------------------------
 void CTRNNNeuronViz::update()
 {
+  glPushAttrib(GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT | GL_POLYGON_BIT);
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_LIGHTING);
+  glEnable(GL_BLEND);
+  glDisable(GL_CULL_FACE);
+  
   int N = m_ctrnn->getSize();
   
   // left upper corner of circle's bounding box at 0,0:
@@ -35,62 +41,65 @@ void CTRNNNeuronViz::update()
   glMultMatrixf(*m_pTM);
   
   // connectivity
-  for(int i = 0; i < N; i++)
+  if(m_renderConnections)
   {
-    float angle = -((float)i + 0.5f) * segmentSize + PI_OVER_TWO;   
-    Vec3f midPoint (networkRadius * cosf(angle), networkRadius * sinf(angle), 0.0f);
-
-    // draw only the selected neuron's connections
-    if(i == m_selected || m_selected == -1)
+    for(int i = 0; i < N; i++)
     {
-      // draw connections    
-      for(int j = 0; j < N; j++)
-      {
-        const double eps = 0.001;
-        const float weight = m_ctrnn->getWeight(j,i);        
-        if(fabs(weight) > eps)
-        {
-          float otherAngle = -((float)j + 0.5f) * segmentSize + PI_OVER_TWO; 
-          Vec3f otherMidPoint (networkRadius * cosf(otherAngle), networkRadius * sinf(otherAngle), 0.0f);
+      float angle = -((float)i + 0.5f) * segmentSize + PI_OVER_TWO;   
+      Vec3f midPoint (networkRadius * cosf(angle), networkRadius * sinf(angle), 0.0f);
 
-          glLineWidth(fabs(weight));
-          if(weight < 0)
-            glColor3f(235.0/255.0, 0.0/255.0, 103.0/255.0); 
-          else
-            glColor3f(0,0,0);
-          ci::gl::drawLine(midPoint, otherMidPoint);
-        }
-      }   
-      
-      // render text 
-      if(m_renderText && i == m_selected)
+      // draw only the selected neuron's connections
+      if(i == m_selected || m_selected == -1)
       {
-        // box
-        glColor4f(0,0,0, 0.5f);
-        const float lineHeight = 13;
-        const float padding = 3;
-        const float textBoxH = 3 * lineHeight + 2 * padding;
-        ci::Vec2f textBoxPos = ci::Vec2f(midPoint);
-        ci::gl::drawSolidRect(ci::Rectf(textBoxPos.x, textBoxPos.y, textBoxPos.x + m_width, textBoxPos.y + textBoxH));
+        // draw connections    
+        for(int j = 0; j < N; j++)
+        {
+          const double eps = 0.001;
+          const float weight = m_ctrnn->getWeight(j,i);        
+          if(fabs(weight) > eps)
+          {
+            float otherAngle = -((float)j + 0.5f) * segmentSize + PI_OVER_TWO; 
+            Vec3f otherMidPoint (networkRadius * cosf(otherAngle), networkRadius * sinf(otherAngle), 0.0f);
+
+            glLineWidth(fabs(weight));
+            if(weight < 0)
+              glColor3f(235.0/255.0, 0.0/255.0, 103.0/255.0); 
+            else
+              glColor3f(0,0,0);
+            ci::gl::drawLine(midPoint, otherMidPoint);
+          }
+        }   
         
-        // text
-        ci::Color textColor(1,1,1);
-        ci::Vec2f textPos = textBoxPos + ci::Vec2f(padding, padding);
-        char str [128];
-        sprintf(str, "Node: %i", i);
-        ci::gl::drawString(str, textPos, textColor, m_font);
-        
-        sprintf(str, "b: %2.2f | t: %2.2f | g: %2.2f", m_ctrnn->getBias(i), m_ctrnn->getTimeConstant(i), m_ctrnn->getGain(i));
-        ci::gl::drawString(str, textPos + ci::Vec2f(0, lineHeight), textColor, m_font);      
-        
-        sprintf(str, "in: %1.3f | out: %1.3f", m_ctrnn->getExternalInput(i), m_ctrnn->getOutput(i));
-        ci::gl::drawString(str, textPos + ci::Vec2f(0, 2 * lineHeight), textColor, m_font);            
+        // render text 
+        if(m_renderText && i == m_selected)
+        {
+          // box
+          glColor4f(0,0,0, 0.5f);
+          const float lineHeight = 13;
+          const float padding = 3;
+          const float textBoxH = 3 * lineHeight + 2 * padding;
+          ci::Vec2f textBoxPos = ci::Vec2f(midPoint);
+          ci::gl::drawSolidRect(ci::Rectf(textBoxPos.x, textBoxPos.y, textBoxPos.x + m_width, textBoxPos.y + textBoxH));
+          
+          // text
+          ci::Color textColor(1,1,1);
+          ci::Vec2f textPos = textBoxPos + ci::Vec2f(padding, padding);
+          char str [128];
+          sprintf(str, "Node: %i", i);
+          ci::gl::drawString(str, textPos, textColor, m_font);
+          
+          sprintf(str, "b: %2.2f | t: %2.2f | g: %2.2f", m_ctrnn->getBias(i), m_ctrnn->getTimeConstant(i), m_ctrnn->getGain(i));
+          ci::gl::drawString(str, textPos + ci::Vec2f(0, lineHeight), textColor, m_font);      
+          
+          sprintf(str, "in: %1.3f | out: %1.3f", m_ctrnn->getExternalInput(i), m_ctrnn->getOutput(i));
+          ci::gl::drawString(str, textPos + ci::Vec2f(0, 2 * lineHeight), textColor, m_font);            
+        }
       }
     }
   }
   
   glLineWidth(1.0f);
-  float outerRadius = neuronRadius + 6;
+  float outerRadius = neuronRadius + (neuronRadius * 0.5);
   for(int i = 0; i < N; i++)
   {
     ci::Color col = m_ctrnn->getState(i) > 0 ? ci::Color(0,0,0) : ci::Color(235.0/255.0, 0.0/255.0, 103.0/255.0);
@@ -108,7 +117,7 @@ void CTRNNNeuronViz::update()
     // ring size indicating external input value
     glColor3f(181.0/255.0, 206.0/255.0, 26.0/255.0);    
     float width = radiansToDegrees(m_ctrnn->getExternalInput(i) * TWO_PI);
-    dmx::drawPartialDisk(neuronRadius, outerRadius, 8, 1, 0, width, GLU_FILL);     
+    dmx::drawPartialDisk(neuronRadius, outerRadius, 32, 1, 0, width, GLU_FILL);
     glColor3f(0,0,0);
     ci::gl::drawStrokedCircle(ci::Vec2f(0,0), outerRadius, 32);
     ci::gl::drawStrokedCircle(ci::Vec2f(0,0), neuronRadius, 32);    
@@ -116,6 +125,8 @@ void CTRNNNeuronViz::update()
   }  
   
   glPopMatrix();
+  
+  glPopAttrib();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -150,43 +161,52 @@ void CTRNNNeuronViz::onMouseMove(const Vec4f& mPos)
 //----------------------------------------------------------------------------------------------------------------------
 void CTRNNWheelViz::update()
 {
+  glPushAttrib(GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT | GL_POLYGON_BIT);
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_LIGHTING);
+  glEnable(GL_BLEND);
+  glDisable(GL_CULL_FACE);
+  
   int N = m_ctrnn->getSize();
   
   const float segmentSizeDeg = 360.0f / N;
   const float segmentSizeRad = degreesToRadians(segmentSizeDeg);
   const float r3 = m_width / 2;
-  const float r2 = r3 - 5;
-  const float r1 = r2 - 10;
+  const float r2 = r3 - r3/10;
+  const float r1 = r2 - r3/5;
   
   // left upper corner of wheel's bounding box at 0,0:    
   glPushMatrix();
   glMultMatrixf(*m_pTM);
   
   // connectivity
-  for(int i = 0; i < N; i++)
+  if(m_renderConnections)
   {
-    // draw only the selected neuron's connections
-    if(i == m_selected || m_selected == -1)
+    for(int i = 0; i < N; i++)
     {
-      float angle = -((float)i + 0.5f) * segmentSizeRad + PI_OVER_TWO; 
-      Vec3f midPoint ((r1+5) * cosf(angle), (r1+5) * sinf(angle), 0.0f);
-      for(int j = 0; j < N; j++)
+      // draw only the selected neuron's connections
+      if(i == m_selected || m_selected == -1)
       {
-        const double eps = 0.001;
-        const float weight = m_ctrnn->getWeight(j, i);        
-        if(fabs(weight) > eps)
+        float angle = -((float)i + 0.5f) * segmentSizeRad + PI_OVER_TWO; 
+        Vec3f midPoint ((r1 + r3/10) * cosf(angle), (r1 + r3/10) * sinf(angle), 0.0f);
+        for(int j = 0; j < N; j++)
         {
-          float otherAngle = -((float)j + 0.5f) * segmentSizeRad + PI_OVER_TWO; 
-          Vec3f otherMidPoint ((r1+5) * cosf(otherAngle), (r1+5) * sinf(otherAngle), 0.0f);
-          glLineWidth(fabs(weight));
-          if(weight < 0)
-            glColor3f(235.0/255.0, 0.0/255.0, 103.0/255.0); 
-          else
-            glColor3f(0,0,0);
-          ci::gl::drawLine(midPoint, otherMidPoint);
-        }
+          const double eps = 0.001;
+          const float weight = m_ctrnn->getWeight(j, i);        
+          if(fabs(weight) > eps)
+          {
+            float otherAngle = -((float)j + 0.5f) * segmentSizeRad + PI_OVER_TWO; 
+            Vec3f otherMidPoint ((r1 + r3/10) * cosf(otherAngle), (r1 + r3/10) * sinf(otherAngle), 0.0f);
+            glLineWidth(fabs(weight));
+            if(weight < 0)
+              glColor3f(235.0/255.0, 0.0/255.0, 103.0/255.0); 
+            else
+              glColor3f(0,0,0);
+            ci::gl::drawLine(midPoint, otherMidPoint);
+          }
+        }   
       }   
-    }   
+    }
   }
   glLineWidth(1.0f);
   
@@ -195,30 +215,32 @@ void CTRNNWheelViz::update()
   {
     // white background
     glColor3f(1,1,1);
-    dmx::drawPartialDisk(r1, r2, 8, 1, i * segmentSizeDeg, segmentSizeDeg, GLU_FILL);
+    dmx::drawPartialDisk(r1, r2, 32, 1, i * segmentSizeDeg, segmentSizeDeg, GLU_FILL);
     // actual amount
     glColor3f(181.0/255.0, 206.0/255.0, 26.0/255.0);
     float outputWidth = m_ctrnn->getOutput(i) * segmentSizeDeg;
-    dmx::drawPartialDisk(r1, r2, 8, 1, i * segmentSizeDeg, outputWidth, GLU_FILL); 
+    dmx::drawPartialDisk(r1, r2, 32, 1, i * segmentSizeDeg, outputWidth, GLU_FILL);
     // outline segment
     glColor3f(0,0,0);
-    dmx::drawPartialDisk(r1, r2, 8, 1, i * segmentSizeDeg, segmentSizeDeg, GLU_SILHOUETTE);   
+    dmx::drawPartialDisk(r1, r2, 32, 1, i * segmentSizeDeg, segmentSizeDeg, GLU_SILHOUETTE);
   }
   
   // indicators
   for(int i = 0; i < N; i++)
   {
     glColor3f(0,0,0);
-    dmx::drawPartialDisk(r2, r3, 8, 1, i * segmentSizeDeg, m_ctrnn->getExternalInput(i) * segmentSizeDeg, GLU_FILL);  
+    dmx::drawPartialDisk(r2, r3, 32, 1, i * segmentSizeDeg, m_ctrnn->getExternalInput(i) * segmentSizeDeg, GLU_FILL);
     
     if(i == m_selected)
       glColor3f(235.0/255.0, 0.0/255.0, 103.0/255.0);
     else
       glColor3f(0,0,0);
     
-    dmx::drawPartialDisk(r2, r3, 8, 1, i * segmentSizeDeg, segmentSizeDeg, GLU_SILHOUETTE); 
+    dmx::drawPartialDisk(r2, r3, 32, 1, i * segmentSizeDeg, segmentSizeDeg, GLU_SILHOUETTE);
   }  
   glPopMatrix();
+  
+  glPopAttrib();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -253,7 +275,7 @@ CTRNNLayerViz::CTRNNLayerViz(const CTRNN* ctrnn, const Topology* top, float widt
   m_maxLayerN = std::max(numInputs, std::max(numHidden, numOutputs));
   
   int space = m_width / m_maxLayerN;   
-  m_r = space / 3;
+  m_r = space / 6;
   
   // Pre-calculate all neuron's positions
   // Inputs
@@ -362,6 +384,8 @@ double CTRNNViz::getOutputNorm(int i, const CTRNN* ctrnn)
   double out = ctrnn->getOutput(i);
   if(out > 1)
     out /= ctrnn->getGain(i);
+  if(out < 0)
+    out *= -1;
   
   return out;
 }
@@ -374,14 +398,17 @@ void CTRNNViz::drawNeuron(int i, const CTRNN* ctrnn, float inner, float outer)
   drawDisk(outer, 0.0, 32, 1);    
   
   // disk size indicating output value
-  ci::Color col = ctrnn->getState(i) > 0 ? ci::Color(0,0,0) : ci::Color(235.0/255.0, 0.0/255.0, 103.0/255.0);    
+  ci::Color col = ctrnn->getState(i) > 0 ? ci::Color(0,0,0) : ci::Color(235.0/255.0, 0.0/255.0, 103.0/255.0);
+  if (ctrnn->getOutput(i) < 0) col = ci::Color(235.0/255.0, 0.0/255.0, 103.0/255.0);
   ci::gl::color(col);    
-  drawDisk(inner * clamp(getOutputNorm(i, ctrnn),0.0,1.0), 0.0, 32, 1);
+  drawDisk(inner * clamp(getOutputNorm(i, ctrnn), 0.0, 1.0), 0.0, 32, 1);
   
   // ring size indicating external input value
-  glColor3f(181.0/255.0, 206.0/255.0, 26.0/255.0);    
+  //glColor3f(181.0/255.0, 206.0/255.0, 26.0/255.0);
+  col = ctrnn->getExternalInput(i) > 0 ? ci::Color(185/255.0, 185/255.0, 185/255.0) : ci::Color(235.0/255.0, 205.0/255.0, 221.0/255.0);
+  ci::gl::color(col);    
   float width = radiansToDegrees(ctrnn->getExternalInput(i) * TWO_PI);
-  dmx::drawPartialDisk(inner, outer, 8, 1, 0, width, GLU_FILL);     
+  dmx::drawPartialDisk(inner, outer, 32, 1, 0, width, GLU_FILL);
   glColor3f(0,0,0);
   ci::gl::drawStrokedCircle(ci::Vec2f(0,0), outer, 32);
   ci::gl::drawStrokedCircle(ci::Vec2f(0,0), inner, 32);      

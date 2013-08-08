@@ -23,13 +23,23 @@ void SMCEnvironmentViz::drawGaussian(const Gaussian& g) const
   // Three sigmas cover approx. 99% of the gaussian
   float a = -3.0 * g.getW();
   float inc = 6.0 * g.getW() / numPoints;
+  
+  ci::Path2d path;
+  path.moveTo(g.getPointAt(a));
   for(int i = 0; i < numPoints; ++i)
   {
-    start = g.getPointAt(a);
     end = g.getPointAt((a+inc));
-    ci::gl::drawLine(start, end);
+    path.lineTo(end);
     a += inc;
   }
+  path.close();
+  
+  glColor4f(0.5,0.5,0.5,0.25);
+  glDisable(GL_CULL_FACE);
+  glDisable(GL_DEPTH_TEST);
+  ci::gl::drawSolid(path);
+  glEnable(GL_CULL_FACE);
+  glEnable(GL_DEPTH_TEST);
 }
   
 //----------------------------------------------------------------------------------------------------------------------

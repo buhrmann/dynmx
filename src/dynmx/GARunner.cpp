@@ -102,14 +102,17 @@ void GARunner::init()
           }
           m_ga->randomise(false, initialMutMax);
           reset(false);
-          // elitist: keep best unmutated
-          m_ga->setGenome(0, &bestGenome[0], bestFit);
+          
+          // Elitist: keep best unmutated
+          // In case fitness function changes, have to evaluate best again
+          if(ga.getChild("Incremental").getAttributeValue<bool>("elitist", 0))
+            m_ga->setGenome(0, &bestGenome[0], MAX_NEG_FLOAT);
         }
         else
         {
           // Random population with best previous genome as single elitist seed
           reset(true);
-          m_ga->setGenome(0, &bestGenome[0], bestFit);
+          m_ga->setGenome(0, &bestGenome[0], MAX_NEG_FLOAT);
         }
       }
       else

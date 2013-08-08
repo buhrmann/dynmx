@@ -58,6 +58,7 @@ public:
   void setSensorMode(int mode) { m_sensorMode = mode; };
   void setSensorMode(const std::string& mode);
   void setPosition(const ci::Vec2f& pos);
+  void setEnergy(float e) { m_energy = e; };
   
   // Getters
   SMCEnvironment& getEnvironment() { return m_environment; };
@@ -72,7 +73,9 @@ public:
   float getTime() { return m_time; };  
   float getAngleWithHeading(ci::Vec2f pos);
   float getMaxPosition() { return m_maxPosition; };
-  float getMaxSpeed() { return m_maxSpeed; };  
+  float getMaxSpeed() { return m_maxSpeed; };
+  float getEnergy() { return m_energy; };
+  float getSensedFood() { return m_food; };
   const ci::Vec2f& getVelocity() const { return m_velocity; };
   
   virtual void toXml(ci::XmlTree& xml);
@@ -105,6 +108,9 @@ protected:
 
   bool m_positionWraps;
   bool m_angleWraps;
+  
+  float m_energy;
+  float m_food;
   
   float m_time;
   

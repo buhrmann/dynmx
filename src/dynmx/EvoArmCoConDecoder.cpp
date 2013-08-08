@@ -91,6 +91,7 @@ void EvoArmCoCon::decodeSpindles(int move/*=0*/)
 void EvoArmCoCon::decodeGenome(const double* genome)
 {
   int I = 0;
+  int numGenesEncoded = getNumGenes();
   
   const int numMuscles = m_arm->getNumMuscles();
   const int numReflexes = m_arm->getNumReflexes();
@@ -524,6 +525,18 @@ void EvoArmCoCon::decodeGenome(const double* genome)
     } // for all reflexes
   } // if evolve slopes
   
+  if(m_goMode == Reflex::kGo_weighted)
+  {
+    for(int i = 0; i <= 1; ++i)
+    {
+      m_arm->getReflex(i)->setGoParameters(map01To(genome[I+0], -maxW, 0),
+                                           map01To(genome[I+1], -maxW, 0),
+                                           map01To(genome[I+2], -maxW, 0),
+                                           map01To(genome[I+3], -maxW, 0));
+      I += 4;
+    }
+  }
+  
   
   // IFV gains
   if(m_evolveIFV)
@@ -634,7 +647,7 @@ void EvoArmCoCon::decodeGenome(const double* genome)
     }
   }
   
-  assert(I == getNumGenes());
+  assert(I == numGenesEncoded);
   
   createTrajectories();
   
@@ -790,6 +803,11 @@ int EvoArmCoCon::getNumGenes()
       numGenes += numReflexes * numMNparams;
     else
       numGenes += numMuscles * numMNparams;
+  }
+  
+  if(m_goMode == Reflex::kGo_weighted)
+  {
+    numGenes += numReflexes * 4;
   }
   
   // Parameters of ifv neurons

@@ -17,13 +17,13 @@ void SMCAgentViz::init()
 { 
   NodeGroup::init(); 
   
-  m_agentDisk = new Disk(m_agent->getRadius(), m_agent->getRadius()/2.0, 32);
+  m_agentDisk = new Disk(m_agent->getRadius(), m_agent->getRadius()*0.9, 32);
   m_agentDisk->m_color = ci::Vec4f(0,0,0,1);
   m_agentDisk->createGeometry();
   m_children.push_back(m_agentDisk);
   
   Disk* innerDisk = new Disk(m_agent->getRadius()/2.0, 0, 32);
-  innerDisk->m_color = ci::Vec4f(1,1,1, 1);
+  innerDisk->m_color = ci::Vec4f(0,0,0, 1);
   innerDisk->createGeometry();
   m_children.push_back(innerDisk);  
 }
@@ -47,6 +47,12 @@ void SMCAgentViz::update()
   glDisable(GL_LIGHTING);
   
   // This is in world space
+  glColor3f(0, 0, 0);
+  const float velScale = 0.1f;
+  glLineWidth(2.0);
+  ci::gl::drawLine(m_agent->getPosition(), m_agent->getPosition() + m_agent->getVelocity() * velScale);
+  glLineWidth(1.0);
+  
   const DistanceSensor& sensor = m_agent->getDistanceSensor();
   float sensedDistance = sensor.getDistance();
   glEnable(GL_LINE_STIPPLE);

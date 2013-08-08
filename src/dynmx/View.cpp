@@ -8,6 +8,8 @@
  */
 
 #include "View.h"
+#include "cinder/ImageIo.h"
+#include "cinder/gl/gl.h"
 #include "cinder/app/KeyEvent.h"
 
 namespace dmx
@@ -27,8 +29,6 @@ View::~View()
 //----------------------------------------------------------------------------------------------------------------------
 void View::init()
 {
-  std::cout << "View::init()" << std::endl;
-  
   m_paused = false;
 
   m_backgroundColor = Vec4f(0.3f, 0.3f, 0.3f, 1.0);
@@ -103,6 +103,9 @@ void View::init()
 //----------------------------------------------------------------------------------------------------------------------
 void View::draw()
 {
+  if(getWindowWidth() <= 0)
+    return;
+  
   // Clear the background
 	glClearColor(m_backgroundColor.x, m_backgroundColor.y, m_backgroundColor.z, 1.0f);  
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ); 
@@ -208,12 +211,13 @@ void View::draw()
     {
       // draw a background quad with potentially four differently coloured corners
       dmx::drawRectangle(getWindowWidth(), getWindowHeight(), m_background.topLeft, m_background.topRight,
-        m_background.bottomLeft, m_background.bottomRight);
+      m_background.bottomLeft, m_background.bottomRight);
+      
       m_scene2d.update();
       draw2d();
     }
     
-    //ci::gl::drawString("dynmx", ci::Vec2f(25,75), ci::ColorA(1,1,1,0.5), m_font);    
+    //ci::gl::drawString("dynmx", ci::Vec2f(25,75), ci::ColorA(1,1,1,0.5), m_font);
 
     // finally draw the GUI on top
     glDisable(GL_BLEND);

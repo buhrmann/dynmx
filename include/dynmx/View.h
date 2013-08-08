@@ -17,6 +17,7 @@
 #include "cinder/Camera.h"
 #include "cinder/MayaCamUI.h"
 #include "cinder/params/Params.h"
+#include "cinder/gl/Texture.h"
 #include "SimpleGUI.h"
 
 namespace dmx
