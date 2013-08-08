@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Config>
+	<Globals>
+		<Visual Value="0"/>
+		<WindowSize Width="1200" Height="1000"/>
+		<FrameRate Value="1000"/>
+		<FullScreen Value="0"/>
+		<VSync Value="0"/>
+		<Model Value="GA"/>
+		<DebugLevel Value="1"/>
+		<PlotDuration Value="0.5"/>
+		<OutputFolder Name="/Users/thomasbuhrmann/Experiments/Arm/IndDirs/R1"/>
+	</Globals>
+	<GA>
+		<Evolvable Name="EvoArmCoCon">
+			<DesiredTrajectory InDegrees="1" ResetEachMove="1">
+				<Move Duration="0.3" LeadIn="0.1" LeadOut="0.2">
+					<From x="90" y="60"/>
+					<To x="60" y="80"/>
+				</Move>
+			</DesiredTrajectory>
+			<EvoFlags>
+				<Muscles symmetric="0" hillParams="0">0</Muscles>
+				<Spindles velRef="0" symmetric="1" symmetricWeights="1" perMove="0">1</Spindles>
+				<Iain simple="0" symmetric="0">0</Iain>
+				<Ibin derivative="0" symmetric="0" interseg="0" flipIntersegWeights="0" recExcIa="0">0</Ibin>
+				<Renshaw symmetric="1">0</Renshaw>
+				<MN symmetric="1">0</MN>
+				<Neurons sigSlope="0"/>
+				<Go invert="0" mode="evolve">0</Go>
+				<Ifv>0</Ifv>
+				<Sfv>0</Sfv>
+				<OpenLoop max="0.3" symmetric="0" tauMaxAct="0.0" tauMaxDeact="0.5" cutoff="1">1</OpenLoop>
+				<InterSegmentInput symmetric="0" max="1.0" perMove="0">0</InterSegmentInput>
+				<DistalCommandDelay max="0.05" perMove="0">0</DistalCommandDelay>
+				<RampDuration perMove="0">0</RampDuration>
+				<Friction>0</Friction>
+				<DecodeLimits>
+					<ArmLimits>
+						<jointRadius min="0.01" max="0.05"/>
+						<jointFriction min="0.01" max="0.2"/>
+					</ArmLimits>
+					<MuscleLimits>
+						<attach min="0.06" max="0.26"/>
+						<force min="100" max="2000"/>
+						<optLength min="0.01" max="1.25"/>
+						<maxVel min="8.0" max="12.0"/>
+					</MuscleLimits>
+					<SpindleLimits>
+						<pos min="0.0" max="6.0"/>
+						<dmp max="1.0"/>
+						<vel max="0.5"/>
+						<exp min="0.9" max="1.0"/>
+						<weight min="0.1" max="1.0"/>
+					</SpindleLimits>
+				</DecodeLimits>
+			</EvoFlags>
+			<CommandTrajSmooth>1</CommandTrajSmooth>
+			<UseMuscleCoords>0</UseMuscleCoords>
+			<FitnessFunction>
+				<EndPointOnly>0</EndPointOnly>
+				<Velocity>0</Velocity>
+				<Coactivation max="0.2">1</Coactivation>
+				<ForceMin threshold="0.997">1</ForceMin>
+			</FitnessFunction>
+			<recordIsometric>0</recordIsometric>
+		</Evolvable>
+		<Incremental initialMutation="0.1" seedOnly="1" seedAll="1" elitist="1">0</Incremental>
+		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/Output/13_07_17__09_34_00/GA_Result.xml"/>
+		<PopulationSize Value="500"/>
+		<DemeSize Value="20"/>
+		<NumGenerations Value="300"/>
+		<MutationMax Value="0.02"/>
+		<MutationMaxReduced Value="0.002"/>
+		<MutationMaxReduceAt Value="200"/>
+		<RecombinationRate Value="0.5"/>
+		<RecombinationRateReduced Value="0.75"/>
+		<AvoidReevaluation Value="1"/>
+		<NumTrials Value="1"/>
+		<SaveBestEachGeneration Value="0"/>
+		<AutoEval Run="1"/>
+		<Eval Run="0">
+			<NumTrials Value="1"/>
+			<RecordState Value="0"/>
+			<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/Output/13_07_10__20_20_44/GA_BestGenome.xml"/>
+		</Eval>
+	</GA>
+	<Arm Gravity="0.0" Integrator="euler" InteractionTorques="1">
+		<BestFitnessMatchDelay>0</BestFitnessMatchDelay>
+		<TorqueFeedback Measured="0" PosMod="1"/>
+		<CoContraction AsCCommand="1"/>
+		<RampDurations>
+			<Value>0.460982</Value>
+		</RampDurations>
+		<OpenLoopActivations/>
+		<IntersegmentalParams/>
+		<UpperArm Length="0.33" Mass="2.52" Inertia="0.022869"/>
+		<LowerArm Length="0.32" Mass="1.3" Inertia="0.011093333333333335"/>
+		<Shoulder Friction="0.14136062124686619" UpperLimit="160" LowerLimit="0" Locked="0" Radius="0.0432988703"/>
+		<Elbow Friction="0.18024445508437148" UpperLimit="160" LowerLimit="0" Locked="0" Radius="0.0469451062"/>
+		<Muscle Joint="Elbow" Name="ElbowFlexor" IsFlexor="1" IsMono="1">
+			<Attachment Origin="0.23912510572138851" Insertion="0.078117459025431699"/>
+			<MaxIsoForce>138.388</MaxIsoForce>
+			<MaxVelocity>11.5859</MaxVelocity>
+			<Length Optimal="0.31050603769120022" Min="0.16785870037155931" Max="0.33645146216902366"/>
+			<HillParameters Shortening="0.12348158394868416" Lengthening="0.40435470135401974" Asymptote="1.4472938369670554" Slope="2"/>
+		</Muscle>
+		<Muscle Joint="Elbow" Name="ElbowExtensor" IsFlexor="0" IsMono="1">
+			<Attachment Origin="0.23912510572138851" Insertion="0.078117459025431699"/>
+			<MaxIsoForce>138.388</MaxIsoForce>
+			<MaxVelocity>11.5859</MaxVelocity>
+			<Length Optimal="0.44737206647359873" Min="0.33645146216902366" Max="0.46754687110784293"/>
+			<HillParameters Shortening="0.12348158394868416" Lengthening="0.40435470135401974" Asymptote="1.4472938369670554" Slope="2"/>
+		</Muscle>
+		<Muscle Joint="Shoulder" Name="ShoulderFlexor" IsFlexor="1" IsMono="1">
+			<Attachment Origin="0.2536625653204998" Insertion="0.060526256007267819"/>
+			<MaxIsoForce>1522.92</MaxIsoForce>
+			<MaxVelocity>11.1522</MaxVelocity>
+			<Length Optimal="0.35897747161543797" Min="0.19787237059712567" Max="0.33417538194641222"/>
+			<HillParameters Shortening="0.44491483368135509" Lengthening="0.13569431903118098" Asymptote="1.1392938854717083" Slope="2"/>
+		</Muscle>
+		<Muscle Joint="Shoulder" Name="ShoulderExtensor" IsFlexor="0" IsMono="1">
+			<Attachment Origin="0.2536625653204998" Insertion="0.060526256007267819"/>
+			<MaxIsoForce>1522.92</MaxIsoForce>
+			<MaxVelocity>11.1522</MaxVelocity>
+			<Length Optimal="0.47709029941041681" Min="0.33417538194641222" Max="0.45508858391178242"/>
+			<HillParameters Shortening="0.44491483368135509" Lengthening="0.13569431903118098" Asymptote="1.1392938854717083" Slope="2"/>
+		</Muscle>
+		<Reflex Agonist="ElbowFlexor" Antagonist="ElbowExtensor" FeedbackDelay="0.025" CommandDelay="0" OpenLoopTauAct="0.024469548418136856" OpenLoopTauDeact="0.023603651229594451">
+			<Spindle>
+				<PosGain Ag="4.565805454842832" An="4.565805454842832"/>
+				<VelGain Ag="0.41918012824213502" An="0.41918012824213502"/>
+				<VelExp Ag="0.51035851486528083" An="0.51035851486528083"/>
+				<DmpGain Ag="0.38824302139672207" An="0.38824302139672207"/>
+				<DmpExp Ag="3.0338289324431256" An="3.0338289324431256"/>
+				<Wspmn Ag="0.44172434986102782" An="0.44172434986102782"/>
+			</Spindle>
+			<Sfv>
+				<Gain Ag="0" An="0"/>
+				<RecInh Ag="0" An="0"/>
+			</Sfv>
+			<Ifv>
+				<Gain Ag="0" An="0"/>
+				<Bias Ag="0" An="0"/>
+			</Ifv>
+			<IaIn Wgo="-0.94989457371205954">
+				<Wiaia Ag="0.26281123013075186" An="0.026064788844658064"/>
+				<Wspia Ag="0.66762486724801806" An="0.23562365353292766"/>
+				<Wrnia Ag="0.83306182784161698" An="0.24365273658180481"/>
+				<Waia Ag="0.49682436551342557" An="0.27808164796769236"/>
+				<Wiamn Ag="0.38096366813066795" An="0.6093650171536521"/>
+				<Bias Ag="0.044717517487873976" An="-0.014796238465117101"/>
+				<Tau Ag="98.082409897306732" An="69.428399514314464"/>
+				<Slope Ag="5.5962133178072984" An="6.2631431777285229"/>
+			</IaIn>
+			<Renshaw Wgo="-0.11830691008171212">
+				<Wmnrn Ag="0.81189014061885945" An="0.81189014061885945"/>
+				<Wrnrn Ag="0.62771497803568788" An="0.62771497803568788"/>
+				<Wrnmn Ag="0.92387894270582949" An="0.92387894270582949"/>
+				<Bias Ag="0.029139300216313807" An="0.029139300216313807"/>
+				<Tau Ag="78.188311559443335" An="78.188311559443335"/>
+				<Slope Ag="5.2533144182363074" An="5.2533144182363074"/>
+			</Renshaw>
+			<IbIn Wgo="-0.83389020344008968">
+				<Wibib Ag="0.85013844196282817" An="0.3594203465542119"/>
+				<Wglib Ag="0.33870645688574536" An="0.3360976371146619"/>
+				<Wgdib Ag="0" An="0"/>
+				<Wibmn Ag="0.26059960764539397" An="0.49746127213938957"/>
+				<Wiaib Ag="0.51431178757798923" An="0.017395763737408313"/>
+				<WisibAg Ag="0.7278586006815766" An="0.0603674336996467"/>
+				<WisibAn Ag="0.11451811212258733" An="0.37153958001711573"/>
+				<Bias Ag="-0.048266949078662941" An="-0.093219703355176278"/>
+				<Tau Ag="32.800952036220743" An="7.2953449035650992"/>
+				<Slope Ag="1.551515389738551" An="2.509394310382107"/>
+			</IbIn>
+			<aMN asNeuron="0" Wgo="-0.19233381975724162">
+				<Bias Ag="0" An="0"/>
+				<Tau Ag="100" An="100"/>
+				<Slope Ag="1" An="1"/>
+				<WeIbinMn Ag="0.019121772783226024" An="0.64224255445160716"/>
+				<WisibAgMn Ag="0.071940010511465369" An="-0.11989530546023119"/>
+				<WisibAnMn Ag="0.10574131646325435" An="-0.3739561934339054"/>
+			</aMN>
+			<IsIn>
+				<Wisep Ag="0" An="0"/>
+			</IsIn>
+		</Reflex>
+		<Reflex Agonist="ShoulderFlexor" Antagonist="ShoulderExtensor" FeedbackDelay="0.025" CommandDelay="0" OpenLoopTauAct="0.024469548418136856" OpenLoopTauDeact="0.023603651229594451">
+			<Spindle>
+				<PosGain Ag="3.4076635966469953" An="3.4076635966469953"/>
+				<VelGain Ag="0.30942354335534733" An="0.30942354335534733"/>
+				<VelExp Ag="2.4168821430812817" An="2.4168821430812817"/>
+				<DmpGain Ag="0.71391743262705087" An="0.71391743262705087"/>
+				<DmpExp Ag="0.75037120143735414" An="0.75037120143735414"/>
+				<Wspmn Ag="0.48989076629798789" An="0.48989076629798789"/>
+			</Spindle>
+			<Sfv>
+				<Gain Ag="0" An="0"/>
+				<RecInh Ag="0" An="0"/>
+			</Sfv>
+			<Ifv>
+				<Gain Ag="0" An="0"/>
+				<Bias Ag="0" An="0"/>
+			</Ifv>
+			<IaIn Wgo="-0.92179969546929164">
+				<Wiaia Ag="0.37127605830373123" An="0.37386970371902534"/>
+				<Wspia Ag="0.47366037859592824" An="0.87598467215780673"/>
+				<Wrnia Ag="0.99276770360449851" An="0.36179649106252942"/>
+				<Waia Ag="0.11448586841998762" An="0.30094671459211603"/>
+				<Wiamn Ag="0.2011377010706315" An="0.55578633534692545"/>
+				<Bias Ag="-0.060085076340724596" An="-0.019321330479430465"/>
+				<Tau Ag="57.811230020683659" An="14.228297632407656"/>
+				<Slope Ag="6.8895363694281153" An="6.9936815480279337"/>
+			</IaIn>
+			<Renshaw Wgo="-0.074999188470912803">
+				<Wmnrn Ag="0.96953216103481776" An="0.96953216103481776"/>
+				<Wrnrn Ag="0.74300450601566648" An="0.74300450601566648"/>
+				<Wrnmn Ag="0.78361260611354111" An="0.78361260611354111"/>
+				<Bias Ag="0.090042822070372369" An="0.090042822070372369"/>
+				<Tau Ag="85.121971386380679" An="85.121971386380679"/>
+				<Slope Ag="9.8655179742293342" An="9.8655179742293342"/>
+			</Renshaw>
+			<IbIn Wgo="-0.37816836117536257">
+				<Wibib Ag="0.118461073089664" An="0.97608338770091885"/>
+				<Wglib Ag="0.42237766343753153" An="0.00028614661926159169"/>
+				<Wgdib Ag="0" An="0"/>
+				<Wibmn Ag="0.029208250692933965" An="0.944719723652924"/>
+				<Wiaib Ag="0.27980528074609867" An="0.28477987758230927"/>
+				<WisibAg Ag="0.46352175876635759" An="0.18676211151170685"/>
+				<WisibAn Ag="0.80756783421828437" An="0.66083055708203009"/>
+				<Bias Ag="0.088089679299607038" An="-0.078379530859472371"/>
+				<Tau Ag="31.050376197524525" An="100.56929567444324"/>
+				<Slope Ag="1.7895161783164957" An="7.5165060902471659"/>
+			</IbIn>
+			<aMN asNeuron="0" Wgo="-0.10679811237638015">
+				<Bias Ag="0" An="0"/>
+				<Tau Ag="100" An="100"/>
+				<Slope Ag="1" An="1"/>
+				<WeIbinMn Ag="0.06975283166901762" An="0.15454134161734745"/>
+				<WisibAgMn Ag="0.099843929914277929" An="-0.28924627325809815"/>
+				<WisibAnMn Ag="-0.4291878490872203" An="-0.56324358482116499"/>
+			</aMN>
+			<IsIn>
+				<Wisep Ag="0" An="0"/>
+			</IsIn>
+		</Reflex>
+	</Arm>
+</Config>
