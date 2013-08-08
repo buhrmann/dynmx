@@ -18,6 +18,7 @@
 		5323E6B60EAFCA7E003A9687 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5323E6B50EAFCA7E003A9687 /* QTKit.framework */; };
 		53E3CDFC0E86099300238D2B /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53E3CDFB0E86099300238D2B /* Carbon.framework */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		D60C452E1778935A00CF2635 /* SMCAgentMeta1d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D60C452D1778935900CF2635 /* SMCAgentMeta1d.cpp */; };
 		D630C7951645396700F2ABE5 /* Topology.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D630C7941645396700F2ABE5 /* Topology.cpp */; };
 		D6D9F12314DC62D6009C0C95 /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10014DC62D6009C0C95 /* App.cpp */; };
 		D6D9F12414DC62D6009C0C95 /* Arm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10114DC62D6009C0C95 /* Arm.cpp */; };
@@ -82,6 +83,9 @@
 		53E3CDFB0E86099300238D2B /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* dynmx.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dynmx.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D60C452D1778935900CF2635 /* SMCAgentMeta1d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SMCAgentMeta1d.cpp; path = ../src/dynmx/SMCAgentMeta1d.cpp; sourceTree = "<group>"; };
+		D60C452F177899D400CF2635 /* SMCView1d.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SMCView1d.h; path = ../src/dynmx/SMCView1d.h; sourceTree = "<group>"; };
+		D60C453017789DD500CF2635 /* SMCAgentViz1d.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SMCAgentViz1d.h; path = ../src/dynmx/SMCAgentViz1d.h; sourceTree = "<group>"; };
 		D630C7941645396700F2ABE5 /* Topology.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Topology.cpp; path = ../src/dynmx/Topology.cpp; sourceTree = "<group>"; };
 		D630C7961645397F00F2ABE5 /* SMCAgentGaussian.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCAgentGaussian.h; path = ../include/dynmx/SMCAgentGaussian.h; sourceTree = "<group>"; };
 		D630C7971645397F00F2ABE5 /* SMCAgentLineDis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCAgentLineDis.h; path = ../include/dynmx/SMCAgentLineDis.h; sourceTree = "<group>"; };
@@ -188,6 +192,7 @@
 		D6D9F20D14DC6A93009C0C95 /* glut32.lib */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = glut32.lib; sourceTree = "<group>"; };
 		D6E6E56D14E15C1300FE6B07 /* Spin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Spin.h; path = ../include/dynmx/Spin.h; sourceTree = "<group>"; };
 		D6E6E56F14E15C2E00FE6B07 /* Spin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Spin.cpp; path = ../src/dynmx/Spin.cpp; sourceTree = "<group>"; };
+		D6ED21B51775B38200B6134D /* SMCAgentMeta1d.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SMCAgentMeta1d.h; path = ../src/dynmx/SMCAgentMeta1d.h; sourceTree = "<group>"; };
 		D6FFB99A14F860390057C7AD /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Log.h; path = ../include/dynmx/Log.h; sourceTree = "<group>"; };
 		D6FFB99C14F860900057C7AD /* EvoArmCoConDecoder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EvoArmCoConDecoder.cpp; path = ../src/dynmx/EvoArmCoConDecoder.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -218,6 +223,8 @@
 		080E96DDFE201D6D7F000001 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				D6ED21B41775B2E100B6134D /* ANN */,
+				D6ED21B31775B2C000B6134D /* GA */,
 				D6D9F0F414DC62BD009C0C95 /* Tests */,
 				D6E6E57214E15DC100FE6B07 /* SMC */,
 				D6E6E57314E15E6E00FE6B07 /* Spin */,
@@ -225,25 +232,11 @@
 				D6D9F10014DC62D6009C0C95 /* App.cpp */,
 				D6D9F0C614DC62A4009C0C95 /* App.h */,
 				D6D9F0D214DC62A4009C0C95 /* CollisionDetection.h */,
-				D6D9F10714DC62D6009C0C95 /* CTRNN.cpp */,
-				D6D9F0D314DC62A4009C0C95 /* CTRNN.h */,
-				D6D9F10814DC62D6009C0C95 /* CTRNNViz.cpp */,
-				D6D9F0D414DC62A4009C0C95 /* CTRNNViz.h */,
-				D6D9F10914DC62D6009C0C95 /* DistanceSensor.cpp */,
-				D6D9F0D514DC62A4009C0C95 /* DistanceSensor.h */,
 				D6D9F10A14DC62D6009C0C95 /* Dynmx.cpp */,
 				D6D9F0D614DC62A4009C0C95 /* Dynmx.h */,
 				32CA4F630368D1EE00C91783 /* dynmx_Prefix.pch */,
-				D6D9F10D14DC62D6009C0C95 /* GA.cpp */,
-				D6D9F0D914DC62A4009C0C95 /* GA.h */,
-				D6D9F10E14DC62D6009C0C95 /* GARunner.cpp */,
-				D6D9F0DA14DC62A4009C0C95 /* GARunner.h */,
-				D6D9F10F14DC62D6009C0C95 /* GATester.cpp */,
-				D6D9F0DB14DC62A4009C0C95 /* GATester.h */,
-				D6D9F11014DC62D6009C0C95 /* GAViz.cpp */,
-				D6D9F0DC14DC62A4009C0C95 /* GAViz.h */,
-				D6D9F11114DC62D6009C0C95 /* Light.cpp */,
 				D6D9F0DD14DC62A4009C0C95 /* Light.h */,
+				D6D9F11114DC62D6009C0C95 /* Light.cpp */,
 				D6FFB99A14F860390057C7AD /* Log.h */,
 				D6D9F14614DC62E9009C0C95 /* main.cpp */,
 				D6D9F0DE14DC62A4009C0C95 /* MathUtils.h */,
@@ -261,8 +254,6 @@
 				D6D9F0EA14DC62A4009C0C95 /* Simulation.h */,
 				D6D9F11C14DC62D6009C0C95 /* SimulationFactory.cpp */,
 				D6D9F0EB14DC62A4009C0C95 /* SimulationFactory.h */,
-				D630C7981645397F00F2ABE5 /* Topology.h */,
-				D630C7941645396700F2ABE5 /* Topology.cpp */,
 				D6D9F12214DC62D6009C0C95 /* View.cpp */,
 				D6D9F0F314DC62A4009C0C95 /* View.h */,
 			);
@@ -472,13 +463,19 @@
 				D6D9F0ED14DC62A4009C0C95 /* SMCAgentEvo.h */,
 				D6D9F11F14DC62D6009C0C95 /* SMCAgentViz.cpp */,
 				D6D9F0EE14DC62A4009C0C95 /* SMCAgentViz.h */,
+				D60C453017789DD500CF2635 /* SMCAgentViz1d.h */,
 				D630C7961645397F00F2ABE5 /* SMCAgentGaussian.h */,
+				D6ED21B51775B38200B6134D /* SMCAgentMeta1d.h */,
+				D60C452D1778935900CF2635 /* SMCAgentMeta1d.cpp */,
 				D630C7971645397F00F2ABE5 /* SMCAgentLineDis.h */,
 				D6D9F12014DC62D6009C0C95 /* SMCEnvironment.cpp */,
 				D6D9F0EF14DC62A4009C0C95 /* SMCEnvironment.h */,
 				D6D9F12114DC62D6009C0C95 /* SMCEnvironmentViz.cpp */,
 				D6D9F0F014DC62A4009C0C95 /* SMCEnvironmentViz.h */,
 				D6D9F0F114DC62A4009C0C95 /* SMCView.h */,
+				D60C452F177899D400CF2635 /* SMCView1d.h */,
+				D6D9F10914DC62D6009C0C95 /* DistanceSensor.cpp */,
+				D6D9F0D514DC62A4009C0C95 /* DistanceSensor.h */,
 			);
 			name = SMC;
 			sourceTree = "<group>";
@@ -516,6 +513,34 @@
 				D6D9F0D814DC62A4009C0C95 /* EvoArmCoCon.h */,
 			);
 			name = Evolvables;
+			sourceTree = "<group>";
+		};
+		D6ED21B31775B2C000B6134D /* GA */ = {
+			isa = PBXGroup;
+			children = (
+				D6D9F10D14DC62D6009C0C95 /* GA.cpp */,
+				D6D9F0D914DC62A4009C0C95 /* GA.h */,
+				D6D9F10E14DC62D6009C0C95 /* GARunner.cpp */,
+				D6D9F0DA14DC62A4009C0C95 /* GARunner.h */,
+				D6D9F10F14DC62D6009C0C95 /* GATester.cpp */,
+				D6D9F0DB14DC62A4009C0C95 /* GATester.h */,
+				D6D9F11014DC62D6009C0C95 /* GAViz.cpp */,
+				D6D9F0DC14DC62A4009C0C95 /* GAViz.h */,
+			);
+			name = GA;
+			sourceTree = "<group>";
+		};
+		D6ED21B41775B2E100B6134D /* ANN */ = {
+			isa = PBXGroup;
+			children = (
+				D630C7981645397F00F2ABE5 /* Topology.h */,
+				D630C7941645396700F2ABE5 /* Topology.cpp */,
+				D6D9F10714DC62D6009C0C95 /* CTRNN.cpp */,
+				D6D9F0D314DC62A4009C0C95 /* CTRNN.h */,
+				D6D9F10814DC62D6009C0C95 /* CTRNNViz.cpp */,
+				D6D9F0D414DC62A4009C0C95 /* CTRNNViz.h */,
+			);
+			name = ANN;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -621,6 +646,7 @@
 				D6E6E57014E15C2E00FE6B07 /* Spin.cpp in Sources */,
 				D6FFB99D14F860900057C7AD /* EvoArmCoConDecoder.cpp in Sources */,
 				D630C7951645396700F2ABE5 /* Topology.cpp in Sources */,
+				D60C452E1778935A00CF2635 /* SMCAgentMeta1d.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -636,6 +662,7 @@
 				CLANG_CXX_LIBRARY = "libstdc++";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../glut/lib/osx\"",
@@ -643,7 +670,7 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 1;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = dynmx_Prefix.pch;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
@@ -676,7 +703,7 @@
 					"\"$(SRCROOT)/../glut/lib/osx\"",
 				);
 				GCC_FAST_MATH = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -710,9 +737,10 @@
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = NO;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = NO;
 				CLANG_WARN__EXIT_TIME_DESTRUCTORS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_CHECK_RETURN_VALUE_OF_OPERATOR_NEW = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-				GCC_OPTIMIZATION_LEVEL = 1;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
 				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES;
 				GCC_VERSION = "";
@@ -750,7 +778,8 @@
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = NO;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = NO;
 				CLANG_WARN__EXIT_TIME_DESTRUCTORS = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;

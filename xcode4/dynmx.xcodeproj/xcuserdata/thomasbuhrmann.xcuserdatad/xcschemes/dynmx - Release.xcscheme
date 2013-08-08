@@ -59,16 +59,28 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "/Users/thomasbuhrmann/Code/dynmx/bin/Configs/EvoArmOplpInterSegMv4SymRefxOnly.xml"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "/Users/thomasbuhrmann/Code/dynmx/bin/Configs/EvoArmFixedOplp1234.xml"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "/Users/thomasbuhrmann/Code/dynmx/bin/Configs/EvoArmIbIs1234.xml"
+            argument = "/Users/thomasbuhrmann/Code/dynmx/bin/Configs/EvoArmIbIsDirs6M.xml"
             isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/thomasbuhrmann/Code/dynmx/bin/Configs/EvoArmIbIsDirsR1.xml"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/thomasbuhrmann/Code/dynmx/bin/Configs/EvoArmIbIsDirs0-180.xml"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/thomasbuhrmann/Code/dynmx/bin/Configs/EvoArmIbIsSpOnly.xml"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/thomasbuhrmann/Code/dynmx/bin/Configs/EvoArmIbIs123456.xml"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/thomasbuhrmann/Code/dynmx/bin/Configs/SMCMetaEvo.xml"
+            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>
