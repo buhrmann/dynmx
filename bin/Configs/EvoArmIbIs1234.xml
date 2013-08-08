@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Config>
 	<Globals>
-		<Visual Value="1"/>
+		<Visual Value="0"/>
 		<WindowSize Width="1200" Height="1000"/>
 		<FrameRate Value="1000"/>
 		<FullScreen Value="0"/>
 		<VSync Value="0"/>
 		<Model Value="GA"/>
-		<DebugLevel Value="3"/>
+		<DebugLevel Value="1"/>
 		<PlotDuration Value="0.5"/>
-		<OutputFolder Name="/Users/thomasbuhrmann/Experiments/Arm/Output"/>
+		<OutputFolder Name="/Users/thomasbuhrmann/Experiments/Arm/Velocity/M0"/>
 	</Globals>
 	<GA>
 		<Evolvable Name="EvoArmCoCon">
@@ -23,25 +23,26 @@
 					<To x="60" y="80"/>
 				</Move>				
 				<Move Duration="0.3" LeadIn="0.1" LeadOut="0.2">
-					<From x="70" y="40"/>
-					<To x="40" y="20"/>
+					<From x="110" y="80"/>
+					<To x="80" y="60"/>
 				</Move>
 				<Move Duration="0.3" LeadIn="0.1" LeadOut="0.2">
-					<From x="70" y="40"/>
-					<To x="40" y="60"/>
+					<From x="110" y="80"/>
+					<To x="80" y="100"/>
 				</Move>
 			</DesiredTrajectory>
 			<EvoFlags>
 				<Muscles symmetric="0" hillParams="0">0</Muscles>
 				<Spindles velRef="1" symmetric="1" symmetricWeights="1" perMove="0">1</Spindles>
-				<Iain simple="0" symmetric="1">1</Iain>
+				<Iain simple="0" symmetric="0">1</Iain>
 				<Ibin derivative="0" symmetric="0" interseg="1" flipIntersegWeights="0" recExcIa="1">1</Ibin>
 				<Renshaw symmetric="1">1</Renshaw>
 				<MN symmetric="1">0</MN>
 				<Neurons sigSlope="1"/>
+				<Go invert="0" mode="evolve">1</Go>
 				<Ifv>0</Ifv>
 				<Sfv>0</Sfv>
-				<OpenLoop max="0.3" symmetric="0" tauMaxAct="0.05" tauMaxDeact="0.5" cutoff="0">1</OpenLoop>
+				<OpenLoop max="0.3" symmetric="0" tauMaxAct="0.05" tauMaxDeact="0.5" cutoff="1">1</OpenLoop>
 				<InterSegmentInput symmetric="0" max="1.0" perMove="0">0</InterSegmentInput>
 				<DistalCommandDelay max="0.05" perMove="0">0</DistalCommandDelay>
 				<RampDuration perMove="0">1</RampDuration>
@@ -58,7 +59,7 @@
 						<maxVel min="8.0" max="12.0"/>
 					</MuscleLimits>
 					<SpindleLimits>
-						<pos max="6.0"/>
+						<pos min="0.0" max="6.0"/>
 						<dmp max="1.0"/>
 						<vel max="0.5"/>
 						<exp min="0.25" max="4.0"/>
@@ -75,24 +76,24 @@
 			</FitnessFunction>
 			<recordIsometric>0</recordIsometric>
 		</Evolvable>
-		<Incremental initialMutation="0.0" seedOnly="1" seedAll="1">1</Incremental>
-		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/Output/13_01_16__12_26_42/GA_Result.xml"/>
-		<PopulationSize Value="300"/>
+		<Incremental initialMutation="0.001" seedOnly="1" seedAll="1">1</Incremental>
+		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/Output/13_04_28__21_35_39/GA_Result.xml"/>
+		<PopulationSize Value="500"/>
 		<DemeSize Value="20"/>
-		<NumGenerations Value="10"/>
-		<MutationMax Value="0.0"/>
-		<MutationMaxReduced Value="0.0001"/>
-		<MutationMaxReduceAt Value="350"/>
-		<RecombinationRate Value="1.0"/>
+		<NumGenerations Value="1000"/>
+		<MutationMax Value="0.0001"/>
+		<MutationMaxReduced Value="0.00001"/>
+		<MutationMaxReduceAt Value="500"/>
+		<RecombinationRate Value="0.5"/>
 		<RecombinationRateReduced Value="0.75"/>
 		<AvoidReevaluation Value="1"/>
 		<NumTrials Value="1"/>
 		<SaveBestEachGeneration Value="0"/>
 		<AutoEval Run="1"/>
-		<Eval Run="1">
-			<NumTrials Value="2"/>
-			<RecordState Value="1"/>
-			<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/Output/13_01_16__12_26_42/GA_BestGenome.xml"/>
+		<Eval Run="1" MutateMin="0.0" MutateMax="0.0" MutateStep="0.001">
+			<NumTrials Value="1"/>
+			<RecordState Value="0"/>
+			<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/Output/13_04_29__11_19_24/GA_BestGenome.xml"/>
 		</Eval>
 	</GA>
 	<Arm Gravity="0.0" Integrator="euler" InteractionTorques="1">
@@ -138,7 +139,7 @@
 			<Length Optimal="0.47709029941041681" Min="0.33417538194641222" Max="0.45508858391178242"/>
 			<HillParameters Shortening="0.44491483368135509" Lengthening="0.13569431903118098" Asymptote="1.1392938854717083" Slope="2"/>
 		</Muscle>
-		<Reflex Agonist="ElbowFlexor" Antagonist="ElbowExtensor" FeedbackDelay="0.01" CommandDelay="0" OpenLoopTauAct="0.040601879346798389" OpenLoopTauDeact="0.23876400382983493">
+		<Reflex Agonist="ElbowFlexor" Antagonist="ElbowExtensor" FeedbackDelay="0.025" CommandDelay="0" OpenLoopTauAct="0.040601879346798389" OpenLoopTauDeact="0.23876400382983493">
 			<Spindle>
 				<PosGain Ag="5.2207059496631416" An="5.6489632165523833"/>
 				<VelGain Ag="0.49589120405898746" An="0.18061302668907528"/>
@@ -191,7 +192,7 @@
 				<Wisep Ag="0" An="0"/>
 			</IsIn>
 		</Reflex>
-		<Reflex Agonist="ShoulderFlexor" Antagonist="ShoulderExtensor" FeedbackDelay="0.01" CommandDelay="0" OpenLoopTauAct="0.040601879346798389" OpenLoopTauDeact="0.23876400382983493">
+		<Reflex Agonist="ShoulderFlexor" Antagonist="ShoulderExtensor" FeedbackDelay="0.025" CommandDelay="0" OpenLoopTauAct="0.040601879346798389" OpenLoopTauDeact="0.23876400382983493">
 			<Spindle>
 				<PosGain Ag="1.1722999999666022" An="3.4880731725751417"/>
 				<VelGain Ag="0.050379186232078717" An="0.086654300601997303"/>

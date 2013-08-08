@@ -2,7 +2,7 @@
 # Executes binary with specified argument N times
 
 N=7
-CFG="Configs/EvoArmIbIs1234.xml"
+CFG="Configs/EvoArmIbIsDirs6M-Inc.xml"
 #CFG="Configs/SMCAgentEvo.xml"
 
 # Copy exe here, so one can keep coding and building the original exe

@@ -3,8 +3,8 @@
 # until all params have been processed
 
 # Params
-N=7
-CFGs=("Configs/EvoArmFixedOplp1234.xml" "Configs/EvoArmFixedOplp1234.xml" "Configs/EvoArmFixedOplp1234.xml" "Configs/EvoArmFixedOplp1234.xml")
+N=8
+CFGs=("Configs/EvoArmIbIsDirs.xml" "Configs/EvoArmIbIsDirs.xml")
 
 # Copy exe here, so one can keep coding and building the original exe
 cd `dirname $0`
@@ -28,4 +28,4 @@ do
   wait					# wait until all N processes have finished before starting the next N
 done
 
-wait
+osascript -e 'tell application "System Events" to sleep'
