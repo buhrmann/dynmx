@@ -20,6 +20,8 @@
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		D60C452E1778935A00CF2635 /* SMCAgentMeta1d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D60C452D1778935900CF2635 /* SMCAgentMeta1d.cpp */; };
 		D630C7951645396700F2ABE5 /* Topology.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D630C7941645396700F2ABE5 /* Topology.cpp */; };
+		D668798B17B4F7C300FC1166 /* SMCArm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D668798917B4F7C300FC1166 /* SMCArm.cpp */; };
+		D668798D17B50F9900FC1166 /* SMCArmView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D668798C17B50F9900FC1166 /* SMCArmView.cpp */; };
 		D6D9F12314DC62D6009C0C95 /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10014DC62D6009C0C95 /* App.cpp */; };
 		D6D9F12414DC62D6009C0C95 /* Arm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10114DC62D6009C0C95 /* Arm.cpp */; };
 		D6D9F12514DC62D6009C0C95 /* ArmMuscled.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10214DC62D6009C0C95 /* ArmMuscled.cpp */; };
@@ -90,6 +92,10 @@
 		D630C7961645397F00F2ABE5 /* SMCAgentGaussian.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCAgentGaussian.h; path = ../include/dynmx/SMCAgentGaussian.h; sourceTree = "<group>"; };
 		D630C7971645397F00F2ABE5 /* SMCAgentLineDis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCAgentLineDis.h; path = ../include/dynmx/SMCAgentLineDis.h; sourceTree = "<group>"; };
 		D630C7981645397F00F2ABE5 /* Topology.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Topology.h; path = ../include/dynmx/Topology.h; sourceTree = "<group>"; };
+		D668798817B4F77400FC1166 /* SMCArm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SMCArm.h; path = ../include/dynmx/SMCArm.h; sourceTree = "<group>"; };
+		D668798917B4F7C300FC1166 /* SMCArm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SMCArm.cpp; path = ../src/dynmx/SMCArm.cpp; sourceTree = "<group>"; };
+		D668798C17B50F9900FC1166 /* SMCArmView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SMCArmView.cpp; path = ../src/dynmx/SMCArmView.cpp; sourceTree = "<group>"; };
+		D668798E17B50FAB00FC1166 /* SMCArmView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SMCArmView.h; sourceTree = "<group>"; };
 		D6D9F0C614DC62A4009C0C95 /* App.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = App.h; path = ../include/dynmx/App.h; sourceTree = "<group>"; };
 		D6D9F0C714DC62A4009C0C95 /* Arm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Arm.h; path = ../include/dynmx/Arm.h; sourceTree = "<group>"; };
 		D6D9F0C814DC62A4009C0C95 /* ArmMuscled.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmMuscled.h; path = ../include/dynmx/ArmMuscled.h; sourceTree = "<group>"; };
@@ -476,6 +482,10 @@
 				D60C452F177899D400CF2635 /* SMCView1d.h */,
 				D6D9F10914DC62D6009C0C95 /* DistanceSensor.cpp */,
 				D6D9F0D514DC62A4009C0C95 /* DistanceSensor.h */,
+				D668798817B4F77400FC1166 /* SMCArm.h */,
+				D668798917B4F7C300FC1166 /* SMCArm.cpp */,
+				D668798E17B50FAB00FC1166 /* SMCArmView.h */,
+				D668798C17B50F9900FC1166 /* SMCArmView.cpp */,
 			);
 			name = SMC;
 			sourceTree = "<group>";
@@ -647,6 +657,8 @@
 				D6FFB99D14F860900057C7AD /* EvoArmCoConDecoder.cpp in Sources */,
 				D630C7951645396700F2ABE5 /* Topology.cpp in Sources */,
 				D60C452E1778935A00CF2635 /* SMCAgentMeta1d.cpp in Sources */,
+				D668798B17B4F7C300FC1166 /* SMCArm.cpp in Sources */,
+				D668798D17B50F9900FC1166 /* SMCArmView.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

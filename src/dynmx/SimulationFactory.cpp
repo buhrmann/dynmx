@@ -42,7 +42,9 @@
 #include "SMCAgentLineDis.h"
 #include "SMCAgentGaussian.h"
 #include "SMCAgentMeta1d.h"
+#include "SMCArm.h"
 #include "SMCView.h"
+#include "SMCArmView.h"
 #include "SMCView1d.h"
 
 #include "Spin.h"
@@ -129,6 +131,16 @@ Simulation* SimulationFactory::create()
       if(visual)
       {
         View* view = new SMCView1d((SMCAgentMeta1d*)evolvable);
+        app = new App(model, view);
+      }
+    }
+    else if ("SMCArm" == evolvableName)
+    {
+      evolvable = new SMCArm();
+      model = evaluateOnly ? (Model*) new GATester(evolvable) : (Model*) new GARunner (evolvable);
+      if(visual)
+      {
+        View* view = new SMCArmView((SMCArm*)evolvable);
         app = new App(model, view);
       }
     }

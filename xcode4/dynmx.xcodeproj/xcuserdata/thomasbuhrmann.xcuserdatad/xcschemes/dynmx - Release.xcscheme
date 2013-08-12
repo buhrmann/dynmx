@@ -59,7 +59,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "/Users/thomasbuhrmann/Code/dynmx/bin/Configs/EvoArmIbIsDirs6M.xml"
+            argument = "/Users/thomasbuhrmann/Code/dynmx/bin/Configs/EvoArmIbIsDirs6M-Inc.xml"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
@@ -80,6 +80,10 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/Users/thomasbuhrmann/Code/dynmx/bin/Configs/SMCMetaEvo.xml"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/thomasbuhrmann/Code/dynmx/bin/Configs/SMCArmEvo.xml"
             isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>

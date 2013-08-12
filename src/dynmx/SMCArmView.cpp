@@ -6,4 +6,4 @@
 //
 //
 
-#include <stdio.h>
+#include "SMCArmView.h"
