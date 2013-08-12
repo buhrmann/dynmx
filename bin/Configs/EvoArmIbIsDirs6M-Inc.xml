@@ -42,12 +42,12 @@
 			<EvoFlags>
 				<Muscles symmetric="0" hillParams="0">0</Muscles>
 				<Spindles velRef="0" symmetric="1" symmetricWeights="1" perMove="0">1</Spindles>
-				<Iain simple="0" symmetric="0">1</Iain>
-				<Ibin derivative="0" symmetric="0" interseg="1" flipIntersegWeights="0" recExcIa="1">1</Ibin>
-				<Renshaw symmetric="1">1</Renshaw>
+				<Iain simple="0" symmetric="0">0</Iain>
+				<Ibin derivative="0" symmetric="0" interseg="0" flipIntersegWeights="0" recExcIa="0">0</Ibin>
+				<Renshaw symmetric="1">0</Renshaw>
 				<MN symmetric="1">0</MN>
-				<Neurons sigSlope="1"/>
-				<Go invert="0" mode="evolve">1</Go>
+				<Neurons sigSlope="0"/>
+				<Go invert="0" mode="evolve">0</Go>
 				<Ifv>0</Ifv>
 				<Sfv>0</Sfv>
 				<OpenLoop max="0.3" symmetric="0" tauMaxAct="0.05" tauMaxDeact="0.5" cutoff="1">1</OpenLoop>
@@ -85,14 +85,14 @@
 			</FitnessFunction>
 			<recordIsometric>0</recordIsometric>
 		</Evolvable>
-		<Incremental initialMutation="0.05" seedOnly="1" seedAll="1" elitist="1">1</Incremental>
-		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/IndDirs6M/13_08_08__10_11_00/GA_Result.xml"/>
-		<PopulationSize Value="500"/>
+		<Incremental initialMutation="0.01" seedOnly="1" seedAll="1" elitist="1">0</Incremental>
+		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/IndDirs6M/13_08_09__13_36_39/GA_Result.xml"/>
+		<PopulationSize Value="250"/>
 		<DemeSize Value="20"/>
-		<NumGenerations Value="1500"/>
-		<MutationMax Value="0.001"/>
-		<MutationMaxReduced Value="0.0001"/>
-		<MutationMaxReduceAt Value="1000"/>
+		<NumGenerations Value="1000"/>
+		<MutationMax Value="0.02"/>
+		<MutationMaxReduced Value="0.002"/>
+		<MutationMaxReduceAt Value="750"/>
 		<RecombinationRate Value="0.5"/>
 		<RecombinationRateReduced Value="0.75"/>
 		<AvoidReevaluation Value="1"/>
@@ -110,75 +110,101 @@
 		<TorqueFeedback Measured="0" PosMod="1"/>
 		<CoContraction AsCCommand="1"/>
 		<RampDurations>
-			<Value>0.616005</Value>
+			<Value>0.628847</Value>
 		</RampDurations>
 		<OpenLoopActivations>
-			<Value>0.168788</Value>
-			<Value>0.231405</Value>
-			<Value>0.043756</Value>
-			<Value>0.280692</Value>
-			<Value>0.114875</Value>
-			<Value>0.256305</Value>
-			<Value>0.135315</Value>
-			<Value>0.0596984</Value>
-			<Value>0.0644759</Value>
-			<Value>0.163082</Value>
-			<Value>0.192015</Value>
-			<Value>0.035914</Value>
-			<Value>0.248466</Value>
-			<Value>0.170186</Value>
-			<Value>0.256794</Value>
-			<Value>0.0857845</Value>
-			<Value>0.267758</Value>
-			<Value>0.130192</Value>
-			<Value>0.0748243</Value>
-			<Value>0.0679751</Value>
-			<Value>0.217756</Value>
-			<Value>0.119698</Value>
-			<Value>0.00737455</Value>
-			<Value>0.298844</Value>
+			<Value>0.169037</Value>
+			<Value>0.233156</Value>
+			<Value>0.0410791</Value>
+			<Value>0.277485</Value>
+			<Value>0.117037</Value>
+			<Value>0.256468</Value>
+			<Value>0.131272</Value>
+			<Value>0.0589289</Value>
+			<Value>0.062637</Value>
+			<Value>0.161655</Value>
+			<Value>0.18783</Value>
+			<Value>0.0379948</Value>
+			<Value>0.252246</Value>
+			<Value>0.172235</Value>
+			<Value>0.254996</Value>
+			<Value>0.0847688</Value>
+			<Value>0.265332</Value>
+			<Value>0.1322</Value>
+			<Value>0.0729808</Value>
+			<Value>0.0652409</Value>
+			<Value>0.216861</Value>
+			<Value>0.121742</Value>
+			<Value>0.00785721</Value>
+			<Value>0.299458</Value>
 		</OpenLoopActivations>
+		<SpindleParams>
+			<Value>0.531823</Value>
+			<Value>0.360727</Value>
+			<Value>0.572017</Value>
+			<Value>0.449532</Value>
+			<Value>0.832974</Value>
+			<Value>0.484957</Value>
+		</SpindleParams>
+		<IbIntersegWeights>
+			<Value>0.871702</Value>
+			<Value>0.805472</Value>
+			<Value>0.0540339</Value>
+			<Value>0.977365</Value>
+			<Value>0.020819</Value>
+			<Value>-0.403359</Value>
+			<Value>-0.109188</Value>
+			<Value>-0.162844</Value>
+			<Value>0.97046</Value>
+			<Value>0.341087</Value>
+			<Value>-0.775334</Value>
+			<Value>0.959539</Value>
+			<Value>-0.579846</Value>
+			<Value>-0.222304</Value>
+			<Value>-0.269407</Value>
+			<Value>-0.127725</Value>
+		</IbIntersegWeights>
 		<IntersegmentalParams/>
 		<UpperArm Length="0.33" Mass="2.52" Inertia="0.022869"/>
 		<LowerArm Length="0.32" Mass="1.3" Inertia="0.011093333333333335"/>
-		<Shoulder Friction="0.16685611752289101" UpperLimit="160" LowerLimit="0" Locked="0" Radius="0.0432988703"/>
-		<Elbow Friction="0.13615938070288905" UpperLimit="160" LowerLimit="0" Locked="0" Radius="0.0469451062"/>
+		<Shoulder Friction="0.16593243522018378" UpperLimit="160" LowerLimit="0" Locked="0" Radius="0.024869833534852719"/>
+		<Elbow Friction="0.12655024510902407" UpperLimit="160" LowerLimit="0" Locked="0" Radius="0.021598571273339365"/>
 		<Muscle Joint="Elbow" Name="ElbowFlexor" IsFlexor="1" IsMono="1">
-			<Attachment Origin="0.07593028934617703" Insertion="0.23126328995055698"/>
-			<MaxIsoForce>370.106</MaxIsoForce>
-			<MaxVelocity>8.17821</MaxVelocity>
-			<Length Optimal="0.24481459883061527" Min="0.16200716974440879" Max="0.31106043382932363"/>
+			<Attachment Origin="0.077366921153165555" Insertion="0.23134067260253002"/>
+			<MaxIsoForce>388.146</MaxIsoForce>
+			<MaxVelocity>8.15275</MaxVelocity>
+			<Length Optimal="0.23864797063935889" Min="0.16083125718230834" Max="0.31275147770431677"/>
 			<HillParameters Shortening="0.14999999999999999" Lengthening="0.14999999999999999" Asymptote="1.5" Slope="2"/>
 		</Muscle>
 		<Muscle Joint="Elbow" Name="ElbowExtensor" IsFlexor="0" IsMono="1">
-			<Attachment Origin="0.20951652350236025" Insertion="0.17892388824059541"/>
-			<MaxIsoForce>1324.56</MaxIsoForce>
-			<MaxVelocity>10.7587</MaxVelocity>
-			<Length Optimal="0.42776390922311475" Min="0.39072152048975733" Max="0.44928784206754357"/>
+			<Attachment Origin="0.20863396842084411" Insertion="0.17820702613730638"/>
+			<MaxIsoForce>1304.98</MaxIsoForce>
+			<MaxVelocity>10.764</MaxVelocity>
+			<Length Optimal="0.42629077654684294" Min="0.3892704561386533" Max="0.44958504486286421"/>
 			<HillParameters Shortening="0.14999999999999999" Lengthening="0.14999999999999999" Asymptote="1.5" Slope="2"/>
 		</Muscle>
 		<Muscle Joint="Shoulder" Name="ShoulderFlexor" IsFlexor="1" IsMono="1">
-			<Attachment Origin="0.23608620315509443" Insertion="0.065942555423917859"/>
-			<MaxIsoForce>612.414</MaxIsoForce>
-			<MaxVelocity>11.5469</MaxVelocity>
-			<Length Optimal="0.31432486388593533" Min="0.17557507521175489" Max="0.30795176257784701"/>
+			<Attachment Origin="0.23530988443527059" Insertion="0.064338254553404708"/>
+			<MaxIsoForce>621.821</MaxIsoForce>
+			<MaxVelocity>11.5151</MaxVelocity>
+			<Length Optimal="0.31153976539370531" Min="0.1762309189904683" Max="0.30583303455720223"/>
 			<HillParameters Shortening="0.14999999999999999" Lengthening="0.14999999999999999" Asymptote="1.5" Slope="2"/>
 		</Muscle>
 		<Muscle Joint="Shoulder" Name="ShoulderExtensor" IsFlexor="0" IsMono="1">
-			<Attachment Origin="0.23987981255533353" Insertion="0.060139332138112858"/>
-			<MaxIsoForce>1217.32</MaxIsoForce>
-			<MaxVelocity>10.7274</MaxVelocity>
-			<Length Optimal="0.38640828852213749" Min="0.30638267895711679" Max="0.3750562428318025"/>
+			<Attachment Origin="0.24038597906444173" Insertion="0.060475098523984798"/>
+			<MaxIsoForce>1212.5</MaxIsoForce>
+			<MaxVelocity>10.7647</MaxVelocity>
+			<Length Optimal="0.38855103717755035" Min="0.30733849815807851" Max="0.37678817435706857"/>
 			<HillParameters Shortening="0.14999999999999999" Lengthening="0.14999999999999999" Asymptote="1.5" Slope="2"/>
 		</Muscle>
-		<Reflex Agonist="ElbowFlexor" Antagonist="ElbowExtensor" FeedbackDelay="0.025000000000000001" CommandDelay="0" OpenLoopTauAct="0.01" OpenLoopTauDeact="0.092720832860388916">
+		<Reflex Agonist="ElbowFlexor" Antagonist="ElbowExtensor" FeedbackDelay="0.025000000000000001" CommandDelay="0" OpenLoopTauAct="0.01" OpenLoopTauDeact="0.084992982311787646">
 			<Spindle>
-				<PosGain Ag="3.2538535779607196" An="3.2538535779607196"/>
+				<PosGain Ag="3.190940544941268" An="3.190940544941268"/>
 				<VelGain Ag="0" An="0"/>
 				<VelExp Ag="1" An="1"/>
-				<DmpGain Ag="0.370045042050823" An="0.370045042050823"/>
-				<DmpExp Ag="0.95755380392488754" An="0.95755380392488754"/>
-				<Wspmn Ag="0.97207812304699592" An="0.97207812304699592"/>
+				<DmpGain Ag="0.36072657931105678" An="0.36072657931105678"/>
+				<DmpExp Ag="0.95720169701802238" An="0.95720169701802238"/>
+				<Wspmn Ag="0.97874572663110238" An="0.97874572663110238"/>
 			</Spindle>
 			<Sfv>
 				<Gain Ag="0" An="0"/>
@@ -188,56 +214,56 @@
 				<Gain Ag="0" An="0"/>
 				<Bias Ag="0" An="0"/>
 			</Ifv>
-			<IaIn Wgo="-0.66751450081674046">
-				<Wiaia Ag="0.37571370102815616" An="0.49179044581873688"/>
-				<Wspia Ag="0.3832700046493015" An="0.45019585871864265"/>
-				<Wrnia Ag="0.29735448102811585" An="0.54563522624907013"/>
-				<Waia Ag="0.28331062222084924" An="0.04577867122686978"/>
-				<Wiamn Ag="0.031360378394818568" An="0.49659347872041748"/>
-				<Bias Ag="-0.035531001225449291" An="-0.0097678329704393302"/>
-				<Tau Ag="26.301070336811758" An="46.831247977818627"/>
-				<Slope Ag="8.7359321978161208" An="8.4048811853936218"/>
+			<IaIn Wgo="-0.66233261747912675">
+				<Wiaia Ag="0.3738548546957729" An="0.50216044560863637"/>
+				<Wspia Ag="0.37519037842858172" An="0.44627038629760346"/>
+				<Wrnia Ag="0.29814344472973187" An="0.5370665133021838"/>
+				<Waia Ag="0.28396836487435057" An="0.032907748384898745"/>
+				<Wiamn Ag="0.028493617000496324" An="0.48697496144528268"/>
+				<Bias Ag="-0.038893610246624077" An="-0.0088348286963569889"/>
+				<Tau Ag="28.27315276509087" An="47.639223959750879"/>
+				<Slope Ag="8.5316598467138736" An="8.2699388461915717"/>
 			</IaIn>
-			<Renshaw Wgo="-0.0099827941876604598">
-				<Wmnrn Ag="0.8995069694095964" An="0.8995069694095964"/>
-				<Wrnrn Ag="0.57582574037359668" An="0.57582574037359668"/>
-				<Wrnmn Ag="0.93623073276746094" An="0.93623073276746094"/>
-				<Bias Ag="0.085156239240984116" An="0.085156239240984116"/>
-				<Tau Ag="64.420523720206972" An="64.420523720206972"/>
-				<Slope Ag="9.0203161880460403" An="9.0203161880460403"/>
+			<Renshaw Wgo="-0.018785283496144833">
+				<Wmnrn Ag="0.90477135059616864" An="0.90477135059616864"/>
+				<Wrnrn Ag="0.57149843392955757" An="0.57149843392955757"/>
+				<Wrnmn Ag="0.9485852172691569" An="0.9485852172691569"/>
+				<Bias Ag="0.088554654269514477" An="0.088554654269514477"/>
+				<Tau Ag="63.984848990211063" An="63.984848990211063"/>
+				<Slope Ag="9.140724068565369" An="9.140724068565369"/>
 			</Renshaw>
-			<IbIn Wgo="-0.68067491980187422">
-				<Wibib Ag="0.27598922097788542" An="0.49533912196750396"/>
-				<Wglib Ag="0.40146569515758984" An="0.83080600518540404"/>
+			<IbIn Wgo="-0.69637007836303366">
+				<Wibib Ag="0.27027815531721644" An="0.49869703136717847"/>
+				<Wglib Ag="0.40494869646134596" An="0.83726277135806892"/>
 				<Wgdib Ag="0" An="0"/>
-				<Wibmn Ag="0.418397628708781" An="0.060772774255421762"/>
-				<Wiaib Ag="0.14832444058846916" An="0.4570017478268727"/>
-				<WisibAg Ag="0.87334277523662363" An="0.091380329680168071"/>
-				<WisibAn Ag="0.8146144920857139" An="0.99650729670097649"/>
-				<Bias Ag="-0.056199455253003613" An="-0.0724236727639231"/>
-				<Tau Ag="52.856029174347263" An="21.307710789722105"/>
-				<Slope Ag="8.9138563942436466" An="7.8192262791308931"/>
+				<Wibmn Ag="0.42473737499051717" An="0.049142747046502101"/>
+				<Wiaib Ag="0.15969160582310199" An="0.46894737563751876"/>
+				<WisibAg Ag="0.87170232028356431" An="0.05403389350619503"/>
+				<WisibAn Ag="0.80547242107569628" An="0.97736504404924185"/>
+				<Bias Ag="-0.057079824487625164" An="-0.071624994105020046"/>
+				<Tau Ag="54.322181735523408" An="22.004568160325636"/>
+				<Slope Ag="8.8808759634949705" An="7.988406576187173"/>
 			</IbIn>
-			<aMN asNeuron="0" Wgo="-0.19031086744491665">
+			<aMN asNeuron="0" Wgo="-0.18375168556734034">
 				<Bias Ag="0" An="0"/>
 				<Tau Ag="100" An="100"/>
 				<Slope Ag="1" An="1"/>
-				<WeIbinMn Ag="0.25290171039571474" An="0.1193047941829979"/>
-				<WisibAgMn Ag="0.01856340584788585" An="-0.10667715894999519"/>
-				<WisibAnMn Ag="-0.41002724537898583" An="-0.16746357575390691"/>
+				<WeIbinMn Ag="0.24626072759445825" An="0.11273543051427191"/>
+				<WisibAgMn Ag="0.020818979747947663" An="-0.10918761435445534"/>
+				<WisibAnMn Ag="-0.40335917690265433" An="-0.16284442609801986"/>
 			</aMN>
 			<IsIn>
 				<Wisep Ag="0" An="0"/>
 			</IsIn>
 		</Reflex>
-		<Reflex Agonist="ShoulderFlexor" Antagonist="ShoulderExtensor" FeedbackDelay="0.025000000000000001" CommandDelay="0" OpenLoopTauAct="0.01" OpenLoopTauDeact="0.092720832860388916">
+		<Reflex Agonist="ShoulderFlexor" Antagonist="ShoulderExtensor" FeedbackDelay="0.025000000000000001" CommandDelay="0" OpenLoopTauAct="0.01" OpenLoopTauDeact="0.084992982311787646">
 			<Spindle>
-				<PosGain Ag="2.6064364282907424" An="2.6064364282907424"/>
+				<PosGain Ag="2.6971931493316745" An="2.6971931493316745"/>
 				<VelGain Ag="0" An="0"/>
 				<VelExp Ag="1" An="1"/>
-				<DmpGain Ag="0.83633665596532047" An="0.83633665596532047"/>
-				<DmpExp Ag="0.9502961025336889" An="0.9502961025336889"/>
-				<Wspmn Ag="0.90125638975564504" An="0.90125638975564504"/>
+				<DmpGain Ag="0.83297411744951566" An="0.83297411744951566"/>
+				<DmpExp Ag="0.94849573190400793" An="0.94849573190400793"/>
+				<Wspmn Ag="0.89276349963810098" An="0.89276349963810098"/>
 			</Spindle>
 			<Sfv>
 				<Gain Ag="0" An="0"/>
@@ -247,43 +273,43 @@
 				<Gain Ag="0" An="0"/>
 				<Bias Ag="0" An="0"/>
 			</Ifv>
-			<IaIn Wgo="-0.67675579807288788">
-				<Wiaia Ag="0.84453299774311663" An="0.48011561561926769"/>
-				<Wspia Ag="0.4734267286176056" An="0.27844217895330936"/>
-				<Wrnia Ag="0.90616495850387258" An="0.20130201861863642"/>
-				<Waia Ag="0.99246492992360946" An="0.6392172239773467"/>
-				<Wiamn Ag="0.34200945512597025" An="0.94385070004140381"/>
-				<Bias Ag="-0.069143945885820804" An="-0.020436054580120724"/>
-				<Tau Ag="52.744112422821864" An="76.106580587447709"/>
-				<Slope Ag="2.5125467493092795" An="6.9010178324776872"/>
+			<IaIn Wgo="-0.67649464871055665">
+				<Wiaia Ag="0.84973520902231348" An="0.5114148130285221"/>
+				<Wspia Ag="0.47222092612381167" An="0.28058607256420504"/>
+				<Wrnia Ag="0.90051333314991822" An="0.18998980893114201"/>
+				<Waia Ag="0.97381516787615607" An="0.63452626057898887"/>
+				<Wiamn Ag="0.34875888611730604" An="0.92558462500441241"/>
+				<Bias Ag="-0.069665600715477435" An="-0.020463318954222959"/>
+				<Tau Ag="51.923118670657452" An="74.498551990258747"/>
+				<Slope Ag="2.4082894848851999" An="6.6764017065396954"/>
 			</IaIn>
-			<Renshaw Wgo="-0.0038324556198213733">
-				<Wmnrn Ag="0.39833967478480919" An="0.39833967478480919"/>
-				<Wrnrn Ag="0.98121767999589449" An="0.98121767999589449"/>
-				<Wrnmn Ag="0.47700997245483928" An="0.47700997245483928"/>
-				<Bias Ag="0.079294821350580802" An="0.079294821350580802"/>
-				<Tau Ag="54.779366101880377" An="54.779366101880377"/>
-				<Slope Ag="7.0574015361015494" An="7.0574015361015494"/>
+			<Renshaw Wgo="-3.1418748028699817e-05">
+				<Wmnrn Ag="0.39934387465324689" An="0.39934387465324689"/>
+				<Wrnrn Ag="0.98391783308676506" An="0.98391783308676506"/>
+				<Wrnmn Ag="0.48320484468181291" An="0.48320484468181291"/>
+				<Bias Ag="0.079042647373575442" An="0.079042647373575442"/>
+				<Tau Ag="53.09372820531167" An="53.09372820531167"/>
+				<Slope Ag="7.1829153551796558" An="7.1829153551796558"/>
 			</Renshaw>
-			<IbIn Wgo="-0.99459635750233">
-				<Wibib Ag="0.31240680646991226" An="0.016542420508873387"/>
-				<Wglib Ag="0.50776477587746882" An="0.38724985716023358"/>
+			<IbIn Wgo="-0.98751724465741986">
+				<Wibib Ag="0.31341498211956892" An="0.025993703101073327"/>
+				<Wglib Ag="0.49408476731309531" An="0.38950480566014278"/>
 				<Wgdib Ag="0" An="0"/>
-				<Wibmn Ag="0.52725392842333807" An="0.35071447183478582"/>
-				<Wiaib Ag="0.74295042891615992" An="0.41671456391991346"/>
-				<WisibAg Ag="0.97785191757452394" An="-0.77073174490600271"/>
-				<WisibAn Ag="0.34672592657346368" An="0.95655681549006366"/>
-				<Bias Ag="-0.099745308845135133" An="-0.076773267026802386"/>
-				<Tau Ag="59.658546386543385" An="52.275595932622842"/>
-				<Slope Ag="0.18276485665220499" An="0.10746326312057138"/>
+				<Wibmn Ag="0.53431690052433012" An="0.36553042606013414"/>
+				<Wiaib Ag="0.73429454816565387" An="0.44281761778183903"/>
+				<WisibAg Ag="0.97046014117561352" An="-0.77533359012703018"/>
+				<WisibAn Ag="0.34108728615789352" An="0.95953862226448416"/>
+				<Bias Ag="-0.099606818424710364" An="-0.075261757734071982"/>
+				<Tau Ag="60.175193115885548" An="52.003569911165627"/>
+				<Slope Ag="0.27234931750091773" An="0.11308452342939262"/>
 			</IbIn>
-			<aMN asNeuron="0" Wgo="-0.0084108139596854592">
+			<aMN asNeuron="0" Wgo="-0.0085265160324884404">
 				<Bias Ag="0" An="0"/>
 				<Tau Ag="100" An="100"/>
 				<Slope Ag="1" An="1"/>
-				<WeIbinMn Ag="0.34193827449796482" An="0.15735613595169382"/>
-				<WisibAgMn Ag="-0.57665135009743629" An="-0.24925474899033007"/>
-				<WisibAnMn Ag="-0.25634571314883203" An="-0.15375935757283443"/>
+				<WeIbinMn Ag="0.34223756899365532" An="0.1601889622401701"/>
+				<WisibAgMn Ag="-0.57984613030765042" An="-0.26940667102505322"/>
+				<WisibAnMn Ag="-0.2223038058604675" An="-0.12772472980561733"/>
 			</aMN>
 			<IsIn>
 				<Wisep Ag="0" An="0"/>

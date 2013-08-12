@@ -85,14 +85,14 @@
 			</FitnessFunction>
 			<recordIsometric>0</recordIsometric>
 		</Evolvable>
-		<Incremental initialMutation="0.05" seedOnly="1" seedAll="1" elitist="1">1</Incremental>
-		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/IndDirs6M/13_08_07__11_16_04/GA_Result.xml"/>
+		<Incremental initialMutation="0.01" seedOnly="1" seedAll="1" elitist="1">1</Incremental>
+		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/IndDirs6M/13_08_08__21_37_41/GA_Result.xml"/>
 		<PopulationSize Value="500"/>
 		<DemeSize Value="20"/>
-		<NumGenerations Value="2000"/>
+		<NumGenerations Value="1500"/>
 		<MutationMax Value="0.001"/>
 		<MutationMaxReduced Value="0.0001"/>
-		<MutationMaxReduceAt Value="1500"/>
+		<MutationMaxReduceAt Value="500"/>
 		<RecombinationRate Value="0.5"/>
 		<RecombinationRateReduced Value="0.75"/>
 		<AvoidReevaluation Value="1"/>

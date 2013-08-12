@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Config>
+	<Globals>
+		<Visual Value="1"/>
+        <WindowSize Width="1000" Height="800"/>    
+		    <FrameRate Value="200"/>    
+        <FullScreen Value="0"/>   
+        <VSync Value="0"/>               	
+    		<Model Value="GA"/>	   
+    		<DebugLevel Value="1"/>
+        <PlotDuration Value="0.5"/>                
+        <OutputFolder Name="/Users/thomasbuhrmann/Experiments/eSMCs/Arm/"/>     
+	</Globals>
+	<GA>
+		<Evolvable Name="SMCArm">
+        <DistanceSensor MaxDist="0.4" TransferFunc="Inverse" NoiseLevel="0.0" Mode="Derivative"/>
+        <TrialDuration>10</TrialDuration>
+        <FitnessEvalDelay>18</FitnessEvalDelay>
+        <Topology symmetric="0">
+          <Inputs asNeurons="1">3</Inputs>
+          <Hidden>4</Hidden>
+          <Outputs laterallyConnected="0">2</Outputs>
+        </Topology>
+        <NetLimits>
+          <Weight min="-10.0" max="10.0"/>
+          <Bias min="-10.0" max="10.0"/>
+          <Gain min="-10.0" max="10.0"/>              
+          <TimeConstant min="0.06" max="10.0"/>
+        </NetLimits>
+        <Environment Name="LinesLeftRight">
+          <Line PosX="0.6" PosY="0.0" Length="0.3" Angle="-45" PosVarX="0.05" PosVarY="0.05" AngleVar="1" Visible="1"/>
+          <UnGaussian PosX="0.4" PosY="0.0" PosVarX="0.0" PosVarY="0.4" Width="0.03" Height="0.2" DirX="0" DirY="1" Visible="1"/>
+          <UnCircle PosX="0.2" PosY="0.2" Radius="0.05" PosVar="0.1" Visible="1"/>
+          <UnTriangle PosX="0.2" PosY="-0.2" Size="0.1" PosVar="0.1"/>
+        </Environment>
+		</Evolvable>	
+		<Incremental initialMutation="0.001">0</Incremental>
+		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/eSMCs/Output/12_06_25__14_58_12/GA_Result.xml"/>
+		<PopulationSize Value="100"/>
+		<DemeSize Value="10"/>
+		<NumGenerations Value="200"/>
+		<MutationMax Value="0.01"/>
+    <MutationMaxReduced Value="0.001"/>
+    <MutationMaxReduceAt Value="150"/>        
+		<RecombinationRate Value="0.5"/>
+    <RecombinationRateReduced Value="0.75"/>        
+		<NumTrials Value="10"/>
+    <AvoidReevaluation Value="0"/>
+    <SaveBestEachGeneration Value="0"/>
+    <AutoEval Run="1"/>
+    <Eval Run="0">
+        <NumTrials Value="10"/>
+        <RecordState Value="0"/>
+        <LoadFrom Value="/Users/thomasbuhrmann/Experiments/eSMCs/Meta/13_06_25__20_49_29/GA_BestGenome.xml"/>
+    </Eval>         
+	</GA>    
+  <Arm Gravity="0.0" Integrator="euler" InteractionTorques="1">
+    <UpperArm Length="0.33" Mass="2.52" Inertia="0.022869"/>
+    <LowerArm Length="0.32" Mass="1.3" Inertia="0.011093333333333335"/>
+    <Shoulder Friction="0.12" UpperLimit="120" LowerLimit="-120" Locked="0"/>
+    <Elbow Friction="0.12" UpperLimit="120" LowerLimit="-120" Locked="0"/>
+  </Arm>
+</Config>
