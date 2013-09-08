@@ -16,6 +16,8 @@
 namespace dmx
 {
 
+#define GA_ERROR_LOG 0
+  
 // --------------------------------------------------------------------------------------------
 GA::GA(int popsize, int genomeLength, int demeWidth) : 
   m_popSize(popsize), 
@@ -149,7 +151,7 @@ const double* GA::getBestGenome(float& fitness) const
 {
   fitness = MAX_NEG_FLOAT;
   double* result = 0;
-  for (int i = 0 ; i < m_popSize ; ++i)
+  for (int i = 0; i < m_popSize; ++i)
   {
     if (m_fitnesses[i] >= fitness)
     {
@@ -296,6 +298,9 @@ void GA::startNextTournament()
     }
   }
   
+#if GA_ERROR_LOG
+  std::cout << "Ga: New Tournament. " << m_currentIndA << ": " << m_fitnesses[m_currentIndA] << ". " << m_currentIndB << ": " << m_fitnesses[m_currentIndB] << std::endl;
+#endif
 }
 
 // --------------------------------------------------------------------------------------------
@@ -311,12 +316,18 @@ void GA::finishThisTournament()
 // --------------------------------------------------------------------------------------------
 void GA::performTournament(uint16_t indA, float fitA, uint16_t indB, float fitB)
 {
+#if GA_ERROR_LOG
+  std::cout << "Ga: perform tournament. " << indA << ": " << fitA << ". " << indB << ": " << fitB << std::endl;
+  std::cout << "Ga: before tournament. " << indA << ": " << m_fitnesses[indA] << ". " << indB << ": " << m_fitnesses[indB] << std::endl;  
+#endif
+  
   int winner, loser;
-  if (fitA > fitB)
+  if (fitA >= fitB)
   {
     winner = indA;
     loser = indB;
-    assert(!m_avoidReevaluation || fitA >= m_fitnesses[indA]); // Make sure we're not overwriting a better one    
+    assert(!m_avoidReevaluation || fitA >= m_fitnesses[indA]); // Make sure we're not overwriting a better one
+
     m_fitnesses[winner] = fitA;
   }
   else 
@@ -326,13 +337,18 @@ void GA::performTournament(uint16_t indA, float fitA, uint16_t indB, float fitB)
     assert(!m_avoidReevaluation || fitB >= m_fitnesses[indB]); // Make sure we're not overwriting a better one    
     m_fitnesses[winner] = fitB;
   }
+  
 
   // do mutation
   mutate(winner, loser);
 
   // The loser's fitness is now undetermined
   m_fitnesses[loser] = MAX_NEG_FLOAT;
-
+  
+#if GA_ERROR_LOG
+  std::cout << "Ga: after tournament. " << winner << ": " << m_fitnesses[winner] << ". " << loser << ": " << m_fitnesses[loser] << std::endl;
+#endif
+  
   m_tournament++;
 
   // reset at end of generation

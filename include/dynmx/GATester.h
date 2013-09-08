@@ -59,6 +59,8 @@ protected:
   uint32_t m_numTrials;
   
   int m_verbosity;
+  int m_trialAggregation;
+  
   bool m_record;
   
   ci::XmlTree* m_modelXml;  

@@ -67,7 +67,15 @@ void GARunner::init()
     m_ga->setMutationMax(ga.getChild("MutationMax").getAttributeValue<float>("Value"));
             
     m_numGenerations = ga.getChild("NumGenerations").getAttributeValue<int>("Value");
-    m_numTrials = ga.getChild("NumTrials").getAttributeValue<int>("Value");
+    m_numTrials = ga.getChild("Trials").getAttributeValue<int>("Num");
+    
+    std::string trialAgg = ga.getChild("Trials").getAttributeValue<std::string>("Combine", "Avg");
+    if(trialAgg == "Avg")
+      m_trialAggregation = kGATrialAgg_Avg;
+    else if(trialAgg == "Mult")
+      m_trialAggregation = kGATrialAgg_Mult;
+    else if(trialAgg == "Min")
+      m_trialAggregation = kGATrialAgg_Min;
     
     m_ga->setAvoidReevaluation(ga.getChild("AvoidReevaluation").getAttributeValue<bool>("Value", true));
     
@@ -192,7 +200,19 @@ void GARunner::update(float dt)
       std::cout << "Trial " << m_trial << ": fitness = " << fitness << std::endl; 
 #endif
     
-    m_accFitness += fitness;
+    if(m_trialAggregation == kGATrialAgg_Avg)
+    {
+      m_accFitness += fitness;
+    }
+    else if(m_trialAggregation == kGATrialAgg_Mult)
+    {
+      m_accFitness = m_trial == 0 ? fitness : (m_accFitness * fitness);
+    }
+    else if(m_trialAggregation == kGATrialAgg_Min)
+    {
+      m_accFitness = m_trial == 0 ? fitness : std::min(m_accFitness, fitness);
+    }
+    
     m_trial++;
     m_time = 0.0;
     
@@ -203,7 +223,8 @@ void GARunner::update(float dt)
     //-------------------------------------------------------
     if (m_trial == m_numTrials)
     {
-      m_accFitness /= m_numTrials;
+      if(m_trialAggregation == kGATrialAgg_Avg)
+        m_accFitness /= m_numTrials;
       
 #if DEBUGGING
       if (m_verbosity >= kGAVerbosityGenome)

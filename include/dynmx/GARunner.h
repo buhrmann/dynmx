@@ -83,6 +83,13 @@ public:
     kGAVerbosityTrial
   };
   
+  enum GATrialAgg
+  {
+    kGATrialAgg_Avg,
+    kGATrialAgg_Min,
+    kGATrialAgg_Mult
+  };
+  
   GARunner(Evolvable* evolvable);
   
   // Inherited from Model
@@ -124,6 +131,7 @@ protected:
   int m_reduceMutationMaxAt;
   
   int m_verbosity;
+  int m_trialAggregation;
   
   bool m_autoEval;
   

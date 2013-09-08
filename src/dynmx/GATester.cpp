@@ -49,6 +49,14 @@ void GATester::init()
     
     m_numTrials = (eval / "NumTrials")["Value"].as<int>();
     
+    std::string trialAgg = settings->getChild("Config/GA/Trials").getAttributeValue<std::string>("Combine", "Avg");
+    if(trialAgg == "Avg")
+      m_trialAggregation = GARunner::kGATrialAgg_Avg;
+    else if(trialAgg == "Mult")
+      m_trialAggregation = GARunner::kGATrialAgg_Mult;
+    else if(trialAgg == "Min")
+      m_trialAggregation = GARunner::kGATrialAgg_Min;
+    
     // Flag whether to record state during run
     if (eval.hasChild("RecordState"))
     {
@@ -154,13 +162,26 @@ void GATester::update(float dt)
     m_fitnessLog.push_back("trial", m_trial);
     m_fitnessLog.push_back("fitness", fitness);
     
-    m_accFitness += fitness;
+    if(m_trialAggregation == GARunner::kGATrialAgg_Avg)
+    {
+      m_accFitness += fitness;
+    }
+    else if(m_trialAggregation == GARunner::kGATrialAgg_Mult)
+    {
+      m_accFitness = m_trial == 0 ? fitness : (m_accFitness * fitness);
+    }
+    else if(m_trialAggregation == GARunner::kGATrialAgg_Min)
+    {
+      m_accFitness = m_trial == 0 ? fitness : std::min(m_accFitness, fitness);
+    }
     m_trial++;
     
     // Finished all trials? Move on to evaluate next genome.
     if (m_trial == m_numTrials)
     {
-      m_accFitness /= m_numTrials;
+      if(m_trialAggregation == GARunner::kGATrialAgg_Avg)
+        m_accFitness /= m_numTrials;
+      
 #if DEBUGGING
       if( m_verbosity >= GARunner::kGAVerbosityGenome)
         std::cout << "Total fitness = " << m_accFitness << std::endl; 
