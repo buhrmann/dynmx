@@ -13,6 +13,7 @@
 #include "Dynmx.h"
 #include "Model.h"
 #include "cinder/Vector.h"
+#include "cinder/Color.h"
 #include "MathUtils.h"
 
 namespace dmx
@@ -36,7 +37,7 @@ public:
   
   virtual ~Positionable(){};
   Positionable(const ci::Vec2f& pos = ci::Vec2f(0,0)) : 
-    m_position(pos), m_positionMean(pos), m_visible(true), m_positionVar(0,0), m_angle(0), m_angleMean(0), m_angleVar(0) {};
+  m_position(pos), m_positionMean(pos), m_visible(true), m_positionVar(0,0), m_angle(0), m_angleMean(0), m_angleVar(0), m_color(ci::Color::black()) { };
   
   virtual const ci::Vec2f& getPosition() const { return m_position; };
   virtual ci::Vec2f getPosition() { return m_position; };
@@ -59,12 +60,16 @@ public:
   void toggleVisibility() { m_visible = !m_visible; };
   bool isVisible() const { return m_visible; };
   
+  void setColor(const ci::ColorA& col) { m_color = col; };
+  const ci::ColorA& getColor() const { return m_color; };
+  
   EnvObjType getType() const { return m_type; };
 
 protected:  
   ci::Vec2f m_position;
   ci::Vec2f m_positionMean;
   ci::Vec2f m_positionVar;
+  ci::ColorA m_color;
   float m_angle;
   float m_angleMean;
   float m_angleVar;
@@ -184,6 +189,7 @@ public:
   
   const ci::Vec2f& getStart() const { return m_start; };
   const ci::Vec2f& getEnd() const { return m_end; };
+  float getLength() const { return m_length; };
   
 protected:
   float m_length;

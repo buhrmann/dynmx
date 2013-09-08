@@ -47,14 +47,14 @@ void SMCEnvironmentViz::update()
 {
   glPushAttrib(GL_LIGHTING);
   glDisable(GL_LIGHTING);
-  
-  glColor3f(0.1, 0.1, 0.1);
 
   for(int i = 0; i < m_environment->getObjects().size(); i++)
   {
     const Positionable& obj = *m_environment->getObjects()[i];
     if(obj.isVisible())
-    {      
+    {
+      ci::gl::color(obj.getColor());
+      
       // Object specific collision detection
       if(obj.getType() == Positionable::kObj_Line)
       {
