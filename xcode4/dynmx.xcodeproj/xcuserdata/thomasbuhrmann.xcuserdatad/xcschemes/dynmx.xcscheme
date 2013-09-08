@@ -83,7 +83,7 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "/Users/thomasbuhrmann/Code/dynmx/bin/Configs/EvoArmIbIsDirs6M.xml"
+            argument = "/Users/thomasbuhrmann/Code/dynmx/bin/Configs/EvoArmIbIsDirs4M.xml"
             isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>

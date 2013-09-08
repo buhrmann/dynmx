@@ -21,25 +21,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "../src/dynmx/GARunner.cpp"
-         timestampString = "395833133.980603"
+         timestampString = "399458321.269014"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "289"
-         endingLineNumber = "289"
+         startingLineNumber = "310"
+         endingLineNumber = "310"
          landmarkName = "GARunner::test(const double* genome, float fitness, float dt)"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "Yes"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "../src/dynmx/GATester.cpp"
-         timestampString = "393929251.152407"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "149"
-         endingLineNumber = "149"
-         landmarkName = "GATester::update(float dt)"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
