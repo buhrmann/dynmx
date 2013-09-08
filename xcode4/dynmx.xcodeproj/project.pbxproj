@@ -91,9 +91,9 @@
 		D630C7961645397F00F2ABE5 /* SMCAgentGaussian.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCAgentGaussian.h; path = ../include/dynmx/SMCAgentGaussian.h; sourceTree = "<group>"; };
 		D630C7971645397F00F2ABE5 /* SMCAgentLineDis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCAgentLineDis.h; path = ../include/dynmx/SMCAgentLineDis.h; sourceTree = "<group>"; };
 		D630C7981645397F00F2ABE5 /* Topology.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Topology.h; path = ../include/dynmx/Topology.h; sourceTree = "<group>"; };
+		D63A49DD17DCD48D00E91585 /* SMCArmView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCArmView.h; path = ../include/dynmx/SMCArmView.h; sourceTree = "<group>"; };
 		D668798817B4F77400FC1166 /* SMCArm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SMCArm.h; path = ../include/dynmx/SMCArm.h; sourceTree = "<group>"; };
 		D668798917B4F7C300FC1166 /* SMCArm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SMCArm.cpp; path = ../src/dynmx/SMCArm.cpp; sourceTree = "<group>"; };
-		D668798E17B50FAB00FC1166 /* SMCArmView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SMCArmView.h; sourceTree = "<group>"; };
 		D6D9F0C614DC62A4009C0C95 /* App.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = App.h; path = ../include/dynmx/App.h; sourceTree = "<group>"; };
 		D6D9F0C714DC62A4009C0C95 /* Arm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Arm.h; path = ../include/dynmx/Arm.h; sourceTree = "<group>"; };
 		D6D9F0C814DC62A4009C0C95 /* ArmMuscled.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmMuscled.h; path = ../include/dynmx/ArmMuscled.h; sourceTree = "<group>"; };
@@ -482,7 +482,7 @@
 				D6D9F0D514DC62A4009C0C95 /* DistanceSensor.h */,
 				D668798817B4F77400FC1166 /* SMCArm.h */,
 				D668798917B4F7C300FC1166 /* SMCArm.cpp */,
-				D668798E17B50FAB00FC1166 /* SMCArmView.h */,
+				D63A49DD17DCD48D00E91585 /* SMCArmView.h */,
 			);
 			name = SMC;
 			sourceTree = "<group>";
