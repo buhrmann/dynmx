@@ -485,7 +485,7 @@ void EvoArmCoCon::init()
   reset();
   
   // Temp.
-#define CALC_TGTSx
+#define CALC_TGTS
 #ifdef CALC_TGTS
   ci::Vec2f ctr, tgt, tmp;
   double ctrElb = degreesToRadians(85.0);
@@ -497,7 +497,7 @@ void EvoArmCoCon::init()
   m_arm->inverseKinematics(ctr, 1, ctrElb, ctrShd);
   std::cout << "Centre: " << ctr << " elb: " << radiansToDegrees(ctrElb) << " shd: " << radiansToDegrees(ctrShd) << std::endl;
   
-  int numMoves = 6;
+  int numMoves = 8;
   float offset = degreesToRadians(20.f);
   for(int i=0; i < numMoves; i++)
   {
