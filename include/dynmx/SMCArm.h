@@ -54,6 +54,7 @@ public:
   virtual float getFitness();
   virtual void nextTrial(int trial = 0);
   virtual bool hasFinished();
+  virtual void endOfEvaluation(float fit);
   
   virtual void toXml(ci::XmlTree& xml);
   virtual void record(Recorder& recorder);
@@ -74,10 +75,22 @@ public:
   
   float getSensedValue() { return m_sensedValue; };
   float getTime() { return m_time; };
+  float getFitnessEvalDelay() { return m_fitnessEvalDelay; };
+  const ci::Vec2f& getProjPos() const { return m_projPos; };
+  const ci::Vec2f& getProjVel() const { return m_projVel; };
+  const std::deque<ci::Vec2f>& getTraj() const { return m_handTraj; };
+  float getHandSpeed() const { return m_handSpeed; };
+  float getHandDist() const { return m_handDist; };
+  
+  float m_fitHandVel;
+  float m_fitHandDist;
+  float m_fitAngleDist;
+  float m_fitMaxSensor;
+  float m_instFit;
   
 protected:
   
-  void updateFitness();
+  void updateFitness(float dt);
   void updateSensor(float dt);
   
   ArmPD m_arm;
@@ -87,10 +100,17 @@ protected:
   DistanceSensor m_distanceSensor;
   int m_sensorMode;
   NetLimits m_netLimits;
+  float m_maxJointAngle;
   
   // States
   float m_sensedValue;
   float m_time;
+  ci::Vec2f m_prevPos;
+  ci::Vec2f m_projPos;
+  ci::Vec2f m_projVel;
+  std::deque<ci::Vec2f> m_handTraj;
+  float m_handSpeed;
+  float m_handDist;
   
   // Params
   
@@ -99,6 +119,7 @@ protected:
   float m_fitness;
   float m_trialDuration;
   float m_fitnessEvalDelay;
+  int m_fitnessStage;
 
 };
   

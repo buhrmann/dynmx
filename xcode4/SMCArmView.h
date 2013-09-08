@@ -17,6 +17,7 @@
 #include "SMCEnvironmentViz.h"
 #include "CTRNNViz.h"
 
+#include "cinder/Color.h"
 #include "cinder/gl/gl.h"
 #include "cinder/Matrix.h"
 #include "SimpleGUI.h"
@@ -125,9 +126,14 @@ inline void SMCArmView::setupScene()
   m_plot->setTitle("Sensor Data");
   column2->m_children.push_back(m_plot);
   
-  m_fitnessPlot = new dmx::Plot(columnWidth2, plotHeight, 2, 200);
+  m_fitnessPlot = new dmx::Plot(columnWidth2, plotHeight, 5, 200);
   m_fitnessPlot->translate(ci::Vec4f(0, 2 * plotHeight + 2 * vSpace, 0, 1));
   m_fitnessPlot->setTitle("Fitness");
+  m_fitnessPlot->setLabel(0, "Hand speed");
+  m_fitnessPlot->setLabel(1, "Hand dist");
+  m_fitnessPlot->setLabel(2, "Angle dist");
+  m_fitnessPlot->setLabel(3, "Sensor act");
+  m_fitnessPlot->setLabel(4, "Inst fit");
   column2->m_children.push_back(m_fitnessPlot);
   
   m_scene2d.m_children.push_back(column1);
@@ -149,12 +155,18 @@ inline void SMCArmView::update(float dt)
   m_plot->addPoint(val, 0);
   
   // Update fitness-related data
-  //m_fitnessPlot->addPoint(m_agent->getPosition(), 0);
+  m_fitnessPlot->addPoint(m_arm->m_fitHandVel, 0);
+  m_fitnessPlot->addPoint(m_arm->m_fitHandDist, 1);
+  m_fitnessPlot->addPoint(m_arm->m_fitAngleDist, 2);
+  m_fitnessPlot->addPoint(m_arm->getSensedValue(), 3);
+  m_fitnessPlot->addPoint(m_arm->m_instFit, 4);
 }
 
   //---------------------------------------------------------------------------------------------------------------------
 inline void SMCArmView::draw3d()
 {
+  glDisable(GL_DEPTH_TEST);
+  
   // Draw distance sensor ray and collision point
   const DistanceSensor& sensor = m_arm->getDistanceSensor();
   float sensedDistance = sensor.getDistance();
@@ -164,11 +176,61 @@ inline void SMCArmView::draw3d()
   ci::gl::drawLine(sensor.getPosition(), sensor.getPosition() + sensor.getDirection() * sensedDistance);
   glDisable(GL_LINE_STIPPLE);
   
+  // Sensor
   glColor3f(1,0,0);
   if(sensedDistance < sensor.getMaxDistance())
   {
     drawPoint(ci::Vec3f(sensor.getCollision()), 5.0f);
   }
+  
+  // Shortest distance
+  //if(m_arm->getTime() > m_arm->getFitnessEvalDelay())
+  {
+    glColor3f(1.0, 0.0, 0.0);
+    ci::gl::drawLine(m_arm->getArm().getEffectorPos(), m_arm->getProjPos());
+    glColor3f(0.0, 1.0, 0.0);
+    ci::gl::drawLine(m_arm->getProjPos(), m_arm->getProjPos() + m_arm->getProjVel());
+  }
+  
+  // Line object
+#if 1
+  ci::ColorA colA (0,0,0);
+  if(m_arm->getTime() > m_arm->getFitnessEvalDelay())
+    colA = ci::ColorA(1,0,1);
+  
+  const std::vector<Positionable*>& objects = m_arm->getEnvironment()->getObjects();
+  objects[0]->setColor(colA);
+  ci::gl::color(colA);
+  ci::Vec2f s = ((Line*)objects[0])->getStart();
+  ci::Vec2f e = ((Line*)objects[0])->getEnd();
+  drawPoint(ci::Vec3f(s), 5.0f);
+  drawPoint(ci::Vec3f(e), 5.0f);
+#endif
+  
+  // Draw trajectory
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_COLOR_ARRAY);
+  const std::deque<Pos>& traj = m_arm->getTraj();
+  int numPoints =  traj.size();
+  float lineVertsDes[numPoints*2];
+  float colorsDes[numPoints*4];
+  glVertexPointer(2, GL_FLOAT, 0, lineVertsDes); // 2d positions
+  glColorPointer(4, GL_FLOAT, 0, colorsDes);     // 4d colors
+  for(size_t i = 0; i < numPoints; i++)
+  {
+    lineVertsDes[i*2 + 0] = traj[i].x;
+    lineVertsDes[i*2 + 1] = traj[i].y;
+    float c = 0.5f * (float)i / (float)numPoints;
+    colorsDes[i*4 + 0] = 0.5;
+    colorsDes[i*4 + 1] = 0.5;
+    colorsDes[i*4 + 2] = 0.5;
+    colorsDes[i*4 + 3] = c;
+  }
+  glDrawArrays( GL_LINE_STRIP, 0, numPoints);
+  glDisableClientState(GL_VERTEX_ARRAY);
+  glDisableClientState(GL_COLOR_ARRAY);
+  
+  glEnable(GL_DEPTH_TEST);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
