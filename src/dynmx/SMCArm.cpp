@@ -263,7 +263,7 @@ void SMCArm::endOfEvaluation(float fit)
 {
   nextTrial(0);
   
-  if ((fit > 0.4f) && (m_fitnessStage == 0))
+  if ((fit > 0.41f) && (m_fitnessStage == 0))
     m_fitnessStage = 1;
   
   //if ((fit > 0.5f) && (m_fitnessStage == 1))
