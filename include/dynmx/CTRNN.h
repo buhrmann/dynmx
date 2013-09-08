@@ -133,6 +133,7 @@ public:
   double getLargestWeight() const;
   
   void setState(int i, double value) { states[i] = value; outputs[i] = sigmoid(gains[i] * (states[i] + biases[i])); };
+  void setStateDynamic(int i, double value) { states[i] = value; outputs[i] = (*m_activationFunctions[i])(states[i] + biases[i]); };
   void setOutput(int i, double value) { outputs[i] = value; states[i] = InverseSigmoid(value)/gains[i] - biases[i]; };
   void setBias(int i, double value) { biases[i] = value; };
   void setGain(int i, double value) { gains[i] = value; };

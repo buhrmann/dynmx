@@ -224,7 +224,7 @@ void CTRNN::randomizeWeights(double lb, double ub, RandomState &rs)
 void CTRNN::zeroStates()
 {
 	for (int i = 0; i < size; i++)
-    setState(i, 0.0);
+    setStateDynamic(i, 0.0);
 }
 
 
