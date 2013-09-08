@@ -35,8 +35,8 @@ public:
   PD() : m_target(0.0f), m_targetPrev(0), m_P(10.0f), m_D(1.0f), m_posFunction(kLinear), m_velFunction(kLinear),
     m_numFramesDelay(0) {};    
   
-  void init(){};
-  void reset(){};
+  void init();
+  void reset();
   
   float update(float target, float pos, float vel, float dt);
   
