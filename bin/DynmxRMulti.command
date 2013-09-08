@@ -2,8 +2,8 @@
 # Executes binary with specified argument N times
 
 N=7
-CFG="Configs/EvoArmIbIsDirs6M-Inc.xml"
-#CFG="Configs/SMCAgentEvo.xml"
+#CFG="Configs/EvoArmIbIsDirs4M.xml"
+CFG="Configs/SMCArmEvo.xml"
 
 # Copy exe here, so one can keep coding and building the original exe
 cd `dirname $0`

@@ -9,7 +9,7 @@
 		<Model Value="GA"/>
 		<DebugLevel Value="1"/>
 		<PlotDuration Value="0.5"/>
-		<OutputFolder Name="/Users/thomasbuhrmann/Experiments/Arm/IndDirs6M/"/>
+		<OutputFolder Name="/Users/thomasbuhrmann/Experiments/Arm/IndDirs4M"/>
 	</Globals>
 	<GA>
 		<Evolvable Name="EvoArmCoCon">
@@ -33,7 +33,7 @@
 			</DesiredTrajectory>
 			<EvoFlags>
 				<Muscles symmetric="0" hillParams="0">0</Muscles>
-				<Spindles velRef="1" symmetric="1" symmetricWeights="1" perMove="0">1</Spindles>
+				<Spindles velRef="1" symmetric="0" symmetricWeights="1" perMove="0">1</Spindles>
 				<Iain simple="0" symmetric="0">0</Iain>
 				<Ibin derivative="0" symmetric="0" interseg="0" flipIntersegWeights="0" recExcIa="0">0</Ibin>
 				<Renshaw symmetric="1">0</Renshaw>
@@ -42,11 +42,11 @@
 				<Go invert="0" mode="evolve">0</Go>
 				<Ifv>0</Ifv>
 				<Sfv>0</Sfv>
-				<OpenLoop max="0.3" symmetric="0" tauMaxAct="0.0" tauMaxDeact="0.5" cutoff="1">1</OpenLoop>
+				<OpenLoop max="0.3" symmetric="0" tauMaxAct="0.05" tauMaxDeact="0.5" cutoff="1">1</OpenLoop>
 				<InterSegmentInput symmetric="0" max="1.0" perMove="0">0</InterSegmentInput>
 				<DistalCommandDelay max="0.05" perMove="0">0</DistalCommandDelay>
-				<RampDuration perMove="0">0</RampDuration>
-				<Friction>0</Friction>
+				<RampDuration perMove="0">1</RampDuration>
+				<Friction>1</Friction>
 				<DecodeLimits>
 					<ArmLimits>
 						<jointRadius min="0.01" max="0.05"/>
@@ -62,7 +62,7 @@
 						<pos min="0.0" max="6.0"/>
 						<dmp max="1.0"/>
 						<vel max="0.5"/>
-						<exp min="0.9" max="1.0"/>
+						<exp min="0.25" max="4.0"/>
 						<weight min="0.1" max="1.0"/>
 					</SpindleLimits>
 				</DecodeLimits>
@@ -73,18 +73,18 @@
 				<EndPointOnly>0</EndPointOnly>
 				<Velocity>0</Velocity>
 				<Coactivation max="0.2">1</Coactivation>
-				<ForceMin threshold="0.997">0</ForceMin>
+				<ForceMin threshold="0.9965">1</ForceMin>
 			</FitnessFunction>
 			<recordIsometric>0</recordIsometric>
 		</Evolvable>
-		<Incremental initialMutation="0.1" seedOnly="1" seedAll="1" elitist="1">0</Incremental>
-		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/Output/13_07_17__09_34_00/GA_Result.xml"/>
-		<PopulationSize Value="500"/>
+		<Incremental initialMutation="0.1" seedOnly="1" seedAll="1" elitist="1">1</Incremental>
+		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/IndDirs4M/13_08_20__14_11_48//GA_Result.xml"/>
+		<PopulationSize Value="300"/>
 		<DemeSize Value="20"/>
-		<NumGenerations Value="1000"/>
-		<MutationMax Value="0.02"/>
-		<MutationMaxReduced Value="0.002"/>
-		<MutationMaxReduceAt Value="850"/>
+		<NumGenerations Value="2000"/>
+		<MutationMax Value="0.01"/>
+		<MutationMaxReduced Value="0.001"/>
+		<MutationMaxReduceAt Value="1350"/>
 		<RecombinationRate Value="0.5"/>
 		<RecombinationRateReduced Value="0.75"/>
 		<AvoidReevaluation Value="1"/>
@@ -94,7 +94,7 @@
 		<Eval Run="0">
 			<NumTrials Value="1"/>
 			<RecordState Value="0"/>
-			<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/Output/13_07_10__20_20_44/GA_BestGenome.xml"/>
+			<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Arm/IndDirs6M/13_08_20__14_11_48/GA_BestGenome.xml"/>
 		</Eval>
 	</GA>
 	<Arm Gravity="0.0" Integrator="euler" InteractionTorques="1">
