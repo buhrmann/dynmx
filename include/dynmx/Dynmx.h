@@ -10,6 +10,8 @@
 #define __DYNMX__
 
 #include <string>
+#include <pwd.h>
+#include <unistd.h>
 
 #include "cinder/xml.h"
 
@@ -53,9 +55,21 @@ namespace dmx
 static std::string pathExpandHome(const std::string& path)
 {
   if(path[0] == '~')
-    return std::string(getenv("HOME")) + path.substr(1, path.length());
+  {
+    const char *homeDir = getenv("HOME");
+    
+    if (!homeDir)
+    {
+      struct passwd* pwd = getpwuid(getuid());
+      if (pwd)
+        homeDir = pwd->pw_dir;
+    }
+    return std::string(homeDir) + path.substr(1, path.length());
+  }
   else
+  {
     return path;
+  }
 }  
   
 //----------------------------------------------------------------------------------------------------------------------    
