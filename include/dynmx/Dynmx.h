@@ -49,6 +49,15 @@ namespace dmx
 #define DATA_DIR Globals::Inst()->getDataDir()
 #define SETTINGS Globals::Inst()->getSettings()
 
+//----------------------------------------------------------------------------------------------------------------------      
+static std::string pathExpandHome(const std::string& path)
+{
+  if(path[0] == '~')
+    return std::string(getenv("HOME")) + path.substr(1, path.length());
+  else
+    return path;
+}  
+  
 //----------------------------------------------------------------------------------------------------------------------    
 // Singleton for global settings determined at runtime
 //----------------------------------------------------------------------------------------------------------------------

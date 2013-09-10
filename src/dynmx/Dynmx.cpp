@@ -136,12 +136,18 @@ void Globals::initialise(const std::string& cfgFnm)
     std::string dir = m_settings->getChild("Config/Globals/OutputFolder").getAttributeValue<std::string>("Name");
     if(!dir.empty())
     {
-      bool isRelative = dir[0] != '/';
+      // Expand home directory: replaces '~' if appropriate
+      dir = pathExpandHome(dir);
       
-      if(isRelative)
+      // Absolute or relative path?
+      if(dir[0] != '/')
+      {
         outputDir = currentPathStr + "/" + dir + "/";
+      }
       else
+      {
         outputDir = dir + "/";
+      }
     }
   }
 

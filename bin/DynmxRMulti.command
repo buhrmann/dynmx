@@ -1,20 +1,18 @@
 #!/bin/bash
 # Executes binary with specified argument N times
 
-N=7
+N=1
 #CFG="Configs/EvoArmIbIsDirs4M.xml"
 CFG="Configs/SMCArmEvo.xml"
 
 # Copy exe here, so one can keep coding and building the original exe
 cd `dirname $0`
-EXE="../xcode/build/Release/cinder_dynmx.app/Contents/MacOS/cinder_dynmx"
+EXE="./../xcode4/build/Release/dynmx.app/Contents/MacOS/dynmx"
 
-EXE="/Users/thomasbuhrmann/Library/Developer/Xcode/DerivedData/dynmx-amgjuztysjhszoffnjbudtngjfze/Build/Products/Release/dynmx.app/Contents/MacOS/dynmx"
-
-cp $EXE ./cinder_dynmx
+cp $EXE ./dynmx
 
 # What to execute
-CMD="./cinder_dynmx $CFG"
+CMD="./dynmx $CFG"
 CD="cd `dirname $0`"
 
 # Start with first then open terminal tabs for rest

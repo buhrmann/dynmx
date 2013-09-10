@@ -91,7 +91,7 @@
 		D630C7961645397F00F2ABE5 /* SMCAgentGaussian.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCAgentGaussian.h; path = ../include/dynmx/SMCAgentGaussian.h; sourceTree = "<group>"; };
 		D630C7971645397F00F2ABE5 /* SMCAgentLineDis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCAgentLineDis.h; path = ../include/dynmx/SMCAgentLineDis.h; sourceTree = "<group>"; };
 		D630C7981645397F00F2ABE5 /* Topology.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Topology.h; path = ../include/dynmx/Topology.h; sourceTree = "<group>"; };
-		D63A49DD17DCD48D00E91585 /* SMCArmView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCArmView.h; path = ../include/dynmx/SMCArmView.h; sourceTree = "<group>"; };
+		D665B83317DCD705001A3AA2 /* SMCArmView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCArmView.h; path = ../include/dynmx/SMCArmView.h; sourceTree = "<group>"; };
 		D668798817B4F77400FC1166 /* SMCArm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SMCArm.h; path = ../include/dynmx/SMCArm.h; sourceTree = "<group>"; };
 		D668798917B4F7C300FC1166 /* SMCArm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SMCArm.cpp; path = ../src/dynmx/SMCArm.cpp; sourceTree = "<group>"; };
 		D6D9F0C614DC62A4009C0C95 /* App.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = App.h; path = ../include/dynmx/App.h; sourceTree = "<group>"; };
@@ -461,6 +461,7 @@
 		D6E6E57214E15DC100FE6B07 /* SMC */ = {
 			isa = PBXGroup;
 			children = (
+				D665B83317DCD705001A3AA2 /* SMCArmView.h */,
 				D6D9F11D14DC62D6009C0C95 /* SMCAgent.cpp */,
 				D6D9F0EC14DC62A4009C0C95 /* SMCAgent.h */,
 				D6D9F11E14DC62D6009C0C95 /* SMCAgentEvo.cpp */,
@@ -482,7 +483,6 @@
 				D6D9F0D514DC62A4009C0C95 /* DistanceSensor.h */,
 				D668798817B4F77400FC1166 /* SMCArm.h */,
 				D668798917B4F7C300FC1166 /* SMCArm.cpp */,
-				D63A49DD17DCD48D00E91585 /* SMCArmView.h */,
 			);
 			name = SMC;
 			sourceTree = "<group>";
@@ -692,6 +692,7 @@
 				MACOSX_DEPLOYMENT_TARGET = "";
 				OTHER_LDFLAGS = "\"$(CINDER_PATH)/lib/libcinder_d.a\"";
 				PRODUCT_NAME = dynmx;
+				SDKROOT = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -728,6 +729,7 @@
 				MACOSX_DEPLOYMENT_TARGET = "";
 				OTHER_LDFLAGS = "\"$(CINDER_PATH)/lib/libcinder.a\"";
 				PRODUCT_NAME = dynmx;
+				SDKROOT = "";
 				STRIP_INSTALLED_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
 			};

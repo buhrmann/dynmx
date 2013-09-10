@@ -86,6 +86,7 @@ void GATester::init()
     if(decodeSaved && eval.hasChild("LoadFrom"))
     {
       std::string fnm = (eval / "LoadFrom")["Value"];
+      fnm = pathExpandHome(fnm);
       ci::XmlTree bestGenomeXml(ci::loadFile(fnm));
       assert(bestGenomeXml.hasChild("GABestGenome"));
       

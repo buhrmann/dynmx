@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Config>
 	<Globals>
-		<Visual Value="1"/>
+		<Visual Value="0"/>
         <WindowSize Width="1000" Height="800"/>    
 		    <FrameRate Value="200"/>    
         <FullScreen Value="0"/>   
@@ -9,7 +9,7 @@
     		<Model Value="GA"/>	   
     		<DebugLevel Value="1"/>
         <PlotDuration Value="0.5"/>                
-        <OutputFolder Name="/Users/thomasbuhrmann/Experiments/eSMCs/Arm"/>     
+        <OutputFolder Name="~/Experiments/eSMCs/Arm"/>     
 	</Globals>
 	<GA>
 		<Evolvable Name="SMCArm">
@@ -35,7 +35,7 @@
         </Environment>
 		</Evolvable>	
 		<Incremental initialMutation="0.01" seedOnly="1" seedAll="1" elitist="1">0</Incremental>
-		<LoadFrom Value="/Users/thomasbuhrmann/Experiments/eSMCs/Arm/13_09_04__14_06_31/GA_Result.xml"/>
+		<LoadFrom Value="~/Experiments/eSMCs/Arm/13_09_04__14_06_31/GA_Result.xml"/>
 		<PopulationSize Value="200"/>
 		<DemeSize Value="20"/>
 		<NumGenerations Value="5000"/>
@@ -51,7 +51,7 @@
     <Eval Run="1">
         <NumTrials Value="10"/>
         <RecordState Value="0"/>
-        <LoadFrom Value="/Users/thomasbuhrmann/Experiments/eSMCs/Arm/13_09_06__15_08_21/GA_BestGenome.xml"/>
+        <LoadFrom Value="~/Experiments/eSMCs/Arm/13_09_06__15_08_21/GA_BestGenome.xml"/>
     </Eval>         
 	</GA>    
   <Arm Gravity="0.0" Integrator="euler" InteractionTorques="1">

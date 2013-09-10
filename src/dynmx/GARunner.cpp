@@ -92,6 +92,8 @@ void GARunner::init()
     if (incremental)
     {
       std::string fnm = ga.getChild("LoadFrom").getAttributeValue<std::string>("Value");
+      fnm = pathExpandHome(fnm);
+      
       if(ga.getChild("Incremental").getAttributeValue<bool>("seedOnly", 0))
       {
         // Read in best individual from last run
