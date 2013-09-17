@@ -3,19 +3,17 @@
 # until all params have been processed
 
 # Params
-N=8
-CFGs=("Configs/EvoArmIbIsDirs.xml" "Configs/EvoArmIbIsDirs.xml")
+N=11
+CFGs=("Configs/SMCArmEvo.xml" "Configs/SMCArmEvo.xml")
 
 # Copy exe here, so one can keep coding and building the original exe
 cd `dirname $0`
-EXE="../xcode/build/Release/cinder_dynmx.app/Contents/MacOS/cinder_dynmx"
+EXE="./../xcode4/build/Release/dynmx.app/Contents/MacOS/dynmx"
 
-EXE="/Users/thomasbuhrmann/Library/Developer/Xcode/DerivedData/dynmx-amgjuztysjhszoffnjbudtngjfze/Build/Products/Release/dynmx.app/Contents/MacOS/dynmx"
-
-cp $EXE ./cinder_dynmx
+cp $EXE ./dynmx
 
 # What to execute
-CMD="./cinder_dynmx"
+CMD="./dynmx"
 
 for i in ${CFGs[@]}
 do
