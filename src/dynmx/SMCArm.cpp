@@ -120,7 +120,7 @@ void SMCArm::update(float dt)
   m_ctrnn->setExternalInput(1, m_arm.getJointAngle(JT_elbow) / m_maxJointAngle);
   m_ctrnn->setExternalInput(2, m_arm.getJointAngle(JT_shoulder) / m_maxJointAngle);
   if (m_topology.getNumInputs() > 3)
-      m_ctrnn->setExternalInput(4, m_distanceSensor.getDerivative());
+      m_ctrnn->setExternalInput(3, m_distanceSensor.getDerivative());
   
   m_ctrnn->updateDynamic(dt);
   
