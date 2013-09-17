@@ -1,7 +1,7 @@
 #!/bin/bash
 # Executes binary with specified argument N times
 
-N=1
+N=7
 #CFG="Configs/EvoArmIbIsDirs4M.xml"
 CFG="Configs/SMCArmEvo.xml"
 

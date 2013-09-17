@@ -94,6 +94,7 @@
 		D665B83317DCD705001A3AA2 /* SMCArmView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCArmView.h; path = ../include/dynmx/SMCArmView.h; sourceTree = "<group>"; };
 		D668798817B4F77400FC1166 /* SMCArm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SMCArm.h; path = ../include/dynmx/SMCArm.h; sourceTree = "<group>"; };
 		D668798917B4F7C300FC1166 /* SMCArm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SMCArm.cpp; path = ../src/dynmx/SMCArm.cpp; sourceTree = "<group>"; };
+		D6B8F87417E766E900C70C75 /* Signal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Signal.h; path = ../include/dynmx/Signal.h; sourceTree = "<group>"; };
 		D6D9F0C614DC62A4009C0C95 /* App.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = App.h; path = ../include/dynmx/App.h; sourceTree = "<group>"; };
 		D6D9F0C714DC62A4009C0C95 /* Arm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Arm.h; path = ../include/dynmx/Arm.h; sourceTree = "<group>"; };
 		D6D9F0C814DC62A4009C0C95 /* ArmMuscled.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmMuscled.h; path = ../include/dynmx/ArmMuscled.h; sourceTree = "<group>"; };
@@ -254,6 +255,7 @@
 				D6D9F0E814DC62A4009C0C95 /* Render.h */,
 				D6D9F11A14DC62D6009C0C95 /* Scene.cpp */,
 				D6D9F0E914DC62A4009C0C95 /* Scene.h */,
+				D6B8F87417E766E900C70C75 /* Signal.h */,
 				D6D9F11B14DC62D6009C0C95 /* Simulation.cpp */,
 				D6D9F0EA14DC62A4009C0C95 /* Simulation.h */,
 				D6D9F11C14DC62D6009C0C95 /* SimulationFactory.cpp */,
@@ -461,7 +463,6 @@
 		D6E6E57214E15DC100FE6B07 /* SMC */ = {
 			isa = PBXGroup;
 			children = (
-				D665B83317DCD705001A3AA2 /* SMCArmView.h */,
 				D6D9F11D14DC62D6009C0C95 /* SMCAgent.cpp */,
 				D6D9F0EC14DC62A4009C0C95 /* SMCAgent.h */,
 				D6D9F11E14DC62D6009C0C95 /* SMCAgentEvo.cpp */,
@@ -483,6 +484,7 @@
 				D6D9F0D514DC62A4009C0C95 /* DistanceSensor.h */,
 				D668798817B4F77400FC1166 /* SMCArm.h */,
 				D668798917B4F7C300FC1166 /* SMCArm.cpp */,
+				D665B83317DCD705001A3AA2 /* SMCArmView.h */,
 			);
 			name = SMC;
 			sourceTree = "<group>";
@@ -763,7 +765,7 @@
 				GCC_WARN_MULTIPLE_DEFINITION_TYPES_FOR_SELECTOR = YES;
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
 				GCC_WARN_PEDANTIC = NO;
-				GCC_WARN_SHADOW = YES;
+				GCC_WARN_SHADOW = NO;
 				GCC_WARN_SIGN_COMPARE = NO;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -804,7 +806,7 @@
 				GCC_WARN_MULTIPLE_DEFINITION_TYPES_FOR_SELECTOR = YES;
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
 				GCC_WARN_PEDANTIC = NO;
-				GCC_WARN_SHADOW = YES;
+				GCC_WARN_SHADOW = NO;
 				GCC_WARN_SIGN_COMPARE = NO;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;

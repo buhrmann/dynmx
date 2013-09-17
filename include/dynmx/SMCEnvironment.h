@@ -42,7 +42,8 @@ public:
   virtual const ci::Vec2f& getPosition() const { return m_position; };
   virtual ci::Vec2f getPosition() { return m_position; };
   virtual const ci::Vec2f& getPositionVar() const { return m_positionVar; };
-  virtual ci::Vec2f getPositionVar() { return m_positionVar; };  
+  virtual ci::Vec2f getPositionVar() { return m_positionVar; };
+  virtual const float getAngleVar() { return m_angleVar; };
   virtual void setPosition(const ci::Vec2f& pos) { m_position = pos; };
   virtual void setPositionMean(const ci::Vec2f& pos) { m_positionMean = pos; };
   void setPositionVariance(const ci::Vec2f& var) { m_positionVar = var; };

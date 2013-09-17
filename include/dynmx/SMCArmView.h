@@ -194,8 +194,10 @@ inline void SMCArmView::draw3d()
   
   // Line object
 #if 1
-  ci::ColorA colA (0,0,0);
-  if(m_arm->getTime() > m_arm->getFitnessEvalDelay())
+  ci::ColorA colA (0.5, 0.5, 0.5);
+  if(m_arm->m_phase == 1)
+    colA = ci::ColorA(0,0,0);
+  else if(m_arm->m_phase == 2)
     colA = ci::ColorA(1,0,1);
   
   const std::vector<Positionable*>& objects = m_arm->getEnvironment()->getObjects();
