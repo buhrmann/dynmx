@@ -286,11 +286,14 @@ void SMCArm::nextTrial(int trial)
   if(numTrials > 1)
   {
     // In rad...
+    const bool posVar = numTrials >= 10;
+    int numAngleTrials = posVar ? numTrials / 2 : numTrials;
     const float maxRange = obj->getAngleVar();
     const float angularRange = m_fitnessStage * (maxRange / m_fitnessMaxStages);
-    int t = trial % (numTrials/2);
+    int t = trial % numAngleTrials;
     // PI/2 (90 deg) makes the line orthogonal to the arm when extended, so that's the middle of the range
-    float angle = PI_OVER_TWO - angularRange/2.0f + (t * angularRange / (numTrials-1));
+    float angle = PI_OVER_TWO - angularRange/2.0f + (t * angularRange / (numAngleTrials - 1));
+    //std::cout << "Trial " << trial << ". Angle: " << radiansToDegrees(angle) << std::endl;
     obj->setAngle(angle);
     
     if(trial < numTrials/2)

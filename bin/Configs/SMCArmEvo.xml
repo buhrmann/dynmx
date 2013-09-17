@@ -52,7 +52,7 @@
     <Eval Run="0">
         <NumTrials Value="10"/>
         <RecordState Value="1"/>
-        <LoadFrom Value="~/Experiments/eSMCs/Arm/13_09_17__09_34_18/GA_BestGenome.xml"/>
+        <LoadFrom Value="~/Experiments/eSMCs/Arm/13_09_17__16_12_34/GA_BestGenome.xml"/>
     </Eval>         
 	</GA>    
   <Arm Gravity="0.0" Integrator="euler" InteractionTorques="1">
