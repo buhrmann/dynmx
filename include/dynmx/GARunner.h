@@ -106,6 +106,8 @@ public:
   
   void setVerbosity(GAVerbosity v) { m_verbosity = v; };
   
+  void fitnessFunctionChanged() { m_ga->resetFitnesses(); };
+  
 protected:  
   
   void generationToXml(ci::XmlTree* xml, uint32_t gen, const double* genome, float bestFit, float avgFit);
