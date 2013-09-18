@@ -28,6 +28,9 @@ namespace dmx
 #define GA_BOUND_CHECK 0  // 0 = clamping, 1 = mirroring
 #define MAX_NUM_PARALLEL_EVALS 8
 
+#define NON_EVAL -100000.f // MAX_NEG_FLOAT
+#define EPS_NON_EVAL 10.f
+
 //----------------------------------------------------------------------------------------------------------------------
 // Microbial GA with Demes				      
 // for details see http://www.cogs.susx.ac.uk/users/inmanh/MicrobialGA_ECAL2009.pdf 
@@ -40,6 +43,7 @@ public:
   ~GA();
 
   void reset(bool randomizeGenomes = true);
+  void resetFitnesses(float f = NON_EVAL) { std::fill(m_fitnesses, m_fitnesses + m_popSize, f); m_fitnessA = m_fitnessB = f; };
   
   // interface for repeated evaluation of individual genomes
   /// Returns pointer to one of two genomes in current tournament, but doesn't allow modification of its contents
@@ -98,9 +102,7 @@ protected:
   
   // internal interface for repeated evaluation of individual genomes
   // selects two random genomes for tournament from neighborhood in population
-  void startNextTournament();   
-  void finishThisTournament();  
-
+  void startNextTournament();
   // determines winner and loser of tournament and mutates loser
   void performTournament(uint16_t indA, float fitA, uint16_t indB, float fitB);
   // loser of a tournament is being replaced by mutated version of the winner

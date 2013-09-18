@@ -12,11 +12,23 @@
 
 #include <time.h>
 #include "assert.h"
+#include <iomanip> 
 
 namespace dmx
 {
 
 #define GA_ERROR_LOG 0
+  
+// --------------------------------------------------------------------------------------------
+static bool isNonEval(float f)
+{
+  return fabs(f - NON_EVAL) < EPS_NON_EVAL;
+}
+
+static bool isEval(float f)
+{
+  return fabs(f - NON_EVAL) >= EPS_NON_EVAL;
+}
   
 // --------------------------------------------------------------------------------------------
 GA::GA(int popsize, int genomeLength, int demeWidth) : 
@@ -42,7 +54,7 @@ void GA::init()
   }
 
   m_fitnesses = new float[m_popSize];
-  std::fill(m_fitnesses, m_fitnesses + m_popSize, MAX_NEG_FLOAT);
+  std::fill(m_fitnesses, m_fitnesses + m_popSize, NON_EVAL);
 
   m_weightedAverageGenome = new double[m_popSize]; 
   
@@ -91,7 +103,7 @@ void GA::reset(bool randomizeGenomes)
         m_genomes[i][j] = ran1(&m_idum);
       }
       
-      m_fitnesses[i] = MAX_NEG_FLOAT;
+      m_fitnesses[i] = NON_EVAL;
     }
   }
   
@@ -149,7 +161,7 @@ const double* GA::getCurrentGenome() const
 // --------------------------------------------------------------------------------------------
 const double* GA::getBestGenome(float& fitness) const
 {
-  fitness = MAX_NEG_FLOAT;
+  fitness = NON_EVAL;
   double* result = 0;
   for (int i = 0; i < m_popSize; ++i)
   {
@@ -169,7 +181,7 @@ float GA::getAvgFitness() const
   int n = 0;
   for (int i = 0 ; i < m_popSize ; ++i)
   {
-    if(fabs(m_fitnesses[i] - MAX_NEG_FLOAT) > 10.0 )
+    if(isEval(m_fitnesses[i]))
     {
       avg += m_fitnesses[i];
       n++;
@@ -217,17 +229,35 @@ void GA::setFitness(float fit)
 {
   if(m_currentGenome == GA_FIRST_GENOME)
   {
-    // If 1st genome: simply cache fitness    
+    // If 1st genome: simply cache fitness
+#if GA_ERROR_LOG
+    std::cout << std::setprecision(10) << "Setting fitA to " << fit << std::endl;
+#endif
     m_fitnessA = fit;
     m_currentGenome = GA_SECOND_GENOME;
-    //m_fitnesses[m_currentIndA] = fit;
+    
+    // Check whether we can skip second evaluation
+    if (m_avoidReevaluation && isEval(m_fitnesses[m_currentIndB]))
+    {
+#if GA_ERROR_LOG
+      std::cout << std::setprecision(10) << "GA WARN: indB " << m_currentIndB << "(" << m_fitnesses[m_currentIndB] <<  ") already evaled. " << std::endl;
+#endif
+      m_fitnessB = m_fitnesses[m_currentIndB];
+      
+      performTournament(m_currentIndA, m_fitnessA, m_currentIndB, m_fitnessB);
+      startNextTournament();
+
+    }
   }
   else if(m_currentGenome == GA_SECOND_GENOME)
   {
-    // If 2nd genome, finish tournament also    
+    // If 2nd genome, finish tournament also
+#if GA_ERROR_LOG
+    std::cout << std::setprecision(10) << "Setting fitB to " << fit << std::endl;
+#endif
     m_fitnessB = fit;
-    //m_fitnesses[m_currentIndB] = fit;
-    finishThisTournament();
+    
+    performTournament(m_currentIndA, m_fitnessA, m_currentIndB, m_fitnessB);
     startNextTournament();
   }
 }
@@ -282,33 +312,23 @@ bool GA::pairIsDifferentFrom(uint16_t& indA, uint16_t& indB, uint16_t* existingP
 void GA::startNextTournament()
 {
   getRandomPairInDeme(m_currentIndA, m_currentIndB);
+#if GA_ERROR_LOG
+  std::cout << std::setprecision(10) << "Ga: New Tournament. " << m_currentIndA << ": " << m_fitnesses[m_currentIndA] << ". " << m_currentIndB << ": " << m_fitnesses[m_currentIndB] << std::endl;
+#endif
+  
   m_currentGenome = GA_FIRST_GENOME;
   
-  if(m_avoidReevaluation)
+  if (m_avoidReevaluation)
   {
     // Test of potential speed up by not reevaluating already evaluated genomes
-    if(m_fitnesses[m_currentIndA] != MAX_NEG_FLOAT)
+    if (isEval(m_fitnesses[m_currentIndA]))
     {
+#if GA_ERROR_LOG
+      std::cout << std::setprecision(10) << "GA WARN: indA " << m_currentIndA << "(" << m_fitnesses[m_currentIndA] <<  ") already evaled. " << std::endl;
+#endif
       setFitness(m_fitnesses[m_currentIndA]);
     }
-    // Do same for second genome in tournament
-    if(m_fitnesses[m_currentIndB] != MAX_NEG_FLOAT)
-    {
-      setFitness(m_fitnesses[m_currentIndB]);
-    }
   }
-  
-#if GA_ERROR_LOG
-  std::cout << "Ga: New Tournament. " << m_currentIndA << ": " << m_fitnesses[m_currentIndA] << ". " << m_currentIndB << ": " << m_fitnesses[m_currentIndB] << std::endl;
-#endif
-}
-
-// --------------------------------------------------------------------------------------------
-// decide winner and loser and perform mutation
-// --------------------------------------------------------------------------------------------
-void GA::finishThisTournament()
-{
-  performTournament(m_currentIndA, m_fitnessA, m_currentIndB, m_fitnessB);
 }
 
 // --------------------------------------------------------------------------------------------
@@ -318,7 +338,7 @@ void GA::performTournament(uint16_t indA, float fitA, uint16_t indB, float fitB)
 {
 #if GA_ERROR_LOG
   std::cout << "Ga: perform tournament. " << indA << ": " << fitA << ". " << indB << ": " << fitB << std::endl;
-  std::cout << "Ga: before tournament. " << indA << ": " << m_fitnesses[indA] << ". " << indB << ": " << m_fitnesses[indB] << std::endl;  
+  std::cout << std::setprecision(10) << "Ga: before tournament. " << indA << ": " << m_fitnesses[indA] << ". " << indB << ": " << m_fitnesses[indB] << std::endl;  
 #endif
   
   int winner, loser;
@@ -326,27 +346,39 @@ void GA::performTournament(uint16_t indA, float fitA, uint16_t indB, float fitB)
   {
     winner = indA;
     loser = indB;
-    assert(!m_avoidReevaluation || fitA >= m_fitnesses[indA]); // Make sure we're not overwriting a better one
-
+    
+    if(m_avoidReevaluation && fitA < m_fitnesses[winner])
+    {
+      std::cout << std::setprecision(10) << "GA ERROR: overwriting fitness of winnerA " << winner << "(" << m_fitnesses[winner] << ")" << " with new value: " << fitA << std::endl;
+    }
+    
+    //assert(!m_avoidReevaluation || fitA >= m_fitnesses[winner]); // Make sure we're not overwriting a better one
+    
     m_fitnesses[winner] = fitA;
   }
   else 
   {
     winner = indB;
     loser = indA;
-    assert(!m_avoidReevaluation || fitB >= m_fitnesses[indB]); // Make sure we're not overwriting a better one    
+    
+    if(m_avoidReevaluation && fitB < m_fitnesses[winner])
+    {
+      std::cout << std::setprecision(10)  << "GA ERROR: overwriting fitness of winnerB " << winner << "(" << m_fitnesses[winner] << ")" << " with new value: " << fitB << std::endl;
+    }
+    
+    assert(!m_avoidReevaluation || fitB >= m_fitnesses[winner]); // Make sure we're not overwriting a better one
+
     m_fitnesses[winner] = fitB;
   }
   
-
   // do mutation
   mutate(winner, loser);
 
   // The loser's fitness is now undetermined
-  m_fitnesses[loser] = MAX_NEG_FLOAT;
+  m_fitnesses[loser] = NON_EVAL;
   
 #if GA_ERROR_LOG
-  std::cout << "Ga: after tournament. " << winner << ": " << m_fitnesses[winner] << ". " << loser << ": " << m_fitnesses[loser] << std::endl;
+  std::cout << std::setprecision(10) << "Ga: after tournament. " << winner << ": " << m_fitnesses[winner] << ". " << loser << ": " << m_fitnesses[loser] << std::endl;
 #endif
   
   m_tournament++;
