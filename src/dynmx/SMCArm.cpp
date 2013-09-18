@@ -8,6 +8,8 @@
 
 #include "SMCArm.h"
 #include "MathUtils.h"
+#include "Simulation.h"
+
 #include "cinder/Rand.h"
 
 namespace dmx
@@ -286,7 +288,7 @@ void SMCArm::nextTrial(int trial)
   if(numTrials > 1)
   {
     // In rad...
-    const bool posVar = numTrials >= 10;
+    const bool posVar = obj->getPositionVar().x > 0;
     int numAngleTrials = posVar ? numTrials / 2 : numTrials;
     const float maxRange = obj->getAngleVar();
     const float angularRange = m_fitnessStage * (maxRange / m_fitnessMaxStages);
@@ -296,10 +298,17 @@ void SMCArm::nextTrial(int trial)
     //std::cout << "Trial " << trial << ". Angle: " << radiansToDegrees(angle) << std::endl;
     obj->setAngle(angle);
     
-    if(trial < numTrials/2)
-      obj->setPosition(ci::Vec2f(0.45, 0));
-    else
-      obj->setPosition(ci::Vec2f(0.55, 0));
+    // Systematicall vary distance of line
+    if(posVar)
+    {
+      const int numPosTrials = 2;
+      const float maxDistRange = obj->getPositionVar().x;
+      int t = trial < numTrials/2 ? 0 : 1;
+      float distRange = m_fitnessStage * (maxDistRange / m_fitnessMaxStages);
+      float dist = 0.5 - distRange/2.0f + (t * distRange / (numPosTrials - 1));
+      obj->setPosition(ci::Vec2f(dist, 0));
+    }
+    
   }
 #endif
 }
@@ -315,14 +324,14 @@ void SMCArm::endOfEvaluation(float fit)
 {
   nextTrial(0);
   
-  if (fit > 0.55f && m_fitnessStage < 7)
+  if (fit > 0.6f && m_fitnessStage < m_fitnessMaxStages)
   {
     m_fitnessStage++;
     std::cout << "Next fitness stage: " << m_fitnessStage << std::endl;
+    
+    // Bad form, but what the heck:
+    ((GARunner*)Simulation::getInstance()->getModel())->fitnessFunctionChanged();
   }
-  
-  //if ((fit > 0.5f) && (m_fitnessStage == 1))
-  //  m_fitnessStage = 2;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
