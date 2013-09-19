@@ -35,14 +35,14 @@
           <UnTria1ngle PosX="0.2" PosY="-0.2" Size="0.1" PosVar="0.1"/>
         </Environment>
 		</Evolvable>	
-		<Incremental initialMutation="0.1" seedOnly="1" seedAll="1" elitist="1">0</Incremental>
-		<LoadFrom Value="~/Experiments/eSMCs/Arm/13_09_17__09_34_18/GA_Result.xml"/>
+		<Incremental initialMutation="0.1" seedOnly="1" seedAll="1" elitist="1">1</Incremental>
+		<LoadFrom Value="~/Experiments/eSMCs/Arm/13_09_19__17_34_31/GA_Result.xml"/>
 		<PopulationSize Value="50"/>
 		<DemeSize Value="10"/>
-		<NumGenerations Value="2000"/>
+		<NumGenerations Value="1000"/>
 		<MutationMax Value="0.01"/>
     <MutationMaxReduced Value="0.002"/>
-    <MutationMaxReduceAt Value="1750"/>        
+    <MutationMaxReduceAt Value="850"/>        
 		<RecombinationRate Value="0.5"/>
     <RecombinationRateReduced Value="0.75"/>
 		<Trials Num="10" Combine="Min"/>

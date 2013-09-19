@@ -324,7 +324,7 @@ void SMCArm::endOfEvaluation(float fit)
 {
   nextTrial(0);
   
-  if (fit > 0.6f && m_fitnessStage < m_fitnessMaxStages)
+  if (fit > 0.7f && m_fitnessStage < m_fitnessMaxStages)
   {
     m_fitnessStage++;
     std::cout << "Next fitness stage: " << m_fitnessStage << std::endl;
