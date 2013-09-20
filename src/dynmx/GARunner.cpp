@@ -67,6 +67,7 @@ void GARunner::init()
     m_ga->setMutationMax(ga.getChild("MutationMax").getAttributeValue<float>("Value"));
             
     m_numGenerations = ga.getChild("NumGenerations").getAttributeValue<int>("Value");
+    m_outputInterval = ga.getChild("NumGenerations").getAttributeValue<int>("OutputInterval", 100);
     m_numTrials = ga.getChild("Trials").getAttributeValue<int>("Num");
     
     std::string trialAgg = ga.getChild("Trials").getAttributeValue<std::string>("Combine", "Avg");
@@ -262,7 +263,7 @@ void GARunner::update(float dt)
           std::cout << "Generation " << currentGen 
                     << ": BestFit = " << bestFitness << " | AvgFit = " << avgFitness << std::endl; 
         }
-        else if(m_verbosity == kGAVerbosityNone && currentGen % 50 == 0)
+        else if(m_verbosity == kGAVerbosityNone && currentGen % m_outputInterval == 0)
         {
           std::string dir = GLOBALS->getDataDirName();
           std::cout.precision(5);

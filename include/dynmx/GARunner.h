@@ -126,6 +126,7 @@ protected:
   uint16_t m_numTrials;
   uint32_t m_prevGeneration;  /// For detecting if GA has incremented a generation
   uint32_t m_numGenerations;
+  uint32_t m_outputInterval;
   
   
   double m_reducedMutationMax;
