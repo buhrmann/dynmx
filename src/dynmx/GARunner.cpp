@@ -262,7 +262,7 @@ void GARunner::update(float dt)
           std::cout << "Generation " << currentGen 
                     << ": BestFit = " << bestFitness << " | AvgFit = " << avgFitness << std::endl; 
         }
-        else if(m_verbosity == kGAVerbosityNone && currentGen % 100 == 0)
+        else if(m_verbosity == kGAVerbosityNone && currentGen % 50 == 0)
         {
           std::string path = DATA_DIR;
           if (path[path.size()-1] == '/')
