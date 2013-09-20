@@ -262,7 +262,17 @@ void GARunner::update(float dt)
           std::cout << "Generation " << currentGen 
                     << ": BestFit = " << bestFitness << " | AvgFit = " << avgFitness << std::endl; 
         }
-#endif     
+        else if(m_verbosity == kGAVerbosityNone && currentGen % 100 == 0)
+        {
+          std::string path = DATA_DIR;
+          if (path[path.size()-1] == '/')
+            path = path.substr(0, path.size()-1);
+          std::string dir = path.substr(path.rfind('/') + 1);
+          std::cout.precision(5);
+          std::cout.width(5);
+          std::cout << dir << " | G " << currentGen << " | B = " << bestFitness << "\t A = " << avgFitness << std::endl;
+        }
+#endif
         m_prevGeneration = currentGen;
         
         // Automatic reduction of mutation rate
