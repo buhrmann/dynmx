@@ -47,6 +47,7 @@ void SMCArm::init()
     m_fitnessEvalDelay = xml.getChild("FitnessEvalDelay").getValue<double>(2.0);
     m_probePhaseDuration = xml.getChild("ProbePhaseDuration").getValue<double>(4.0);
     m_evalPhaseDuration = m_trialDuration - m_fitnessEvalDelay - m_probePhaseDuration;
+    m_fitnessStageThreshold = xml.getChild("FitnessStageThreshold").getValue<float>(0.5);
     
     // Load environment objects
     m_environment.fromXml(xml.getChild("Environment"));
@@ -295,7 +296,6 @@ void SMCArm::nextTrial(int trial)
     int t = trial % numAngleTrials;
     // PI/2 (90 deg) makes the line orthogonal to the arm when extended, so that's the middle of the range
     float angle = PI_OVER_TWO - angularRange/2.0f + (t * angularRange / (numAngleTrials - 1));
-    //std::cout << "Trial " << trial << ". Angle: " << radiansToDegrees(angle) << std::endl;
     obj->setAngle(angle);
     
     // Systematicall vary distance of line
@@ -324,12 +324,12 @@ void SMCArm::endOfEvaluation(float fit)
 {
   nextTrial(0);
   
-  if (fit > 0.7f && m_fitnessStage < m_fitnessMaxStages)
+  if (fit > m_fitnessStageThreshold && m_fitnessStage < m_fitnessMaxStages)
   {
     m_fitnessStage++;
     std::cout <<  Globals::Inst()->getDataDirName() << " | Next fitness stage: " << m_fitnessStage << std::endl;
     
-    // Bad form, but what the heck:
+    // Bad form, but what the heck: need to inform GA to reset previous evaluations
     ((GARunner*)Simulation::getInstance()->getModel())->fitnessFunctionChanged();
   }
 };

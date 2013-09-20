@@ -124,6 +124,7 @@ protected:
   float m_evalPhaseDuration;
   int m_fitnessStage;
   int m_fitnessMaxStages;
+  float m_fitnessStageThreshold;
 
 };
   
