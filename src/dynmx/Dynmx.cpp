@@ -45,6 +45,15 @@ void Globals::saveToDataDir()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+std::string Globals::getDataDirName()
+{
+  std::string path = getDataDir();
+  if (path[path.size()-1] == '/')
+    path = path.substr(0, path.size()-1);
+  return path.substr(path.rfind('/') + 1);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 void Globals::initialise(const std::string& cfgFnm)
 {
   // Defaults
@@ -90,7 +99,7 @@ void Globals::initialise(const std::string& cfgFnm)
     {
       m_fnm = cfgFnm.substr(cfgFnm.rfind('/') + 1);
       pathToConfig = cfgFnm;
-#if DEBUGGING
+#if 0
       std::cout << "Found specified config file in ABSOLUTE path '" << cfgFnm << "'." << std::endl;    
 #endif                
     }
@@ -101,9 +110,9 @@ void Globals::initialise(const std::string& cfgFnm)
       {
         m_fnm = cfgFnm.substr(cfgFnm.rfind('/') + 1);;
         pathToConfig = localPath;
-  #if DEBUGGING
-        std::cout << "Found specified config file in LOCAL path '" << localPath << "'." << std::endl;    
-  #endif
+#if 0
+        std::cout << "Found specified config file in LOCAL path '" << localPath << "'." << std::endl;
+#endif
       }
     }
   }

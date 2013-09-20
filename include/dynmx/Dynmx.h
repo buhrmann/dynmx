@@ -50,6 +50,7 @@ namespace dmx
   
 #define DATA_DIR Globals::Inst()->getDataDir()
 #define SETTINGS Globals::Inst()->getSettings()
+#define GLOBALS Globals::Inst()
 
 //----------------------------------------------------------------------------------------------------------------------      
 static std::string pathExpandHome(const std::string& path)
@@ -80,6 +81,7 @@ class Globals
 public:
   static Globals* Inst(const std::string& cfgFnm="");
   std::string getDataDir() { return m_dataDir; };
+  std::string getDataDirName();
   ci::XmlTree* getSettings() { return m_settings; };
   
 protected:

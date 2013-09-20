@@ -19,16 +19,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 int main( int argc, char * const argv[] )
 {
-  
-#if DEBUGGING
-  std::cout << "Starting with cmdline args: ";
-  for(int i = 0; i < argc; ++i)
-  {
-    std::cout << argv[i] << ", ";
-  }
-  std::cout << std::endl;
-#endif
-  
+    
 #if defined( CINDER_COCOA )
   ci::cocoa::SafeNsAutoreleasePool pool;
 #endif

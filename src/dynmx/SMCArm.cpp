@@ -327,7 +327,7 @@ void SMCArm::endOfEvaluation(float fit)
   if (fit > 0.7f && m_fitnessStage < m_fitnessMaxStages)
   {
     m_fitnessStage++;
-    std::cout << "Next fitness stage: " << m_fitnessStage << std::endl;
+    std::cout <<  Globals::Inst()->getDataDirName() << " | Next fitness stage: " << m_fitnessStage << std::endl;
     
     // Bad form, but what the heck:
     ((GARunner*)Simulation::getInstance()->getModel())->fitnessFunctionChanged();
