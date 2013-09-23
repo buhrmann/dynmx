@@ -76,11 +76,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "../src/dynmx/SMCArm.cpp"
-         timestampString = "401192476.550126"
+         timestampString = "401625584.983209"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "299"
-         endingLineNumber = "299"
+         startingLineNumber = "300"
+         endingLineNumber = "300"
          landmarkName = "SMCArm::nextTrial(int trial)"
          landmarkType = "5">
       </FileBreakpoint>

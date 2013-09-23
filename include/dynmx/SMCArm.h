@@ -122,6 +122,7 @@ protected:
   float m_fitnessEvalDelay;
   float m_probePhaseDuration;
   float m_evalPhaseDuration;
+  int m_numTrials;
   int m_fitnessStage;
   int m_fitnessMaxStages;
   float m_fitnessStageThreshold;

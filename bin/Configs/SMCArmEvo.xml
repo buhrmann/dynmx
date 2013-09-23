@@ -13,14 +13,14 @@
   </Globals>
   <GA>
     <Evolvable Name="SMCArm">
-      <DistanceSensor MaxDist="0.05" TransferFunc="Inverse" NoiseLevel="0.0" Mode="Absolute"/>
+      <DistanceSensor MaxDist="0.15" TransferFunc="Inverse" NoiseLevel="0.0" Mode="Absolute"/>
       <TrialDuration>14</TrialDuration>
       <FitnessEvalDelay>2</FitnessEvalDelay>
       <ProbePhaseDuration>4</ProbePhaseDuration>
       <FitnessStageThreshold>0.69</FitnessStageThreshold>
       <Topology symmetric="0">
-        <Inputs asNeurons="1">3</Inputs>
-        <Hidden>6</Hidden>
+        <Inputs asNeurons="1">4</Inputs>
+        <Hidden>4</Hidden>
         <Outputs laterallyConnected="1">2</Outputs>
       </Topology>
       <NetLimits>
@@ -40,13 +40,13 @@
     <LoadFrom Value="~/Experiments/eSMCs/Arm/13_09_19__19_46_34/GA_Result.xml"/>
     <PopulationSize Value="100"/>
     <DemeSize Value="20"/>
-    <NumGenerations Value="5000" OutputInterval="100"/>
+    <NumGenerations Value="2000" OutputInterval="50"/>
     <MutationMax Value="0.01"/>
     <MutationMaxReduced Value="0.001"/>
-    <MutationMaxReduceAt Value="4000"/>        
+    <MutationMaxReduceAt Value="1750"/>        
     <RecombinationRate Value="0.5"/>
     <RecombinationRateReduced Value="0.75"/>
-    <Trials Num="5" Combine="Min"/>
+    <Trials Num="1" Combine="Min"/>
     <AvoidReevaluation Value="0"/>
     <SaveBestEachGeneration Value="0"/>
     <AutoEval Run="1"/>

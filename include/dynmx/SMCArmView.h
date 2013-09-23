@@ -151,8 +151,8 @@ inline void SMCArmView::update(float dt)
   }
   
   // Add data to plot
-  double val = m_arm->getSensedValue();
-  m_plot->addPoint(val, 0);
+  m_plot->addPoint(m_arm->getSensedValue(), 0);
+  m_plot->addPoint(m_arm->getDistanceSensor().getDerivative(), 1);
   
   // Update fitness-related data
   m_fitnessPlot->addPoint(m_arm->m_fitHandVel, 0);

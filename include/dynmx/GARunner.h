@@ -103,6 +103,7 @@ public:
   GA* getGA() { return m_ga; };
   
   int getNumTrials() { return m_numTrials; };
+  void setNumTrials(int n) { m_numTrials = n; };
   
   void setVerbosity(GAVerbosity v) { m_verbosity = v; };
   

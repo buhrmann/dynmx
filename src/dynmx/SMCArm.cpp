@@ -78,7 +78,7 @@ void SMCArm::init()
       m_fitnessStage = 1;
   }
   
-
+  m_numTrials = 1;
   nextTrial(0);
   
   reset();
@@ -123,7 +123,7 @@ void SMCArm::update(float dt)
   m_ctrnn->setExternalInput(1, m_arm.getJointAngle(JT_elbow) / m_maxJointAngle);
   m_ctrnn->setExternalInput(2, m_arm.getJointAngle(JT_shoulder) / m_maxJointAngle);
   if (m_topology.getNumInputs() > 3)
-      m_ctrnn->setExternalInput(3, m_distanceSensor.getDerivative());
+      m_ctrnn->setExternalInput(3, m_distanceSensor.getDerivative() / 100.0f);
   
   m_ctrnn->updateDynamic(dt);
   
@@ -264,7 +264,8 @@ float SMCArm::getFitness()
 //----------------------------------------------------------------------------------------------------------------------
 void SMCArm::nextTrial(int trial)
 {
-  const int numTrials = SETTINGS->getChild("Config/GA/Trials").getAttributeValue<int>("Num",1);
+  //const int numTrials = SETTINGS->getChild("Config/GA/Trials").getAttributeValue<int>("Num",1);
+  const int numTrials = m_numTrials;
   Positionable* obj = getEnvironment()->getObjects()[0];
   
 #if 0
@@ -324,10 +325,18 @@ void SMCArm::endOfEvaluation(float fit)
 {
   nextTrial(0);
   
+  // Safe here, since we know we're being called by GARunner
+  m_numTrials = ((GARunner*)Simulation::getInstance()->getModel())->getNumTrials();
+  
   if (fit > m_fitnessStageThreshold && m_fitnessStage < m_fitnessMaxStages)
   {
     m_fitnessStage++;
     std::cout <<  Globals::Inst()->getDataDirName() << " | Next fitness stage: " << m_fitnessStage << std::endl;
+    
+    if(m_fitnessStage == 3)
+      ((GARunner*)Simulation::getInstance()->getModel())->setNumTrials(3);
+    else if(m_fitnessStage == 5)
+      ((GARunner*)Simulation::getInstance()->getModel())->setNumTrials(5);
     
     // Bad form, but what the heck: need to inform GA to reset previous evaluations
     ((GARunner*)Simulation::getInstance()->getModel())->fitnessFunctionChanged();
@@ -351,6 +360,7 @@ void SMCArm::toXml(ci::XmlTree& xml)
 {
   ci::XmlTree evolvable ("SMCArm", "");
   evolvable.setAttribute("Fitness", getFitness());
+  evolvable.setAttribute("FitnessStage", m_fitnessStage);
   
   m_distanceSensor.toXml(evolvable);
   

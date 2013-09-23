@@ -587,8 +587,9 @@ void Plot::update()
   const float labelHeight = 16;
   ci::ColorA labelColor (0.0f, 0.0f, 0.0f, 0.5f);
   ci::gl::color(labelColor);
-  ci::gl::drawSolidRect(ci::Rectf(0, 0, m_w, labelHeight));         
-  ci::gl::drawString("Graph: " + m_title, ci::Vec2f(3,3), ci::Color(1,1,1), m_font);    
+  ci::gl::drawSolidRect(ci::Rectf(0, 0, m_w, labelHeight));
+  std::string title = "Graph: " + m_title + ". [" + toString(m_minY) + ", " + toString(m_maxY) + "]";
+  ci::gl::drawString(title, ci::Vec2f(3,3), ci::Color(1,1,1), m_font);
   
   glPushMatrix();
   glTranslatef(0, labelHeight,0);
