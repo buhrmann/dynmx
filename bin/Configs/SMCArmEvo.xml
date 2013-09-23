@@ -46,7 +46,7 @@
     <MutationMaxReduceAt Value="1750"/>        
     <RecombinationRate Value="0.5"/>
     <RecombinationRateReduced Value="0.75"/>
-    <Trials Num="1" Combine="Min"/>
+    <Trials Num="5" Combine="Min"/>
     <AvoidReevaluation Value="0"/>
     <SaveBestEachGeneration Value="0"/>
     <AutoEval Run="1"/>

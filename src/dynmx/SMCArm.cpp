@@ -69,16 +69,22 @@ void SMCArm::init()
   {
     // We're testing
     m_fitnessStage = m_fitnessMaxStages;
+    m_numTrials = SETTINGS->getChild("Config/GA/Eval/NumTrials").getValue<int>(1);
   }
   else
   {
     if (SETTINGS->getChild("Config/GA/Incremental").getValue<bool>(false))
+    {
       m_fitnessStage = m_fitnessMaxStages;
+      m_numTrials = SETTINGS->getChild("Config/GA/Trials").getAttributeValue<int>("Num", 1);
+    }
     else
+    {
       m_fitnessStage = 1;
+      m_numTrials = 1;
+    }
   }
   
-  m_numTrials = 1;
   nextTrial(0);
   
   reset();
