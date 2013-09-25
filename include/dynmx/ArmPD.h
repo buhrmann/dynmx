@@ -31,7 +31,7 @@ public:
   void updatePD(float angle1, float angle2, float timeStep); 
   
   /// Tick arm model given a desired end-effector position
-  void updatePosition(float x, float y, float timeStep); 
+  void updatePosition(float timeStep, float x, float y);
   
   double getDesiredJointAngle(Joint j) { assert(j == JT_elbow || j == JT_shoulder); return m_desiredAngle[j]; };
 

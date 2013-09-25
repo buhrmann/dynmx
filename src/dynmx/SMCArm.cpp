@@ -69,7 +69,7 @@ void SMCArm::init()
   {
     // We're testing
     m_fitnessStage = m_fitnessMaxStages;
-    m_numTrials = SETTINGS->getChild("Config/GA/Eval/NumTrials").getValue<int>(1);
+    m_numTrials = SETTINGS->getChild("Config/GA/Eval/NumTrials").getAttributeValue<int>("Value", 1);
   }
   else
   {
@@ -107,6 +107,7 @@ void SMCArm::reset()
   
   m_arm.reset();
   m_prevPos = m_arm.getEffectorPos();
+  m_vel.set(0,0);
   m_handTraj.clear();
   
   m_handSpeed = 0.0;
@@ -119,32 +120,47 @@ void SMCArm::reset()
 //----------------------------------------------------------------------------------------------------------------------
 void SMCArm::update(float dt)
 {
-
+  
+#define CONTROL_JOINTS 1
+  
   // Sense environment
   updateSensor(dt);
   m_sensedValue = m_distanceSensor.getActivation();
   
   // Update CTRNN
   m_ctrnn->setExternalInput(0, m_sensedValue);
+  
+#if CONTROL_JOINTS
   m_ctrnn->setExternalInput(1, m_arm.getJointAngle(JT_elbow) / m_maxJointAngle);
   m_ctrnn->setExternalInput(2, m_arm.getJointAngle(JT_shoulder) / m_maxJointAngle);
+#else
+  m_ctrnn->setExternalInput(1, m_vel.x);
+  m_ctrnn->setExternalInput(2, m_vel.y);
+#endif
+  
   if (m_topology.getNumInputs() > 3)
       m_ctrnn->setExternalInput(3, m_distanceSensor.getDerivative() / 100.0f);
   
   m_ctrnn->updateDynamic(dt);
   
+  // Move
   const int mn1Id = m_topology.getSize() - 1;
   const int mn2Id = m_topology.getSize() - 2;
   
+  m_prevPos = m_arm.getEffectorPos();
+  
+#if CONTROL_JOINTS
   float desAng1 = -m_maxJointAngle + (2 * m_maxJointAngle * m_ctrnn->getOutput(mn1Id));
   float desAng2 = -m_maxJointAngle + (2 * m_maxJointAngle * m_ctrnn->getOutput(mn2Id));
-  
-  //desAng1 = 0.0;
-  //desAng2 = 0.0;
-  
-  // Move
-  m_prevPos = m_arm.getEffectorPos();
   m_arm.updatePD(dt, desAng1, desAng2);
+#else
+  const float maxVel = 0.2f;
+  const ci::Vec2f desVel(-1.0f + 2.0f * m_ctrnn->getOutput(mn1Id), -1.0f + 2.0f * m_ctrnn->getOutput(mn2Id));
+  const ci::Vec2f desPos = m_arm.getEffectorPos() + maxVel * desVel;
+  m_arm.updatePosition(dt, desPos.x, desPos.y);
+#endif
+  
+  m_vel = (m_arm.getEffectorPos() - m_prevPos) / dt;
   
   m_time += dt;
   
@@ -156,7 +172,6 @@ void SMCArm::update(float dt)
     m_handTraj.pop_front();
   }
 
-  
   updateFitness(dt);
 }
 
@@ -210,8 +225,8 @@ void SMCArm::updateFitness(float dt)
   if (abs(m_handSpeed) > 0.0001f)
   {
     float dot = lineDir.dot(handVel.normalized());
-    float angle = acos(clamp(dot, -1.f, 1.f));
-    m_fitAngleDist = 1.0f - (angle/PI);
+    float angle = acos(clamp(dot, -1.f, 1.f)) / PI; // in [0,1]
+    m_fitAngleDist = angle < 0.1f ? 1.0f - angle : 0.0f;
   }
   else
   {
@@ -271,7 +286,6 @@ float SMCArm::getFitness()
 void SMCArm::nextTrial(int trial)
 {
   //const int numTrials = SETTINGS->getChild("Config/GA/Trials").getAttributeValue<int>("Num",1);
-  const int numTrials = m_numTrials;
   Positionable* obj = getEnvironment()->getObjects()[0];
   
 #if 0
@@ -293,11 +307,11 @@ void SMCArm::nextTrial(int trial)
   
 #if 1
   // Systematically vary angle of line
-  if(numTrials > 1)
+  if(m_numTrials > 1)
   {
     // In rad...
     const bool posVar = obj->getPositionVar().x > 0;
-    int numAngleTrials = posVar ? numTrials / 2 : numTrials;
+    int numAngleTrials = posVar ? m_numTrials / 2 : m_numTrials;
     const float maxRange = obj->getAngleVar();
     const float angularRange = m_fitnessStage * (maxRange / m_fitnessMaxStages);
     int t = trial % numAngleTrials;
@@ -310,7 +324,7 @@ void SMCArm::nextTrial(int trial)
     {
       const int numPosTrials = 2;
       const float maxDistRange = obj->getPositionVar().x;
-      int t = trial < numTrials/2 ? 0 : 1;
+      int t = trial < m_numTrials/2 ? 0 : 1;
       float distRange = m_fitnessStage * (maxDistRange / m_fitnessMaxStages);
       float dist = 0.5 - distRange/2.0f + (t * distRange / (numPosTrials - 1));
       obj->setPosition(ci::Vec2f(dist, 0));
@@ -339,7 +353,7 @@ void SMCArm::endOfEvaluation(float fit)
     m_fitnessStage++;
     std::cout <<  Globals::Inst()->getDataDirName() << " | Next fitness stage: " << m_fitnessStage << std::endl;
     
-    if(m_fitnessStage == 3)
+    if(m_fitnessStage == 2)
       ((GARunner*)Simulation::getInstance()->getModel())->setNumTrials(3);
     else if(m_fitnessStage == 5)
       ((GARunner*)Simulation::getInstance()->getModel())->setNumTrials(5);

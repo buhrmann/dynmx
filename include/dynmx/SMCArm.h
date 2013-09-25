@@ -107,6 +107,7 @@ protected:
   float m_sensedValue;
   float m_time;
   ci::Vec2f m_prevPos;
+  ci::Vec2f m_vel;
   ci::Vec2f m_projPos;
   ci::Vec2f m_projVel;
   std::deque<ci::Vec2f> m_handTraj;
