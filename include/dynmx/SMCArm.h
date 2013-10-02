@@ -115,7 +115,9 @@ protected:
   float m_handDist;
   
   // Params
-  
+  float m_noise;
+  float m_sensorDropTail;
+  float m_sensorDropInterval;
   
   // Fitness related
   float m_fitness;
@@ -127,6 +129,10 @@ protected:
   int m_fitnessStage;
   int m_fitnessMaxStages;
   float m_fitnessStageThreshold;
+  
+  bool m_minimiseConnections;
+  float m_maxTotalWeight;
+  float m_minFitness;
 
 };
   

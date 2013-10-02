@@ -43,11 +43,27 @@ void SMCArm::init()
     m_distanceSensor.setTransferFunction(xml.getChild("DistanceSensor").getAttributeValue<std::string>("TransferFunc", "Binary"));
     m_distanceSensor.setNoiseLevel(xml.getChild("DistanceSensor").getAttributeValue<float>("NoiseLevel", 0.0));
     setSensorMode(xml.getChild("DistanceSensor").getAttributeValue<std::string>("Mode", "Absolute"));
+    
+    m_sensorDropTail = xml.getChild("SensorFilter").getAttributeValue<double>("dropTail", 0.0);
+    m_sensorDropInterval = xml.getChild("SensorFilter").getAttributeValue<double>("dropInterval", 0.0);
+    m_noise = xml.getChild("SensorFilter").getAttributeValue<double>("noise", 0.0);
+    
     m_trialDuration = xml.getChild("TrialDuration").getValue<double>(14.0);
     m_fitnessEvalDelay = xml.getChild("FitnessEvalDelay").getValue<double>(2.0);
     m_probePhaseDuration = xml.getChild("ProbePhaseDuration").getValue<double>(4.0);
     m_evalPhaseDuration = m_trialDuration - m_fitnessEvalDelay - m_probePhaseDuration;
     m_fitnessStageThreshold = xml.getChild("FitnessStageThreshold").getValue<float>(0.5);
+    m_minimiseConnections = xml.getChild("MinimiseConnections").getValue<bool>(false);
+    if(m_minimiseConnections)
+    {
+      m_maxTotalWeight = xml.getChild("MinimiseConnections").getAttributeValue<float>("maxWeight");
+      m_minFitness = xml.getChild("MinimiseConnections").getAttributeValue<float>("minFit");
+    }
+    else
+    {
+      m_maxTotalWeight = 0.0f;
+      m_minFitness = 0.0f;
+    }
     
     // Load environment objects
     m_environment.fromXml(xml.getChild("Environment"));
@@ -128,7 +144,29 @@ void SMCArm::update(float dt)
   m_sensedValue = m_distanceSensor.getActivation();
   
   // Update CTRNN
-  m_ctrnn->setExternalInput(0, m_sensedValue);
+
+  // Manipulate sensor input
+  float sensor = m_sensedValue;
+  sensor = clamp(sensor + UniformRandom(-m_noise, m_noise), 0.0, 1.0);
+  
+  // "Random" sensor failure
+  if(m_sensorDropInterval > 0)
+  {
+    const int numDrops = 3;
+    float drops [numDrops] = {8.0f, 10.0f, 12.0f};
+    for (int i = 0; i < numDrops; ++i)
+    {
+      if ((m_time >= drops[i]) && (m_time < (drops[i] + m_sensorDropInterval)))
+      {
+        sensor = 0;
+      }
+    }
+  }
+  
+  if(m_time > (m_trialDuration - m_sensorDropTail))
+    sensor = 0;
+  
+  m_ctrnn->setExternalInput(0, sensor);
   
 #if CONTROL_JOINTS
   m_ctrnn->setExternalInput(1, m_arm.getJointAngle(JT_elbow) / m_maxJointAngle);
@@ -269,7 +307,7 @@ void SMCArm::updateFitness(float dt)
     }
     //if (m_fitnessStage >= 0)
     {
-      m_instFit += (m_sensedValue * m_fitHandVel * m_fitAngleDist) / m_evalPhaseDuration;
+      m_instFit += ((m_sensedValue) * m_fitHandVel * m_fitAngleDist) / m_evalPhaseDuration;
     }
   }
 
@@ -279,6 +317,13 @@ void SMCArm::updateFitness(float dt)
 //----------------------------------------------------------------------------------------------------------------------
 float SMCArm::getFitness()
 {
+  if(m_minimiseConnections)
+  {
+    float annWeightProp = m_ctrnn->getWeightSum() / m_maxTotalWeight;
+    float weightFit = 1 - annWeightProp;
+    return weightFit * (m_fitness / 2.0);
+  }
+  
   return m_fitness / 2.0f;
 }
 
