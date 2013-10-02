@@ -111,7 +111,6 @@ int Topology::getNumParameters() const
   return N;
 }
   
-  
 //----------------------------------------------------------------------------------------------------------------------  
 // Input neurons are placeholder neurons only and are arranged in a layer different from real neurons.
 // Each real neuron receives connections from all input neurons.
@@ -159,7 +158,7 @@ bool Topology::decode(CTRNN& ctrnn, const double* params, const NetLimits& limit
         double weight = map01To(params[I], limits.weight);
         int from = j;
         int to = firstHidden + i;
-        ctrnn.setWeight(from, to, weight); // from ->to
+        ctrnn.setWeight(from, to, cutWeight(weight)); // from ->to
         ctrnn.setInputNeuron(from);
         ++I;
         
@@ -172,7 +171,7 @@ bool Topology::decode(CTRNN& ctrnn, const double* params, const NetLimits& limit
           if(toSym != to)
           {
             int fromSym = lastInput - j;
-            ctrnn.setWeight(fromSym, toSym, weight);
+            ctrnn.setWeight(fromSym, toSym, cutWeight(weight));
             ctrnn.setInputNeuron(fromSym);
           }
         } // if symmetric
@@ -206,7 +205,7 @@ bool Topology::decode(CTRNN& ctrnn, const double* params, const NetLimits& limit
       double weight = map01To(params[I], limits.weight);
       int from = firstHidden + j;
       int to = firstHidden + i;
-      ctrnn.setWeight(from, to, weight);
+      ctrnn.setWeight(from, to, cutWeight(weight));
       ++I;
       
       if(isSymmetric())
@@ -216,7 +215,7 @@ bool Topology::decode(CTRNN& ctrnn, const double* params, const NetLimits& limit
         if(toSym != to)
         {
           int fromSym = lastHidden - j;
-          ctrnn.setWeight(fromSym, toSym, weight);
+          ctrnn.setWeight(fromSym, toSym, cutWeight(weight));
         }
       }
     }
@@ -249,7 +248,7 @@ bool Topology::decode(CTRNN& ctrnn, const double* params, const NetLimits& limit
       double weight = map01To(params[I], limits.weight);
       int from = firstHidden + j;
       int to = firstOutput + i;      
-      ctrnn.setWeight(from, to, weight); // from ->to
+      ctrnn.setWeight(from, to, cutWeight(weight)); // from ->to
       ++I;
       
       // If network is symmetric, this means connections from hidden layer to first hidden neuron
@@ -261,7 +260,7 @@ bool Topology::decode(CTRNN& ctrnn, const double* params, const NetLimits& limit
         if(toSym != to)
         {
           int fromSym = lastHidden - j;
-          ctrnn.setWeight(fromSym, toSym, weight);
+          ctrnn.setWeight(fromSym, toSym, cutWeight(weight));
         }
       } // if symmetric
     } // for numInputs
@@ -278,7 +277,7 @@ bool Topology::decode(CTRNN& ctrnn, const double* params, const NetLimits& limit
         double weight = map01To(params[I], limits.weight);
         int from = firstOutput + j;
         int to = firstOutput + i;
-        ctrnn.setWeight(from, to, weight);
+        ctrnn.setWeight(from, to, cutWeight(weight));
         ++I;
         
         if(isSymmetric())
@@ -288,7 +287,7 @@ bool Topology::decode(CTRNN& ctrnn, const double* params, const NetLimits& limit
           if(toSym != to)
           {
             int fromSym = lastOutput - j;
-            ctrnn.setWeight(fromSym, toSym, weight);
+            ctrnn.setWeight(fromSym, toSym, cutWeight(weight));
           }
         }
       }
@@ -308,7 +307,8 @@ bool Topology::decode(CTRNN& ctrnn, const double* params, const NetLimits& limit
 void Topology::toXml(ci::XmlTree& xml) const
 {
   ci::XmlTree topXml ("Topology", "");
-  topXml.setAttribute("Symmetric", symmetric);
+  topXml.setAttribute("symmetric", symmetric);
+  topXml.setAttribute("weightCutoff", weightCutoff);
   
   ci::XmlTree inputs ("Inputs", toString(size[0]));
   inputs.setAttribute("asNeurons", inputsAreNeurons);
@@ -329,6 +329,7 @@ void Topology::fromXml(const ci::XmlTree& xml)
   if (xml.getTag() == "Topology")
   {
     symmetric = xml.getAttributeValue<bool>("symmetric");
+    weightCutoff = xml.getAttributeValue<double>("weightCutoff", 100.0);
     
     size[0] = xml.getChild("Inputs").getValue<int>();
     size[1] = xml.getChild("Hidden").getValue<int>();

@@ -44,7 +44,7 @@ public:
     kLyr_NumLayers
   };
   
-  Topology() : inputsAreNeurons(true) { setSize(1, 2, 0); setSymmetric(true); };
+  Topology() : inputsAreNeurons(true), weightCutoff(0) { setSize(1, 2, 0); setSymmetric(true); };
   Topology(int l0, int l1, int l2, bool inputsAsNeurons = true) : inputsAreNeurons(inputsAsNeurons) { setSize(l0, l1, l2); setSymmetric(true); };
   ~Topology(){};
   
@@ -72,10 +72,14 @@ public:
   bool decode(CTRNN& ctrnn, const double* params, const NetLimits& limits) const;  
   
 protected:
+  
+  inline double cutWeight(double w) const { return std::abs(w) >= weightCutoff ? w : 0; };
+  
   int size[3];
   bool symmetric;
   bool inputsAreNeurons;
   bool outputsLaterallyConnected;
+  double weightCutoff;
 };  
   
 } // namespace
