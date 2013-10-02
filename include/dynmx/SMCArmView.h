@@ -98,23 +98,25 @@ inline void SMCArmView::setupScene()
   //m_scene3d.rotate(ci::Vec4f(0,0,1,1), -PI_OVER_TWO);
   
   // 2d viz
-  float columnWidth1 = 200;
+  float columnWidth1 = 240;
   float columnWidth2 = 300;
   float columnMargin = 5;
   float plotHeight = 100;
   float vSpace = 32;
   
   NodeGroup* column1 = new NodeGroup();
-  column1->setRightAligned(true);
-  column1->translate(ci::Vec4f(columnWidth1 + columnWidth2 + 2 * columnMargin, columnMargin, 0, 1));
+  column1->setRightAligned(false);
+  //column1->translate(ci::Vec4f(columnWidth1 + columnWidth2 + 2 * columnMargin, columnMargin, 0, 1));
+  column1->translate(ci::Vec4f(columnWidth2 + 2 * columnMargin, columnMargin, 0, 1));
   
   // Add ctrnnViz to column
   m_ctrnnViz = new CTRNNViz(m_arm->getCTRNN(), columnWidth1, &m_arm->getTopology());
   column1->m_children.push_back(m_ctrnnViz);
   
   NodeGroup* column2 = new NodeGroup();
-  column2->setRightAligned(true);
-  column2->translate(ci::Vec4f(columnWidth2 + columnMargin, columnMargin, 0, 1));
+  column2->setRightAligned(false);
+  //column2->translate(ci::Vec4f(columnWidth2 + columnMargin, columnMargin, 0, 1));
+  column2->translate(ci::Vec4f(columnMargin, columnMargin, 0, 1));
   
   // Add plots to column
   m_ctrnnPlot = new Plot(columnWidth2, plotHeight, m_arm->getCTRNN()->getSize(), 200);
@@ -152,7 +154,7 @@ inline void SMCArmView::update(float dt)
   
   // Add data to plot
   m_plot->addPoint(m_arm->getSensedValue(), 0);
-  m_plot->addPoint(m_arm->getDistanceSensor().getDerivative(), 1);
+  m_plot->addPoint(m_arm->getDistanceSensor().getDerivative() / 100.0f, 1);
   
   // Update fitness-related data
   m_fitnessPlot->addPoint(m_arm->m_fitHandVel, 0);
@@ -189,7 +191,7 @@ inline void SMCArmView::draw3d()
     glColor3f(1.0, 0.0, 0.0);
     ci::gl::drawLine(m_arm->getArm().getEffectorPos(), m_arm->getProjPos());
     glColor3f(0.0, 1.0, 0.0);
-    ci::gl::drawLine(m_arm->getProjPos(), m_arm->getProjPos() + m_arm->getProjVel());
+    ci::gl::drawLine(m_arm->getArm().getEffectorPos(), m_arm->getArm().getEffectorPos() + 0.1f * m_arm->getProjVel());
   }
   
   // Line object
