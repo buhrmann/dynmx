@@ -315,10 +315,10 @@ double CTRNN:: getWeightSum() const
   {
     for (int j = 0; j < size; j++)
     {
-      sum += weights[i][j];
+      sum += std::fabs(weights[i][j]);
     }
   }
-  return std::fabs(sum);
+  return sum;
 }
   
 //----------------------------------------------------------------------------------------------------------------------  
@@ -341,6 +341,7 @@ void CTRNN::toXml(ci::XmlTree& xml)
 {
   ci::XmlTree nn("CTRNN","");
   nn.setAttribute("Size", size);
+  nn.setAttribute("Weight", getWeightSum());
   
   for(int i = 0; i < size; ++i)
   {
