@@ -238,9 +238,9 @@ void SMCArm::setSensorMode(const std::string& mode)
 void SMCArm::updateFitness(float dt)
 {
   // Measure fitness components relative to line
-  const std::vector<Positionable*>& objects = getEnvironment()->getObjects();
-  const ci::Vec2f& s = ((Line*)objects[0])->getStart();
-  const ci::Vec2f& e = ((Line*)objects[0])->getEnd();
+  Line* line = (Line*)(getEnvironment()->getObjects()[0]);
+  const ci::Vec2f& s = line->getStart();
+  const ci::Vec2f& e = line->getEnd();
   ci::Vec2f lineDir = (e - s).normalized();
 
   // Ensure a minimum averge hand speed
@@ -254,7 +254,7 @@ void SMCArm::updateFitness(float dt)
   // Punish distance from line
   const float maxDist = 0.1f;
   float handProj = (handPos - s).dot(lineDir);
-  handProj = clamp(handProj, 0.0f, ((Line*)objects[0])->getLength());
+  handProj = clamp(handProj, 0.0f, line->getLength());
   m_projPos = s + lineDir * handProj;
   m_fitHandDist = 1.0f - sqr(clamp(m_projPos.distance(handPos), 0.0f, maxDist) / maxDist);
   
@@ -288,30 +288,16 @@ void SMCArm::updateFitness(float dt)
     float maxDist = 1.0f;
     m_instFit = 1.0f - sqr(clamp(m_projPos.distance(handPos), 0.0f, maxDist) / maxDist);
     m_instFit /= m_probePhaseDuration;
-    //if (m_fitnessStage < 0)
-    {
-      //m_instFit = m_sensedValue / evalDur;
-    }
-    //else
-    {
-      //fit = min(min(m_sensedValue, m_fitHandVel), m_fitAngleDist);
-      //m_instFit = (m_fitHandDist * m_fitHandVel * m_fitAngleDist) / m_fitnessEvalDelay;
-    }
   }
   else if(m_phase == 2)
   {
-    // Only correct movement rewarded in final phase
-    //if (m_fitnessStage == 0)
-    {
-      //m_instFit += m_sensedValue / (m_trialDuration - m_fitnessEvalDelay);
-    }
-    //if (m_fitnessStage >= 0)
-    {
-      m_instFit += ((m_sensedValue) * m_fitHandVel * m_fitAngleDist) / m_evalPhaseDuration;
-    }
+    m_instFit += ((m_sensedValue) * m_fitHandVel * m_fitAngleDist) / m_evalPhaseDuration;
   }
 
   m_fitness += dt * m_instFit;
+  
+  // Visual candy
+  line->setVisibility(m_time < (m_trialDuration - m_sensorDropTail));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
