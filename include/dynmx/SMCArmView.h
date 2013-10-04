@@ -10,8 +10,10 @@
 #ifndef _DMX_SMC_ARM_VIEW_
 #define _DMX_SMC_ARM_VIEW_
 
+#include "Dynmx.h"
 #include "View.h"
 #include "Scene.h"
+#include "MathUtils.h"
 #include "ArmViz.h"
 #include "SMCArm.h"
 #include "SMCEnvironmentViz.h"
@@ -56,6 +58,8 @@ protected:
   Plot* m_plot;
   Plot* m_ctrnnPlot;
   Plot* m_fitnessPlot;
+  
+  mowa::sgui::LabelControl* m_timeLabel;
   
 }; // class
 
@@ -146,6 +150,9 @@ inline void SMCArmView::setupScene()
 //--------------------------------------------------------------------------------------------------------------------
 inline void SMCArmView::update(float dt)
 {
+  float t = m_arm->getTime();
+  m_timeLabel->setText("Time: " + toString(t));
+  
   // update data in graph
   for(int i = 0; i < m_arm->getCTRNN()->getSize(); i++)
   {
@@ -224,11 +231,12 @@ inline void SMCArmView::draw3d()
   {
     lineVertsDes[i*2 + 0] = traj[i].x;
     lineVertsDes[i*2 + 1] = traj[i].y;
-    float c = 0.5f * (float)i / (float)numPoints;
-    colorsDes[i*4 + 0] = 0.5;
-    colorsDes[i*4 + 1] = 0.5;
-    colorsDes[i*4 + 2] = 0.5;
-    colorsDes[i*4 + 3] = c;
+    //float c = 0.5f * (float)i / (float)numPoints;
+    float g = 0.5f - 0.5f * (float)i / (float)numPoints;
+    colorsDes[i*4 + 0] = g;
+    colorsDes[i*4 + 1] = g;
+    colorsDes[i*4 + 2] = g;
+    colorsDes[i*4 + 3] = 1 - 2*g;
   }
   glDrawArrays( GL_LINE_STRIP, 0, numPoints);
   glDisableClientState(GL_VERTEX_ARRAY);
@@ -255,7 +263,8 @@ inline void SMCArmView::keyDown(ci::app::KeyEvent event)
 
 //--------------------------------------------------------------------------------------------------------------------
 inline void SMCArmView::buildGui() 
-{ 
+{
+  m_timeLabel = m_gui->addLabel("Time");
   m_gui->addParam("FPS", &m_fixedFrameRate, -1, 300, m_fixedFrameRate);   
   
   m_gui->addPanel();
