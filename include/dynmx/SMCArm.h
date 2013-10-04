@@ -74,7 +74,7 @@ public:
   DistanceSensor& getDistanceSensor() { return m_distanceSensor; };
   
   float getSensedValue() { return m_sensedValue; };
-  float getTime() { return m_time; };
+  float getTime() const { return m_time; };
   float getFitnessEvalDelay() { return m_fitnessEvalDelay; };
   const ci::Vec2f& getProjPos() const { return m_projPos; };
   const ci::Vec2f& getProjVel() const { return m_projVel; };
