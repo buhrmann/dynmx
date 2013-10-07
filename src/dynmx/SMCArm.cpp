@@ -177,7 +177,17 @@ void SMCArm::update(float dt)
 #endif
   
   if (m_topology.getNumInputs() > 3)
-      m_ctrnn->setExternalInput(3, m_distanceSensor.getDerivative() / 100.0f);
+  {
+    if (m_time > (m_trialDuration - m_sensorDropTail))
+    {
+      m_ctrnn->setExternalInput(3, 1.0f);
+    }
+    else
+    {
+      m_ctrnn->setExternalInput(3, 0.0f);
+    }
+    //m_ctrnn->setExternalInput(3, m_distanceSensor.getDerivative() / 100.0f);
+  }
   
   m_ctrnn->updateDynamic(dt);
   

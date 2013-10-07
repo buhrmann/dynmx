@@ -13,8 +13,8 @@
   </Globals>
   <GA>
     <Evolvable Name="SMCArm">
-      <DistanceSensor MaxDist="0.05" TransferFunc="Inverse" NoiseLevel="0.2" Mode="Absolute"/>
-      <SensorFilter noise="0.0" dropInterval="0.0" dropTail="2.0"/>
+      <DistanceSensor MaxDist="0.05" TransferFunc="Inverse" NoiseLevel="0.0" Mode="Absolute"/>
+      <SensorFilter noise="0.3" dropInterval="0.05" dropTail="2.0"/>
       <TrialDuration>11</TrialDuration>
       <FitnessEvalDelay>2</FitnessEvalDelay>
       <ProbePhaseDuration>4</ProbePhaseDuration>
