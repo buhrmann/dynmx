@@ -143,29 +143,34 @@ void SMCArm::update(float dt)
   updateSensor(dt);
   m_sensedValue = m_distanceSensor.getActivation();
   
-  // Update CTRNN
-
   // Manipulate sensor input
   float sensor = m_sensedValue;
-  sensor = clamp(sensor + UniformRandom(-m_noise, m_noise), 0.0, 1.0);
   
-  // "Random" sensor failure
-  if(m_sensorDropInterval > 0)
+  // "Random" sensor failure: duration increases with fitness stage
+  bool blackout = m_time > (m_trialDuration - m_sensorDropTail);
+  
+  float sensorDropInterval = m_sensorDropInterval * ((float)m_fitnessStage / m_fitnessMaxStages);
+  if(sensorDropInterval > 0)
   {
-    const int numDrops = 3;
-    float drops [numDrops] = {8.0f, 10.0f, 12.0f};
+    const int numDrops = 5;
+    float drops [numDrops] = {8.0f, 8.5f, 9.0f, 9.5f, 10.0f};
     for (int i = 0; i < numDrops; ++i)
     {
-      if ((m_time >= drops[i]) && (m_time < (drops[i] + m_sensorDropInterval)))
+      if ((m_time >= drops[i]) && (m_time < (drops[i] + sensorDropInterval)))
       {
-        sensor = 0;
+        blackout = true;
       }
     }
   }
   
-  if(m_time > (m_trialDuration - m_sensorDropTail))
+  if(blackout)
     sensor = 0;
   
+  // Add noise
+  sensor = sensor + UniformRandom(-m_noise, m_noise);
+
+  
+  // Update CTRNN
   m_ctrnn->setExternalInput(0, sensor);
   
 #if CONTROL_JOINTS
@@ -178,7 +183,7 @@ void SMCArm::update(float dt)
   
   if (m_topology.getNumInputs() > 3)
   {
-    if (m_time > (m_trialDuration - m_sensorDropTail))
+    if (blackout)
     {
       m_ctrnn->setExternalInput(3, 1.0f);
     }
@@ -329,24 +334,6 @@ void SMCArm::nextTrial(int trial)
   //const int numTrials = SETTINGS->getChild("Config/GA/Trials").getAttributeValue<int>("Num",1);
   Positionable* obj = getEnvironment()->getObjects()[0];
   
-#if 0
-  // Systematically vary distance of line
-  if(numTrials > 1)
-  {
-    obj->setPosition(ci::Vec2f(0.4, 0) + trial * ci::Vec2f(0.2/numTrials, 0));
-  }
-#endif
-
-#if 0
-  // Increasing angular deviation from straight
-  if(numTrials > 1)
-  {
-    obj->setPosition(ci::Vec2f(0.4, 0) + trial * ci::Vec2f(0.2/numTrials, 0));
-  }
-#endif
-
-  
-#if 1
   // Systematically vary angle of line
   if(m_numTrials > 1)
   {
@@ -372,7 +359,6 @@ void SMCArm::nextTrial(int trial)
     }
     
   }
-#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------
