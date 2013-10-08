@@ -14,22 +14,22 @@
   <GA>
     <Evolvable Name="SMCArm">
       <DistanceSensor MaxDist="0.05" TransferFunc="Inverse" NoiseLevel="0.0" Mode="Absolute"/>
-      <SensorFilter noise="0.2" dropInterval="0.1" dropTail="1.0"/>
-      <TrialDuration>11</TrialDuration>
+      <SensorFilter noise="0.0" dropInterval="0.3" dropTail="2.0"/>
+      <TrialDuration>12</TrialDuration>
       <FitnessEvalDelay>2</FitnessEvalDelay>
       <ProbePhaseDuration>4</ProbePhaseDuration>
       <FitnessStageThreshold>0.69</FitnessStageThreshold>
       <MinimiseConnections maxWeight="207.8" minFit="0.809">0</MinimiseConnections>
       <Topology symmetric="0" weightCutoff="0.0">
         <Inputs asNeurons="1">4</Inputs>
-        <Hidden>4</Hidden>
-        <Outputs laterallyConnected="1">2</Outputs>
+        <Hidden>3</Hidden>
+        <Outputs laterallyConnected="0">2</Outputs>
       </Topology>
       <NetLimits>
         <Weight min="-10.0" max="10.0"/>
         <Bias min="-10.0" max="10.0"/>
         <Gain min="-10.0" max="10.0"/>              
-        <TimeConstant min="0.01" max="2.0"/>
+        <TimeConstant min="0.01" max="4.0"/>
       </NetLimits>
       <Environment Name="LinesLeftRight">
         <Line PosX="0.5" PosY="0.0" Length="1.4" Angle="90" PosVarX="0.0" PosVarY="0.0" AngleVar="50" Visible="1"/>
@@ -39,7 +39,7 @@
       </Environment>
     </Evolvable>  
     <Incremental initialMutation="0.1" seedOnly="1" seedAll="1" elitist="1">0</Incremental>
-    <LoadFrom Value="~/Experiments/eSMCs/Arm/13_10_07__13_39_36/GA_Result.xml"/>
+    <LoadFrom Value="~/Experiments/eSMCs/Arm/13_10_08__14_20_59/GA_Result.xml"/>
     <PopulationSize Value="50"/>
     <DemeSize Value="10"/>
     <NumGenerations Value="2000" OutputInterval="25"/>
@@ -55,7 +55,7 @@
     <Eval Run="0">
       <NumTrials Value="5"/>
       <RecordState Value="0"/>
-      <LoadFrom Value="~/Experiments/eSMCs/Arm/13_10_07__15_58_20/GA_BestGenome.xml"/>
+      <LoadFrom Value="~/Experiments/eSMCs/Arm/13_10_08__14_20_59/GA_BestGenome.xml"/>
     </Eval>         
   </GA>    
   <Arm Gravity="0.0" Integrator="euler" InteractionTorques="1">

@@ -311,8 +311,6 @@ void SMCArm::updateFitness(float dt)
 
   m_fitness += dt * m_instFit;
   
-  // Visual candy
-  line->setVisibility(m_time < (m_trialDuration - m_sensorDropTail));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
