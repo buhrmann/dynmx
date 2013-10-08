@@ -146,10 +146,13 @@ void SMCArm::update(float dt)
   // Manipulate sensor input
   float sensor = m_sensedValue;
   
-  // "Random" sensor failure: duration increases with fitness stage
-  bool blackout = m_time > (m_trialDuration - m_sensorDropTail);
-  
-  float sensorDropInterval = m_sensorDropInterval * ((float)m_fitnessStage / m_fitnessMaxStages);
+  // Final blackout: starts earlier with increasing fitness stage
+  float fitnessStageProp = ((float)m_fitnessStage) / m_fitnessMaxStages;
+  float sensorDropTail = m_sensorDropTail * fitnessStageProp;
+  bool blackout = m_time > (m_trialDuration - sensorDropTail);
+
+  // Interval blackouts: duration increases with fitness stage
+  float sensorDropInterval = m_sensorDropInterval * fitnessStageProp;
   if(sensorDropInterval > 0)
   {
     const int numDrops = 5;
@@ -181,6 +184,7 @@ void SMCArm::update(float dt)
   m_ctrnn->setExternalInput(2, m_vel.y);
 #endif
   
+  // Add blackout signal
   if (m_topology.getNumInputs() > 3)
   {
     if (blackout)
