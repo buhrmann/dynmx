@@ -155,8 +155,8 @@ void SMCArm::update(float dt)
   float sensorDropInterval = m_sensorDropInterval * fitnessStageProp;
   if(sensorDropInterval > 0)
   {
-    const int numDrops = 5;
-    float drops [numDrops] = {8.0f, 8.5f, 9.0f, 9.5f, 10.0f};
+    const int numDrops = 4;
+    float drops [numDrops] = {8.0f, 9.0f, 10.0f, 11.0f};
     for (int i = 0; i < numDrops; ++i)
     {
       if ((m_time >= drops[i]) && (m_time < (drops[i] + sensorDropInterval)))

@@ -14,7 +14,7 @@
   <GA>
     <Evolvable Name="SMCArm">
       <DistanceSensor MaxDist="0.05" TransferFunc="Inverse" NoiseLevel="0.0" Mode="Absolute"/>
-      <SensorFilter noise="0.0" dropInterval="0.3" dropTail="2.0"/>
+      <SensorFilter noise="0.0" dropInterval="0.5" dropTail="0.0"/>
       <TrialDuration>12</TrialDuration>
       <FitnessEvalDelay>2</FitnessEvalDelay>
       <ProbePhaseDuration>4</ProbePhaseDuration>
@@ -22,8 +22,8 @@
       <MinimiseConnections maxWeight="207.8" minFit="0.809">0</MinimiseConnections>
       <Topology symmetric="0" weightCutoff="0.0">
         <Inputs asNeurons="1">4</Inputs>
-        <Hidden>3</Hidden>
-        <Outputs laterallyConnected="0">2</Outputs>
+        <Hidden>6</Hidden>
+        <Outputs laterallyConnected="1">2</Outputs>
       </Topology>
       <NetLimits>
         <Weight min="-10.0" max="10.0"/>
@@ -40,12 +40,12 @@
     </Evolvable>  
     <Incremental initialMutation="0.1" seedOnly="1" seedAll="1" elitist="1">0</Incremental>
     <LoadFrom Value="~/Experiments/eSMCs/Arm/13_10_08__14_20_59/GA_Result.xml"/>
-    <PopulationSize Value="50"/>
+    <PopulationSize Value="200"/>
     <DemeSize Value="10"/>
-    <NumGenerations Value="2000" OutputInterval="25"/>
+    <NumGenerations Value="6000" OutputInterval="100"/>
     <MutationMax Value="0.01"/>
     <MutationMaxReduced Value="0.001"/>
-    <MutationMaxReduceAt Value="1550"/>        
+    <MutationMaxReduceAt Value="5000"/>        
     <RecombinationRate Value="0.5"/>
     <RecombinationRateReduced Value="0.75"/>
     <Trials Num="5" Combine="Min"/>
@@ -55,7 +55,7 @@
     <Eval Run="0">
       <NumTrials Value="5"/>
       <RecordState Value="0"/>
-      <LoadFrom Value="~/Experiments/eSMCs/Arm/13_10_08__14_20_59/GA_BestGenome.xml"/>
+      <LoadFrom Value="~/Experiments/eSMCs/Arm/13_10_08__15_21_25/GA_BestGenome.xml"/>
     </Eval>         
   </GA>    
   <Arm Gravity="0.0" Integrator="euler" InteractionTorques="1">
