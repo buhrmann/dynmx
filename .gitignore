@@ -1,0 +1,8 @@
+bin/Mathematica/SMC/Export
+bin/dynmx
+xcode4/build
+xcode4/DerivedData
+*.pbxuser
+*.perspectivev3
+xcuserdata
+.DS_Store
