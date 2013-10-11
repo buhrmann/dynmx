@@ -1,5 +1,6 @@
 bin/Mathematica/SMC/Export
 bin/dynmx
+bin/log.txt
 xcode4/build
 xcode4/DerivedData
 *.pbxuser
