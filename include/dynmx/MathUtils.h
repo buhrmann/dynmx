@@ -40,31 +40,7 @@ static const float asinh(float v)
 }
 #endif
 
-//----------------------------------------------------------------------------------------------------------------------
-struct Range
-{
-  Range(double mi = 0.0, double ma = 1.0) : min(mi), max(ma) {};
-
-  void set(double mi, double ma) { min = mi; max = ma; };
-  void toXml(ci::XmlTree& xml, const char* name) const 
-  {  
-    ci::XmlTree r (name, "");
-    r.setAttribute("min", min);
-    r.setAttribute("max", max); 
-    xml.push_back(r);
-  };
-  void fromXml(const ci::XmlTree& parent, const char* name)
-  {
-    if(parent.hasChild(name))
-    {
-      min = parent.getChild(name).getAttributeValue<double>("min");
-      max = parent.getChild(name).getAttributeValue<double>("max");
-    }
-  }
   
-  double min, max;
-};
-
 // Map one range to another
 //----------------------------------------------------------------------------------------------------------------------
 static double mapUnitIntervalToRange(double val, double min, double max)
@@ -81,10 +57,54 @@ static double map01To(double val, double min, double max)
   return min + val * (max - min);
 }
 
+static double mapTo01(double val, double min, double max)
+{
+  assert(max >= min);
+  assert(val >=min && val <= max);
+  return (val - min) / (max - min);
+}
+  
+//----------------------------------------------------------------------------------------------------------------------
+struct Range
+{
+  Range(double mi = 0.0, double ma = 1.0) : min(mi), max(ma) {};
+
+  void set(double mi, double ma) { min = mi; max = ma; };
+  
+  void toXml(ci::XmlTree& xml, const char* name) const 
+  {  
+    ci::XmlTree r (name, "");
+    r.setAttribute("min", min);
+    r.setAttribute("max", max); 
+    xml.push_back(r);
+  };
+  
+  void fromXml(const ci::XmlTree& parent, const char* name)
+  {
+    if(parent.hasChild(name))
+    {
+      min = parent.getChild(name).getAttributeValue<double>("min");
+      max = parent.getChild(name).getAttributeValue<double>("max");
+    }
+  }
+  
+  double encode(double v) const { return mapTo01(v, min, max); }
+  double decode(double v) const { return map01To(v, min, max); }
+  
+  double min, max;
+};
+
+
 static double map01To(double val, const Range& r)
 {
   return map01To(val, r.min, r.max);
 }
+  
+static double mapTo01(double val, const Range& r)
+{
+  return map01To(val, r.min, r.max);
+}
+  
 
 //----------------------------------------------------------------------------------------------------------------------
 static const float sqr(float v) { return v * v; };
@@ -193,7 +213,7 @@ void vecFromXml(const ci::XmlTree& xml, const std::string& name, std::vector<T>&
     vecFromXml(subTree, vec, childName);
   }
 }
-
+  
 // Vector sum
 //----------------------------------------------------------------------------------------------------------------------
 template<class T>
