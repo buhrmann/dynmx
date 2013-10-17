@@ -50,11 +50,6 @@ public:
   const double* getCurrentGenome() const;
   /// sets the fitness of the current genome and selects a new current genome
   void setFitness(float fit);
-
-  // interface for evaluating N pairs of genomes in parallel
-  // returns 2*N pointers to genomes in the population
-  const std::vector<const double*> getNTournamentPairs(int n);
-  void setNFitnessPairs(const std::vector<float>& fitnesses);
   
   uint16_t getGenomeSize() const { return m_genomeLength; };
   uint16_t getPopulationSize() const { return m_popSize; };
@@ -74,6 +69,7 @@ public:
   void setRandomSeed(long seed) { m_idum = seed; };
   void setDemeWidth(int width) { m_demeWidth = width; };
   void setMutationMax(double mut) { m_maxMutation = mut; };
+  void setMutationRate(double mr) { m_mutationRate = mr; };
   void setRecombinationRate(double rcr) { m_recombinationRate = rcr; };
   
   // If evaluation is deterministic an already evaluated individual does not need
@@ -110,9 +106,6 @@ protected:
   // returns indices for a random pair of genomes from a neighbourhood defined by demeWidth
   void getRandomPairInDeme(uint16_t& indA, uint16_t& indB);
   // returns indices for a random pair of genomes that is different from a list of already existing pairs
-  void getDifferentRandomPair(uint16_t& indA, uint16_t& indB, uint16_t* existingPairs, uint16_t numExistingPairs);
-  // checks whether a pair of genomes is different from a list of already existing pairs
-  bool pairIsDifferentFrom(uint16_t& indA, uint16_t& indB, uint16_t* existingPairs, uint16_t numExistingPairs);
 
   // the population of genomes: array of arrays of type SCALAR (float/double)
   double** m_genomes;
@@ -135,6 +128,7 @@ protected:
   long m_idum;                // seed for random number generator
 
   double m_maxMutation;       // amount of Gaussian vector mutation
+  double m_mutationRate;
   double m_recombinationRate; // amount of Gaussian vector mutation
 
   float 

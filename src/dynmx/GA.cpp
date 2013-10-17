@@ -60,6 +60,7 @@ void GA::init()
   
   // Some defaults, though should be set externally and not subsequently reset to these defaults
   m_maxMutation = 0.01;      // amount of mutation  (scales a gaussian random variable)
+  m_mutationRate = 1.0;
   m_recombinationRate = 0.05; // probability of copying a gene from winner to loser of tournament  
   m_avoidReevaluation = true;
   
@@ -276,37 +277,6 @@ void GA::getRandomPairInDeme(uint16_t& indA, uint16_t& indB)
 }
 
 // --------------------------------------------------------------------------------------------
-// returns indices for a random pair of genomes that is different from a list of already existing pairs
-// --------------------------------------------------------------------------------------------
-void GA::getDifferentRandomPair(uint16_t& indA, uint16_t& indB, uint16_t* existingPairs, uint16_t numPairs)
-{
-  do
-  {
-    getRandomPairInDeme(indA, indB);
-  } while(!pairIsDifferentFrom(indA, indB, existingPairs, numPairs));
-}
-
-// --------------------------------------------------------------------------------------------
-// checks whether a pair of genomes is different from a list of already existing pairs
-// --------------------------------------------------------------------------------------------
-bool GA::pairIsDifferentFrom(uint16_t& indA, uint16_t& indB, uint16_t* existingPairs, uint16_t numExistingPairs)
-{
-  bool isDifferent = true;
-  for(int i = 0; i < numExistingPairs; i++)
-  {
-    int otherA = existingPairs[i * 2];
-    int otherB = existingPairs[i * 2 + 1];
-    if ( indA == otherA || indA == otherB || indB == otherA || indB == otherB )
-    {
-      isDifferent = false;
-      break;
-    }
-  }
-  return isDifferent;
-}
-
-
-// --------------------------------------------------------------------------------------------
 // Generates next couple of genomes to evaluate (randomly from neighborhood in 1d population)
 // --------------------------------------------------------------------------------------------
 void GA::startNextTournament()
@@ -391,48 +361,6 @@ void GA::performTournament(uint16_t indA, float fitA, uint16_t indB, float fitB)
 }
 
 // --------------------------------------------------------------------------------------------
-// interface for N parallel tournaments
-// first fills array with inidices of selected tournament pairs
-// then returns a vector of pointers to selected genomes
-// --------------------------------------------------------------------------------------------
-const std::vector<const double*> GA::getNTournamentPairs(int n)
-{
-  assert((2*n <= m_popSize/2) && (n < MAX_NUM_PARALLEL_EVALS)); 
-  
-  // 1st pair randomly:
-  getRandomPairInDeme(m_requestedGenomes[0], m_requestedGenomes[1]);
- 
-  // remaining pairs must be different:
-  for(int i = 1; i < n; i++)
-  {
-    getDifferentRandomPair(m_requestedGenomes[2 * i], m_requestedGenomes[2 * i + 1], &m_requestedGenomes[0], i);
-  }
-
-  // collect pointers
-  std::vector<const double*> tournamentPairs;
-  for(int i = 0; i < n * 2; i++)
-  {
-    tournamentPairs.push_back(m_genomes[m_requestedGenomes[i]]);
-  }
-  
-  return tournamentPairs;
-}
-
-// --------------------------------------------------------------------------------------------
-void GA::setNFitnessPairs(const std::vector<float>& fitnesses)
-{
-  assert((fitnesses.size() < 2 * MAX_NUM_PARALLEL_EVALS) && (fitnesses.size() % 2 == 0));
-
-  // use fitness to perform tournament/mutation
-  for (int i = 0; i < (int) fitnesses.size() / 2; i++)
-  {
-    int indA = 2 * i;
-    int indB = 2 * i + 1;
-    performTournament(m_requestedGenomes[indA], fitnesses[indA], m_requestedGenomes[indB], fitnesses[indB]);
-  }
-}
-
-// --------------------------------------------------------------------------------------------
 // Mutate loser with features from winner (genotype must stay within [0,1] boundaries)
 // Mutations come from a random vector in a unit hypersphere, whose length is chosen from
 // a gaussian, and its direction from a uniform distribution.
@@ -451,9 +379,11 @@ void GA::mutate(uint16_t winner, uint16_t loser)
 
     // Gaussian mutation
     //const double mutation = gasdev(&m_idum) * m_maxMutation;
-    const double mutation = (-1.0 + 2.0 * ran1(&m_idum)) * randGausLength;
-
-    m_genomes[loser][i] += mutation;
+    if ((m_mutationRate < 1) && (ran1(&m_idum) < m_mutationRate))
+    {
+      const double mutation = (-1.0 + 2.0 * ran1(&m_idum)) * randGausLength;
+      m_genomes[loser][i] += mutation;
+    }
 
     // ensure values stay in [0,1] range
     if (m_genomes[loser][i] > 1)
@@ -498,6 +428,7 @@ void GA::toXml(ci::XmlTree& parent, bool includeGenomes) const
   ga.setAttribute("PopulationSize", m_popSize);
   ga.setAttribute("DemeWidth", m_demeWidth);
   ga.setAttribute("MaxMutation", m_maxMutation);
+  ga.setAttribute("MutationRate", m_mutationRate);
   ga.setAttribute("RecombinationRate", m_recombinationRate);
   float bestFit;
   getBestGenome(bestFit);
