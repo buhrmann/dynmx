@@ -109,10 +109,11 @@ public:
   
   void fitnessFunctionChanged() { m_ga->resetFitnesses(); };
   
+  static void genomeToXml(ci::XmlTree& xml, const double* genome, int numGenes, float bestFit);
+  
 protected:  
   
   void generationToXml(ci::XmlTree* xml, uint32_t gen, const double* genome, float bestFit, float avgFit);
-  void genomeToXml(ci::XmlTree& xml, const double* genome, float bestFit);
   void test(const double* evolvable, float fitness, float dt);
   
   // An instance of the model to evolve

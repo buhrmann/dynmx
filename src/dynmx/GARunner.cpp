@@ -65,6 +65,7 @@ void GARunner::init()
     m_ga = new GA(populationSize, numGenes, demeSize);
     m_ga->setRecombinationRate(ga.getChild("RecombinationRate").getAttributeValue<float>("Value"));
     m_ga->setMutationMax(ga.getChild("MutationMax").getAttributeValue<float>("Value"));
+    m_ga->setMutationRate(ga.getChild("MutationRate").getAttributeValue<float>("Value", 1.0));
             
     m_numGenerations = ga.getChild("NumGenerations").getAttributeValue<int>("Value");
     m_outputInterval = ga.getChild("NumGenerations").getAttributeValue<int>("OutputInterval", 100);
@@ -290,7 +291,7 @@ void GARunner::update(float dt)
           m_resultsLog->write(ci::writeFile(dmx::DATA_DIR + "GA_Result.xml"));
           m_progressLog->write(ci::writeFile(dmx::DATA_DIR + "GA_Progress.xml"));
           
-          genomeToXml(*m_finalGenomeLog, bestGenome, bestFitness);
+          genomeToXml(*m_finalGenomeLog, bestGenome, m_ga->getGenomeSize(), bestFitness);
           m_finalGenomeLog->write(ci::writeFile(dmx::DATA_DIR + "GA_BestGenome.xml"));
           
           // Evaluate best evolved individual
@@ -323,7 +324,7 @@ void GARunner::test(const double* genome, float fitness, float dt)
   GATester tester (m_evolvable);
   // We're only doing this to record the state data! So overwrite any flag read in from xml config.
   tester.enableRecording(true);
-  genomeToXml(tester.getXml(), genome, fitness);
+  genomeToXml(tester.getXml(), genome, m_ga->getGenomeSize(), fitness);
   while(!tester.hasFinished())
   {
     tester.update(dt);
@@ -331,12 +332,12 @@ void GARunner::test(const double* genome, float fitness, float dt)
 }
 
 //----------------------------------------------------------------------------------------------------------------------  
-void GARunner::genomeToXml(ci::XmlTree& xml, const double* genome, float fitness)
+void GARunner::genomeToXml(ci::XmlTree& xml, const double* genome, int numGenes, float fitness)
 {
   ci::XmlTree genXml ("Genome","");
   genXml.setAttribute("Fitness", fitness);
-  genXml.setAttribute("NumGenes", m_ga->getGenomeSize());
-  for(size_t i = 0; i < m_ga->getGenomeSize(); ++i)
+  genXml.setAttribute("NumGenes", numGenes);
+  for(size_t i = 0; i < numGenes; ++i)
   {
     ci::XmlTree gene ("Gene", "");
     gene.setAttribute("Index", i);
@@ -361,7 +362,7 @@ void GARunner::generationToXml(ci::XmlTree* xmlTree, uint32_t gen, const double*
   // Output best genome
   if(m_saveBestEachGen)
   {
-    genomeToXml(generation, bestGenome, bestFitness);
+    genomeToXml(generation, bestGenome, m_ga->getGenomeSize(), bestFitness);
   }
   
   xmlTree->push_back(generation);
