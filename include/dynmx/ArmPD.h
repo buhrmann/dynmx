@@ -28,7 +28,7 @@ public:
   virtual void reset();
 
   /// Tick arm model given desired joint angles
-  void updatePD(float angle1, float angle2, float timeStep); 
+  void updatePD(float dt, float angleElbow, float angleShoulder);
   
   /// Tick arm model given a desired end-effector position
   void updatePosition(float timeStep, float x, float y);
