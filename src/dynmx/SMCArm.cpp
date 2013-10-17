@@ -67,6 +67,8 @@ void SMCArm::init()
     
     // Load environment objects
     m_environment.fromXml(xml.getChild("Environment"));
+    
+    m_posVar = getEnvironment()->getObjects()[0]->getPositionVar().x > 0;
   }
   
   m_arm.init();
@@ -320,20 +322,27 @@ void SMCArm::updateFitness(float dt)
 //----------------------------------------------------------------------------------------------------------------------
 float SMCArm::getFitness()
 {
+  float fitness = m_fitness / 2.0;
+  
   if(m_minimiseConnections)
   {
     float annWeightProp = m_ctrnn->getWeightSum() / m_maxTotalWeight;
     float weightFit = 1 - annWeightProp;
-    return weightFit * (m_fitness / 2.0);
+    
+    //std::cout << "Fit without con. min.: " << fitness << std::endl;
+
+    if(fitness >= m_minFitness)
+      fitness = weightFit;
+    else
+      fitness = 0.0f;
   }
   
-  return m_fitness / 2.0f;
+  return fitness;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 void SMCArm::nextTrial(int trial)
 {
-  //const int numTrials = SETTINGS->getChild("Config/GA/Trials").getAttributeValue<int>("Num",1);
   Positionable* obj = getEnvironment()->getObjects()[0];
   
   // Systematically vary angle of line
@@ -349,6 +358,10 @@ void SMCArm::nextTrial(int trial)
     float angle = PI_OVER_TWO - angularRange/2.0f + (t * angularRange / (numAngleTrials - 1));
     obj->setAngle(angle);
     
+#if 0
+    std::cout << "Angle: " << radiansToDegrees(angle) << std::endl;
+#endif
+    
     // Systematicall vary distance of line
     if(posVar)
     {
@@ -358,6 +371,9 @@ void SMCArm::nextTrial(int trial)
       float distRange = m_fitnessStage * (maxDistRange / m_fitnessMaxStages);
       float dist = 0.5 - distRange/2.0f + (t * distRange / (numPosTrials - 1));
       obj->setPosition(ci::Vec2f(dist, 0));
+#if 0
+      std::cout << "Distance: " << dist << std::endl;
+#endif
     }
     
   }
@@ -374,22 +390,35 @@ void SMCArm::endOfEvaluation(float fit)
 {
   nextTrial(0);
   
-  // Safe here, since we know we're being called by GARunner
-  m_numTrials = ((GARunner*)Simulation::getInstance()->getModel())->getNumTrials();
-  
   if (fit > m_fitnessStageThreshold && m_fitnessStage < m_fitnessMaxStages)
   {
     m_fitnessStage++;
-    std::cout <<  Globals::Inst()->getDataDirName() << " | Next fitness stage: " << m_fitnessStage << std::endl;
     
     if(m_fitnessStage == 2)
-      ((GARunner*)Simulation::getInstance()->getModel())->setNumTrials(3);
+    {
+      // 3 different angles (and 2 positions)
+      m_numTrials = 3 * (m_posVar ? 2 : 1);
+      ((GARunner*)Simulation::getInstance()->getModel())->setNumTrials(m_numTrials);
+    }
     else if(m_fitnessStage == 5)
-      ((GARunner*)Simulation::getInstance()->getModel())->setNumTrials(5);
+    {
+      // 5 different angles (and 2 positions)
+      m_numTrials = 5 * (m_posVar ? 2 : 1);
+      ((GARunner*)Simulation::getInstance()->getModel())->setNumTrials(m_numTrials);
+    }
     
     // Bad form, but what the heck: need to inform GA to reset previous evaluations
     ((GARunner*)Simulation::getInstance()->getModel())->fitnessFunctionChanged();
+    
+    std::cout <<  Globals::Inst()->getDataDirName() << " | Next fitness stage: " << m_fitnessStage;
+    std::cout << " | numTrials: " << m_numTrials << std::endl;
   }
+  
+  // Safe here, since we know we're being called by GARunner
+#if 0
+  std::cout << "Arm trials n: " << m_numTrials << " GA: " << ((GARunner*)Simulation::getInstance()->getModel())->getNumTrials() << std::endl;
+  // m_numTrials = ((GARunner*)Simulation::getInstance()->getModel())->getNumTrials();
+#endif
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -402,6 +431,27 @@ int SMCArm::getNumGenes()
 void SMCArm::decodeGenome(const double* genome)
 {
   m_topology.decode(*m_ctrnn, genome, m_netLimits);
+  
+  // Hack: check if new encode method roundtrips
+#if 0
+  m_ctrnn
+  
+  const int numGenes = m_topology.getNumParameters();
+  double new_genome [numGenes];
+  m_topology.encode(*m_ctrnn, &new_genome[0], m_netLimits);
+  bool equal = true;
+  double eps = 0.000001;
+  for(int i = 0; i < numGenes; i++)
+  {
+    if(fabs(new_genome[i] - genome[i]) > eps)
+    {
+      equal = false;
+      std::cout << "Roundtrip o: " << genome[i] << " n: " << new_genome[i] << std::endl;
+      break;
+    }
+  }
+  std::cout << "Roundtrips: " << equal << std::endl;
+#endif
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -129,6 +129,7 @@ protected:
   int m_fitnessStage;
   int m_fitnessMaxStages;
   float m_fitnessStageThreshold;
+  bool m_posVar;
   
   bool m_minimiseConnections;
   float m_maxTotalWeight;
