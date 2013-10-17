@@ -158,6 +158,8 @@ public:
   void randomizeTimeConstants(double lb, double ub);
   void zeroStates();
   
+  void knockOut(int i);
+  
   void toXml(ci::XmlTree& xml);
   void fromXml(const ci::XmlTree& xml);
   
