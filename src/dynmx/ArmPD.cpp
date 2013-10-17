@@ -32,10 +32,10 @@ void ArmPD::reset()
 }
   
 //----------------------------------------------------------------------------------------------------------------------
-void ArmPD::updatePD(float dt, float angle1, float angle2)
+void ArmPD::updatePD(float dt, float angleElb, float angleShd)
 {
-  float elbTorque = m_pd[JT_elbow].update(angle1, m_state.angles[JT_elbow], m_state.velocities[JT_elbow], dt);
-  float shdTorque = m_pd[JT_shoulder].update(angle2, m_state.angles[JT_shoulder], m_state.velocities[JT_shoulder], dt);
+  float elbTorque = m_pd[JT_elbow].update(angleElb, m_state.angles[JT_elbow], m_state.velocities[JT_elbow], dt);
+  float shdTorque = m_pd[JT_shoulder].update(angleShd, m_state.angles[JT_shoulder], m_state.velocities[JT_shoulder], dt);
   Arm::update(dt, elbTorque, shdTorque);
   //update(dt);
 }
