@@ -302,6 +302,111 @@ bool Topology::decode(CTRNN& ctrnn, const double* params, const NetLimits& limit
   return correct;
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+// Input neurons are placeholder neurons only and are arranged in a layer different from real neurons.
+// Each real neuron receives connections from all input neurons.
+// Real neurons are are arranged in a bilaterally symmetric layer. I.e. first and last neuron are identical, as well
+// as the second and second to last etc...
+//----------------------------------------------------------------------------------------------------------------------
+bool Topology::encode(CTRNN& ctrnn, double* params, const NetLimits& limits) const
+{
+  
+  int I = 0; // tracks starting index of a range of parameters
+  
+  int numUniqueInputs = getNumUniqueNeurons(Topology::kLyr_Input);
+  int numUniqueHidden = getNumUniqueNeurons(Topology::kLyr_Hidden);
+  int numUniqueOutputs = getNumUniqueNeurons(Topology::kLyr_Output);
+  int numInputs = getNumInputs();
+  int numInputNeurons = getInputsAreNeurons() ? numInputs : 0;
+  int numHidden = getNumHidden();
+  
+  // Input gains, if inputs are not neurons (in which case weights take care of individual weighting)
+  int lastInput = numInputs - 1;
+  if(!getInputsAreNeurons())
+  {
+    for(int i = 0; i < numUniqueInputs; ++i)
+    {
+      params[I++] = limits.gain.encode(ctrnn.getGain(i));
+    }
+  }
+  
+  // Weights from input to hidden layer
+  int firstHidden = numInputNeurons;
+  int lastHidden = numInputNeurons + numHidden - 1;
+  if(getInputsAreNeurons())
+  {
+    for(int i = 0; i < numUniqueHidden; ++i)
+    {
+      for(int j = 0; j < numInputs; ++j)
+      {
+        int from = j;
+        int to = firstHidden + i;
+        params[I++] = limits.weight.encode(ctrnn.getWeight(from, to));
+      }
+    }
+  }
+  
+  // Hidden layer: biases and time constants
+  for(int i = 0; i < numUniqueHidden; ++i)
+  {
+    params[I++] = limits.bias.encode(ctrnn.getBias(firstHidden + i));
+    params[I++] = limits.tau.encode(ctrnn.getTimeConstant(firstHidden + i));
+  }
+  
+  // Hidden intralayer weights
+  for(int i = 0; i < numUniqueHidden; ++i)
+  {
+    for(int j = 0; j < numHidden; ++j)
+    {
+      int from = firstHidden + j;
+      int to = firstHidden + i;
+      params[I++] = limits.weight.encode(ctrnn.getWeight(from, to));
+    }
+  }
+  
+  // Output layer: biases and time constants
+  int firstOutput = numInputNeurons + numHidden;
+  int lastOutput = firstOutput + getNumOutputs() - 1;
+  for(int i = 0; i < numUniqueOutputs; ++i)
+  {
+    params[I++] = limits.bias.encode(ctrnn.getBias(firstOutput + i));
+    params[I++] = limits.tau.encode(ctrnn.getTimeConstant(firstOutput + i));
+  }
+  
+  // Weights from hidden layer to outputs
+  for(int i = 0; i < numUniqueOutputs; ++i)
+  {
+    for(int j = 0; j < numHidden; ++j)
+    {
+      int from = firstHidden + j;
+      int to = firstOutput + i;
+      params[I++] = limits.weight.encode(ctrnn.getWeight(from, to));
+    }
+  }
+  
+  
+  // Output intralayer weights
+  if(getOutputsAreLaterallyConnected())
+  {
+    for(int i = 0; i < numUniqueOutputs; ++i)
+    {
+      for(int j = 0; j < getNumOutputs(); ++j)
+      {
+        int from = firstOutput + j;
+        int to = firstOutput + i;
+        params[I++] = limits.weight.encode(ctrnn.getWeight(from, to));
+      }
+    }  
+  }
+  
+  // Check we decoded correctly!
+  int numReqParams = getNumParameters();
+  bool correct = I == numReqParams;
+  assert(correct);
+  
+  return correct;
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 void Topology::toXml(ci::XmlTree& xml) const

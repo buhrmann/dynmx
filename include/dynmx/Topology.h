@@ -69,7 +69,8 @@ public:
   void toXml(ci::XmlTree& xml) const;
   void fromXml(const ci::XmlTree& xml);
   
-  bool decode(CTRNN& ctrnn, const double* params, const NetLimits& limits) const;  
+  bool decode(CTRNN& ctrnn, const double* params, const NetLimits& limits) const;
+  bool encode(CTRNN& ctrnn, double* params, const NetLimits& limits) const;
   
 protected:
   
