@@ -192,6 +192,8 @@ void GATester::update(float dt)
     // Write model data to xml
     if(hasFinished())
     {
+      m_evolvable->endOfEvaluation(m_accFitness);
+      
       // Store description of evolvable
       m_evolvable->toXml(*m_modelXml);
       m_modelXml->write(ci::writeFile(dmx::DATA_DIR + "Evolvable.xml"));  

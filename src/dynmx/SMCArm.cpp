@@ -308,11 +308,11 @@ void SMCArm::updateFitness(float dt)
     // Encourage sensor use in the beginning
     float maxDist = 1.0f;
     m_instFit = 1.0f - sqr(clamp(m_projPos.distance(handPos), 0.0f, maxDist) / maxDist);
-    m_instFit /= m_probePhaseDuration;
+    m_instFit /= 2.0f * m_probePhaseDuration;
   }
   else if(m_phase == 2)
   {
-    m_instFit += ((m_sensedValue) * m_fitHandVel * m_fitAngleDist) / m_evalPhaseDuration;
+    m_instFit += ((m_sensedValue) * m_fitHandVel * m_fitAngleDist) / (2.0f * m_evalPhaseDuration);
   }
 
   m_fitness += dt * m_instFit;
@@ -322,7 +322,6 @@ void SMCArm::updateFitness(float dt)
 //----------------------------------------------------------------------------------------------------------------------
 float SMCArm::getFitness()
 {
-  float fitness = m_fitness / 2.0;
   
   if(m_minimiseConnections)
   {
@@ -331,13 +330,13 @@ float SMCArm::getFitness()
     
     //std::cout << "Fit without con. min.: " << fitness << std::endl;
 
-    if(fitness >= m_minFitness)
-      fitness = weightFit;
+    if(m_fitness >= m_minFitness)
+      return weightFit;
     else
-      fitness = 0.0f;
+      return 0.0f;
   }
   
-  return fitness;
+  return m_fitness;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -413,6 +412,8 @@ void SMCArm::endOfEvaluation(float fit)
     std::cout <<  Globals::Inst()->getDataDirName() << " | Next fitness stage: " << m_fitnessStage;
     std::cout << " | numTrials: " << m_numTrials << std::endl;
   }
+  
+  m_fitness = fit;
   
   // Safe here, since we know we're being called by GARunner
 #if 0
