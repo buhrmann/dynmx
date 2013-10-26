@@ -387,7 +387,7 @@ bool SMCArm::hasFinished()
 //----------------------------------------------------------------------------------------------------------------------
 void SMCArm::endOfEvaluation(float fit)
 {
-  nextTrial(0);
+  //nextTrial(0);
   
   if (fit > m_fitnessStageThreshold && m_fitnessStage < m_fitnessMaxStages)
   {

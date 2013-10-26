@@ -220,9 +220,6 @@ void GARunner::update(float dt)
     m_trial++;
     m_time = 0.0;
     
-    m_evolvable->reset();        
-    m_evolvable->nextTrial(m_trial);
-    
     // Finished all trials? Move on to evaluate next genome.
     //-------------------------------------------------------
     if (m_trial == m_numTrials)
@@ -308,10 +305,12 @@ void GARunner::update(float dt)
             std::cout << "GA finished. Best fitness: " << bestFitness << ". Evaluated " <<  numEvaluations << " trials." << std::endl;
           }
 #endif             
-        }
-      }
-    }
+        } // GA hasFinished()
+      } // End of generation
+    } // End of trial
     
+    m_evolvable->reset();
+    m_evolvable->nextTrial(m_trial);
   }
 }
 
