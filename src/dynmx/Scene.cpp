@@ -688,7 +688,8 @@ void Plot::setLabel(int pId, const std::string& name)
 void Plot::init()
 {
   m_type = NODE_PLOT;
-  m_font = ci::Font(ci::app::loadResource("pf_tempesta_seven.ttf"), 8);  
+  //m_font = ci::Font(ci::app::loadResource("pf_tempesta_seven.ttf"), 8);
+  m_font = ci::Font("PF Tempesta Seven", 8);
 #ifdef _DEBUG
   print();
 #endif

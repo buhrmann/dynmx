@@ -419,7 +419,8 @@ void CTRNNViz::init()
 {
   NodeGroup::init();
   
-  m_font = ci::Font(ci::app::loadResource("pf_tempesta_seven.ttf"), 8);
+  //m_font = ci::Font(ci::app::loadResource("pf_tempesta_seven.ttf"), 8);
+  m_font = ci::Font("PF Tempesta Seven", 8);
   
   m_mode = kRM_Layers;
   m_selected = -1;

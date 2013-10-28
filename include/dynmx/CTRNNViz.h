@@ -32,10 +32,14 @@ public:
   int getSelectedNeuron() { return m_selected; };
 
 protected:
-  virtual void init(){ m_selected = -1; m_font = ci::Font(ci::app::loadResource("pf_tempesta_seven.ttf"), 8);  };
+  virtual void init(){
+    m_selected = -1;
+    //m_font = ci::Font(ci::app::loadResource("pf_tempesta_seven.ttf"), 8);
+    m_font = ci::Font("PF Tempesta Seven", 8);
+  };
   
   const CTRNN* m_ctrnn;  
-  ci::Font m_font;  
+  ci::Font m_font;
   float m_width;
   int m_selected;
   bool m_renderText;
