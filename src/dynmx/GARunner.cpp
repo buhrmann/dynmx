@@ -319,6 +319,7 @@ void GARunner::update(float dt)
 void GARunner::test(const double* genome, float fitness, float dt)
 {
   m_evolvable->reset();
+  m_evolvable->nextTrial(0);
   m_evolvable->decodeGenome(genome);
   GATester tester (m_evolvable);
   // We're only doing this to record the state data! So overwrite any flag read in from xml config.
