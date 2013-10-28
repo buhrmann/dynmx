@@ -2,7 +2,7 @@
 for folder in $1/*
 do
   f="$folder/Evolvable.xml"
-  fit=$(grep "Genome Fitness" "$f")
+  fit=$(grep "SMCArm Fitness" "$f")
   fnm=$(basename $folder)
   echo "$fnm: $fit"
 done
