@@ -83,17 +83,17 @@ void SMCArm::init()
   
   // Which stage do we start with?
   m_fitnessMaxStages = 8;
-  if (SETTINGS->getChild("Config/GA/Eval").getAttributeValue<bool>("Run", false))
+  if (settings->getChild("Config/GA/Eval").getAttributeValue<bool>("Run", false))
   {
     // We're testing
-    m_fitnessStage = m_fitnessMaxStages;
+    m_fitnessStage = settings->getChild("Config/GA/Evolvable/FitnessStageThreshold").getAttributeValue<float>("initialStage", m_fitnessMaxStages);
     m_numTrials = SETTINGS->getChild("Config/GA/Eval/NumTrials").getAttributeValue<int>("Value", 1);
   }
   else
   {
-    if (SETTINGS->getChild("Config/GA/Incremental").getValue<bool>(false))
+    if (settings->getChild("Config/GA/Incremental").getValue<bool>(false))
     {
-      m_fitnessStage = m_fitnessMaxStages;
+      m_fitnessStage = settings->getChild("Config/GA/Evolvable/FitnessStageThreshold").getAttributeValue<float>("initialStage", m_fitnessMaxStages);
       m_numTrials = SETTINGS->getChild("Config/GA/Trials").getAttributeValue<int>("Num", 1);
     }
     else
