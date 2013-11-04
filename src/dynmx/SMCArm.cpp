@@ -46,6 +46,7 @@ void SMCArm::init()
     
     m_sensorDropTail = xml.getChild("SensorFilter").getAttributeValue<double>("dropTail", 0.0);
     m_sensorDropInterval = xml.getChild("SensorFilter").getAttributeValue<double>("dropInterval", 0.0);
+    m_sensorDropStaged = xml.getChild("SensorFilter").getAttributeValue<bool>("staged", true);
     m_noise = xml.getChild("SensorFilter").getAttributeValue<double>("noise", 0.0);
     
     m_trialDuration = xml.getChild("TrialDuration").getValue<double>(14.0);
@@ -149,7 +150,7 @@ void SMCArm::update(float dt)
   float sensor = m_sensedValue;
   
   // Final blackout: starts earlier with increasing fitness stage
-  float fitnessStageProp = ((float)m_fitnessStage) / m_fitnessMaxStages;
+  float fitnessStageProp = m_sensorDropStaged ? ((float)m_fitnessStage) / m_fitnessMaxStages : 1.0f;
   float sensorDropTail = m_sensorDropTail * fitnessStageProp;
   bool blackout = m_time > (m_trialDuration - sensorDropTail);
 
@@ -172,7 +173,8 @@ void SMCArm::update(float dt)
     sensor = 0;
   
   // Add noise
-  sensor = sensor + UniformRandom(-m_noise, m_noise);
+  if(m_noise > 0.0)
+    sensor = sensor + UniformRandom(-m_noise, m_noise);
 
   
   // Update CTRNN
