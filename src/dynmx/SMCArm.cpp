@@ -267,7 +267,7 @@ void SMCArm::updateFitness(float dt)
   ci::Vec2f lineDir = (e - s).normalized();
 
   // Ensure a minimum averge hand speed
-  const float minVel = 0.1f;
+  const float minVel = 0.08f;
   ci::Vec2f handPos = m_arm.getEffectorPos();
   ci::Vec2f handVel = (handPos - m_prevPos) / dt;
   m_handSpeed = handVel.dot(lineDir);
