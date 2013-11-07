@@ -390,8 +390,8 @@ bool SMCArm::hasFinished()
 void SMCArm::endOfEvaluation(float fit)
 {
   //nextTrial(0);
-  
-  if (fit > m_fitnessStageThreshold && m_fitnessStage < m_fitnessMaxStages)
+  bool evo = ! SETTINGS->getChild("Config/GA/Eval").getAttributeValue<bool>("Run", 0);
+  if (evo && (fit > m_fitnessStageThreshold) && (m_fitnessStage < m_fitnessMaxStages))
   {
     m_fitnessStage++;
     
