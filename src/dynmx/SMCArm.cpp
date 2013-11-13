@@ -46,6 +46,7 @@ void SMCArm::init()
     
     m_sensorDropTail = xml.getChild("SensorFilter").getAttributeValue<double>("dropTail", 0.0);
     m_sensorDropInterval = xml.getChild("SensorFilter").getAttributeValue<double>("dropInterval", 0.0);
+    m_sensorDropShift = xml.getChild("SensorFilter").getAttributeValue<double>("dropShift", 0.0);
     m_sensorDropStaged = xml.getChild("SensorFilter").getAttributeValue<bool>("staged", true);
     m_noise = xml.getChild("SensorFilter").getAttributeValue<double>("noise", 0.0);
     
@@ -162,7 +163,7 @@ void SMCArm::update(float dt)
     float drops [numDrops] = {8.0f, 9.0f, 10.0f, 11.0f};
     for (int i = 0; i < numDrops; ++i)
     {
-      if ((m_time >= drops[i]) && (m_time < (drops[i] + sensorDropInterval)))
+      if ((m_time >= drops[i] + m_sensorDropShift) && (m_time < (drops[i] + sensorDropInterval + m_sensorDropShift)))
       {
         blackout = true;
       }
@@ -179,14 +180,17 @@ void SMCArm::update(float dt)
   
   // Update CTRNN
   m_ctrnn->setExternalInput(0, sensor);
-  
+
+  if (m_topology.getNumInputs() > 1)
+  {
 #if CONTROL_JOINTS
-  m_ctrnn->setExternalInput(1, m_arm.getJointAngle(JT_elbow) / m_maxJointAngle);
-  m_ctrnn->setExternalInput(2, m_arm.getJointAngle(JT_shoulder) / m_maxJointAngle);
+    m_ctrnn->setExternalInput(1, m_arm.getJointAngle(JT_elbow) / m_maxJointAngle);
+    m_ctrnn->setExternalInput(2, m_arm.getJointAngle(JT_shoulder) / m_maxJointAngle);
 #else
-  m_ctrnn->setExternalInput(1, m_vel.x);
-  m_ctrnn->setExternalInput(2, m_vel.y);
+    m_ctrnn->setExternalInput(1, m_vel.x);
+    m_ctrnn->setExternalInput(2, m_vel.y);
 #endif
+  }
   
   // Add blackout signal
   if (m_topology.getNumInputs() > 3)

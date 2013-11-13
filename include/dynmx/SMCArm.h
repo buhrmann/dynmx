@@ -118,6 +118,7 @@ protected:
   float m_noise;
   float m_sensorDropTail;
   float m_sensorDropInterval;
+  float m_sensorDropShift;
   bool m_sensorDropStaged;
   
   // Fitness related
