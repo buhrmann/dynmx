@@ -43,14 +43,17 @@ public:
   virtual ci::Vec2f getPosition() { return m_position; };
   virtual const ci::Vec2f& getPositionVar() const { return m_positionVar; };
   virtual ci::Vec2f getPositionVar() { return m_positionVar; };
-  virtual const float getAngleVar() { return m_angleVar; };
+  virtual const ci::Vec2f& getPositionMean() const { return m_positionMean; };
+  virtual ci::Vec2f getPositionMean() { return m_positionMean; };
   virtual void setPosition(const ci::Vec2f& pos) { m_position = pos; };
   virtual void setPositionMean(const ci::Vec2f& pos) { m_positionMean = pos; };
   void setPositionVariance(const ci::Vec2f& var) { m_positionVar = var; };
   void randomisePosition();
   
   virtual float getAngle() const { return m_angle; };
-  virtual void setAngle(float ang) { m_angle = ang; };  
+  virtual const float getAngleVar() const { return m_angleVar; };
+  virtual const float getAngleMean() const { return m_angleMean; };
+  virtual void setAngle(float ang) { m_angle = ang; };
   virtual void setAngleMean(float ang) { m_angleMean = ang; };  
   void setAngleVariance(float var) { m_angleVar = var; };
   void randomiseAngle();
@@ -182,7 +185,8 @@ public:
   }
   
   virtual void setAngle(float angle)
-  {   
+  {
+    m_angle = angle;
     ci::Vec2f dir (cos(angle), sin(angle));
     m_start = m_position - 0.5 * m_length * dir;
     m_end =   m_position + 0.5 * m_length * dir; 

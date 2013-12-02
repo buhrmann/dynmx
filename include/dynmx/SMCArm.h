@@ -122,12 +122,14 @@ protected:
   bool m_sensorDropStaged;
   
   // Fitness related
+  int m_trial;
   float m_fitness;
   float m_trialDuration;
   float m_fitnessEvalDelay;
   float m_probePhaseDuration;
   float m_evalPhaseDuration;
   int m_numTrials;
+  int m_numPosTrials;
   int m_fitnessStage;
   int m_fitnessMaxStages;
   float m_fitnessStageThreshold;
@@ -137,6 +139,13 @@ protected:
   float m_maxTotalWeight;
   float m_minFitness;
 
+  bool m_isTest;
+  
+  bool m_recordFirstContact;
+  bool m_contacted;
+  bool m_lastContacted;
+  std::ofstream m_firstContactsFile;
+  std::ofstream m_lastContactsFile;
 };
   
 } // namespace

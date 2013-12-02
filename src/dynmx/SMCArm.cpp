@@ -31,6 +31,9 @@ SMCArm::~SMCArm()
 void SMCArm::init()
 {
   const ci::XmlTree* settings = SETTINGS;
+  
+  m_isTest = settings->getChild("Config/GA/Eval").getAttributeValue<bool>("Run", 0);
+
   if (settings->hasChild("Config/GA/Evolvable"))
   {
     const ci::XmlTree& xml = settings->getChild("Config/GA/Evolvable");
@@ -55,6 +58,9 @@ void SMCArm::init()
     m_probePhaseDuration = xml.getChild("ProbePhaseDuration").getValue<double>(4.0);
     m_evalPhaseDuration = m_trialDuration - m_fitnessEvalDelay - m_probePhaseDuration;
     m_fitnessStageThreshold = xml.getChild("FitnessStageThreshold").getValue<float>(0.5);
+
+    m_recordFirstContact = xml.getChild("RecordFirstContact").getValue<bool>(false);
+    
     m_minimiseConnections = xml.getChild("MinimiseConnections").getValue<bool>(false);
     if(m_minimiseConnections)
     {
@@ -85,6 +91,7 @@ void SMCArm::init()
   
   // Which stage do we start with?
   m_fitnessMaxStages = 8;
+  m_numPosTrials = SETTINGS->getChild("Config/GA/Evolvable/NumPosTrials").getValue<int>(2);
   if (settings->getChild("Config/GA/Eval").getAttributeValue<bool>("Run", false))
   {
     // We're testing
@@ -105,6 +112,20 @@ void SMCArm::init()
     }
   }
   
+  if(m_isTest && m_recordFirstContact)
+  {
+    std::string fnm = dmx::DATA_DIR + "FirstContacts.txt";
+    m_firstContactsFile.open(fnm.c_str(), std::ios_base::app);
+    if(m_firstContactsFile.fail())
+      return;
+    
+    fnm = dmx::DATA_DIR + "LastContacts.txt";
+    m_lastContactsFile.open(fnm.c_str(), std::ios_base::app);
+    if(m_lastContactsFile.fail())
+      return;
+
+  }
+  
   nextTrial(0);
   
   reset();
@@ -116,6 +137,7 @@ void SMCArm::reset()
   m_time = 0.0f;
   m_sensedValue = 0.0f;
   
+  m_trial = 0;
   m_fitness = 0;
   m_fitHandVel = 0;
   m_fitHandDist = 0;
@@ -134,6 +156,9 @@ void SMCArm::reset()
   m_handDist = 0.0;
   
   m_phase = 0;
+  
+  m_contacted = false;
+  m_lastContacted = false;
 }
 
 
@@ -238,6 +263,25 @@ void SMCArm::update(float dt)
   }
 
   updateFitness(dt);
+  
+  if(m_isTest && m_recordFirstContact)
+  {
+    const float skip = 0.5f;
+    if(m_time > skip && m_sensedValue > 0.0f && !m_contacted)
+    {
+      m_contacted = true;
+      m_firstContactsFile << m_time << std::endl;
+    }
+    
+    if(blackout && !m_lastContacted)
+    {
+      Positionable* obj = getEnvironment()->getObjects()[0];
+      m_lastContacted = true;
+      m_lastContactsFile << m_arm.getJointAngle(JT_elbow) << " " << m_arm.getJointAngle(JT_shoulder) << " ";
+      m_lastContactsFile << obj->getPosition()[0] << " " << radiansToDegrees(obj->getAngle())  << std::endl;
+    }
+  }
+  
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -328,7 +372,6 @@ void SMCArm::updateFitness(float dt)
 //----------------------------------------------------------------------------------------------------------------------
 float SMCArm::getFitness()
 {
-  
   if(m_minimiseConnections)
   {
     float annWeightProp = m_ctrnn->getWeightSum() / m_maxTotalWeight;
@@ -348,6 +391,7 @@ float SMCArm::getFitness()
 //----------------------------------------------------------------------------------------------------------------------
 void SMCArm::nextTrial(int trial)
 {
+  m_trial = trial;
   Positionable* obj = getEnvironment()->getObjects()[0];
   
   // Systematically vary angle of line
@@ -355,32 +399,27 @@ void SMCArm::nextTrial(int trial)
   {
     // In rad...
     const bool posVar = obj->getPositionVar().x > 0;
-    int numAngleTrials = posVar ? m_numTrials / 2 : m_numTrials;
+    int numAngleTrials = posVar ? m_numTrials / m_numPosTrials : m_numTrials;
     const float maxRange = obj->getAngleVar();
     const float angularRange = m_fitnessStage * (maxRange / m_fitnessMaxStages);
     int t = trial % numAngleTrials;
     // PI/2 (90 deg) makes the line orthogonal to the arm when extended, so that's the middle of the range
-    float angle = PI_OVER_TWO - angularRange/2.0f + (t * angularRange / (numAngleTrials - 1));
+    float angle = obj->getAngleMean() - angularRange/2.0f + (t * angularRange / (numAngleTrials - 1));
     obj->setAngle(angle);
-    
-#if 0
-    std::cout << "Angle: " << radiansToDegrees(angle) << std::endl;
-#endif
     
     // Systematicall vary distance of line
     if(posVar)
     {
-      const int numPosTrials = 2;
       const float maxDistRange = obj->getPositionVar().x;
-      int t = trial < m_numTrials/2 ? 0 : 1;
+      int t = trial / numAngleTrials;
       float distRange = m_fitnessStage * (maxDistRange / m_fitnessMaxStages);
-      float dist = 0.5 - distRange/2.0f + (t * distRange / (numPosTrials - 1));
+      float dist = obj->getPositionMean()[0] - distRange/2.0f + (t * distRange / (m_numPosTrials - 1));
       obj->setPosition(ci::Vec2f(dist, 0));
-#if 0
-      std::cout << "Distance: " << dist << std::endl;
-#endif
     }
-    
+#if 0
+    std::cout << "Dist: " << obj->getPosition()[0] << " | ";
+    std::cout << "Ang: " << radiansToDegrees(obj->getAngle()) << std::endl;
+#endif
   }
 }
 
@@ -394,8 +433,7 @@ bool SMCArm::hasFinished()
 void SMCArm::endOfEvaluation(float fit)
 {
   //nextTrial(0);
-  bool evo = ! SETTINGS->getChild("Config/GA/Eval").getAttributeValue<bool>("Run", 0);
-  if (evo && (fit > m_fitnessStageThreshold) && (m_fitnessStage < m_fitnessMaxStages))
+  if (!m_isTest && (fit > m_fitnessStageThreshold) && (m_fitnessStage < m_fitnessMaxStages))
   {
     m_fitnessStage++;
     
@@ -421,11 +459,11 @@ void SMCArm::endOfEvaluation(float fit)
   
   m_fitness = fit;
   
-  // Safe here, since we know we're being called by GARunner
-#if 0
-  std::cout << "Arm trials n: " << m_numTrials << " GA: " << ((GARunner*)Simulation::getInstance()->getModel())->getNumTrials() << std::endl;
-  // m_numTrials = ((GARunner*)Simulation::getInstance()->getModel())->getNumTrials();
-#endif
+  if(m_isTest && m_recordFirstContact)
+  {
+    m_firstContactsFile.close();
+    m_lastContactsFile.close();
+  }
 };
 
 //----------------------------------------------------------------------------------------------------------------------
