@@ -11,6 +11,7 @@
 #define _DMX_SMC_AGENT_EVO_
 
 #include "SMCAgent.h"
+#include "Bacterium.h"
 #include "GARunner.h"
 
 namespace dmx
@@ -24,8 +25,11 @@ namespace dmx
 class SMCAgentEvo : public Evolvable
 {
   
+friend class SMCView;
+  
 public:
   SMCAgentEvo();
+  SMCAgentEvo(SMCAgent* agent);
   ~SMCAgentEvo();
 
   // Inherited from Model  
@@ -38,7 +42,7 @@ public:
   virtual void decodeGenome(const double* genome);
   virtual float getFitness();
   virtual void nextTrial(int trial = 0) {};
-  virtual inline bool hasFinished() { return m_agent->getTime() >= m_trialDuration; };
+  virtual bool hasFinished() { return m_agent->getTime() >= m_trialDuration; };
   
   virtual void toXml(ci::XmlTree& xml);
   virtual void record(Recorder& recorder);
@@ -48,11 +52,12 @@ public:
   
 protected:
   
-  virtual void updateFitness() {};
+  virtual void updateFitness(float dt) {};
   
   SMCAgent* m_agent;
   NetLimits m_netLimits;
   float m_fitness;
+  float m_fitnessInst;
   float m_trialDuration;
   float m_fitnessEvalDelay;
 };

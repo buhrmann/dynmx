@@ -58,6 +58,8 @@ public:
   virtual void resize(ci::app::ResizeEvent event);
   virtual int pick(int x, int y);
   
+  CameraPersp& getCameraPersp() { return m_cam; };
+  
   // Getter and Setter for name, to be used by Factories e.g.
   const std::string& getName() const { return m_name; };
   void setName(const std::string& name) { m_name = name; };
@@ -76,6 +78,7 @@ protected:
   NodeGroup m_scene2d;
   NodeGeometry* m_selectedNode;
   Light m_light;
+  ci::CameraPersp m_cam;
   ci::MayaCamUI	m_cam3d;
   ci::CameraOrtho m_cam2d;
 	ci::Vec2i m_mouse; 

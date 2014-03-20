@@ -133,7 +133,7 @@ void ArmMuscledViz::update()
   drawTriangle(rt, lt, bt);
   ci::gl::color(m_colors.boneOutline);
   drawTriangle(rt, lt, bt, GL_LINE);
-  ci::gl::drawLine(ci::Vec2f(bt), elbRad * ci::Vec2f(1,0));      
+  ci::gl::drawLine(ci::Vec2f(&bt.x), elbRad * ci::Vec2f(1,0));
   // joint disk
   ci::gl::color(m_colors.jointFill);
   ci::gl::drawSolidCircle(ci::Vec2f(0,0), elbRad, 32);

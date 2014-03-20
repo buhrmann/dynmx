@@ -76,12 +76,11 @@ void View::init()
   m_scene3d.m_children.push_back(&m_light);
   
   // set up the cameras
-	CameraPersp cam;
-	cam.setEyePoint(Vec3f(0.0f, 0.0f, 1.0f));
-	cam.setCenterOfInterestPoint(Vec3f(0.0f, 0.0f, 0.0f));
-  cam.setWorldUp(Vec3f(0,1,0));
-	cam.setPerspective(60.0f, getWindowAspectRatio(), 0.001f, 100.0f);
-	m_cam3d.setCurrentCam(cam);
+	m_cam.setEyePoint(Vec3f(0.0f, 0.0f, 1.0f));
+	m_cam.setCenterOfInterestPoint(Vec3f(0.0f, 0.0f, 0.0f));
+  m_cam.setWorldUp(Vec3f(0,1,0));
+	m_cam.setPerspective(60.0f, getWindowAspectRatio(), 0.001f, 100.0f);
+	m_cam3d.setCurrentCam(m_cam);
     
   m_cam2d.setOrtho(0, ci::app::getWindowWidth(), ci::app::getWindowHeight(), 0, 0.001f, 100.0f);
 
@@ -103,6 +102,7 @@ void View::init()
 //----------------------------------------------------------------------------------------------------------------------
 void View::draw()
 {
+
   if(getWindowWidth() <= 0)
     return;
   

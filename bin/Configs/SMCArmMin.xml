@@ -9,21 +9,23 @@
     <Model Value="GA"/>    
     <DebugLevel Value="0"/>
     <PlotDuration Value="0.5"/>                
-    <OutputFolder Name="~/Experiments/eSMCs/ArmInp3H6/Pos2"/>     
+    <OutputFolder Name="~/Experiments/eSMCs/ArmInp3H6/Pos2/Min"/>     
   </Globals>
   <GA>
     <Evolvable Name="SMCArm">
       <DistanceSensor MaxDist="0.05" TransferFunc="Binary" NoiseLevel="0.0" Mode="Absolute"/>
-      <SensorFilter noise="0.0" dropInterval="0.8" dropShift="0.0" dropTail="0.0" staged="1"/>
+      <SensorFilter noise="0.0" dropInterval="0.8" dropShift="-1.0" dropTail="1.0" staged="1"/>
       <TrialDuration>12</TrialDuration>
       <FitnessEvalDelay>2</FitnessEvalDelay>
-      <ProbePhaseDuration>3</ProbePhaseDuration>
+      <ProbePhaseDuration>2</ProbePhaseDuration>
+      <NumPosTrials>2</NumPosTrials>
       <FitnessStageThreshold initialStage="8">0.69</FitnessStageThreshold>
+      <RecordFirstContact>1</RecordFirstContact>
       <MinimiseConnections maxWeight="318.836" minFit="0.85">0</MinimiseConnections>
       <Topology symmetric="0" weightCutoff="0.0">
         <Inputs asNeurons="1">1</Inputs>
-        <Hidden>5</Hidden>
-        <Outputs laterallyConnected="0">2</Outputs>
+        <Hidden>7</Hidden>
+        <Outputs laterallyConnected="1">2</Outputs>
       </Topology>
       <NetLimits>
         <Weight min="-10.0" max="10.0"/>
@@ -38,14 +40,14 @@
         <UnTriangle PosX="0.2" PosY="-0.2" Size="0.1" PosVar="0.1"/>
       </Environment>
     </Evolvable>  
-    <Incremental initialMutation="0.1" seedOnly="1" seedAll="1" elitist="1">0</Incremental>
-    <LoadFrom Value="~/Experiments/eSMCs/ArmInp3H6/Pos2/13_11_13__10_14_13/GA_Result.xml"/>
-    <PopulationSize Value="200"/>
+    <Incremental initialMutation="0.1" seedOnly="1" seedAll="0" elitist="1">0</Incremental>
+    <LoadFrom Value="~/Experiments/eSMCs/ArmInp3H6/Pos2/Min/13_11_14__10_02_07/GA_Result.xml"/>
+    <PopulationSize Value="100"/>
     <DemeSize Value="10"/>
-    <NumGenerations Value="6000" OutputInterval="100"/>
+    <NumGenerations Value="3000" OutputInterval="25"/>
     <MutationMax Value="0.01"/>
     <MutationMaxReduced Value="0.001"/>
-    <MutationMaxReduceAt Value="5000"/>
+    <MutationMaxReduceAt Value="2300"/>
     <MutationRate Value="0.5"/>
     <RecombinationRate Value="0.5"/>
     <RecombinationRateReduced Value="0.75"/>

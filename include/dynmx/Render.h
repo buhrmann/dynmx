@@ -235,7 +235,37 @@ namespace dmx
       glColor4f(tr.r, tr.g, tr.g, tr.a);
       glVertex3f( lx, 0, 0.0f);
 	  glEnd();
-	}  
+	}
+  
+  static void drawRadialGradient(ci::ColorA innerColor, ci::ColorA outerColor, int slices, float radius)
+  {
+    glDisable(GL_DEPTH_TEST);
+    glBlendFunc(GL_ZERO, GL_SRC_COLOR);
+    
+    float incr = 2.0 * PI / slices;
+    
+    glBegin(GL_TRIANGLE_FAN);
+    
+    glColor4f(0.5, 0.5, 0.5, 0.5);
+    glVertex2f(0.0f, 0.0f);
+    
+    glColor4f(1, 1, 1, 0.5);
+    
+    for(int i = 0; i < slices; i++)
+    {
+      float angle = incr * i;
+      float x = cos(angle) * radius;
+      float y = sin(angle) * radius;
+      glVertex2f(x, y);
+    }
+    
+    glVertex2f(radius, 0.0f);
+    
+    glEnd();
+    
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_DEPTH_TEST);
+  }
   
   static void drawSquares(int N=100, int M=100)
   {
@@ -394,9 +424,9 @@ namespace dmx
     glPushAttrib(GL_POLYGON_BIT);
     glPolygonMode(face, mode);
 	  glBegin(GL_TRIANGLES);
-      glVertex3fv(a);
-      glVertex3fv(b);
-      glVertex3fv(c);
+      glVertex3fv(&a.x);
+      glVertex3fv(&b.x);
+      glVertex3fv(&c.x);
     glEnd();
     glPopAttrib();
 	};

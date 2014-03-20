@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Config>
 	<Globals>
-		<Visual Value="0"/>
+		<Visual Value="1"/>
         <WindowSize Width="1000" Height="800"/>    
 		    <FrameRate Value="200"/>    
         <FullScreen Value="0"/>   
@@ -47,10 +47,11 @@
 		<NumGenerations Value="200"/>
 		<MutationMax Value="0.01"/>
     <MutationMaxReduced Value="0.001"/>
-    <MutationMaxReduceAt Value="150"/>        
+    <MutationMaxReduceAt Value="150"/>   
+    <MutationRate Value="0.5"/>
 		<RecombinationRate Value="0.5"/>
     <RecombinationRateReduced Value="0.75"/>        
-		<NumTrials Value="10"/>
+		<Trials Num="10"/>
     <AvoidReevaluation Value="0"/>
     <SaveBestEachGeneration Value="0"/>
     <AutoEval Run="1"/>

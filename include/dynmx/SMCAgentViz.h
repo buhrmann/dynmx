@@ -26,6 +26,7 @@ public:
   SMCAgentViz(SMCAgent* agent) : m_agent(agent) { init(); };
   
   virtual void update();
+  virtual void reset();
   
 protected:
   
@@ -33,6 +34,7 @@ protected:
   
   SMCAgent* m_agent;
   Disk* m_agentDisk;
+  std::deque<ci::Vec2f> m_traj;
   
 }; // class
   

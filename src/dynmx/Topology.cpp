@@ -434,7 +434,7 @@ void Topology::fromXml(const ci::XmlTree& xml)
   if (xml.getTag() == "Topology")
   {
     symmetric = xml.getAttributeValue<bool>("symmetric");
-    weightCutoff = xml.getAttributeValue<double>("weightCutoff", 100.0);
+    weightCutoff = xml.getAttributeValue<double>("weightCutoff", 0.0);
     
     size[0] = xml.getChild("Inputs").getValue<int>();
     size[1] = xml.getChild("Hidden").getValue<int>();

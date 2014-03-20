@@ -124,7 +124,7 @@ void SMCAgentMeta1d::updateSensor(float dt)
 {
   m_distanceSensor.setPosition(ci::Vec2f(0, m_position));
   m_distanceSensor.setDirection(ci::Vec2f(1, 0));
-  m_distanceSensor.senseEnvironment(m_environment, dt);
+  m_distanceSensor.sense(m_environment, dt);
 }
 
 

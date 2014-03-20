@@ -58,17 +58,17 @@ void Light::update()
     {
     case LIGHT_POINT:
       position[3] = 1.0;
-      glLightfv(light, GL_POSITION, position );
+      glLightfv(light, GL_POSITION, &position.x );
       glLightf(light, GL_SPOT_CUTOFF, 180.0f);
       break;
     case LIGHT_DIRECTIONAL:
       position[3] = 0.0;
-      glLightfv(light, GL_POSITION, position );
+      glLightfv(light, GL_POSITION, &position.x );
       glLightf(light, GL_SPOT_CUTOFF, 180.0f);
       break;
     case LIGHT_SPOT:
       position[3] = 1.0;
-      glLightfv(light, GL_POSITION, position );
+      glLightfv(light, GL_POSITION, &position.x );
       glLightf(light, GL_SPOT_CUTOFF, m_spotCutoff);
       glLightfv(light, GL_SPOT_DIRECTION, &direction.x);
       glLightf(light, GL_SPOT_EXPONENT, m_spotExponent);

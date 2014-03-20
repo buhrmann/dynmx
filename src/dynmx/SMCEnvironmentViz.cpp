@@ -71,13 +71,38 @@ void SMCEnvironmentViz::update()
         const Circle& circle = (Circle&)obj;        
         ci::gl::drawSolidCircle(circle.getPosition(), circle.getRadius(), 32);
       }
+      else if (obj.getType() == Positionable::kObj_Torus)
+      {
+        // Width specifies inflection points. For drawing we use the "half width at tenth of maximum"
+        const Torus& t = (Torus&)obj;
+        const ci::Vec2f& p = t.getPosition();
+        glPushMatrix();
+        glTranslatef(p.x, p.y, 0);
+        //ci::gl::drawStrokedCircle(t.getPosition(), t.getRadius() - 2.15 * t.getWidth(), 32);
+        //ci::gl::drawStrokedCircle(t.getPosition(), t.getRadius() + 2.15 * t.getWidth(), 32);
+        //glColor3f(1,0,0);
+        drawDisk(t.getRadius() + 2.15 * t.getWidth(), t.getRadius() - 2.15 * t.getWidth(), 32, 2, GLU_FILL);
+        glPopMatrix();
+      }
+      else if (obj.getType() == Positionable::kObj_Gradient)
+      {
+        const Gradient& g = (Gradient&)obj;
+        const ci::Vec2f& p = g.getPosition();
+        ci::ColorA c =  ci::ColorA(1,1,1,1);
+        glPushMatrix();
+        glTranslatef(p.x, p.y, 0);
+        drawRadialGradient(obj.getColor(), c, 32, g.getRadius());
+        //glColor3f(0.9,0.9,0.9);
+        //drawDisk(g.getRadius(), 0, 32, 2, GLU_SILHOUETTE);
+        glPopMatrix();
+      }
       else if (obj.getType() == Positionable::kObj_Gaussian)
       {
         const Gaussian& gaus = (Gaussian&)obj;        
         drawGaussian(gaus);
-      }      
+      }
       
-#if DMX_ENV_DRAW_POS      
+#if DMX_ENV_DRAW_POS
       dmx::drawPoint(ci::Vec3f(obj.getPosition()), 4);
 #endif
     }

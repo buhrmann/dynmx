@@ -27,6 +27,7 @@ class ArmMuscledViz : public ArmViz
 public:
   
   ArmMuscledViz(ArmMuscled* model) : ArmViz((Arm*)model), m_arm(model) { init(); };
+  virtual ~ArmMuscledViz(){};
   
   void setModel(ArmMuscled* model) { m_arm = model; };
   virtual void update();

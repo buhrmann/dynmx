@@ -127,6 +127,7 @@ public:
   double getGain(int i) const { return gains[i]; };
   double getTimeConstant(int i) const { return taus[i]; };
   double getExternalInput(int i) const { return externalinputs[i]; };
+  double getInput(int i) const { return inputs[i]; };
   double getWeight(int from, int to) const { return weights[from][to]; };
   const double* const* getWeights() const { return weights; };
   double getWeightSum() const;
@@ -160,6 +161,8 @@ public:
   
   void knockOut(int i);
   
+  void leakWeights(float tau, float cutoff=0.0f);
+  
   void toXml(ci::XmlTree& xml);
   void fromXml(const ci::XmlTree& xml);
   
@@ -179,7 +182,8 @@ protected:
   // internal data
   int size;
   
-  double 
+  double
+    *inputs,
     *states, 
     *outputs, 
     *biases, 

@@ -67,6 +67,7 @@ void Simulation::runVisual()
   const int antiAliasingSteps = 4; // Todo: read from config.xml.
   
   cinder::app::Renderer* renderer = new ci::app::RendererGl(antiAliasingSteps);
+  //cinder::app::AppBasic::executeLaunch((ci::app::AppBasic*)m_app, cinder::app::RendererRef(renderer), "Test", 0, argv);
   cinder::app::AppBasic::executeLaunch((ci::app::AppBasic*)m_app, renderer, "Test", 0, argv);
 }
 

@@ -267,18 +267,19 @@ void SMCArm::update(float dt)
   if(m_isTest && m_recordFirstContact)
   {
     const float skip = 0.5f;
+    Positionable* obj = getEnvironment()->getObjects()[0];
     if(m_time > skip && m_sensedValue > 0.0f && !m_contacted)
     {
       m_contacted = true;
-      m_firstContactsFile << m_time << std::endl;
+      m_firstContactsFile << m_time << " " << m_arm.getJointAngle(JT_elbow) << " " << m_arm.getJointAngle(JT_shoulder) << " ";
+      m_firstContactsFile << obj->getPosition()[0] << " " << radiansToDegrees(obj->getAngle()) << std::endl;
     }
     
     if(blackout && !m_lastContacted)
     {
-      Positionable* obj = getEnvironment()->getObjects()[0];
       m_lastContacted = true;
       m_lastContactsFile << m_arm.getJointAngle(JT_elbow) << " " << m_arm.getJointAngle(JT_shoulder) << " ";
-      m_lastContactsFile << obj->getPosition()[0] << " " << radiansToDegrees(obj->getAngle())  << std::endl;
+      m_lastContactsFile << obj->getPosition()[0] << " " << radiansToDegrees(obj->getAngle()) << std::endl;
     }
   }
   
@@ -290,7 +291,7 @@ void SMCArm::updateSensor(float dt)
   m_distanceSensor.setPosition(m_arm.getEffectorPos());
   ci::Vec2f dir = (m_arm.getEffectorPos() - m_arm.getElbowPos()).normalized();
   m_distanceSensor.setDirection(dir);
-  m_distanceSensor.senseEnvironment(m_environment, dt);
+  m_distanceSensor.sense(m_environment, dt);
 }
 
 

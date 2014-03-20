@@ -117,7 +117,7 @@ inline void ArmReflexView::update(float dt)
 {
   ArmMuscledView::update(dt);
   
-  m_armRx->setTarget(dmx::Pos(m_target));
+  m_armRx->setTarget(dmx::Pos(&m_target.x));
   
   // Control reflex parameters visually
   if(m_selectedReflex != m_previousReflex)

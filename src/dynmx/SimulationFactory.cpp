@@ -46,6 +46,8 @@
 #include "SMCView.h"
 #include "SMCArmView.h"
 #include "SMCView1d.h"
+#include "Bacterium.h"
+#include "BacteriumEvo.h"
 
 #include "Spin.h"
 
@@ -101,6 +103,17 @@ Simulation* SimulationFactory::create()
       if(visual)
       {
         View* view = new SMCView((SMCAgentEvo*)evolvable);
+        app = new App(model, view);
+      }
+    }
+    else if ("Bacterium" == evolvableName)
+    {
+      Bacterium* b = new Bacterium();
+      evolvable = new BacteriumEvo(b);
+      model = evaluateOnly ? (Model*) new GATester(evolvable) : (Model*) new GARunner (evolvable);
+      if(visual)
+      {
+        View* view = new SMCView((BacteriumEvo*)evolvable);
         app = new App(model, view);
       }
     }

@@ -78,7 +78,7 @@ void CTRNNNeuronViz::update()
           const float lineHeight = 13;
           const float padding = 3;
           const float textBoxH = 3 * lineHeight + 2 * padding;
-          ci::Vec2f textBoxPos = ci::Vec2f(midPoint);
+          ci::Vec2f textBoxPos = ci::Vec2f(&midPoint.x);
           ci::gl::drawSolidRect(ci::Rectf(textBoxPos.x, textBoxPos.y, textBoxPos.x + m_width, textBoxPos.y + textBoxH));
           
           // text
@@ -572,7 +572,7 @@ void CTRNNViz::update()
     sprintf(str, "b: %2.2f | t: %2.2f | g: %2.2f", m_ctrnn->getBias(i), m_ctrnn->getTimeConstant(i), m_ctrnn->getGain(i));
     ci::gl::drawString(str, textPos + ci::Vec2f(0, m_lineHeight), m_textColor, m_font);      
     
-    sprintf(str, "in: %1.3f | out: %1.3f", m_ctrnn->getExternalInput(i), m_ctrnn->getOutput(i));
+    sprintf(str, "e: %2.2f | i: %2.2f | y: %2.2f | out: %1.3f", m_ctrnn->getExternalInput(i), m_ctrnn->getInput(i), m_ctrnn->getState(i), m_ctrnn->getOutput(i));
     ci::gl::drawString(str, textPos + ci::Vec2f(0, 2 * m_lineHeight), m_textColor, m_font);            
   }
   
@@ -603,7 +603,7 @@ void CTRNNViz::onMousePress(const Vec4f& mPos)
   ci::Vec4f localPos = toLocalPos(mPos);
   
   // Button triggers view mode
-  if(m_modeButton.contains(ci::Vec2f(localPos)) ) 
+  if(m_modeButton.contains(ci::Vec2f(&localPos.x)) )
   {
     // We have n viz in children (but matrix viz consists of two, therefore one less)
     m_mode = (m_mode + 1) % (m_children.size() - 1);

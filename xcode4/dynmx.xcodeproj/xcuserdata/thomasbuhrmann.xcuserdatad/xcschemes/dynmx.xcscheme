@@ -74,7 +74,11 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/Users/thomasbuhrmann/Code/dynmx/bin/Configs/SMCArmEvo.xml"
-            isEnabled = "YES">
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/thomasbuhrmann/Code/dynmx/bin/Configs/SMCArmTest.xml"
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/Users/thomasbuhrmann/Experiments/Arm/Output/12_11_19__21_52_30/Run.xml"
@@ -87,6 +91,10 @@
          <CommandLineArgument
             argument = "/Users/thomasbuhrmann/Code/dynmx/bin/Configs/EvoArmIbIsDirs4M.xml"
             isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/thomasbuhrmann/Code/dynmx/bin/Configs/Bacterium.xml"
+            isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>

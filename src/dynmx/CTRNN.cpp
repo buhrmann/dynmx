@@ -74,6 +74,7 @@ CTRNN::CTRNN(int newsize)
   gains = new double[size];
   taus = new double[size];
   Rtaus = new double[size];
+  inputs = new double[size];
   externalinputs = new double[size];
   m_updateFunctions = new UpdateFunction[size];
   m_activationFunctions = new ActivationFunction[size];
@@ -92,7 +93,8 @@ CTRNN::CTRNN(int newsize)
   std::fill(states, states + size, 0.0);
   std::fill(outputs, outputs + size, 0.0);
   std::fill(biases, biases + size, 0.0);
-  std::fill(externalinputs, externalinputs + size, 0.0);  
+  std::fill(inputs, inputs + size, 0.0);
+  std::fill(externalinputs, externalinputs + size, 0.0);
   std::fill(gains, gains + size, 1.0);
   std::fill(taus, taus + size, 1.0);
   std::fill(Rtaus, Rtaus + size, 1.0);
@@ -115,6 +117,7 @@ CTRNN::~CTRNN()
   delete [] gains;
   delete [] taus;
   delete [] Rtaus;
+  delete [] inputs;
   delete [] externalinputs;
   
   delete [] m_updateFunctions;
@@ -235,13 +238,13 @@ void CTRNN::update(double stepsize)
   // Update the state of all neurons.
   for (int i = 0; i < size; i++) 
   {
-    double input = gains[i] * externalinputs[i];
+    inputs[i] = gains[i] * externalinputs[i];
     for (int j = 0; j < size; j++) 
     {
-      input += weights[j][i] * outputs[j];
+      inputs[i] += weights[j][i] * outputs[j];
     }
     
-    states[i] += stepsize * Rtaus[i] * (input - states[i]);
+    states[i] += stepsize * Rtaus[i] * (inputs[i] - states[i]);
   }
   
   // Update the outputs of all neurons.
@@ -273,13 +276,13 @@ void CTRNN::updateDynamic(double stepsize)
 void CTRNN::updateNeuron(int i, double stepsize)
 {
   // Update the state of all neurons.
-  double input = gains[i] * externalinputs[i];
+  inputs[i] = gains[i] * externalinputs[i];
   for (int j = 0; j < size; j++) 
   {
-    input += weights[j][i] * outputs[j];
+    inputs[i] += weights[j][i] * outputs[j];
   }
   
-  states[i] += stepsize * Rtaus[i] * (input - states[i]);
+  states[i] += stepsize * Rtaus[i] * (inputs[i] - states[i]);
 }
 
 //----------------------------------------------------------------------------------------------------------------------  
@@ -308,7 +311,7 @@ void CTRNN::setCenterCrossing(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------  
-double CTRNN:: getWeightSum() const 
+double CTRNN::getWeightSum() const
 {
   double sum = 0;
   for (int i = 0; i < size; i++) 
@@ -322,7 +325,7 @@ double CTRNN:: getWeightSum() const
 }
   
 //----------------------------------------------------------------------------------------------------------------------  
-double CTRNN:: getLargestWeight() const 
+double CTRNN::getLargestWeight() const
 {
   double w = -666;
   for (int i = 0; i < size; i++) 
@@ -346,7 +349,21 @@ void CTRNN::knockOut(int n)
   }
 }
 
-//----------------------------------------------------------------------------------------------------------------------  
+//----------------------------------------------------------------------------------------------------------------------
+void CTRNN::leakWeights(float tau, float cutoff)
+{
+  for (int i = 0; i < size; i++)
+  {
+    for (int j = 0; j < size; j++)
+    {
+      weights[i][j] *= tau;
+      if(weights[i][j] < cutoff)
+        weights[i][j] = 0.0f;
+    }
+  }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 void CTRNN::toXml(ci::XmlTree& xml)
 {
   ci::XmlTree nn("CTRNN","");
@@ -406,6 +423,7 @@ void CTRNN::record(Recorder& recorder)
 {
   for(int i = 0; i < size; ++i)
   {
+    recorder.push_back("NeuralInput" + toString(i), inputs[i]);
     recorder.push_back("NeuralState" + toString(i), states[i]);
     recorder.push_back("NeuralOutput" + toString(i), outputs[i]);
     recorder.push_back("NeuralExtInput" + toString(i), externalinputs[i]);

@@ -110,6 +110,7 @@ public:
 
   virtual ~Node() { NUM_NODES--; };
   virtual void update() = 0;
+  virtual void reset() {};
 
   // only effective when not externally driven !
   virtual void translate(const cinder::Vec4f& p) { m_TM.translate(p); };
@@ -151,6 +152,7 @@ public:
 
   NodeGroup();
   virtual void update();
+  virtual void reset();
 
   void setRightAligned(bool align) { m_isRightAligned = align; };
   
@@ -179,6 +181,7 @@ class NodeGeometry : public Node
 public:
   virtual ~NodeGeometry(){ glDeleteLists(m_dl,1); };
   virtual void update();
+  virtual void reset();
 
   virtual Node* getNode(int pickID);
   virtual void createGeometry() = 0;
@@ -365,6 +368,8 @@ public:
   Plot(float w = 2.0, float h = 1.0, int nr = 1, int N = 100);
 
   virtual void update();
+  virtual void reset();
+  
   void addPoint(float p, int pID = 0);
   void setLabel(int pId, const std::string& name);
   void setTitle(const std::string& title) { m_title = title; };

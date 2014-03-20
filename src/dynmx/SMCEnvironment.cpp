@@ -7,7 +7,6 @@
  *
  */
 
-
 #include "SMCEnvironment.h"
 #include "Random.h"
 
@@ -52,6 +51,17 @@ void SMCEnvironment::fromXml(const ci::XmlTree& xml)
     {
       Circle* c = new Circle (pos, obj["Radius"].as<float>());
       m_objects.push_back(c);      
+    }
+    else if (obj.getTag() == "Torus")
+    {
+      Torus* t = new Torus (pos, obj["Radius"].as<float>(), obj["Width"].as<float>());
+      t->setPeak(obj.getAttributeValue<float>("Peak", 1.0f));
+      m_objects.push_back(t);
+    }
+    else if (obj.getTag() == "Gradient")
+    {
+      Gradient* c = new Gradient (pos, obj["Radius"].as<float>());
+      m_objects.push_back(c);
     }
     else if (obj.getTag() == "Triangle")
     {

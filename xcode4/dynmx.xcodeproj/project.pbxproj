@@ -19,8 +19,12 @@
 		53E3CDFC0E86099300238D2B /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53E3CDFB0E86099300238D2B /* Carbon.framework */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		D60C452E1778935A00CF2635 /* SMCAgentMeta1d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D60C452D1778935900CF2635 /* SMCAgentMeta1d.cpp */; };
+		D61E196718BD3C5B00C6FEB4 /* GradientSensor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D61E196618BD3C5B00C6FEB4 /* GradientSensor.cpp */; };
 		D630C7951645396700F2ABE5 /* Topology.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D630C7941645396700F2ABE5 /* Topology.cpp */; };
+		D63189F918BBB6DB00095777 /* Bacterium.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D63189F818BBB6DB00095777 /* Bacterium.cpp */; };
 		D668798B17B4F7C300FC1166 /* SMCArm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D668798917B4F7C300FC1166 /* SMCArm.cpp */; };
+		D681B49718BF59A6002E9114 /* BacteriumEvo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D681B49518BF59A6002E9114 /* BacteriumEvo.cpp */; };
+		D6B4697F18C9D0FF006C0544 /* Sensor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6B4697E18C9D0FF006C0544 /* Sensor.cpp */; };
 		D6D9F12314DC62D6009C0C95 /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10014DC62D6009C0C95 /* App.cpp */; };
 		D6D9F12414DC62D6009C0C95 /* Arm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10114DC62D6009C0C95 /* Arm.cpp */; };
 		D6D9F12514DC62D6009C0C95 /* ArmMuscled.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10214DC62D6009C0C95 /* ArmMuscled.cpp */; };
@@ -87,13 +91,22 @@
 		D60C452D1778935900CF2635 /* SMCAgentMeta1d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SMCAgentMeta1d.cpp; path = ../src/dynmx/SMCAgentMeta1d.cpp; sourceTree = "<group>"; };
 		D60C452F177899D400CF2635 /* SMCView1d.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SMCView1d.h; path = ../src/dynmx/SMCView1d.h; sourceTree = "<group>"; };
 		D60C453017789DD500CF2635 /* SMCAgentViz1d.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SMCAgentViz1d.h; path = ../src/dynmx/SMCAgentViz1d.h; sourceTree = "<group>"; };
+		D61E196518BD3ABC00C6FEB4 /* GradientSensor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GradientSensor.h; path = ../include/dynmx/GradientSensor.h; sourceTree = "<group>"; };
+		D61E196618BD3C5B00C6FEB4 /* GradientSensor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GradientSensor.cpp; path = ../src/dynmx/GradientSensor.cpp; sourceTree = "<group>"; };
 		D630C7941645396700F2ABE5 /* Topology.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Topology.cpp; path = ../src/dynmx/Topology.cpp; sourceTree = "<group>"; };
 		D630C7961645397F00F2ABE5 /* SMCAgentGaussian.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCAgentGaussian.h; path = ../include/dynmx/SMCAgentGaussian.h; sourceTree = "<group>"; };
 		D630C7971645397F00F2ABE5 /* SMCAgentLineDis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCAgentLineDis.h; path = ../include/dynmx/SMCAgentLineDis.h; sourceTree = "<group>"; };
 		D630C7981645397F00F2ABE5 /* Topology.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Topology.h; path = ../include/dynmx/Topology.h; sourceTree = "<group>"; };
+		D631899E18BBB6BF00095777 /* Bacterium.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Bacterium.h; path = ../include/dynmx/Bacterium.h; sourceTree = "<group>"; };
+		D63189F818BBB6DB00095777 /* Bacterium.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Bacterium.cpp; path = ../src/dynmx/Bacterium.cpp; sourceTree = "<group>"; };
 		D665B83317DCD705001A3AA2 /* SMCArmView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCArmView.h; path = ../include/dynmx/SMCArmView.h; sourceTree = "<group>"; };
 		D668798817B4F77400FC1166 /* SMCArm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SMCArm.h; path = ../include/dynmx/SMCArm.h; sourceTree = "<group>"; };
 		D668798917B4F7C300FC1166 /* SMCArm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SMCArm.cpp; path = ../src/dynmx/SMCArm.cpp; sourceTree = "<group>"; };
+		D6693F6318C9E1D700F02676 /* TorusSensor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TorusSensor.h; path = ../include/TorusSensor.h; sourceTree = "<group>"; };
+		D681B49418BF597D002E9114 /* BacteriumEvo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BacteriumEvo.h; path = ../include/dynmx/BacteriumEvo.h; sourceTree = "<group>"; };
+		D681B49518BF59A6002E9114 /* BacteriumEvo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BacteriumEvo.cpp; path = ../src/dynmx/BacteriumEvo.cpp; sourceTree = "<group>"; };
+		D6B4697D18C9D0EB006C0544 /* Sensor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Sensor.h; path = ../include/dynmx/Sensor.h; sourceTree = "<group>"; };
+		D6B4697E18C9D0FF006C0544 /* Sensor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Sensor.cpp; path = ../src/dynmx/Sensor.cpp; sourceTree = "<group>"; };
 		D6B8F87417E766E900C70C75 /* Signal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Signal.h; path = ../include/dynmx/Signal.h; sourceTree = "<group>"; };
 		D6D9F0C614DC62A4009C0C95 /* App.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = App.h; path = ../include/dynmx/App.h; sourceTree = "<group>"; };
 		D6D9F0C714DC62A4009C0C95 /* Arm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Arm.h; path = ../include/dynmx/Arm.h; sourceTree = "<group>"; };
@@ -463,6 +476,10 @@
 		D6E6E57214E15DC100FE6B07 /* SMC */ = {
 			isa = PBXGroup;
 			children = (
+				D631899E18BBB6BF00095777 /* Bacterium.h */,
+				D63189F818BBB6DB00095777 /* Bacterium.cpp */,
+				D681B49418BF597D002E9114 /* BacteriumEvo.h */,
+				D681B49518BF59A6002E9114 /* BacteriumEvo.cpp */,
 				D6D9F11D14DC62D6009C0C95 /* SMCAgent.cpp */,
 				D6D9F0EC14DC62A4009C0C95 /* SMCAgent.h */,
 				D6D9F11E14DC62D6009C0C95 /* SMCAgentEvo.cpp */,
@@ -480,8 +497,13 @@
 				D6D9F0F014DC62A4009C0C95 /* SMCEnvironmentViz.h */,
 				D6D9F0F114DC62A4009C0C95 /* SMCView.h */,
 				D60C452F177899D400CF2635 /* SMCView1d.h */,
-				D6D9F10914DC62D6009C0C95 /* DistanceSensor.cpp */,
+				D6B4697D18C9D0EB006C0544 /* Sensor.h */,
+				D6B4697E18C9D0FF006C0544 /* Sensor.cpp */,
 				D6D9F0D514DC62A4009C0C95 /* DistanceSensor.h */,
+				D6D9F10914DC62D6009C0C95 /* DistanceSensor.cpp */,
+				D61E196518BD3ABC00C6FEB4 /* GradientSensor.h */,
+				D61E196618BD3C5B00C6FEB4 /* GradientSensor.cpp */,
+				D6693F6318C9E1D700F02676 /* TorusSensor.h */,
 				D668798817B4F77400FC1166 /* SMCArm.h */,
 				D668798917B4F7C300FC1166 /* SMCArm.cpp */,
 				D665B83317DCD705001A3AA2 /* SMCArmView.h */,
@@ -620,9 +642,11 @@
 				D6D9F12514DC62D6009C0C95 /* ArmMuscled.cpp in Sources */,
 				D6D9F12614DC62D6009C0C95 /* ArmMuscledViz.cpp in Sources */,
 				D6D9F12714DC62D6009C0C95 /* ArmPD.cpp in Sources */,
+				D681B49718BF59A6002E9114 /* BacteriumEvo.cpp in Sources */,
 				D6D9F12814DC62D6009C0C95 /* ArmReflex.cpp in Sources */,
 				D6D9F12914DC62D6009C0C95 /* ArmViz.cpp in Sources */,
 				D6D9F12A14DC62D6009C0C95 /* CTRNN.cpp in Sources */,
+				D63189F918BBB6DB00095777 /* Bacterium.cpp in Sources */,
 				D6D9F12B14DC62D6009C0C95 /* CTRNNViz.cpp in Sources */,
 				D6D9F12C14DC62D6009C0C95 /* DistanceSensor.cpp in Sources */,
 				D6D9F12D14DC62D6009C0C95 /* Dynmx.cpp in Sources */,
@@ -633,6 +657,7 @@
 				D6D9F13214DC62D6009C0C95 /* GATester.cpp in Sources */,
 				D6D9F13314DC62D6009C0C95 /* GAViz.cpp in Sources */,
 				D6D9F13414DC62D6009C0C95 /* Light.cpp in Sources */,
+				D61E196718BD3C5B00C6FEB4 /* GradientSensor.cpp in Sources */,
 				D6D9F13514DC62D6009C0C95 /* Muscle.cpp in Sources */,
 				D6D9F13614DC62D6009C0C95 /* MuscleBiWrap.cpp in Sources */,
 				D6D9F13714DC62D6009C0C95 /* MuscleMonoWrap.cpp in Sources */,
@@ -645,6 +670,7 @@
 				D6D9F13E14DC62D6009C0C95 /* Simulation.cpp in Sources */,
 				D6D9F13F14DC62D6009C0C95 /* SimulationFactory.cpp in Sources */,
 				D6D9F14014DC62D6009C0C95 /* SMCAgent.cpp in Sources */,
+				D6B4697F18C9D0FF006C0544 /* Sensor.cpp in Sources */,
 				D6D9F14114DC62D6009C0C95 /* SMCAgentEvo.cpp in Sources */,
 				D6D9F14214DC62D6009C0C95 /* SMCAgentViz.cpp in Sources */,
 				D6D9F14314DC62D6009C0C95 /* SMCEnvironment.cpp in Sources */,
@@ -666,6 +692,7 @@
 		C01FCF4B08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CINDER_PATH = ../../Cinder;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libstdc++";
@@ -690,10 +717,10 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../glut/lib/win\"",
 				);
-				MACOSX_DEPLOYMENT_TARGET = "";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_LDFLAGS = "\"$(CINDER_PATH)/lib/libcinder_d.a\"";
 				PRODUCT_NAME = dynmx;
-				SDKROOT = "";
+				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -701,6 +728,7 @@
 		C01FCF4C08A954540054247B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CINDER_PATH = ../../Cinder;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libstdc++";
@@ -726,10 +754,10 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../glut/lib/win\"",
 				);
-				MACOSX_DEPLOYMENT_TARGET = "";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_LDFLAGS = "\"$(CINDER_PATH)/lib/libcinder.a\"";
 				PRODUCT_NAME = dynmx;
-				SDKROOT = "";
+				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
 			};
@@ -740,7 +768,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CINDER_PATH = ../../../Cinder;
+				CINDER_PATH = ../../Cinder;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libstdc++";
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -750,6 +778,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_CHECK_RETURN_VALUE_OF_OPERATOR_NEW = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.cpp;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
 				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES;
@@ -769,7 +798,9 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/boost\"";
 				MACH_O_TYPE = mh_execute;
-				ONLY_ACTIVE_ARCH = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\" ../include";
@@ -781,7 +812,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CINDER_PATH = ../../../Cinder;
+				CINDER_PATH = ../../Cinder;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libstdc++";
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -791,6 +822,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.cpp;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
 				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES;
@@ -809,6 +841,9 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/boost\"";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\" ../include";
 			};

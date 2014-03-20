@@ -31,6 +31,8 @@ public:
     kObj_Line,
     kObj_Triangle,
     kObj_Circle,
+    kObj_Gradient,
+    kObj_Torus,
     kObj_Gaussian,
     kObj_NumTypes
   };
@@ -124,6 +126,37 @@ public:
   
 protected:
   float m_radius;
+};
+  
+//----------------------------------------------------------------------------------------------------------------------
+// A radial gradient
+//----------------------------------------------------------------------------------------------------------------------
+class Gradient : public Circle
+{
+public:
+  virtual ~Gradient(){};
+  Gradient(const ci::Vec2f& pos, float r) : Circle(pos, r) { m_type = kObj_Gradient; m_color = ci::ColorA(0.6,0.6,0.6,0.5);};
+};
+  
+//----------------------------------------------------------------------------------------------------------------------
+// A circle with width
+//----------------------------------------------------------------------------------------------------------------------
+class Torus : public Circle
+{
+public:
+  Torus(const ci::Vec2f& pos, float r, float w) : Circle(pos, r), m_width(w) { m_type = kObj_Torus; m_peak = 1.0f; m_color = ci::ColorA(0.0,0.6,0.6,0.1);};
+  virtual ~Torus(){};
+  
+  void setPeak(float v) { m_peak = v; };
+  
+  bool isPointWithin(const ci::Vec2f& p) const { return fabs(relDistanceFromCentralLine(p)) < m_width; };
+  float relDistanceFromCentralLine(const ci::Vec2f& p) const { return p.distance(m_position) - m_radius; };
+  float getWidth() const { return m_width; };
+  float getPeak() const { return m_peak; };
+  
+protected:
+  float m_width;
+  float m_peak;
 };
   
 //----------------------------------------------------------------------------------------------------------------------

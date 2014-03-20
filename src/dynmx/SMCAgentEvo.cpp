@@ -15,6 +15,21 @@ namespace dmx
 //----------------------------------------------------------------------------------------------------------------------  
 SMCAgentEvo::SMCAgentEvo()
 {
+  if (SETTINGS->hasChild("Config/GA/Evolvable/Topology"))
+  {
+    Topology topology;
+    topology.fromXml(SETTINGS->getChild("Config/GA/Evolvable/Topology"));
+    m_agent = new SMCAgent(topology);
+  }
+  
+  init();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+SMCAgentEvo::SMCAgentEvo(SMCAgent* agent)
+{
+  m_agent = agent;
+  
   init();
 }
 
@@ -26,35 +41,13 @@ SMCAgentEvo::~SMCAgentEvo()
 
 //----------------------------------------------------------------------------------------------------------------------    
 void SMCAgentEvo::init() 
-{    
-  const ci::XmlTree* settings = SETTINGS;
-  if (settings->hasChild("Config/GA/Evolvable"))
+{
+  if (SETTINGS->hasChild("Config/GA/Evolvable"))
   {
-    // Use setting from globals file
-    const ci::XmlTree& xml = settings->getChild("Config/GA/Evolvable");
-  
-    Topology topology; 
-    topology.fromXml(xml.getChild("Topology"));
-    
+    const ci::XmlTree& xml = SETTINGS->getChild("Config/GA/Evolvable");
     m_netLimits.fromXml(xml.getChild("NetLimits"));
-    
-    m_agent = new SMCAgent(topology);
-    
-    m_agent->getDistanceSensor().setMaxDistance(xml.getChild("DistanceSensor").getAttributeValue<double>("MaxDist", 1.0));
-    m_agent->getDistanceSensor().setTransferFunction(xml.getChild("DistanceSensor").getAttributeValue<std::string>("TransferFunc", "Binary"));
-    m_agent->getDistanceSensor().setNoiseLevel(xml.getChild("DistanceSensor").getAttributeValue<float>("NoiseLevel", 0.0));
-    m_agent->setSensorMode(xml.getChild("DistanceSensor").getAttributeValue<std::string>("Mode", "Absolute"));
-    m_agent->setMaxSpeed(xml.getChild("MaxSpeed").getValue<double>(1.0));
-    m_agent->setMaxAngularSpeed(degreesToRadians(xml.getChild("MaxAngularSpeed").getValue<double>(180)));
-    m_agent->setMaxAngle(degreesToRadians(xml.getChild("MaxAngle").getValue<double>(90)));
-    m_agent->setMaxPosition(xml.getChild("MaxPosition").getValue<double>(0.5));
-    m_agent->setAngleWraps(xml.getChild("AngleWraps").getValue<bool>(1));
-    m_agent->setPositionWraps(xml.getChild("PositionWraps").getValue<bool>(1));
     m_trialDuration = xml.getChild("TrialDuration").getValue<double>(10.0);
     m_fitnessEvalDelay = xml.getChild("FitnessEvalDelay").getValue<double>(8.0);    
-    
-    // Load environment objects
-    m_agent->getEnvironment().fromXml(xml.getChild("Environment"));
   }
 };  
 
@@ -81,7 +74,7 @@ void SMCAgentEvo::update(float dt)
 { 
   m_agent->update(dt);
   
-  updateFitness();
+  updateFitness(dt);
 }
   
 

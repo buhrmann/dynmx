@@ -65,7 +65,7 @@ void App::update(float dt)
   
   if(!m_paused)
   {
-    m_model->update(dt); 
+    m_model->update(dt);           
     m_view->update(dt);
   }
 }

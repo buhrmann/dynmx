@@ -70,7 +70,7 @@ void GAViz::update()
   {    
     ci::Color textColor (0,0,0);
     // draw stuff not already in child nodes
-    ci::Vec2f pos = ci::Vec2f(m_pTM->getTranslate());
+    ci::Vec2f pos = ci::Vec2f(m_pTM->getTranslate().x, m_pTM->getTranslate().y);
     glColor3f(0,0,0);
     
     // fitnesses section
