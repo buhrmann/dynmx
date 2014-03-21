@@ -94,24 +94,26 @@ void Globals::initialise(const std::string& cfgFnm)
   }
   else
   {
+    std::string pathHomeExpanded = pathExpandHome(cfgFnm);
+    
     // Global paths start with a forward slash '/', local paths don't.
-    if (cfgFnm[0] == '/' && bfs::exists(cfgFnm))
+    if (pathHomeExpanded[0] == '/' && bfs::exists(pathHomeExpanded))
     {
-      m_fnm = cfgFnm.substr(cfgFnm.rfind('/') + 1);
-      pathToConfig = cfgFnm;
+      m_fnm = pathHomeExpanded.substr(pathHomeExpanded.rfind('/') + 1);
+      pathToConfig = pathHomeExpanded;
 #if 0
-      std::cout << "Found specified config file in ABSOLUTE path '" << cfgFnm << "'." << std::endl;    
+      std::cout << "Found specified config file in ABSOLUTE path '" << pathToConfig << "'." << std::endl;
 #endif                
     }
     else 
     {
-      const std::string localPath = currentPathStr + "/" + cfgFnm;      
+      const std::string localPath = currentPathStr + "/" + pathHomeExpanded;
       if(bfs::exists(localPath))
       {
-        m_fnm = cfgFnm.substr(cfgFnm.rfind('/') + 1);;
+        m_fnm = cfgFnm.substr(cfgFnm.rfind('/') + 1);
         pathToConfig = localPath;
 #if 0
-        std::cout << "Found specified config file in LOCAL path '" << localPath << "'." << std::endl;
+        std::cout << "Found specified config file in LOCAL path '" << pathToConfig << "'." << std::endl;
 #endif
       }
     }

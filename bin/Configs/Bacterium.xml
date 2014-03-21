@@ -3,7 +3,7 @@
 	<Globals>
 		<Visual Value="0"/>
         <WindowSize Width="1000" Height="800"/>    
-	    <FrameRate Value="100"/>    
+	    <FrameRate Value="50"/>    
         <FullScreen Value="0"/>   
         <VSync Value="0"/>               	
 		<Model Value="GA"/>	   
@@ -46,9 +46,9 @@
     	<PopulationSize>100</PopulationSize>
     	<DemeSize>10</DemeSize>
     	<NumGenerations>1000</NumGenerations>
-    	<Mutation Rate="0.5" Var="0.1" VarReduced="0.01" ReduceAt="800">
+    	<Mutation Rate="0.5" Var="0.05" VarReduced="0.01" ReduceAt="800">
             <IntraGenomePD>Gaussian</IntraGenomePD>
-            <InterGenomePD>Gaussian</InterGenomePD>
+            <InterGenomePD>Uniform</InterGenomePD>
         </Mutation>    
     	<Recombination Rate="0.5" RateReduced="0.75"/>             
     	<Trials Combine="Avg">1</Trials>
@@ -58,7 +58,7 @@
         <Eval Run="0">
             <NumTrials>1</NumTrials>
             <RecordState>0</RecordState>
-            <LoadFrom>/Users/thomasbuhrmann/Experiments/Bacterium/Evo/SensorAbs/14_03_20__20_54_37/GA_BestGenome.xml</LoadFrom>
+            <LoadFrom>/Users/thomasbuhrmann/Experiments/Bacterium/Evo/SensorAbs/14_03_21__14_07_32/GA_BestGenome.xml</LoadFrom>
         </Eval>         
 	</GA>    
 </Config>

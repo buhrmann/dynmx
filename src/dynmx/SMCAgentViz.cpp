@@ -35,6 +35,8 @@ void SMCAgentViz::reset()
   m_traj.clear();
   
   NodeGroup::reset();
+  
+  m_steps = 0;
 }
   
 //----------------------------------------------------------------------------------------------------------------------
@@ -46,11 +48,17 @@ void SMCAgentViz::update()
   const ci::Vec2f& pos = m_agent->getPosition();
   float angle = m_agent->getAngle();
   
-  m_traj.push_back(pos);
-  if(m_traj.size() >= 800)
-  {
-    m_traj.pop_front();
+  // Update trajectory
+  if(m_steps % 2 == 0){
+    m_traj.push_back(pos);
+  
+    if(m_traj.size() >= 800)
+    {
+      m_traj.pop_front();
+    }
   }
+  
+  m_steps++;
   
   // pose
   m_pTM->setToIdentity();  

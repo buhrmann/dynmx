@@ -36,6 +36,8 @@ protected:
   Disk* m_agentDisk;
   std::deque<ci::Vec2f> m_traj;
   
+  int m_steps;
+  
 }; // class
   
 } // namespace
