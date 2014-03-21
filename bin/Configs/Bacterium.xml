@@ -46,7 +46,7 @@
     	<PopulationSize>100</PopulationSize>
     	<DemeSize>10</DemeSize>
     	<NumGenerations>1000</NumGenerations>
-    	<Mutation Rate="1.0" Var="0.1" VarReduced="0.01" ReduceAt="800">
+    	<Mutation Rate="0.5" Var="0.1" VarReduced="0.01" ReduceAt="800">
             <IntraGenomePD>Gaussian</IntraGenomePD>
             <InterGenomePD>Gaussian</InterGenomePD>
         </Mutation>    
