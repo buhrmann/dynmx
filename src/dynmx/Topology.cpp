@@ -321,7 +321,7 @@ bool Topology::encode(CTRNN& ctrnn, double* params, const NetLimits& limits) con
   int numHidden = getNumHidden();
   
   // Input gains, if inputs are not neurons (in which case weights take care of individual weighting)
-  int lastInput = numInputs - 1;
+  //int lastInput = numInputs - 1;
   if(!getInputsAreNeurons())
   {
     for(int i = 0; i < numUniqueInputs; ++i)
@@ -332,7 +332,7 @@ bool Topology::encode(CTRNN& ctrnn, double* params, const NetLimits& limits) con
   
   // Weights from input to hidden layer
   int firstHidden = numInputNeurons;
-  int lastHidden = numInputNeurons + numHidden - 1;
+  //int lastHidden = numInputNeurons + numHidden - 1;
   if(getInputsAreNeurons())
   {
     for(int i = 0; i < numUniqueHidden; ++i)
@@ -366,7 +366,7 @@ bool Topology::encode(CTRNN& ctrnn, double* params, const NetLimits& limits) con
   
   // Output layer: biases and time constants
   int firstOutput = numInputNeurons + numHidden;
-  int lastOutput = firstOutput + getNumOutputs() - 1;
+  //int lastOutput = firstOutput + getNumOutputs() - 1;
   for(int i = 0; i < numUniqueOutputs; ++i)
   {
     params[I++] = limits.bias.encode(ctrnn.getBias(firstOutput + i));

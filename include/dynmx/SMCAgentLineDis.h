@@ -26,7 +26,7 @@ public:
   virtual void nextTrial(int trial);
 
 protected:  
-  void updateFitness();  
+  virtual void updateFitness(float dt);
 };  
 
 //----------------------------------------------------------------------------------------------------------------------    
@@ -54,7 +54,7 @@ inline void SMCAgentLineDis::nextTrial(int trial)
 
 // Go left if object 0 is visible, otherwise right
 //----------------------------------------------------------------------------------------------------------------------  
-inline void SMCAgentLineDis::updateFitness()
+inline void SMCAgentLineDis::updateFitness(float dt)
 {
   const std::vector<Positionable*>& objects = m_agent->getEnvironment().getObjects();
 

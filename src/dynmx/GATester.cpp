@@ -47,7 +47,7 @@ void GATester::init()
   {
     const ci::XmlTree& eval = settings->getChild("Config/GA/Eval");
     
-    m_numTrials = (eval / "NumTrials")["Value"].as<int>();
+    m_numTrials = (eval / "NumTrials").getValue<int>();
     
     std::string trialAgg = settings->getChild("Config/GA/Trials").getAttributeValue<std::string>("Combine", "Avg");
     if(trialAgg == "Avg")
@@ -58,14 +58,7 @@ void GATester::init()
       m_trialAggregation = GARunner::kGATrialAgg_Min;
     
     // Flag whether to record state during run
-    if (eval.hasChild("RecordState"))
-    {
-      m_record = (eval / "RecordState")["Value"].as<bool>();
-    }
-    else 
-    {
-      m_record = false;
-    }
+    m_record = (eval / "RecordState").getValue<bool>();
     
     // Mutations
     m_mutateMin = eval.getAttributeValue<double>("MutateMin", 0);
@@ -85,7 +78,7 @@ void GATester::init()
     bool decodeSaved = eval["Run"].as<bool>();    
     if(decodeSaved && eval.hasChild("LoadFrom"))
     {
-      std::string fnm = (eval / "LoadFrom")["Value"];
+      std::string fnm = (eval / "LoadFrom").getValue<std::string>();
       fnm = pathExpandHome(fnm);
       ci::XmlTree bestGenomeXml(ci::loadFile(fnm));
       assert(bestGenomeXml.hasChild("GABestGenome"));

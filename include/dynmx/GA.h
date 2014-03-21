@@ -38,6 +38,12 @@ namespace dmx
 class GA
 {
 public:
+  
+  enum GAProbDist
+  {
+    kPD_Uniform = 0,
+    kPD_Gaussian,
+  };
 
   GA(int popsize=100, int genlength=10, int demeWidth = 3);
   ~GA();
@@ -68,9 +74,13 @@ public:
 
   void setRandomSeed(long seed) { m_idum = seed; };
   void setDemeWidth(int width) { m_demeWidth = width; };
-  void setMutationMax(double mut) { m_maxMutation = mut; };
+  void setMutationVar(double v) { m_mutationVar = v; };
   void setMutationRate(double mr) { m_mutationRate = mr; };
   void setRecombinationRate(double rcr) { m_recombinationRate = rcr; };
+  
+  void setInterGenomeMutPD(GAProbDist pd) {m_interGenomeMutPD = pd; };
+  void setIntraGenomeMutPD(GAProbDist pd) {m_intraGenomeMutPD = pd; };
+
   
   // If evaluation is deterministic an already evaluated individual does not need
   // to be evaluated again in a subsequent tournament.
@@ -127,9 +137,12 @@ protected:
 
   long m_idum;                // seed for random number generator
 
-  double m_maxMutation;       // amount of Gaussian vector mutation
+  double m_mutationVar;       // amount of Gaussian vector mutation
   double m_mutationRate;
   double m_recombinationRate; // amount of Gaussian vector mutation
+  
+  GAProbDist m_interGenomeMutPD;
+  GAProbDist m_intraGenomeMutPD;
 
   float 
     m_fitnessA,   // fitness of first individual in current tournament

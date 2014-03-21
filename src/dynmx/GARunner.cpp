@@ -33,8 +33,8 @@ GARunner::GARunner(Evolvable* evolvable) : m_evolvable(evolvable)
 //----------------------------------------------------------------------------------------------------------------------
 void GARunner::init()
 {
-  m_reducedMutationMax = 0.001;
-  m_reduceMutationMaxAt = -1;  // Indicates no automatic reduction of mutation rate
+  m_reducedMutationVar = 0.001;
+  m_reduceMutationAt = -1;  // Indicates no automatic reduction of mutation rate
 
   // For storing data to disk at the end
   m_progressLog = new ci::XmlTree("GAProgress", ""); 
@@ -59,17 +59,30 @@ void GARunner::init()
   {
     // Use setting from globals file
     const ci::XmlTree& ga = settings->getChild("Config/GA");
-    int populationSize = ga.getChild("PopulationSize").getAttributeValue<int>("Value");
-    int demeSize = ga.getChild("DemeSize").getAttributeValue<int>("Value");
+    int populationSize = ga.getChild("PopulationSize").getValue<int>(50);
+    int demeSize = ga.getChild("DemeSize").getValue<int>(10);
     
     m_ga = new GA(populationSize, numGenes, demeSize);
-    m_ga->setRecombinationRate(ga.getChild("RecombinationRate").getAttributeValue<float>("Value"));
-    m_ga->setMutationMax(ga.getChild("MutationMax").getAttributeValue<float>("Value"));
-    m_ga->setMutationRate(ga.getChild("MutationRate").getAttributeValue<float>("Value", 1.0));
-            
-    m_numGenerations = ga.getChild("NumGenerations").getAttributeValue<int>("Value");
+
+    m_ga->setRecombinationRate(ga.getChild("Recombination").getAttributeValue<float>("Rate", 0.5));
+    m_ga->setMutationVar(ga.getChild("Mutation").getAttributeValue<float>("Var", 0.1));
+    m_ga->setMutationRate(ga.getChild("Mutation").getAttributeValue<float>("Rate", 1.0));
+    
+    std::string pdname = (ga / "Mutation" / "IntraGenomePD").getValue<std::string>("Gaussian");
+    GA::GAProbDist pd = pdname == "Gaussian" ? GA::kPD_Gaussian : GA::kPD_Uniform;
+    m_ga->setIntraGenomeMutPD(pd);
+    
+    pdname = (ga / "Mutation" / "InterGenomePD").getValue<std::string>("Gaussian");
+    pd = pdname == "Gaussian" ? GA::kPD_Gaussian : GA::kPD_Uniform;
+    m_ga->setInterGenomeMutPD(pd);
+    
+    m_reduceMutationAt = ga.getChild("Mutation").getAttributeValue<int>("ReduceAt");
+    m_reducedMutationVar = ga.getChild("Mutation").getAttributeValue<double>("VarReduced");
+    m_reducedRecombinationRate = ga.getChild("Recombination").getAttributeValue<double>("RateReduced");
+    
+    m_numGenerations = ga.getChild("NumGenerations").getValue<int>(100);
     m_outputInterval = ga.getChild("NumGenerations").getAttributeValue<int>("OutputInterval", 100);
-    m_numTrials = ga.getChild("Trials").getAttributeValue<int>("Num");
+    m_numTrials = ga.getChild("Trials").getValue<int>(1);
     
     std::string trialAgg = ga.getChild("Trials").getAttributeValue<std::string>("Combine", "Avg");
     if(trialAgg == "Avg")
@@ -79,21 +92,13 @@ void GARunner::init()
     else if(trialAgg == "Min")
       m_trialAggregation = kGATrialAgg_Min;
     
-    m_ga->setAvoidReevaluation(ga.getChild("AvoidReevaluation").getAttributeValue<bool>("Value", true));
-    
-    // Parameters for automatic reduction of mutation rate
-    if(ga.hasChild("MutationMaxReduceAt"))
-    {
-      m_reducedMutationMax = ga.getChild("MutationMaxReduced").getAttributeValue<double>("Value");
-      m_reducedRecombinationRate = ga.getChild("RecombinationRateReduced").getAttributeValue<double>("Value");
-      m_reduceMutationMaxAt = ga.getChild("MutationMaxReduceAt").getAttributeValue<int>("Value");      
-    }
+    m_ga->setAvoidReevaluation(ga.getChild("AvoidReevaluation").getValue<bool>(true));
     
     // Pick up from previous run
     bool incremental = ga.getChild("Incremental").getValue<bool>();
     if (incremental)
     {
-      std::string fnm = ga.getChild("LoadFrom").getAttributeValue<std::string>("Value");
+      std::string fnm = ga.getChild("LoadFrom").getValue<std::string>();
       fnm = pathExpandHome(fnm);
       
       if(ga.getChild("Incremental").getAttributeValue<bool>("seedOnly", 0))
@@ -103,16 +108,17 @@ void GARunner::init()
         std::string bestFnm = fnm.substr(0, fnm.rfind("/") + 1) + "GA_BestGenome.xml";
         double bestGenome [numGenes];
         double bestFit = readBestGenome(bestFnm, &bestGenome[0], numGenes);
+        (void) bestFit;
         
         if(ga.getChild("Incremental").getAttributeValue<bool>("seedAll", 1))
         {
           // Randomly distribute population around previous best
-          double initialMutMax = ga.getChild("Incremental").getAttributeValue<double>("initialMutation");
+          double initialMutVar = ga.getChild("Incremental").getAttributeValue<double>("initialMutation");
           for (int i = 0; i < populationSize; ++i)
           {
             m_ga->setGenome(i, &bestGenome[0], MAX_NEG_FLOAT);
           }
-          m_ga->randomise(false, initialMutMax);
+          m_ga->randomise(false, initialMutVar);
           reset(false);
           
           // Elitist: keep best unmutated
@@ -143,14 +149,10 @@ void GARunner::init()
     }
     
     // What to save out in xml
-    m_saveBestEachGen = false;
-    if(ga.hasChild("SaveBestEachGeneration"))
-    {
-      m_saveBestEachGen = ga.getChild("SaveBestEachGeneration").getAttributeValue<bool>("Value"); 
-    }
+    m_saveBestEachGen = ga.hasChild("SaveBestEachGeneration") ? (ga / "SaveBestEachGeneration").getValue<bool>() : false;
 
     // Run evaluation of best individual at end of evolution
-    m_autoEval = ga.hasChild("AutoEval") ? (ga / "AutoEval")["Run"].as<bool>() : false; 
+    m_autoEval = ga.hasChild("AutoEval") ? (ga / "AutoEval").getValue<bool>(false) : false;
 
   }
   else
@@ -158,7 +160,7 @@ void GARunner::init()
     // If we have no config file, use default values instead
     m_ga = new GA(DEFAULT_GA_POPSIZE, numGenes, DEFAULT_GA_DEMESIZE);
     m_ga->setRecombinationRate(DEFAULT_GA_RECOMBINATIONRATE);
-    m_ga->setMutationMax(DEFAULT_GA_MUTATIONMAX);
+    m_ga->setMutationVar(DEFAULT_GA_MUTATIONMAX);
     m_numTrials = 1;
     m_numGenerations = 10;
     reset(true);    
@@ -273,9 +275,9 @@ void GARunner::update(float dt)
         m_prevGeneration = currentGen;
         
         // Automatic reduction of mutation rate
-        if(m_reduceMutationMaxAt > 0 && currentGen == m_reduceMutationMaxAt)
+        if(currentGen == m_reduceMutationAt)
         {
-          m_ga->setMutationMax(m_reducedMutationMax);
+          m_ga->setMutationVar(m_reducedMutationVar);
           m_ga->setRecombinationRate(m_reducedRecombinationRate);
         }
         

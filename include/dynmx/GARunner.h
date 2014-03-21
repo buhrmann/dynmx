@@ -130,10 +130,9 @@ protected:
   uint32_t m_numGenerations;
   uint32_t m_outputInterval;
   
-  
-  double m_reducedMutationMax;
+  double m_reducedMutationVar;
   double m_reducedRecombinationRate;
-  int m_reduceMutationMaxAt;
+  int m_reduceMutationAt;
   
   int m_verbosity;
   int m_trialAggregation;

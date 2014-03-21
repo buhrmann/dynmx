@@ -69,7 +69,7 @@ void ArmMuscledViz::update()
   const float elbAngle = m_arm->getJointAngle(JT_elbow);
   
   const ci::Vec3f elbPos = Vec3f(m_arm->getElbowPos());
-  const ci::Vec3f effPos = Vec3f(m_arm->getEffectorPos());
+  //const ci::Vec3f effPos = Vec3f(m_arm->getEffectorPos());
   const ci::Vec3f shdPos = Vec3f(0,0,0);
   
   const double elbRad = m_arm->getJointRadius(JT_elbow);

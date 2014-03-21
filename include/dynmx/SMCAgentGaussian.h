@@ -47,7 +47,7 @@ public:
   virtual void reset();
   
 protected:  
-  virtual void updateFitness();  
+  virtual void updateFitness(float dt);
   
   int m_evalMode;
   float m_heightAvg;
@@ -252,7 +252,7 @@ inline float SMCAgentGaussian::getFitness()
 
 // Go left if object 0 is visible, otherwise right
 //----------------------------------------------------------------------------------------------------------------------  
-inline void SMCAgentGaussian::updateFitness()
+inline void SMCAgentGaussian::updateFitness(float dt)
 {
   // Measure distance from desired position
   if(m_agent->getTime() >= m_fitnessEvalDelay)

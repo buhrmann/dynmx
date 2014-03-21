@@ -59,10 +59,13 @@ void GA::init()
   m_weightedAverageGenome = new double[m_popSize]; 
   
   // Some defaults, though should be set externally and not subsequently reset to these defaults
-  m_maxMutation = 0.01;      // amount of mutation  (scales a gaussian random variable)
+  m_mutationVar = 0.01;      // variation of gaussian mutation  (scales a gaussian random variable)
   m_mutationRate = 1.0;
   m_recombinationRate = 0.05; // probability of copying a gene from winner to loser of tournament  
   m_avoidReevaluation = true;
+  
+  m_interGenomeMutPD = kPD_Uniform;
+  m_intraGenomeMutPD = kPD_Gaussian;
   
   reset();
 }
@@ -367,8 +370,35 @@ void GA::performTournament(uint16_t indA, float fitA, uint16_t indB, float fitB)
 // --------------------------------------------------------------------------------------------
 void GA::mutate(uint16_t winner, uint16_t loser)
 {
-  double randGausLength = gasdev(&m_idum) * m_maxMutation;
+  // 1. Create a unit length vector in random direction
+  double mutations [m_genomeLength];
+  double length = 0;
+
+  for (int i = 0; i < m_genomeLength; i++)
+  {
+    double m = 0;
+    if (m_intraGenomeMutPD == kPD_Gaussian)
+      m = gasdev(&m_idum);
+    else if (m_intraGenomeMutPD == kPD_Uniform)
+      m = -1.0 + 2.0 * ran1(&m_idum);
+
+    mutations[i] = m;
+    length += m * m;
+  }
   
+  // normalise
+  length = sqrt(length);
+  for (int i = 0; i < m_genomeLength; i++)
+    mutations[i] /= length;
+  
+  // Scale length randomly
+  double randLength = 1;
+  if (m_interGenomeMutPD == kPD_Gaussian)
+    randLength = gasdev(&m_idum) * m_mutationVar;
+  else if (m_interGenomeMutPD == kPD_Uniform)
+    randLength = ran1(&m_idum) * m_mutationVar;
+  
+  // add mutations
   for (int i = 0; i < m_genomeLength; i++)
   {      
     // recombination/genetic infection (some genes are copied from winner to loser)
@@ -378,11 +408,11 @@ void GA::mutate(uint16_t winner, uint16_t loser)
     }
 
     // Gaussian mutation
-    //const double mutation = gasdev(&m_idum) * m_maxMutation;
     if ((m_mutationRate < 1) && (ran1(&m_idum) < m_mutationRate))
     {
-      const double mutation = (-1.0 + 2.0 * ran1(&m_idum)) * randGausLength;
-      m_genomes[loser][i] += mutation;
+      //const double mutation = (-1.0 + 2.0 * ran1(&m_idum)) * randGausLength;
+      //const double mutation = gasdev(&m_idum) * m_maxMutation;
+      m_genomes[loser][i] += mutations[i] * randLength;
     }
 
     // ensure values stay in [0,1] range
@@ -427,7 +457,7 @@ void GA::toXml(ci::XmlTree& parent, bool includeGenomes) const
   ga.setAttribute("GenomeLength", m_genomeLength);
   ga.setAttribute("PopulationSize", m_popSize);
   ga.setAttribute("DemeWidth", m_demeWidth);
-  ga.setAttribute("MaxMutation", m_maxMutation);
+  ga.setAttribute("MutationVar", m_mutationVar);
   ga.setAttribute("MutationRate", m_mutationRate);
   ga.setAttribute("RecombinationRate", m_recombinationRate);
   float bestFit;

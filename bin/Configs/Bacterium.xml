@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Config>
 	<Globals>
-		<Visual Value="1"/>
+		<Visual Value="0"/>
         <WindowSize Width="1000" Height="800"/>    
 	    <FrameRate Value="100"/>    
         <FullScreen Value="0"/>   
@@ -18,10 +18,10 @@
             <DistanceSensor MaxDist="0.4" Mode="Identity" TransferFunc="Identity" NoiseLevel="0.01">0</DistanceSensor> 
             <MaxSpeed>1.0</MaxSpeed>
             <MaxAngularSpeed>1440</MaxAngularSpeed>            
-            <MaxPosition>2</TrackLength>            
+            <MaxPosition>2</MaxPosition>            
             <PositionWraps>1</PositionWraps>
-            <MaxAngle>360</MaxSensorAngle>            
-            <AngleWraps>1</PositionWraps>
+            <MaxAngle>360</MaxAngle>            
+            <AngleWraps>1</AngleWraps>
             <Energy initial="10" threshForSpeed="0" evMin="2" evMax="5"/>
             <TrialDuration numPhases="6">60</TrialDuration>
             <FitnessEvalDelay>5</FitnessEvalDelay>
@@ -41,25 +41,24 @@
               <Torus PosX="0.0" PosY="0.0" Radius="0.4" Width="0.05" Peak="4" PosVarX="0.0" PosVarY="0.0" Visible="1"/>
             </Environment>
 		</Evolvable>	
-    	<Incremental initialMutation="0.01">1</Incremental>
-    	<LoadFrom Value="/Users/thomasbuhrmann/Experiments/Bacterium/Evo/SensorAbs/14_03_20__14_07_27/GA_Result.xml"/>
-    	<PopulationSize Value="100"/>
-    	<DemeSize Value="10"/>
-    	<NumGenerations Value="300"/>
-    	<MutationMax Value="0.01"/>
-        <MutationMaxReduced Value="0.001"/>
-        <MutationMaxReduceAt Value="270"/>        
-        <MutationRate Value="0.5"/>
-    	<RecombinationRate Value="0.5"/>
-        <RecombinationRateReduced Value="0.75"/>        
-    	<Trials Num="1" Combine="Avg"/>
-        <AvoidReevaluation Value="0"/>
-        <SaveBestEachGeneration Value="0"/>
-        <AutoEval Run="1"/>
-        <Eval Run="1">
-            <NumTrials Value="1"/>
-            <RecordState Value="0"/>
-            <LoadFrom Value="/Users/thomasbuhrmann/Experiments/Bacterium/Evo/SensorAbs/14_03_20__15_32_57/GA_BestGenome.xml"/>
+    	<Incremental initialMutation="0.01" seedOnly="0" seedAll="0" elitist="0">0</Incremental>
+    	<LoadFrom>/Users/thomasbuhrmann/Experiments/Bacterium/Evo/SensorAbs/14_03_20__14_07_27/GA_Result.xml</LoadFrom>
+    	<PopulationSize>100</PopulationSize>
+    	<DemeSize>10</DemeSize>
+    	<NumGenerations>1000</NumGenerations>
+    	<Mutation Rate="1.0" Var="0.1" VarReduced="0.01" ReduceAt="800">
+            <IntraGenomePD>Gaussian</IntraGenomePD>
+            <InterGenomePD>Gaussian</InterGenomePD>
+        </Mutation>    
+    	<Recombination Rate="0.5" RateReduced="0.75"/>             
+    	<Trials Combine="Avg">1</Trials>
+        <AvoidReevaluation>0</AvoidReevaluation>
+        <SaveBestEachGeneration>0</SaveBestEachGeneration>
+        <AutoEval>1</AutoEval>
+        <Eval Run="0">
+            <NumTrials>1</NumTrials>
+            <RecordState>0</RecordState>
+            <LoadFrom>/Users/thomasbuhrmann/Experiments/Bacterium/Evo/SensorAbs/14_03_20__20_54_37/GA_BestGenome.xml</LoadFrom>
         </Eval>         
 	</GA>    
 </Config>

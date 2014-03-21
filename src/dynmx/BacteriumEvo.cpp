@@ -75,10 +75,14 @@ void BacteriumEvo::nextPhase()
   // Setup next trial
   // Invisible food
   const std::vector<Positionable*>& objects = m_agent->getEnvironment().getObjects();
+  
+#define CHANGE_VISIBILITY 0
+#if CHANGE_VISIBILITY
   if(m_phase % 3 == 2)
     objects[1]->setVisibility(false);
   else
     objects[1]->setVisibility(true);
+#endif
   
   // Set food location
   float foodR = m_phase < 3 ? 0.2 : 0.8;
@@ -151,7 +155,7 @@ void BacteriumEvo::updateFitness(float dt)
     
     // Desired thermal level
     float foodR = ((Torus*)objects[1])->getRadius();
-    float foodMax = ((Torus*)objects[1])->getPeak();
+    //float foodMax = ((Torus*)objects[1])->getPeak();
     float agentDist = m_agent->getPosition().distance(objects[1]->getPosition());
     m_fitnessInst = 1.0f - clamp(fabs(foodR - agentDist), 0.0f, 1.0f);
     //m_fitnessInst = m_agent->getTorusSensor()->getLevel() / foodMax;
