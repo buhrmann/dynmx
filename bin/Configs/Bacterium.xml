@@ -9,7 +9,7 @@
 		<Model Value="GA"/>	   
 		<DebugLevel Value="1"/>
         <PlotDuration Value="0.5"/>                
-        <OutputFolder Name="/Users/thomasbuhrmann/Experiments/Bacterium/Evo/SensorAbs"/>     
+        <OutputFolder Name="~/Experiments/Bacterium/Evo/SensorAbs"/>     
 	</Globals>
 	<GA>
 		<Evolvable Name="Bacterium">            
@@ -42,7 +42,7 @@
             </Environment>
 		</Evolvable>	
     	<Incremental initialMutation="0.01" seedOnly="0" seedAll="0" elitist="0">0</Incremental>
-    	<LoadFrom>/Users/thomasbuhrmann/Experiments/Bacterium/Evo/SensorAbs/14_03_20__14_07_27/GA_Result.xml</LoadFrom>
+    	<LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/14_03_20__14_07_27/GA_Result.xml</LoadFrom>
     	<PopulationSize>100</PopulationSize>
     	<DemeSize>10</DemeSize>
     	<NumGenerations>1000</NumGenerations>
@@ -58,7 +58,7 @@
         <Eval Run="0">
             <NumTrials>1</NumTrials>
             <RecordState>0</RecordState>
-            <LoadFrom>/Users/thomasbuhrmann/Experiments/Bacterium/Evo/SensorAbs/14_03_21__14_07_32/GA_BestGenome.xml</LoadFrom>
+            <LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/14_03_21__14_07_32/GA_BestGenome.xml</LoadFrom>
         </Eval>         
 	</GA>    
 </Config>
