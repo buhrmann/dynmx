@@ -320,6 +320,7 @@ void View::keyDown(KeyEvent event)
 void View::keyUp(KeyEvent event)
 {
   m_scene2d.onKeyPress(event);
+  m_scene3d.onKeyPress(event);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

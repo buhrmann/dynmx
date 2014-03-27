@@ -26,7 +26,9 @@ void SMCAgentViz::init()
   //innerDisk->translate(cinder::Vec4f(0,0,0,0));
   innerDisk->m_color = ci::Vec4f(0,0,0, 1);
   innerDisk->createGeometry();
-  m_children.push_back(innerDisk);  
+  m_children.push_back(innerDisk);
+  
+  m_paused = false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -38,6 +40,13 @@ void SMCAgentViz::reset()
   
   m_steps = 0;
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+void SMCAgentViz::onKeyPress(cinder::app::KeyEvent e)
+{
+  if(e.getCode() == ci::app::KeyEvent::KEY_SPACE)
+    m_paused = !m_paused;
+};
   
 //----------------------------------------------------------------------------------------------------------------------
 void SMCAgentViz::update()
@@ -49,7 +58,7 @@ void SMCAgentViz::update()
   float angle = m_agent->getAngle();
   
   // Update trajectory
-  if(m_steps % 2 == 0){
+  if(!m_paused && m_steps % 2 == 0){
     m_traj.push_back(pos);
   
     if(m_traj.size() >= 800)

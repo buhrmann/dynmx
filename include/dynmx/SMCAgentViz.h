@@ -27,6 +27,7 @@ public:
   
   virtual void update();
   virtual void reset();
+  virtual void onKeyPress(cinder::app::KeyEvent e);
   
 protected:
   
@@ -37,6 +38,7 @@ protected:
   std::deque<ci::Vec2f> m_traj;
   
   int m_steps;
+  bool m_paused;
   
 }; // class
   
