@@ -31,6 +31,7 @@ public:
   virtual void decodeGenome(const double* genome) = 0;
   virtual float getFitness() = 0;
   virtual void nextTrial(int trial = 0) {};
+  virtual void nextStage(int stage){};
   virtual void endOfEvaluation(float fit) {};
 
   // Inherited from Model
@@ -112,8 +113,12 @@ public:
   static void genomeToXml(ci::XmlTree& xml, const double* genome, int numGenes, float bestFit);
   
 protected:  
-  
+
+  void updateTrialFitness(float f);
+  void finishGeneration(int currentGen, float dt);
+  void finishRun(const double* bestGenome, float bestFit, float dt);
   void generationToXml(ci::XmlTree* xml, uint32_t gen, const double* genome, float bestFit, float avgFit);
+  void updateFitnessStage(int currentGen, float bestFit);
   void test(const double* evolvable, float fitness, float dt);
   
   // An instance of the model to evolve
@@ -126,9 +131,14 @@ protected:
   float m_accFitness;
   uint16_t m_trial;
   uint16_t m_numTrials;
+  uint16_t m_stage;
   uint32_t m_prevGeneration;  /// For detecting if GA has incremented a generation
   uint32_t m_numGenerations;
   uint32_t m_outputInterval;
+  
+  uint16_t m_genFitBufferSize;
+  float m_stageFitThreshold;
+  std::vector<float> m_genFitBuffer;
   
   double m_reducedMutationVar;
   double m_reducedRecombinationRate;

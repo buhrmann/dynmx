@@ -94,6 +94,14 @@ void GARunner::init()
     
     m_ga->setAvoidReevaluation(ga.getChild("AvoidReevaluation").getValue<bool>(true));
     
+    if (ga.hasChild("Stages"))
+    {
+      m_stageFitThreshold = (ga / "Stages").getAttributeValue<float>("FitThreshold", 1);
+      m_genFitBufferSize = (ga / "Stages").getAttributeValue<int>("NumGensAbove", 0);
+      m_genFitBuffer.reserve(m_genFitBufferSize);
+      m_genFitBuffer.resize(m_genFitBufferSize, 0);
+    }
+    
     // Pick up from previous run
     bool incremental = ga.getChild("Incremental").getValue<bool>();
     if (incremental)
@@ -178,6 +186,7 @@ void GARunner::reset(bool randomiseGenomes)
   m_accFitness = 0.0f;
   m_trial = 0;
   m_prevGeneration = 0;
+  m_stage = 0;
   
   m_ga->reset(randomiseGenomes);
   
@@ -197,27 +206,11 @@ void GARunner::update(float dt)
   }
   else
   {
-    // End of trial: update GA
+    // End of trial
     //-------------------------------------------------------
     const float fitness = m_evolvable->getFitness();
-    
-#if DEBUGGING
-    if( m_verbosity >= kGAVerbosityTrial)
-      std::cout << "Trial " << m_trial << ": fitness = " << fitness << std::endl; 
-#endif
-    
-    if(m_trialAggregation == kGATrialAgg_Avg)
-    {
-      m_accFitness += fitness;
-    }
-    else if(m_trialAggregation == kGATrialAgg_Mult)
-    {
-      m_accFitness = m_trial == 0 ? fitness : (m_accFitness * fitness);
-    }
-    else if(m_trialAggregation == kGATrialAgg_Min)
-    {
-      m_accFitness = m_trial == 0 ? fitness : std::min(m_accFitness, fitness);
-    }
+   
+    updateTrialFitness(fitness);
     
     m_trial++;
     m_time = 0.0;
@@ -226,15 +219,13 @@ void GARunner::update(float dt)
     //-------------------------------------------------------
     if (m_trial == m_numTrials)
     {
-      if(m_trialAggregation == kGATrialAgg_Avg)
-        m_accFitness /= m_numTrials;
       
 #if DEBUGGING
       if (m_verbosity >= kGAVerbosityGenome)
         std::cout << "Total fitness = " << m_accFitness << std::endl; 
 #endif      
       
-      // Set the fitness ...
+      // Set the fitness in the GA ...
       m_evolvable->endOfEvaluation(m_accFitness);
       m_ga->setFitness(m_accFitness);
       
@@ -250,72 +241,135 @@ void GARunner::update(float dt)
       const uint32_t currentGen = m_ga->getCurrentGeneration();
       if (m_prevGeneration != currentGen)
       {
-        float bestFitness;
-        const double* bestGenome = m_ga->getBestGenome(bestFitness);
-        const float avgFitness = m_ga->getAvgFitness();  
-        
-        // Store fitness for later analysis and potentially the best genome
-        generationToXml(m_progressLog, currentGen, bestGenome, bestFitness, avgFitness);
-        
-#if DEBUGGING
-        if (m_verbosity >= kGAVerbosityPopulation)
-        {
-          std::cout << "Generation " << currentGen 
-                    << ": BestFit = " << bestFitness << " | AvgFit = " << avgFitness << std::endl; 
-        }
-        else if(m_verbosity == kGAVerbosityNone && currentGen % m_outputInterval == 0)
-        {
-          std::string dir = GLOBALS->getDataDirName();
-          std::cout.precision(5);
-          std::cout.width(5);
-          std::cout.fill(5);
-          std::cout << dir << " | G " << currentGen << " | B = " << bestFitness << "\t A = " << avgFitness << std::endl;
-        }
-#endif
-        m_prevGeneration = currentGen;
-        
-        // Automatic reduction of mutation rate
-        if(currentGen == m_reduceMutationAt)
-        {
-          m_ga->setMutationVar(m_reducedMutationVar);
-          m_ga->setRecombinationRate(m_reducedRecombinationRate);
-        }
-        
-        // When the maximum number of generations has been reached. 
-        //---------------------------------------------------------
-        if (hasFinished())
-        { 
-          // Write results to file
-          getGA()->toXml(*m_resultsLog, true);
-          m_resultsLog->write(ci::writeFile(dmx::DATA_DIR + "GA_Result.xml"));
-          m_progressLog->write(ci::writeFile(dmx::DATA_DIR + "GA_Progress.xml"));
-          
-          genomeToXml(*m_finalGenomeLog, bestGenome, m_ga->getGenomeSize(), bestFitness);
-          m_finalGenomeLog->write(ci::writeFile(dmx::DATA_DIR + "GA_BestGenome.xml"));
-          
-          // Evaluate best evolved individual
-          if(m_autoEval)
-          {
-            test(bestGenome, bestFitness, dt);
-          }
-
-#if DEBUGGING
-          // Output number of evaluations performed (handy for calculating speed of simulation; divide overall time by)
-          const int numEvaluations = currentGen * m_ga->getPopulationSize() * m_numTrials;
-          if (m_verbosity >= kGAVerbosityPopulation)
-          {
-            std::cout << "GA finished. Best fitness: " << bestFitness << ". Evaluated " <<  numEvaluations << " trials." << std::endl;
-          }
-#endif             
-        } // GA hasFinished()
-      } // End of generation
-    } // End of trial
+        finishGeneration(currentGen, dt);
+      }
+      
+    } // End of indiviual's evaluation (all trials)
     
     m_evolvable->reset();
     m_evolvable->nextTrial(m_trial);
+  } // end of trial
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+void GARunner::updateTrialFitness(float fitness)
+{
+  if(m_trialAggregation == kGATrialAgg_Avg)
+  {
+    m_accFitness += (fitness / m_numTrials);
+  }
+  else if(m_trialAggregation == kGATrialAgg_Mult)
+  {
+    m_accFitness = m_trial == 0 ? fitness : (m_accFitness * fitness);
+  }
+  else if(m_trialAggregation == kGATrialAgg_Min)
+  {
+    m_accFitness = m_trial == 0 ? fitness : std::min(m_accFitness, fitness);
+  }
+
+#if DEBUGGING
+  if( m_verbosity >= kGAVerbosityTrial)
+    std::cout << "Trial " << m_trial << ": fitness = " << fitness << std::endl;
+#endif
+}
+  
+//----------------------------------------------------------------------------------------------------------------------
+void GARunner::finishGeneration(int currentGen, float dt)
+{
+  float bestFitness;
+  const double* bestGenome = m_ga->getBestGenome(bestFitness);
+  const float avgFitness = m_ga->getAvgFitness();
+  
+  // Store fitness for later analysis and potentially the best genome
+  generationToXml(m_progressLog, currentGen, bestGenome, bestFitness, avgFitness);
+  
+#if DEBUGGING
+  if (m_verbosity >= kGAVerbosityPopulation)
+  {
+    std::cout << "Generation " << currentGen << " (Stage " << m_stage << " )"
+    << ": BestFit = " << bestFitness
+    << " | AvgFit = " << avgFitness << std::endl;
+  }
+  else if(m_verbosity == kGAVerbosityNone && currentGen % m_outputInterval == 0)
+  {
+    std::string dir = GLOBALS->getDataDirName();
+    std::cout.precision(5);
+    std::cout.width(5);
+    std::cout.fill(5);
+    std::cout << dir << " | G " << currentGen << " (S " << m_stage << " )"
+              << " | B = " << bestFitness
+              << "\t A = " << avgFitness << std::endl;
+  }
+#endif
+  
+  // Check whether next fitness stage is due and tell evolvable if needed
+  updateFitnessStage(currentGen, bestFitness);
+  
+  m_prevGeneration = currentGen;
+  
+  // Automatic reduction of mutation rate
+  if(currentGen == m_reduceMutationAt)
+  {
+    m_ga->setMutationVar(m_reducedMutationVar);
+    m_ga->setRecombinationRate(m_reducedRecombinationRate);
+  }
+  
+  // When the maximum number of generations has been reached.
+  //---------------------------------------------------------
+  if (hasFinished())
+  {
+    finishRun(bestGenome, bestFitness, dt);
   }
 }
 
+// Finish the evolutionary run (writes results to file etc.)
+//----------------------------------------------------------------------------------------------------------------------
+void GARunner::finishRun(const double* bestGenome, float bestFitness, float dt)
+{
+  // Write results to file
+  getGA()->toXml(*m_resultsLog, true);
+  m_resultsLog->write(ci::writeFile(dmx::DATA_DIR + "GA_Result.xml"));
+  m_progressLog->write(ci::writeFile(dmx::DATA_DIR + "GA_Progress.xml"));
+  
+  genomeToXml(*m_finalGenomeLog, bestGenome, m_ga->getGenomeSize(), bestFitness);
+  m_finalGenomeLog->write(ci::writeFile(dmx::DATA_DIR + "GA_BestGenome.xml"));
+  
+  // Evaluate best evolved individual
+  if(m_autoEval)
+  {
+    test(bestGenome, bestFitness, dt);
+  }
+  
+#if DEBUGGING
+  // Output number of evaluations performed (handy for calculating speed of simulation; divide overall time by)
+  const int numEvaluations = m_ga->getCurrentGeneration() * m_ga->getPopulationSize() * m_numTrials;
+  if (m_verbosity >= kGAVerbosityPopulation)
+  {
+    std::cout << "GA finished. Best fitness: " << bestFitness << " in fitness stage " << m_stage << ". Evaluated " <<  numEvaluations << " trials." << std::endl;
+  }
+#endif
+}
+
+// Check if next fitness stage should be initiated??
+//----------------------------------------------------------------------------------------------------------------------
+void GARunner::updateFitnessStage(int currentGen, float bestFit)
+{
+  if(m_genFitBufferSize > 0)
+  {
+    m_genFitBuffer[(currentGen - 1) % m_genFitBufferSize] = bestFit;
+    bool nextStage = true;
+    for ( auto &f : m_genFitBuffer ) {
+      nextStage &= (f > m_stageFitThreshold);
+    }
+    
+    if(nextStage)
+    {
+      m_stage++;
+      m_evolvable->nextStage(m_stage);
+      std::fill(m_genFitBuffer.begin(), m_genFitBuffer.end(), 0); // reset
+    }
+  }
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 void GARunner::test(const double* genome, float fitness, float dt)
@@ -360,6 +414,7 @@ void GARunner::generationToXml(ci::XmlTree* xmlTree, uint32_t gen, const double*
   generation.setAttribute("Index", gen); 
   generation.setAttribute("BestFitness", bestFitness);
   generation.setAttribute("AverageFitness", avgFitness);
+  generation.setAttribute("Stage", m_stage);
 
   // Output best genome
   if(m_saveBestEachGen)

@@ -24,6 +24,8 @@ void BacteriumEvo::init()
     m_numPhases = xml.getChild("TrialDuration").getAttributeValue<float>("numPhases", 1);
     m_phaseDuration = m_trialDuration / m_numPhases;
   }
+  
+  m_randInitProp = 0.0f;
 };
   
 //----------------------------------------------------------------------------------------------------------------------
@@ -51,6 +53,13 @@ void BacteriumEvo::update(float dt)
   m_phaseTime += dt;
   if (m_phaseTime >= m_phaseDuration)
     nextPhase();
+}
+  
+//----------------------------------------------------------------------------------------------------------------------
+void BacteriumEvo::nextStage(int stage)
+{
+  if(m_randInitProp < 1)
+    m_randInitProp += 0.1;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -89,8 +98,8 @@ void BacteriumEvo::nextPhase()
   ((Torus*)objects[1])->setRadius(foodR);
 
   // Set agent position and orientation
-  float p = 0.5f; //0.4 + UniformRandom(0, 0.2);
-  float a = 0.0f; //UniformRandom(0, TWO_PI);
+  float p = 0.5 + 0.2 * m_randInitProp * UniformRandom(-1, 1);
+  float a = m_randInitProp * UniformRandom(-TWO_PI, TWO_PI);
   m_agent->setAngle(a);
   m_agent->setPosition(ci::Vec2f(0, p));
 }
@@ -155,9 +164,16 @@ void BacteriumEvo::updateFitness(float dt)
     
     // Desired thermal level
     float foodR = ((Torus*)objects[1])->getRadius();
+    float agentR = m_agent->getPosition().distance(objects[1]->getPosition());
+    
     //float foodMax = ((Torus*)objects[1])->getPeak();
-    float agentDist = m_agent->getPosition().distance(objects[1]->getPosition());
-    m_fitnessInst = 1.0f - clamp(fabs(foodR - agentDist), 0.0f, 1.0f);
+    
+    const float initialDist = fabs(0.5f - foodR);
+    const float currentDist = fabs(agentR - foodR);
+    float relAgentDist = 0.5f * clamp(currentDist / initialDist, 0.0f, 2.0f); // in [0, 1]
+    
+    m_fitnessInst = 1.0f - relAgentDist;
+    //m_fitnessInst = 1.0f - clamp(fabs(foodR - agentDist), 0.0f, 1.0f);
     //m_fitnessInst = m_agent->getTorusSensor()->getLevel() / foodMax;
     
     //float ft = sqrt(1.0f - 2.0f * fabs(m_agent->getGradientSensor()->getActivation() - 0.5f));

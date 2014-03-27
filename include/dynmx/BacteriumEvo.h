@@ -29,6 +29,7 @@ public:
   virtual void reset();
   virtual float getFitness();
   virtual bool hasFinished() { return m_phaseTime == 0 && m_phase==m_numPhases;};
+  virtual void nextStage(int stage);
   virtual void nextTrial(int t);
   
   virtual void update(float dt);
@@ -45,6 +46,8 @@ protected:
   int m_numPhases;
   float m_phaseTime;
   float m_phaseFit;
+  
+  float m_randInitProp;
 };
   
 } // namespace

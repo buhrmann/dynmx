@@ -7,7 +7,7 @@
         <FullScreen Value="0"/>   
         <VSync Value="0"/>               	
 		<Model Value="GA"/>	   
-		<DebugLevel Value="1"/>
+		<DebugLevel Value="0"/>
         <PlotDuration Value="0.5"/>                
         <OutputFolder Name="~/Experiments/Bacterium/Evo/SensorAbs"/>     
 	</Globals>
@@ -41,24 +41,25 @@
               <Torus PosX="0.0" PosY="0.0" Radius="0.4" Width="0.05" Peak="4" PosVarX="0.0" PosVarY="0.0" Visible="1"/>
             </Environment>
 		</Evolvable>	
-    	<Incremental initialMutation="0.01" seedOnly="0" seedAll="0" elitist="0">0</Incremental>
-    	<LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/14_03_20__14_07_27/GA_Result.xml</LoadFrom>
-    	<PopulationSize>100</PopulationSize>
+    	<Incremental initialMutation="0.0" seedOnly="1" seedAll="0" elitist="0">0</Incremental>
+    	<LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/14_03_26__18_29_01/GA_Result.xml</LoadFrom>
+    	<PopulationSize>50</PopulationSize>
     	<DemeSize>10</DemeSize>
-    	<NumGenerations>1000</NumGenerations>
-    	<Mutation Rate="0.5" Var="0.05" VarReduced="0.01" ReduceAt="800">
+    	<NumGenerations OutputInterval="1">2000</NumGenerations>
+    	<Mutation Rate="0.5" Var="0.1" VarReduced="0.01" ReduceAt="1500">
             <IntraGenomePD>Gaussian</IntraGenomePD>
-            <InterGenomePD>Uniform</InterGenomePD>
-        </Mutation>    
+            <InterGenomePD>Gaussian</InterGenomePD>
+        </Mutation>
     	<Recombination Rate="0.5" RateReduced="0.75"/>             
-    	<Trials Combine="Avg">1</Trials>
+    	<Trials Combine="Avg">10</Trials>
         <AvoidReevaluation>0</AvoidReevaluation>
         <SaveBestEachGeneration>0</SaveBestEachGeneration>
-        <AutoEval>1</AutoEval>
+        <AutoEval>0</AutoEval>
+        <Stages FitThreshold="0.2" NumGensAbove="5"/>
         <Eval Run="0">
-            <NumTrials>1</NumTrials>
+            <NumTrials>50</NumTrials>
             <RecordState>0</RecordState>
-            <LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/14_03_21__14_07_32/GA_BestGenome.xml</LoadFrom>
+            <LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/14_03_27__09_36_23/GA_BestGenome.xml</LoadFrom>
         </Eval>         
 	</GA>    
 </Config>
