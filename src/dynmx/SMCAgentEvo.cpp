@@ -46,7 +46,7 @@ void SMCAgentEvo::init()
   {
     const ci::XmlTree& xml = SETTINGS->getChild("Config/GA/Evolvable");
     m_netLimits.fromXml(xml.getChild("NetLimits"));
-    m_trialDuration = xml.getChild("TrialDuration").getValue<double>(10.0);
+    m_trialDuration = xml.getChild("Trial").getValue<double>(10.0);
     m_fitnessEvalDelay = xml.getChild("FitnessEvalDelay").getValue<double>(8.0);    
   }
 };  

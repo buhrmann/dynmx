@@ -23,11 +23,11 @@
             <MaxAngle>360</MaxAngle>            
             <AngleWraps>1</AngleWraps>
             <Energy initial="10" threshForSpeed="0" evMin="2" evMax="5"/>
-            <TrialDuration phaseDuration="6" numTests="3" numEnvirons="2">60</TrialDuration>
+            <Trial phaseDuration="6" numTests="3" numEnvirons="2">60</Trial>
             <FitnessEvalDelay>5</FitnessEvalDelay>
             <Topology symmetric="0" weightCutoff="0">
               <Inputs asNeurons="1">2</Inputs>
-              <Hidden>10</Hidden>
+              <Hidden>8</Hidden>
               <Outputs laterallyConnected="1">0</Outputs>
             </Topology>
             <NetLimits>
@@ -41,8 +41,8 @@
               <Torus PosX="0.0" PosY="0.0" Radius="0.2" Width="0.05" Peak="4" PosVarX="0.0" PosVarY="0.0" Visible="1"/>
             </Environment>
 		</Evolvable>	
-    	<Incremental initialMutation="0.0" seedOnly="1" seedAll="0" elitist="0">0</Incremental>
-    	<LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/14_03_26__18_29_01/GA_Result.xml</LoadFrom>
+    	<Incremental initialMutation="0.0" seedOnly="1" seedAll="0" elitist="0" initialStage="1">1</Incremental>
+    	<LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/Rand/14_04_07__12_58_03/GA_Result.xml</LoadFrom>
     	<PopulationSize>100</PopulationSize>
     	<DemeSize>10</DemeSize>
     	<NumGenerations OutputInterval="5">1000</NumGenerations>
@@ -59,7 +59,7 @@
         <Eval Run="0" Stage="10">
             <NumTrials>10</NumTrials>
             <RecordState>0</RecordState>
-            <LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/14_03_27__17_56_12/GA_BestGenome.xml</LoadFrom>
+            <LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/14_04_07__12_29_00/GA_BestGenome.xml</LoadFrom>
         </Eval>         
 	</GA>    
 </Config>

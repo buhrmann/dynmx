@@ -106,6 +106,8 @@ void GARunner::init()
     bool incremental = ga.getChild("Incremental").getValue<bool>();
     if (incremental)
     {
+      m_stage = ga.getChild("Incremental").getAttributeValue<int>("initialStage", 0);
+      
       std::string fnm = ga.getChild("LoadFrom").getValue<std::string>();
       fnm = pathExpandHome(fnm);
       
@@ -186,13 +188,13 @@ void GARunner::reset(bool randomiseGenomes)
   m_accFitness = 0.0f;
   m_trial = 0;
   m_prevGeneration = 0;
-  m_stage = 0;
   
   m_ga->reset(randomiseGenomes);
   
   // setup simulation model
   m_evolvable->decodeGenome(m_ga->getCurrentGenome());
-  m_evolvable->reset();  
+  m_evolvable->reset();
+  m_evolvable->nextStage(m_stage);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

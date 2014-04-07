@@ -18,17 +18,18 @@ void BacteriumEvo::init()
   // Already called by superclass constructor
   //SMCAgentEvo::init();
   
+  m_randInitProp = 0.0f;
+  
   if (SETTINGS->hasChild("Config/GA/Evolvable"))
   {
     const ci::XmlTree& xml = SETTINGS->getChild("Config/GA/Evolvable");
-    m_phaseDuration = xml.getChild("TrialDuration").getAttributeValue<float>("phaseDuration", 1);
-    m_numTests = xml.getChild("TrialDuration").getAttributeValue<int>("numTests", 1);
-    m_numEnvirons = xml.getChild("TrialDuration").getAttributeValue<int>("numEnvirons", 1);
+    m_phaseDuration = xml.getChild("Trial").getAttributeValue<float>("phaseDuration", 1);
+    m_numTests = xml.getChild("Trial").getAttributeValue<int>("numTests", 1);
+    m_numEnvirons = xml.getChild("Trial").getAttributeValue<int>("numEnvirons", 1);
     m_numPhases = m_numEnvirons * m_numTests;
     m_trialDuration = m_phaseDuration * m_numPhases;
   }
   
-  m_randInitProp = 0.0f;
 };
   
 //----------------------------------------------------------------------------------------------------------------------
