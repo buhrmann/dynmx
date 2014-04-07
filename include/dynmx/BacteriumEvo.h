@@ -47,6 +47,9 @@ protected:
   float m_phaseTime;
   float m_phaseFit;
   
+  int m_numTests;
+  int m_numEnvirons;
+  
   float m_randInitProp;
 };
   

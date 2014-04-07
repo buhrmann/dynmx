@@ -21,8 +21,11 @@ void BacteriumEvo::init()
   if (SETTINGS->hasChild("Config/GA/Evolvable"))
   {
     const ci::XmlTree& xml = SETTINGS->getChild("Config/GA/Evolvable");
-    m_numPhases = xml.getChild("TrialDuration").getAttributeValue<float>("numPhases", 1);
-    m_phaseDuration = m_trialDuration / m_numPhases;
+    m_phaseDuration = xml.getChild("TrialDuration").getAttributeValue<float>("phaseDuration", 1);
+    m_numTests = xml.getChild("TrialDuration").getAttributeValue<int>("numTests", 1);
+    m_numEnvirons = xml.getChild("TrialDuration").getAttributeValue<int>("numEnvirons", 1);
+    m_numPhases = m_numEnvirons * m_numTests;
+    m_trialDuration = m_phaseDuration * m_numPhases;
   }
   
   m_randInitProp = 0.0f;
@@ -67,10 +70,14 @@ void BacteriumEvo::nextPhase()
   m_phaseTime = 0;
   
   // Process fitness for previous trial
-  if(m_phase % 3 == 0)
+  if(m_phase % m_numTests == 0)
+  {
     m_phaseFit = 1;
+  }
   else
+  {
     m_phaseFit /= m_phaseDuration;
+  }
 
   if(m_phase > -1)
     m_fitness *= m_phaseFit;
@@ -92,10 +99,15 @@ void BacteriumEvo::nextPhase()
     objects[1]->setVisibility(true);
 #endif
   
-  // Set food location
-  float foodR = m_phase < 3 ? 0.2 : 0.8;
-  ((Torus*)objects[1])->setRadius(foodR);
-
+  // Change environment
+  if(m_phase < m_numPhases && m_phase % m_numTests == 0)
+  {
+    float currentFoodR = ((Torus*)objects[1])->getRadius();
+    float foodR = currentFoodR > 0.5 ? 0.2 + UniformRandom(0, 0.2) : 0.7 + UniformRandom(0, 0.2);
+    //float foodR = m_phase < 3 ? 0.2 : 0.8;
+    ((Torus*)objects[1])->setRadius(foodR);
+  }
+  
   // Set agent position and orientation
   float p = 0.5 + 0.2 * m_randInitProp * UniformRandom(-1, 1);
   float a = m_randInitProp * UniformRandom(-TWO_PI, TWO_PI);

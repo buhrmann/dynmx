@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Config>
 	<Globals>
-		<Visual Value="1"/>
+		<Visual Value="0"/>
         <WindowSize Width="1000" Height="800"/>    
 	    <FrameRate Value="50"/>    
         <FullScreen Value="0"/>   
@@ -23,7 +23,7 @@
             <MaxAngle>360</MaxAngle>            
             <AngleWraps>1</AngleWraps>
             <Energy initial="10" threshForSpeed="0" evMin="2" evMax="5"/>
-            <TrialDuration numPhases="6">60</TrialDuration>
+            <TrialDuration phaseDuration="6" numTests="3" numEnvirons="2">60</TrialDuration>
             <FitnessEvalDelay>5</FitnessEvalDelay>
             <Topology symmetric="0" weightCutoff="0">
               <Inputs asNeurons="1">2</Inputs>
@@ -38,15 +38,15 @@
             </NetLimits>
             <Environment Name="SingleGradient">
               <Gradient PosX="0.0" PosY="0.0" Radius="1.0" PosVarX="0.0" PosVarY="0.0" Visible="1"/>
-              <Torus PosX="0.0" PosY="0.0" Radius="0.4" Width="0.05" Peak="4" PosVarX="0.0" PosVarY="0.0" Visible="1"/>
+              <Torus PosX="0.0" PosY="0.0" Radius="0.2" Width="0.05" Peak="4" PosVarX="0.0" PosVarY="0.0" Visible="1"/>
             </Environment>
 		</Evolvable>	
     	<Incremental initialMutation="0.0" seedOnly="1" seedAll="0" elitist="0">0</Incremental>
     	<LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/14_03_26__18_29_01/GA_Result.xml</LoadFrom>
     	<PopulationSize>100</PopulationSize>
     	<DemeSize>10</DemeSize>
-    	<NumGenerations OutputInterval="5">2000</NumGenerations>
-    	<Mutation Rate="0.5" Var="0.2" VarReduced="0.01" ReduceAt="1500">
+    	<NumGenerations OutputInterval="5">1000</NumGenerations>
+    	<Mutation Rate="0.5" Var="0.1" VarReduced="0.01" ReduceAt="750">
             <IntraGenomePD>Gaussian</IntraGenomePD>
             <InterGenomePD>Gaussian</InterGenomePD>
         </Mutation>
@@ -56,7 +56,7 @@
         <SaveBestEachGeneration>0</SaveBestEachGeneration>
         <AutoEval>1</AutoEval>
         <Stages FitThreshold="0.3" NumGensAbove="5"/>
-        <Eval Run="1" Stage="10">
+        <Eval Run="0" Stage="10">
             <NumTrials>10</NumTrials>
             <RecordState>0</RecordState>
             <LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/14_03_27__17_56_12/GA_BestGenome.xml</LoadFrom>

@@ -366,7 +366,8 @@ void GARunner::updateFitnessStage(int currentGen, float bestFit)
     {
       m_stage++;
       m_evolvable->nextStage(m_stage);
-      std::fill(m_genFitBuffer.begin(), m_genFitBuffer.end(), 0); // reset
+      std::fill(m_genFitBuffer.begin(), m_genFitBuffer.end(), 0); // reset buffer
+      fitnessFunctionChanged();
     }
   }
 }
