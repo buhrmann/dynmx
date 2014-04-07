@@ -56,6 +56,7 @@ void GATester::init()
       m_trialAggregation = GARunner::kGATrialAgg_Mult;
     else if(trialAgg == "Min")
       m_trialAggregation = GARunner::kGATrialAgg_Min;
+
     
     // Flag whether to record state during run
     m_record = (eval / "RecordState").getValue<bool>();
@@ -114,6 +115,9 @@ void GATester::init()
       // Store genome in xml file, even if not read here. It could have been decoded pre
       m_modelXml->push_back(ci::XmlTree(genomeXml));
     }
+    
+    int stage = eval.getAttributeValue<int>("Stage", 0);
+    m_evolvable->nextStage(stage);
   }
   
   reset();
