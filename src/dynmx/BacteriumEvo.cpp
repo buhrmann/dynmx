@@ -7,7 +7,7 @@
 //
 
 #include "BacteriumEvo.h"
-
+#include "Simulation.h"
 
 namespace dmx
 {
@@ -104,13 +104,13 @@ void BacteriumEvo::nextPhase()
   if(m_phase < m_numPhases && m_phase % m_numTests == 0)
   {
     float currentFoodR = ((Torus*)objects[1])->getRadius();
-    float foodR = currentFoodR > 0.5 ? 0.2 + UniformRandom(0, 0.2) : 0.7 + UniformRandom(0, 0.2);
+    float foodR = currentFoodR > 0.5 ? 0.3 + m_randInitProp * UniformRandom(-0.1, 0.1) : 0.8 + m_randInitProp * UniformRandom(-0.1, 0.1);
     //float foodR = m_phase < 3 ? 0.2 : 0.8;
     ((Torus*)objects[1])->setRadius(foodR);
   }
   
   // Set agent position and orientation
-  float p = 0.5 + 0.2 * m_randInitProp * UniformRandom(-1, 1);
+  float p = 0.55 + m_randInitProp * UniformRandom(-0.1, 0.1);
   float a = m_randInitProp * UniformRandom(-TWO_PI, TWO_PI);
   m_agent->setAngle(a);
   m_agent->setPosition(ci::Vec2f(0, p));

@@ -41,21 +41,21 @@
               <Torus PosX="0.0" PosY="0.0" Radius="0.2" Width="0.05" Peak="4" PosVarX="0.0" PosVarY="0.0" Visible="1"/>
             </Environment>
 		</Evolvable>	
-    	<Incremental initialMutation="0.0" seedOnly="1" seedAll="0" elitist="0" initialStage="1">1</Incremental>
-    	<LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/Rand/14_04_07__12_58_03/GA_Result.xml</LoadFrom>
+    	<Incremental initialMutation="0.0" seedOnly="1" seedAll="0" elitist="0" initialStage="3">1</Incremental>
+    	<LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/14_04_08__12_00_04/GA_Result.xml</LoadFrom>
     	<PopulationSize>100</PopulationSize>
     	<DemeSize>10</DemeSize>
-    	<NumGenerations OutputInterval="5">1000</NumGenerations>
+    	<NumGenerations OutputInterval="1">1000</NumGenerations>
     	<Mutation Rate="0.5" Var="0.1" VarReduced="0.01" ReduceAt="750">
             <IntraGenomePD>Gaussian</IntraGenomePD>
             <InterGenomePD>Gaussian</InterGenomePD>
         </Mutation>
     	<Recombination Rate="0.5" RateReduced="0.75"/>             
-    	<Trials Combine="Avg">50</Trials>
+    	<Trials Combine="Avg" numStageMult="10">1</Trials>
         <AvoidReevaluation>0</AvoidReevaluation>
         <SaveBestEachGeneration>0</SaveBestEachGeneration>
         <AutoEval>1</AutoEval>
-        <Stages FitThreshold="0.3" NumGensAbove="5"/>
+        <Stages FitThreshold="0.3" NumGensAbove="5" Max="10"/>
         <Eval Run="0" Stage="10">
             <NumTrials>10</NumTrials>
             <RecordState>0</RecordState>

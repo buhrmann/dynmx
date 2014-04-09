@@ -131,13 +131,15 @@ protected:
   float m_accFitness;
   uint16_t m_trial;
   uint16_t m_numTrials;
+  uint16_t m_numTrialsStageMult;
   uint16_t m_stage;
   uint32_t m_prevGeneration;  /// For detecting if GA has incremented a generation
   uint32_t m_numGenerations;
   uint32_t m_outputInterval;
   
-  uint16_t m_genFitBufferSize;
+  int m_maxStage;
   float m_stageFitThreshold;
+  uint16_t m_genFitBufferSize;
   std::vector<float> m_genFitBuffer;
   
   double m_reducedMutationVar;

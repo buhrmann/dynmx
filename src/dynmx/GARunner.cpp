@@ -83,6 +83,7 @@ void GARunner::init()
     m_numGenerations = ga.getChild("NumGenerations").getValue<int>(100);
     m_outputInterval = ga.getChild("NumGenerations").getAttributeValue<int>("OutputInterval", 100);
     m_numTrials = ga.getChild("Trials").getValue<int>(1);
+    m_numTrialsStageMult = ga.getChild("Trials").getAttributeValue<int>("numStageMult", 1);
     
     std::string trialAgg = ga.getChild("Trials").getAttributeValue<std::string>("Combine", "Avg");
     if(trialAgg == "Avg")
@@ -98,6 +99,7 @@ void GARunner::init()
     {
       m_stageFitThreshold = (ga / "Stages").getAttributeValue<float>("FitThreshold", 1);
       m_genFitBufferSize = (ga / "Stages").getAttributeValue<int>("NumGensAbove", 0);
+      m_maxStage = (ga / "Stages").getAttributeValue<int>("Max", 10);
       m_genFitBuffer.reserve(m_genFitBufferSize);
       m_genFitBuffer.resize(m_genFitBufferSize, 0);
     }
@@ -155,6 +157,8 @@ void GARunner::init()
     }
     else
     {
+      // Not incremental
+      m_stage = 0;
       reset(true);
     }
     
@@ -188,6 +192,10 @@ void GARunner::reset(bool randomiseGenomes)
   m_accFitness = 0.0f;
   m_trial = 0;
   m_prevGeneration = 0;
+  
+  // If we start incrementally from non-zero stage
+  if(m_stage > 0)
+    m_numTrials = m_stage * m_numTrialsStageMult;
   
   m_ga->reset(randomiseGenomes);
   
@@ -356,7 +364,7 @@ void GARunner::finishRun(const double* bestGenome, float bestFitness, float dt)
 //----------------------------------------------------------------------------------------------------------------------
 void GARunner::updateFitnessStage(int currentGen, float bestFit)
 {
-  if(m_genFitBufferSize > 0)
+  if(m_genFitBufferSize > 0 && m_stage < m_maxStage)
   {
     m_genFitBuffer[(currentGen - 1) % m_genFitBufferSize] = bestFit;
     bool nextStage = true;
@@ -370,6 +378,7 @@ void GARunner::updateFitnessStage(int currentGen, float bestFit)
       m_evolvable->nextStage(m_stage);
       std::fill(m_genFitBuffer.begin(), m_genFitBuffer.end(), 0); // reset buffer
       fitnessFunctionChanged();
+      m_numTrials = m_stage * m_numTrialsStageMult;
     }
   }
 }
