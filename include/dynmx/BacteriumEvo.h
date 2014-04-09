@@ -47,6 +47,8 @@ protected:
   float m_phaseTime;
   float m_phaseFit;
   
+  float m_phaseInitialDist;
+  
   int m_numTests;
   int m_numEnvirons;
   

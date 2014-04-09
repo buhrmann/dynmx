@@ -100,13 +100,27 @@ void BacteriumEvo::nextPhase()
     objects[1]->setVisibility(true);
 #endif
   
-  // Change environment
   if(m_phase < m_numPhases && m_phase % m_numTests == 0)
   {
-    float currentFoodR = ((Torus*)objects[1])->getRadius();
-    float foodR = currentFoodR > 0.5 ? 0.3 + m_randInitProp * UniformRandom(-0.1, 0.1) : 0.8 + m_randInitProp * UniformRandom(-0.1, 0.1);
-    //float foodR = m_phase < 3 ? 0.2 : 0.8;
-    ((Torus*)objects[1])->setRadius(foodR);
+    // Change food position
+    if(m_phase == 0)
+    {
+      // random initial position
+      float foodR = ProbabilisticChoice(0.5) ? 0.3 + m_randInitProp * UniformRandom(-0.1, 0.1) : 0.8 + m_randInitProp * UniformRandom(-0.1, 0.1);
+      ((Torus*)objects[1])->setRadius(foodR);
+      ((Torus*)objects[1])->setColor(ci::ColorA(1,0,1,0.15));
+    }
+    else
+    {
+      // alternate
+      float currentFoodR = ((Torus*)objects[1])->getRadius();
+      float foodR = currentFoodR > 0.5 ? 0.3 + m_randInitProp * UniformRandom(-0.1, 0.1) : 0.8 + m_randInitProp * UniformRandom(-0.1, 0.1);
+      ((Torus*)objects[1])->setRadius(foodR);
+      ((Torus*)objects[1])->setColor(ci::ColorA(1,0,0,0.15));
+    }
+  }
+  else{
+      ((Torus*)objects[1])->setColor(ci::ColorA(0,1,0,0.15));
   }
   
   // Set agent position and orientation
@@ -114,6 +128,8 @@ void BacteriumEvo::nextPhase()
   float a = m_randInitProp * UniformRandom(-TWO_PI, TWO_PI);
   m_agent->setAngle(a);
   m_agent->setPosition(ci::Vec2f(0, p));
+  
+  m_phaseInitialDist = fabs(p - ((Torus*)objects[1])->getRadius());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -162,15 +178,12 @@ void BacteriumEvo::trialTaxisGrWidth(int t)
 //----------------------------------------------------------------------------------------------------------------------
 void BacteriumEvo::trialFoodPos(int t)
 {
-  
 }
   
 //----------------------------------------------------------------------------------------------------------------------
 void BacteriumEvo::updateFitness(float dt)
 {
-  
-  //if(m_agent->getTime() > m_fitnessEvalDelay)
-  if(m_phase % 3 > 0)
+  if(m_phase % m_numTests > 0)
   {
     const std::vector<Positionable*>& objects = m_agent->getEnvironment().getObjects();
     
@@ -180,9 +193,8 @@ void BacteriumEvo::updateFitness(float dt)
     
     //float foodMax = ((Torus*)objects[1])->getPeak();
     
-    const float initialDist = fabs(0.5f - foodR);
     const float currentDist = fabs(agentR - foodR);
-    float relAgentDist = 0.5f * clamp(currentDist / initialDist, 0.0f, 2.0f); // in [0, 1]
+    float relAgentDist = 0.5f * clamp(currentDist / m_phaseInitialDist, 0.0f, 2.0f); // in [0, 1]
     
     m_fitnessInst = 1.0f - relAgentDist;
     //m_fitnessInst = 1.0f - clamp(fabs(foodR - agentDist), 0.0f, 1.0f);
