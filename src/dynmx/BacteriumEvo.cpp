@@ -12,6 +12,8 @@
 namespace dmx
 {
   
+#define COMBINE_PHASES_MULT 0
+  
 //----------------------------------------------------------------------------------------------------------------------
 void BacteriumEvo::init()
 {
@@ -39,7 +41,11 @@ void BacteriumEvo::reset()
   m_agent->reset();
   m_agent->getCTRNN().zeroStates();
   
+#if COMBINE_PHASES_MULT
   m_fitness = 1.0f;
+#else
+  m_fitness = 0.0f;
+#endif
   m_fitnessInst = 0.0f;
   m_phaseFit = 0.0f;
 
@@ -69,8 +75,9 @@ void BacteriumEvo::nextStage(int stage)
 void BacteriumEvo::nextPhase()
 {
   m_phaseTime = 0;
-  
+
   // Process fitness for previous trial
+#if COMBINE_PHASES_MULT
   if(m_phase % m_numTests == 0)
   {
     m_phaseFit = 1;
@@ -82,6 +89,19 @@ void BacteriumEvo::nextPhase()
 
   if(m_phase > -1)
     m_fitness *= m_phaseFit;
+#else
+  if(m_phase % m_numTests == 0)
+  {
+    m_phaseFit = 0;
+  }
+  else
+  {
+    m_phaseFit /= m_phaseDuration * (m_numEnvirons * (m_numTests - 1));
+  }
+  
+  if(m_phase > -1)
+    m_fitness += m_phaseFit;
+#endif
   
   m_phase++;
   m_phaseFit = 0;
@@ -194,9 +214,9 @@ void BacteriumEvo::updateFitness(float dt)
     //float foodMax = ((Torus*)objects[1])->getPeak();
     
     const float currentDist = fabs(agentR - foodR);
-    float relAgentDist = 0.5f * clamp(currentDist / m_phaseInitialDist, 0.0f, 2.0f); // in [0, 1]
+    float relAgentDist = clamp(currentDist / m_phaseInitialDist, 0.0f, 2.0f); // in [0, 2]
     
-    m_fitnessInst = 1.0f - relAgentDist;
+    m_fitnessInst = (1.0f - relAgentDist);
     //m_fitnessInst = 1.0f - clamp(fabs(foodR - agentDist), 0.0f, 1.0f);
     //m_fitnessInst = m_agent->getTorusSensor()->getLevel() / foodMax;
     

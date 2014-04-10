@@ -51,7 +51,7 @@
             <InterGenomePD>Gaussian</InterGenomePD>
         </Mutation>
         <Recombination Rate="0.5" RateReduced="0.75"/>
-        <Trials Combine="Avg" numStageMult="10">1</Trials>
+        <Trials Combine="Avg" numStageMult="5">1</Trials>
         <AvoidReevaluation>0</AvoidReevaluation>
         <SaveBestEachGeneration>0</SaveBestEachGeneration>
         <AutoEval>1</AutoEval>
@@ -59,7 +59,7 @@
         <Eval Run="0" Stage="10">
             <NumTrials>10</NumTrials>
             <RecordState>0</RecordState>
-            <LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/14_04_09__11_50_34/GA_BestGenome.xml</LoadFrom>
+            <LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/Rand/14_04_10__13_35_32/GA_BestGenome.xml</LoadFrom>
         </Eval>
     </GA>
 </Config>
