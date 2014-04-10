@@ -110,7 +110,7 @@ public:
   
   void fitnessFunctionChanged() { m_ga->resetFitnesses(); };
   
-  static void genomeToXml(ci::XmlTree& xml, const double* genome, int numGenes, float bestFit);
+  static void genomeToXml(ci::XmlTree& xml, const double* genome, int numGenes, float bestFit, int stage=0);
   
 protected:  
 

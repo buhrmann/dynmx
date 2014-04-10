@@ -338,10 +338,11 @@ void GARunner::finishRun(const double* bestGenome, float bestFitness, float dt)
 {
   // Write results to file
   getGA()->toXml(*m_resultsLog, true);
+  m_resultsLog->setAttribute("Stage", m_stage);
   m_resultsLog->write(ci::writeFile(dmx::DATA_DIR + "GA_Result.xml"));
   m_progressLog->write(ci::writeFile(dmx::DATA_DIR + "GA_Progress.xml"));
   
-  genomeToXml(*m_finalGenomeLog, bestGenome, m_ga->getGenomeSize(), bestFitness);
+  genomeToXml(*m_finalGenomeLog, bestGenome, m_ga->getGenomeSize(), bestFitness, m_stage);
   m_finalGenomeLog->write(ci::writeFile(dmx::DATA_DIR + "GA_BestGenome.xml"));
   
   // Evaluate best evolved individual
@@ -392,7 +393,7 @@ void GARunner::test(const double* genome, float fitness, float dt)
   GATester tester (m_evolvable);
   // We're only doing this to record the state data! So overwrite any flag read in from xml config.
   tester.enableRecording(true);
-  genomeToXml(tester.getXml(), genome, m_ga->getGenomeSize(), fitness);
+  genomeToXml(tester.getXml(), genome, m_ga->getGenomeSize(), fitness, m_stage);
   while(!tester.hasFinished())
   {
     tester.update(dt);
@@ -400,11 +401,12 @@ void GARunner::test(const double* genome, float fitness, float dt)
 }
 
 //----------------------------------------------------------------------------------------------------------------------  
-void GARunner::genomeToXml(ci::XmlTree& xml, const double* genome, int numGenes, float fitness)
+void GARunner::genomeToXml(ci::XmlTree& xml, const double* genome, int numGenes, float fitness, int stage)
 {
   ci::XmlTree genXml ("Genome","");
   genXml.setAttribute("Fitness", fitness);
   genXml.setAttribute("NumGenes", numGenes);
+  genXml.setAttribute("Stage", stage);
   for(size_t i = 0; i < numGenes; ++i)
   {
     ci::XmlTree gene ("Gene", "");
