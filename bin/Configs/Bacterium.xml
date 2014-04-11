@@ -23,7 +23,7 @@
             <MaxAngle>360</MaxAngle>
             <AngleWraps>1</AngleWraps>
             <Energy initial="10" threshForSpeed="0" evMin="2" evMax="5"/>
-            <Trial phaseDuration="6" numTests="2" numEnvirons="2">60</Trial>
+            <Trial phaseDuration="6" numTests="2" numEnvirons="2" fitAcc="mult">60</Trial>
             <FitnessEvalDelay>5</FitnessEvalDelay>
             <Topology symmetric="0" weightCutoff="0">
               <Inputs asNeurons="1">2</Inputs>
@@ -51,15 +51,15 @@
             <InterGenomePD>Gaussian</InterGenomePD>
         </Mutation>
         <Recombination Rate="0.5" RateReduced="0.75"/>
-        <Trials Combine="Avg" numStageMult="5">1</Trials>
+        <Trials Combine="Min" numStageMult="5">1</Trials>
         <AvoidReevaluation>0</AvoidReevaluation>
         <SaveBestEachGeneration>0</SaveBestEachGeneration>
         <AutoEval>1</AutoEval>
-        <Stages FitThreshold="0.3" NumGensAbove="5" Max="10"/>
-        <Eval Run="0" Stage="10">
-            <NumTrials>10</NumTrials>
+        <Stages FitThreshold="1" NumGensAbove="5" Max="10"/>
+        <Eval Run="1" Stage="10">
+            <NumTrials>50</NumTrials>
             <RecordState>0</RecordState>
-            <LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/Rand/14_04_10__13_35_32/GA_BestGenome.xml</LoadFrom>
+            <LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/Rand/14_04_10__19_10_52/GA_BestGenome.xml</LoadFrom>
         </Eval>
     </GA>
 </Config>

@@ -23,6 +23,14 @@ class BacteriumEvo : public SMCAgentEvo
 {
   
 public:
+  
+  enum PhFitAcc
+  {
+    kFitAcc_Avg,
+    kFitAcc_Min,
+    kFitAcc_Mult
+  };
+  
   BacteriumEvo(Bacterium* b) : SMCAgentEvo(b) { init(); nextTrial(0); };
   
   virtual void init();
@@ -46,6 +54,8 @@ protected:
   int m_numPhases;
   float m_phaseTime;
   float m_phaseFit;
+  int m_phaseFitAcc;
+  std::vector<float> m_phaseFits;
   
   float m_phaseInitialDist;
   

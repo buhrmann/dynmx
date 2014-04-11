@@ -8,17 +8,15 @@
 
 #include "BacteriumEvo.h"
 #include "Simulation.h"
+#include <numeric>
 
 namespace dmx
 {
   
-#define COMBINE_PHASES_MULT 0
-  
 //----------------------------------------------------------------------------------------------------------------------
 void BacteriumEvo::init()
 {
-  // Already called by superclass constructor
-  //SMCAgentEvo::init();
+  // super::init() Already called by superclass constructor
   
   m_randInitProp = 0.0f;
   
@@ -28,6 +26,15 @@ void BacteriumEvo::init()
     m_phaseDuration = xml.getChild("Trial").getAttributeValue<float>("phaseDuration", 1);
     m_numTests = xml.getChild("Trial").getAttributeValue<int>("numTests", 1);
     m_numEnvirons = xml.getChild("Trial").getAttributeValue<int>("numEnvirons", 1);
+    
+    std::string fitAccNm = xml.getChild("Trial").getAttributeValue<std::string>("fitAcc", "avg");
+    if(fitAccNm == "avg")
+      m_phaseFitAcc = kFitAcc_Avg;
+    else if(fitAccNm == "mult")
+      m_phaseFitAcc = kFitAcc_Mult;
+    else
+      m_phaseFitAcc = kFitAcc_Min;
+    
     m_numPhases = m_numEnvirons * m_numTests;
     m_trialDuration = m_phaseDuration * m_numPhases;
   }
@@ -41,13 +48,11 @@ void BacteriumEvo::reset()
   m_agent->reset();
   m_agent->getCTRNN().zeroStates();
   
-#if COMBINE_PHASES_MULT
-  m_fitness = 1.0f;
-#else
   m_fitness = 0.0f;
-#endif
   m_fitnessInst = 0.0f;
   m_phaseFit = 0.0f;
+  
+  m_phaseFits.clear();
 
   m_phase = -1;
   nextPhase();
@@ -76,32 +81,9 @@ void BacteriumEvo::nextPhase()
 {
   m_phaseTime = 0;
 
-  // Process fitness for previous trial
-#if COMBINE_PHASES_MULT
-  if(m_phase % m_numTests == 0)
-  {
-    m_phaseFit = 1;
-  }
-  else
-  {
-    m_phaseFit /= m_phaseDuration;
-  }
-
-  if(m_phase > -1)
-    m_fitness *= m_phaseFit;
-#else
-  if(m_phase % m_numTests == 0)
-  {
-    m_phaseFit = 0;
-  }
-  else
-  {
-    m_phaseFit /= m_phaseDuration * (m_numEnvirons * (m_numTests - 1));
-  }
-  
-  if(m_phase > -1)
-    m_fitness += m_phaseFit;
-#endif
+  // Only store fitness on test phases
+  if((m_phase > 0) && (m_phase % m_numTests != 0))
+    m_phaseFits.push_back(m_phaseFit / m_phaseDuration);
   
   m_phase++;
   m_phaseFit = 0;
@@ -109,9 +91,9 @@ void BacteriumEvo::nextPhase()
   m_agent->reset(); // doesn't reset ctrnn
   
   // Setup next trial
-  // Invisible food
   const std::vector<Positionable*>& objects = m_agent->getEnvironment().getObjects();
   
+    // Invisible food
 #define CHANGE_VISIBILITY 0
 #if CHANGE_VISIBILITY
   if(m_phase % 3 == 2)
@@ -155,6 +137,20 @@ void BacteriumEvo::nextPhase()
 //----------------------------------------------------------------------------------------------------------------------
 float BacteriumEvo::getFitness()
 {
+  if(m_phaseFitAcc == kFitAcc_Mult)
+  {
+    m_fitness = std::accumulate(m_phaseFits.begin(), m_phaseFits.end(), 1.0, std::multiplies<float>());
+  }
+  else if(m_phaseFitAcc == kFitAcc_Avg)
+  {
+    m_fitness = std::accumulate(m_phaseFits.begin(), m_phaseFits.end(), 0.0);
+    m_fitness /= m_phaseFits.size();
+  }
+  else
+  {
+    m_fitness = *std::min_element(m_phaseFits.begin(), m_phaseFits.end());
+  }
+
   return m_fitness;
 };
 
@@ -216,7 +212,14 @@ void BacteriumEvo::updateFitness(float dt)
     const float currentDist = fabs(agentR - foodR);
     float relAgentDist = clamp(currentDist / m_phaseInitialDist, 0.0f, 2.0f); // in [0, 2]
     
-    m_fitnessInst = (1.0f - relAgentDist);
+    if(m_phaseFitAcc == kFitAcc_Mult){
+      // Make sure it's > 0
+      m_fitnessInst = (1.0f - 0.5f * relAgentDist);
+    }
+    else{
+      // Can be negative
+      m_fitnessInst = (1.0f - relAgentDist);
+    }
     //m_fitnessInst = 1.0f - clamp(fabs(foodR - agentDist), 0.0f, 1.0f);
     //m_fitnessInst = m_agent->getTorusSensor()->getLevel() / foodMax;
     
