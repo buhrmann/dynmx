@@ -220,8 +220,8 @@ void GATester::update(float dt)
     }
     
     m_time = 0.0;
-    m_evolvable->reset();
     m_evolvable->nextTrial(m_trial);
+    m_evolvable->reset();
   }
   
 }

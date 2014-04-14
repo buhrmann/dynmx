@@ -39,6 +39,7 @@ public:
   virtual bool hasFinished() { return m_phaseTime == 0 && m_phase==m_numPhases;};
   virtual void nextStage(int stage);
   virtual void nextTrial(int t);
+  virtual void endOfEvaluation(float f) { m_trial = 0; };
   
   virtual void update(float dt);
 
@@ -50,6 +51,7 @@ protected:
   void trialFoodPos(int t);
   
   int m_phase;
+  int m_trial;
   float m_phaseDuration;
   int m_numPhases;
   float m_phaseTime;

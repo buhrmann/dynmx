@@ -256,8 +256,8 @@ void GARunner::update(float dt)
       
     } // End of indiviual's evaluation (all trials)
     
-    m_evolvable->reset();
     m_evolvable->nextTrial(m_trial);
+    m_evolvable->reset();
   } // end of trial
 }
 

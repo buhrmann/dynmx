@@ -39,6 +39,8 @@ void BacteriumEvo::init()
     m_trialDuration = m_phaseDuration * m_numPhases;
   }
   
+  m_trial = 0;
+  
 };
   
 //----------------------------------------------------------------------------------------------------------------------
@@ -108,7 +110,8 @@ void BacteriumEvo::nextPhase()
     if(m_phase == 0)
     {
       // random initial position
-      float foodR = ProbabilisticChoice(0.5) ? 0.3 + m_randInitProp * UniformRandom(-0.1, 0.1) : 0.8 + m_randInitProp * UniformRandom(-0.1, 0.1);
+      //float foodR = ProbabilisticChoice(0.5) ? 0.3 + m_randInitProp * UniformRandom(-0.1, 0.1) : 0.8 + m_randInitProp * UniformRandom(-0.1, 0.1);
+      float foodR = m_trial % 2 == 0 ? 0.3 + m_randInitProp * UniformRandom(-0.1, 0.1) : 0.8 + m_randInitProp * UniformRandom(-0.1, 0.1);
       ((Torus*)objects[1])->setRadius(foodR);
       ((Torus*)objects[1])->setColor(ci::ColorA(1,0,1,0.15));
     }
@@ -164,6 +167,8 @@ void BacteriumEvo::nextTrial(int t)
 #elif TRIAL_FUNC == 2
   trialFoodPos(t);
 #endif
+  
+  m_trial = t;
 }
 
 // 4 orientations x 2 positions x 2 radii
@@ -218,6 +223,8 @@ void BacteriumEvo::updateFitness(float dt)
     }
     else{
       // Can be negative
+      if(relAgentDist < 1.0)
+        relAgentDist *= 2;
       m_fitnessInst = (1.0f - relAgentDist);
     }
     //m_fitnessInst = 1.0f - clamp(fabs(foodR - agentDist), 0.0f, 1.0f);

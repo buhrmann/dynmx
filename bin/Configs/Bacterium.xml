@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Config>
     <Globals>
-        <Visual Value="0"/>
+        <Visual Value="1"/>
         <WindowSize Width="1000" Height="800"/>
         <FrameRate Value="50"/>
         <FullScreen Value="0"/>
@@ -23,7 +23,7 @@
             <MaxAngle>360</MaxAngle>
             <AngleWraps>1</AngleWraps>
             <Energy initial="10" threshForSpeed="0" evMin="2" evMax="5"/>
-            <Trial phaseDuration="6" numTests="2" numEnvirons="2" fitAcc="mult">60</Trial>
+            <Trial phaseDuration="6" numTests="2" numEnvirons="2" fitAcc="avg">60</Trial>
             <FitnessEvalDelay>5</FitnessEvalDelay>
             <Topology symmetric="0" weightCutoff="0">
               <Inputs asNeurons="1">2</Inputs>
@@ -41,25 +41,25 @@
               <Torus PosX="0.0" PosY="0.0" Radius="0.2" Width="0.05" Peak="4" PosVarX="0.0" PosVarY="0.0" Visible="1"/>
             </Environment>
         </Evolvable>    
-        <Incremental initialMutation="0.0" seedOnly="1" seedAll="0" elitist="0" initialStage="0">0</Incremental>
-        <LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/14_04_09__11_50_34/GA_Result.xml</LoadFrom>
+        <Incremental initialMutation="0.0" seedOnly="1" seedAll="0" elitist="0" initialStage="0">1</Incremental>
+        <LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/Rand/14_04_11__13_50_12/GA_Result.xml</LoadFrom>
         <PopulationSize>100</PopulationSize>
         <DemeSize>10</DemeSize>
-        <NumGenerations OutputInterval="1">1000</NumGenerations>
-        <Mutation Rate="0.5" Var="0.1" VarReduced="0.01" ReduceAt="750">
+        <NumGenerations OutputInterval="1">2000</NumGenerations>
+        <Mutation Rate="0.5" Var="0.1" VarReduced="0.01" ReduceAt="1500">
             <IntraGenomePD>Gaussian</IntraGenomePD>
             <InterGenomePD>Gaussian</InterGenomePD>
         </Mutation>
         <Recombination Rate="0.5" RateReduced="0.75"/>
-        <Trials Combine="Min" numStageMult="5">1</Trials>
+        <Trials Combine="Avg" numStageMult="6">2</Trials>
         <AvoidReevaluation>0</AvoidReevaluation>
         <SaveBestEachGeneration>0</SaveBestEachGeneration>
         <AutoEval>1</AutoEval>
-        <Stages FitThreshold="1" NumGensAbove="5" Max="10"/>
+        <Stages FitThreshold="0.5" NumGensAbove="5" Max="10"/>
         <Eval Run="1" Stage="10">
-            <NumTrials>50</NumTrials>
+            <NumTrials>10</NumTrials>
             <RecordState>0</RecordState>
-            <LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/Rand/14_04_10__19_10_52/GA_BestGenome.xml</LoadFrom>
+            <LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/Rand/14_04_11__14_55_50/GA_BestGenome.xml</LoadFrom>
         </Eval>
     </GA>
 </Config>
