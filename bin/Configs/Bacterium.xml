@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Config>
     <Globals>
-        <Visual Value="1"/>
+        <Visual Value="0"/>
         <WindowSize Width="1000" Height="800"/>
         <FrameRate Value="50"/>
         <FullScreen Value="0"/>
@@ -41,7 +41,7 @@
               <Torus PosX="0.0" PosY="0.0" Radius="0.2" Width="0.05" Peak="4" PosVarX="0.0" PosVarY="0.0" Visible="1"/>
             </Environment>
         </Evolvable>    
-        <Incremental initialMutation="0.0" seedOnly="1" seedAll="0" elitist="0" initialStage="0">1</Incremental>
+        <Incremental initialMutation="0.0" seedOnly="1" seedAll="0" elitist="0" initialStage="0">0</Incremental>
         <LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/Rand/14_04_11__13_50_12/GA_Result.xml</LoadFrom>
         <PopulationSize>100</PopulationSize>
         <DemeSize>10</DemeSize>
@@ -51,12 +51,12 @@
             <InterGenomePD>Gaussian</InterGenomePD>
         </Mutation>
         <Recombination Rate="0.5" RateReduced="0.75"/>
-        <Trials Combine="Avg" numStageMult="6">2</Trials>
+        <Trials Combine="Avg" numStageMult="-1">50</Trials>
         <AvoidReevaluation>0</AvoidReevaluation>
         <SaveBestEachGeneration>0</SaveBestEachGeneration>
         <AutoEval>1</AutoEval>
         <Stages FitThreshold="0.5" NumGensAbove="5" Max="10"/>
-        <Eval Run="1" Stage="10">
+        <Eval Run="0" Stage="10">
             <NumTrials>10</NumTrials>
             <RecordState>0</RecordState>
             <LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/Rand/14_04_11__14_55_50/GA_BestGenome.xml</LoadFrom>

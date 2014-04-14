@@ -131,7 +131,7 @@ protected:
   float m_accFitness;
   uint16_t m_trial;
   uint16_t m_numTrials;
-  uint16_t m_numTrialsStageMult;
+  int16_t m_numTrialsStageMult;
   uint16_t m_stage;
   uint32_t m_prevGeneration;  /// For detecting if GA has incremented a generation
   uint32_t m_numGenerations;

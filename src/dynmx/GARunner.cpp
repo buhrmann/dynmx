@@ -194,7 +194,7 @@ void GARunner::reset(bool randomiseGenomes)
   m_prevGeneration = 0;
   
   // If we start incrementally from non-zero stage
-  if(m_stage > 0)
+  if(m_stage > 0 && m_numTrialsStageMult > 0)
     m_numTrials = m_stage * m_numTrialsStageMult;
   
   m_ga->reset(randomiseGenomes);
@@ -379,7 +379,8 @@ void GARunner::updateFitnessStage(int currentGen, float bestFit)
       m_evolvable->nextStage(m_stage);
       std::fill(m_genFitBuffer.begin(), m_genFitBuffer.end(), 0); // reset buffer
       fitnessFunctionChanged();
-      m_numTrials = m_stage * m_numTrialsStageMult;
+      if(m_numTrialsStageMult > 0)
+        m_numTrials = m_stage * m_numTrialsStageMult;
     }
   }
 }
