@@ -84,8 +84,13 @@ void BacteriumEvo::nextPhase()
   m_phaseTime = 0;
 
   // Only store fitness on test phases
-  if((m_phase > 0) && (m_phase % m_numTests != 0))
+  if((m_phase >= 0))// && (m_phase % m_numTests != 0))
+  {
     m_phaseFits.push_back(m_phaseFit / m_phaseDuration);
+
+    if(SETTINGS->getChild("Config/Globals/DebugLevel").getAttributeValue<int>("Value", 0) > 2)
+      std::cout << "Phase " << m_phase << " fit: " << m_phaseFit/m_phaseDuration << std::endl;
+  }
   
   m_phase++;
   m_phaseFit = 0;
@@ -204,44 +209,53 @@ void BacteriumEvo::trialFoodPos(int t)
 //----------------------------------------------------------------------------------------------------------------------
 void BacteriumEvo::updateFitness(float dt)
 {
+  const std::vector<Positionable*>& objects = m_agent->getEnvironment().getObjects();
+  
+  // Desired thermal level
+  float foodR = ((Torus*)objects[1])->getRadius();
+  float agentR = m_agent->getPosition().distance(objects[1]->getPosition());
+  
+  //float foodMax = ((Torus*)objects[1])->getPeak();
+  
+  const float currentDist = fabs(agentR - foodR);
+  float relAgentDist = clamp(currentDist / m_phaseInitialDist, 0.0f, 2.0f); // in [0, 2]
+  
+  if(m_phaseFitAcc == kFitAcc_Mult){
+    // Make sure it's > 0
+    m_fitnessInst = (1.0f - 0.5f * relAgentDist);
+  }
+  else{
+    // Can be negative
+    if(relAgentDist < 1.0)
+      relAgentDist *= 2;
+    m_fitnessInst = (1.0f - relAgentDist);
+  }
+  //m_fitnessInst = 1.0f - clamp(fabs(foodR - agentDist), 0.0f, 1.0f);
+  //m_fitnessInst = m_agent->getTorusSensor()->getLevel() / foodMax;
+  
+  //float ft = sqrt(1.0f - 2.0f * fabs(m_agent->getGradientSensor()->getActivation() - 0.5f));
+  //float f = m_agent->getSensedFood() * dt;
+  
+  // Minimise angular velocity to avoid circling on the spot
+  float fv = 1;
+  if(m_phaseTime > 0.5 * m_phaseDuration)
+    fv = 1.0f - (fabs(m_agent->getAngularSpeed()) / m_agent->getMaxAngularSpeed());
+
+  // Maximise energy
+  //float f = m_agent->getEnergy() * dt;
+  
   if(m_phase % m_numTests > 0)
   {
-    const std::vector<Positionable*>& objects = m_agent->getEnvironment().getObjects();
-    
-    // Desired thermal level
-    float foodR = ((Torus*)objects[1])->getRadius();
-    float agentR = m_agent->getPosition().distance(objects[1]->getPosition());
-    
-    //float foodMax = ((Torus*)objects[1])->getPeak();
-    
-    const float currentDist = fabs(agentR - foodR);
-    float relAgentDist = clamp(currentDist / m_phaseInitialDist, 0.0f, 2.0f); // in [0, 2]
-    
-    if(m_phaseFitAcc == kFitAcc_Mult){
-      // Make sure it's > 0
-      m_fitnessInst = (1.0f - 0.5f * relAgentDist);
-    }
-    else{
-      // Can be negative
-      if(relAgentDist < 1.0)
-        relAgentDist *= 2;
-      m_fitnessInst = (1.0f - relAgentDist);
-    }
-    //m_fitnessInst = 1.0f - clamp(fabs(foodR - agentDist), 0.0f, 1.0f);
-    //m_fitnessInst = m_agent->getTorusSensor()->getLevel() / foodMax;
-    
-    //float ft = sqrt(1.0f - 2.0f * fabs(m_agent->getGradientSensor()->getActivation() - 0.5f));
-    //float f = m_agent->getSensedFood() * dt;
-    
-    // Minimise angular velocity to avoid circling on the spot
-    float fv = 1.0f - (fabs(m_agent->getAngularSpeed()) / m_agent->getMaxAngularSpeed());
-
-    // Maximise energy
-    //float f = m_agent->getEnergy() * dt;
-    
-    //assert(ft < 1 && fv < 1);
     m_phaseFit += m_fitnessInst * fv * dt;
   }
+  else
+  {
+    if (m_phaseTime > 0.5 * m_phaseDuration)
+      m_phaseFit += m_fitnessInst * dt;
+    else
+      m_phaseFit += 1 * dt;
+  }
+
 };
 
 }
