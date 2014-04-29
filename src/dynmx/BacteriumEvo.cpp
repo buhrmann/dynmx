@@ -226,7 +226,7 @@ void BacteriumEvo::updateFitness(float dt)
   }
   else{
     // Can be negative
-    if(relAgentDist < 1.0)
+    if(relAgentDist > 1.0)
       relAgentDist *= 2;
     m_fitnessInst = (1.0f - relAgentDist);
   }
@@ -246,15 +246,15 @@ void BacteriumEvo::updateFitness(float dt)
   
   if(m_phase % m_numTests > 0)
   {
-    m_phaseFit += m_fitnessInst * fv * dt;
+    m_fitnessInst *= fv;
   }
   else
   {
-    if (m_phaseTime > 0.5 * m_phaseDuration)
-      m_phaseFit += m_fitnessInst * dt;
-    else
-      m_phaseFit += 1 * dt;
+    if (m_phaseTime < 0.5 * m_phaseDuration)
+      m_fitnessInst = 1;
   }
+  
+  m_phaseFit += m_fitnessInst * dt;
 
 };
 
