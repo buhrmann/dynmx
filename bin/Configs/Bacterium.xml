@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Config>
     <Globals>
-        <Visual Value="1"/>
+        <Visual Value="0"/>
         <WindowSize Width="1000" Height="800"/>
         <FrameRate Value="50"/>
         <FullScreen Value="0"/>
         <VSync Value="0"/>
         <Model Value="GA"/>
-        <DebugLevel Value="3"/>
+        <DebugLevel Value="0"/>
         <PlotDuration Value="0.5"/>
         <OutputFolder Name="~/Experiments/Bacterium/Evo/SensorAbs/Rand"/>
     </Globals>
@@ -17,7 +17,7 @@
             <TorusSensor Angle="0.0" Mode="Identity" TransferFunc="Identity" NoiseLevel="0.0">1</TorusSensor>
             <DistanceSensor MaxDist="0.4" Mode="Identity" TransferFunc="Identity" NoiseLevel="0.01">0</DistanceSensor> 
             <MaxSpeed>1.0</MaxSpeed>
-            <MaxAngularSpeed>360</MaxAngularSpeed>
+            <MaxAngularSpeed>720</MaxAngularSpeed>
             <MaxPosition>2</MaxPosition>
             <PositionWraps>1</PositionWraps>
             <MaxAngle>360</MaxAngle>
@@ -27,26 +27,26 @@
             <FitnessEvalDelay>5</FitnessEvalDelay>
             <Topology symmetric="0" weightCutoff="0">
               <Inputs asNeurons="1">2</Inputs>
-              <Hidden>10</Hidden>
-              <Outputs laterallyConnected="0">1</Outputs>
+              <Hidden>6</Hidden>
+              <Outputs laterallyConnected="0">0</Outputs>
             </Topology>
             <NetLimits>
               <Weight min="-10.0" max="10.0"/>
               <Bias min="-10.0" max="10.0"/>
               <Gain min="-10.0" max="10.0"/>
-              <TimeConstant min="0.05" max="10"/>
+              <TimeConstant min="0.05" max="1"/>
             </NetLimits>
             <Environment Name="SingleGradient">
               <Gradient PosX="0.0" PosY="0.0" Radius="1.0" PosVarX="0.0" PosVarY="0.0" Visible="1"/>
               <Torus PosX="0.0" PosY="0.0" Radius="0.2" Width="0.05" Peak="4" PosVarX="0.0" PosVarY="0.0" Visible="1"/>
             </Environment>
         </Evolvable>    
-        <Incremental initialMutation="0.025" seedOnly="1" seedAll="1" elitist="0" initialStage="0">0</Incremental>
-        <LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/Rand/14_04_25__12_55_07/GA_Result.xml</LoadFrom>
+        <Incremental initialMutation="0.025" seedOnly="1" seedAll="1" elitist="0" initialStage="0">1</Incremental>
+        <LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/Rand/14_04_29__19_22_49/GA_Result.xml</LoadFrom>
         <PopulationSize>200</PopulationSize>
         <DemeSize>20</DemeSize>
-        <NumGenerations OutputInterval="1">3000</NumGenerations>
-        <Mutation Rate="0.5" Var="0.1" VarReduced="0.01" ReduceAt="2500">
+        <NumGenerations OutputInterval="1">2000</NumGenerations>
+        <Mutation Rate="0.5" Var="0.01" VarReduced="0.001" ReduceAt="1500">
             <IntraGenomePD>Gaussian</IntraGenomePD>
             <InterGenomePD>Gaussian</InterGenomePD>
         </Mutation>
@@ -56,10 +56,10 @@
         <SaveBestEachGeneration>0</SaveBestEachGeneration>
         <AutoEval>1</AutoEval>
         <Stages FitThreshold="1.5" NumGensAbove="5" Max="10"/>
-        <Eval Run="1" Stage="0">
+        <Eval Run="0" Stage="0">
             <NumTrials>2</NumTrials>
             <RecordState>0</RecordState>
-            <LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/Rand/14_04_28__16_59_54/GA_BestGenome.xml</LoadFrom>
+            <LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/Rand/14_04_29__19_22_49/GA_BestGenome.xml</LoadFrom>
         </Eval>
     </GA>
 </Config>

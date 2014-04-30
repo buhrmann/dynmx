@@ -239,7 +239,10 @@ void BacteriumEvo::updateFitness(float dt)
   // Minimise angular velocity to avoid circling on the spot
   float fv = 1;
   if(m_phaseTime > 0.5 * m_phaseDuration)
-    fv = 1.0f - (fabs(m_agent->getAngularSpeed()) / m_agent->getMaxAngularSpeed());
+  {
+    float relSpeed = fabs(m_agent->getAngularSpeed()) / m_agent->getMaxAngularSpeed();
+    fv = relSpeed > 0.5 ? 2.0 - 2.0 * relSpeed : 1;
+  }
 
   // Maximise energy
   //float f = m_agent->getEnergy() * dt;
@@ -252,6 +255,8 @@ void BacteriumEvo::updateFitness(float dt)
   {
     if (m_phaseTime < 0.5 * m_phaseDuration)
       m_fitnessInst = 1;
+    else
+      m_fitnessInst *= fv;
   }
   
   m_phaseFit += m_fitnessInst * dt;
