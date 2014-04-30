@@ -41,8 +41,8 @@
               <Torus PosX="0.0" PosY="0.0" Radius="0.2" Width="0.05" Peak="4" PosVarX="0.0" PosVarY="0.0" Visible="1"/>
             </Environment>
         </Evolvable>    
-        <Incremental initialMutation="0.025" seedOnly="1" seedAll="1" elitist="0" initialStage="0">1</Incremental>
-        <LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/Rand/14_04_29__19_22_49/GA_Result.xml</LoadFrom>
+        <Incremental initialMutation="0.1" seedOnly="1" seedAll="1" elitist="0" initialStage="0">0</Incremental>
+        <LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/Rand/14_04_30__15_16_21/GA_Result.xml</LoadFrom>
         <PopulationSize>200</PopulationSize>
         <DemeSize>20</DemeSize>
         <NumGenerations OutputInterval="1">2000</NumGenerations>
@@ -59,7 +59,7 @@
         <Eval Run="0" Stage="0">
             <NumTrials>2</NumTrials>
             <RecordState>0</RecordState>
-            <LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/Rand/14_04_29__19_22_49/GA_BestGenome.xml</LoadFrom>
+            <LoadFrom>~/Experiments/Bacterium/Evo/SensorAbs/Rand/14_04_30__11_23_14/GA_BestGenome.xml</LoadFrom>
         </Eval>
     </GA>
 </Config>

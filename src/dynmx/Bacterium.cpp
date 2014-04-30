@@ -39,18 +39,19 @@ void Bacterium::update(float dt)
   if( hasTorusSensor() )
     m_food = m_torusSensor->getLevel() * m_velocity.length() / m_maxSpeed;
   
-  // Neural dynamics
-  m_ctrnn->setExternalInput(0, 10.0f * sensed);
-  
-  if(m_topology.getNumInputs() > 1)
-    m_ctrnn->setExternalInput(1, 10.0f * getSensedEnergy());
-  
-  m_ctrnn->updateDynamic(dt);
-  
   // Metabolise
   float tau = 0.25f;
   float dA = tau * ((-0.075*m_energy*m_energy*m_energy) + (0.5*m_food*m_energy*m_energy) - m_energy);
   m_energy += dA * dt;
+  
+  // Neural dynamics
+  m_ctrnn->setExternalInput(0, 10.0f * sensed);
+  
+  if(m_topology.getNumInputs() > 1)
+    //m_ctrnn->setExternalInput(1, 10.0f * getSensedEnergy());
+    m_ctrnn->setExternalInput(1, 10.0f * m_torusSensor->getLevel());
+  
+  m_ctrnn->updateDynamic(dt);
   
   /*if(m_energy < 1)
   {
