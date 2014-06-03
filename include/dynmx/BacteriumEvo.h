@@ -44,9 +44,11 @@ public:
   virtual void update(float dt);
 
 protected:
-  virtual void updateFitness(float dt);
-  void nextPhase();
   
+  virtual void updateFitness(float dt);
+  
+  bool isInnerPhase();
+  void nextPhase();
   void trialTaxisGrWidth(int t);
   void trialFoodPos(int t);
   

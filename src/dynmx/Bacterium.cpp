@@ -45,11 +45,14 @@ void Bacterium::update(float dt)
   m_energy += dA * dt;
   
   // Neural dynamics
-  m_ctrnn->setExternalInput(0, 10.0f * sensed);
+  m_ctrnn->setExternalInput(0, sensed);
   
   if(m_topology.getNumInputs() > 1)
-    //m_ctrnn->setExternalInput(1, 10.0f * getSensedEnergy());
-    m_ctrnn->setExternalInput(1, 10.0f * m_torusSensor->getLevel());
+    //m_ctrnn->setExternalInput(1, getSensedEnergy());
+    m_ctrnn->setExternalInput(1, m_torusSensor->getLevel());
+  
+  if(m_topology.getNumInputs() > 2)
+    m_ctrnn->setExternalInput(2, m_gradientSensor->getDerivative());
   
   m_ctrnn->updateDynamic(dt);
   
@@ -60,14 +63,28 @@ void Bacterium::update(float dt)
  
   
   // Move
-  static int motRot = m_topology.getSize() - 1;
+  float angSpeed, speed = 0;
+  if(m_topology.getNumOutputs() == 1)
+  {
+    const int motRot = m_topology.getSize() - 1;
+    angSpeed = 2 * m_ctrnn->getOutput(motRot) - 1;
+    speed = m_maxSpeed;
+  }
+  else
+  {
+    const int mot1 = m_topology.getSize() - 1;
+    const int mot2 = m_topology.getSize() - 2;
+    angSpeed = m_ctrnn->getOutput(mot1) - m_ctrnn->getOutput(mot2);
+    speed = 0.5 * (m_ctrnn->getOutput(mot1) + m_ctrnn->getOutput(mot2));
+  }
+
   
   float speedScalar = 1.0f;
   if(m_energy < m_energySpeedTresh)
     speedScalar = (1 / m_energySpeedTresh) * m_energy;
   
   // Rotation
-  m_angularSpeed = speedScalar * m_maxAngularSpeed * (2 * m_ctrnn->getOutput(motRot) - 1);
+  m_angularSpeed = speedScalar * m_maxAngularSpeed * angSpeed;
   m_angle += m_angularSpeed * dt;
   if(m_angleWraps)
     m_angle = wrap(m_angle, -m_maxAngle, m_maxAngle);
@@ -75,7 +92,7 @@ void Bacterium::update(float dt)
     m_angle = clamp(m_angle, -m_maxAngle, m_maxAngle);
 
   // Translation
-  m_velocity = speedScalar * m_maxSpeed * ci::Vec2f(cos(m_angle), sin(m_angle));
+  m_velocity = speedScalar * speed * ci::Vec2f(cos(m_angle), sin(m_angle));
   m_position += m_velocity * dt;
   
   if(m_positionWraps){
