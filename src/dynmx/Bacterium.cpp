@@ -103,6 +103,15 @@ void Bacterium::update(float dt)
   m_time += dt;
   
 }
+  
+//----------------------------------------------------------------------------------------------------------------------
+void Bacterium::record(Recorder& recorder)
+{
+  SMCAgent::record(recorder);
+  const std::vector<Positionable*>& objects = getEnvironment().getObjects();
+  float foodR = ((Torus*)objects[1])->getRadius();
+  recorder.push_back("foodR", foodR);
+}
 
 
 } // namespace

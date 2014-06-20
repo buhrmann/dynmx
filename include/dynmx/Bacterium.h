@@ -27,6 +27,8 @@ public:
   virtual void update(float dt);
   virtual void reset();
   virtual void init();
+  
+  virtual void record(Recorder& recorder); 
 };
   
 } // namespace

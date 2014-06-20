@@ -133,8 +133,11 @@ void BacteriumEvo::nextPhase()
     objects[1]->setVisibility(true);
 #endif
   
-  float foodR = isInnerPhase() ? 0.3 + m_randInitProp * UniformRandom(-0.1, 0.1) : 0.8 + m_randInitProp * UniformRandom(-0.1, 0.1);
-  ((Torus*)objects[1])->setRadius(foodR);
+  if(m_phase % m_numTests == 0)
+  {
+    float foodR = isInnerPhase() ? 0.3 + m_randInitProp * UniformRandom(-0.1, 0.1) : 0.8 + m_randInitProp * UniformRandom(-0.1, 0.1);
+    ((Torus*)objects[1])->setRadius(foodR);
+  }
   
   // Every time we enter a new environment
   if(m_phase < m_numPhases && m_phase % m_numTests == 0)
