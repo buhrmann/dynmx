@@ -13,9 +13,10 @@ circleFun <- function(p = c(0,0), r = 1, npoints = 100){
 
 dir = "~/Experiments/Bacterium/Evo/SensorAbs/Rand/"
 folders = c("14_06_04__18_40_41", "14_06_04__17_08_45", "14_06_04__17_08_53",
-            "14_06_04__19_15_17", "14_06_04__19_15_19", "14_06_20__09_13_36")
+            "14_06_04__19_15_17", "14_06_04__19_15_19", "14_06_20__09_13_36",
+            "14_06_24__12_10_01")
 
-folder = folders[[6]]
+folder = folders[[7]]
 
 file = paste(dir, folder, "/State.txt", sep="")
 cfgfnm = paste(dir, folder, "/Bacterium.xml", sep="")

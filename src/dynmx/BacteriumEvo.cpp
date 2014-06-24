@@ -127,7 +127,7 @@ void BacteriumEvo::nextPhase()
     // Invisible food
 #define CHANGE_VISIBILITY 1
 #if CHANGE_VISIBILITY
-  if(m_phase % 3 == 2)
+  if((m_phase % m_numTests) == (m_numTests - 1))
     objects[1]->setVisibility(false);
   else
     objects[1]->setVisibility(true);
@@ -297,13 +297,27 @@ void BacteriumEvo::updateFitness(float dt)
     fv = 1 - (fabs(desAng - ang) / PI_OVER_TWO); // In [1, 0] (no wrong direction)
   }
   
-
-  // Maximise ener gy
+  // Maximise energy
   //float f = m_agent->getEnergy() * dt;
   
-  if(m_phase % m_numTests > 0)
+  int test = m_phase % m_numTests;
+  if(test > 0)
   {
-    m_fitnessInst *= fv;
+    // Not the first phase after re-initialization
+    
+    // In invisible condition, only enforce tracking of remembered gradient in first half
+    if(!objects[1]->isVisible())
+    {
+      if (m_phaseTime > 0.5 * m_phaseDuration)
+        m_fitnessInst = 0;
+      else
+        m_fitnessInst *= 2 * fv; // make up for having only half the trial to evaluate
+      
+    }
+    else
+    {
+      m_fitnessInst *= fv;
+    }
   }
   else
   {
