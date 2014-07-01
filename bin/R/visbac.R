@@ -12,11 +12,14 @@ circleFun <- function(p = c(0,0), r = 1, npoints = 100){
 }
 
 dir = "~/Experiments/Bacterium/Evo/SensorAbs/Rand/"
-folders = c("14_06_04__18_40_41", "14_06_04__17_08_45", "14_06_04__17_08_53",
+foldersNoReLearn = c("14_06_04__18_40_41", "14_06_04__17_08_45", "14_06_04__17_08_53",
             "14_06_04__19_15_17", "14_06_04__19_15_19", "14_06_20__09_13_36",
             "14_06_24__12_10_01")
 
-folder = folders[[7]]
+foldersReLearn = c("14_06_27__12_10_18", "14_06_27__09_48_58", "14_06_27__11_58_09")
+
+
+folder = foldersReLearn[[1]]
 
 file = paste(dir, folder, "/State.txt", sep="")
 cfgfnm = paste(dir, folder, "/Bacterium.xml", sep="")
@@ -24,7 +27,9 @@ evofnm = paste(dir, folder, "/Evolvable.xml", sep="")
 cfg = xmlInternalTreeParse(cfgfnm)
 evo = xmlInternalTreeParse(evofnm)
 
-numPh = strtoi(xpathApply(cfg, "/Config/GA/Evolvable/Trial", xmlGetAttr, "numTests")[[1]])
+numTe = strtoi(xpathApply(cfg, "/Config/GA/Evolvable/Trial", xmlGetAttr, "numTests")[[1]])
+numEnv = strtoi(xpathApply(cfg, "/Config/GA/Evolvable/Trial", xmlGetAttr, "numEnvirons")[[1]])
+numPh = numTe * numEnv
 numTr = strtoi(xpathApply(cfg, "/Config/GA/Eval/NumTrials", xmlValue)[[1]])
 totalPh = numTr * numPh
 
@@ -41,7 +46,7 @@ D$phase = times %/% phlength
 D$time = times %% phlength
 
 # remove last step in each trial
-D = D[D$time!=phlength-1,]
+D = D[D$time!=(phlength-1),]
 D$nph = D$phase %% numPh
 D$tr = D$phase %/% numPh
 n = nrow(D)
@@ -58,6 +63,10 @@ for (i in c(0:(totalPh-1))){
   r = D$foodR[[i*phlength+1]]
   c = circleFun(c(0,0), r)
   c$phase = i
+  if ((i %% 3) == 2)
+    c$cola = "white"
+  else
+    c$cola = "green"
   cs = rbind(cs, c)
 }
 
@@ -67,7 +76,7 @@ trajs = ggplot(D, aes(x = PosX, y = PosY)) +
   geom_path(aes(color = time)) +
   coord_fixed() +
   theme_classic() + scale_color_gradient(limits=c(0, phlength), low="red", high="black", guide=F) +
-  facet_wrap(~phase, ncol=3) +
+  facet_wrap(~phase, ncol=numPh) +
   ggtitle(sprintf("EvoStage=%i F=%1.2f TestStage=%i\n", stageEvo, fit, stageTest))
 
 print(trajs)

@@ -54,6 +54,9 @@ void Bacterium::update(float dt)
   if(m_topology.getNumInputs() > 2)
     m_ctrnn->setExternalInput(2, m_gradientSensor->getDerivative());
   
+  if(m_topology.getNumInputs() > 3)
+    m_ctrnn->setExternalInput(3, m_energy);
+  
   m_ctrnn->updateDynamic(dt);
   
   /*if(m_energy < 1)
