@@ -25,6 +25,7 @@ void BacteriumEvo::init()
     const ci::XmlTree& xml = SETTINGS->getChild("Config/GA/Evolvable");
     m_phaseDuration = xml.getChild("Trial").getAttributeValue<float>("phaseDuration", 1);
     m_numTests = xml.getChild("Trial").getAttributeValue<int>("numTests", 1);
+    m_invTest = xml.getChild("Trial").getAttributeValue<int>("invTest", -1);
     m_numEnvirons = xml.getChild("Trial").getAttributeValue<int>("numEnvirons", 1);
     
     std::string fitAccNm = xml.getChild("Trial").getAttributeValue<std::string>("fitAcc", "avg");
@@ -124,14 +125,13 @@ void BacteriumEvo::nextPhase()
   // Setup next trial
   const std::vector<Positionable*>& objects = m_agent->getEnvironment().getObjects();
   
-    // Invisible food
-#define CHANGE_VISIBILITY 1
-#if CHANGE_VISIBILITY
-  if((m_phase % m_numTests) == (m_numTests - 1))
+  // Invisible food
+  int test = m_phase % m_numTests;
+  if(test == m_invTest)
     objects[1]->setVisibility(false);
   else
     objects[1]->setVisibility(true);
-#endif
+
   
   if(m_phase % m_numTests == 0)
   {
