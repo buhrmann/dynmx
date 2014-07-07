@@ -27,6 +27,7 @@ void BacteriumEvo::init()
     m_numTests = xml.getChild("Trial").getAttributeValue<int>("numTests", 1);
     m_invTest = xml.getChild("Trial").getAttributeValue<int>("invTest", -1);
     m_numEnvirons = xml.getChild("Trial").getAttributeValue<int>("numEnvirons", 1);
+    m_envReset =  xml.getChild("Trial").getAttributeValue<bool>("envReset", true);
     
     std::string fitAccNm = xml.getChild("Trial").getAttributeValue<std::string>("fitAcc", "avg");
     if(fitAccNm == "avg")
@@ -158,12 +159,16 @@ void BacteriumEvo::nextPhase()
   }
   
   // Set agent position and orientation
-  float p = 0.55 + m_randInitProp * UniformRandom(-0.1, 0.1);
-  float a = m_randInitProp * UniformRandom(-PI, PI);
-  m_agent->setAngle(a);
-  m_agent->setPosition(ci::Vec2f(0, p));
+  bool skipReset = !m_envReset && (m_phase % m_numTests == 0) && (m_phase > 0);
+  if(!skipReset)
+  {
+    float p = 0.55 + m_randInitProp * UniformRandom(-0.1, 0.1);
+    float a = m_randInitProp * UniformRandom(-PI, PI);
+    m_agent->setAngle(a);
+    m_agent->setPosition(ci::Vec2f(0, p));
+  }
   
-  m_phaseInitialDist = fabs(p - ((Torus*)objects[1])->getRadius());
+  m_phaseInitialDist = fabs(m_agent->getPosition().length() - ((Torus*)objects[1])->getRadius());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

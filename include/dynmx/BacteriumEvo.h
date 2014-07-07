@@ -66,6 +66,7 @@ protected:
   int m_numTests;
   int m_numEnvirons;
   int m_invTest;
+  bool m_envReset;
   
   float m_randInitProp;
 };
