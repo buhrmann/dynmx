@@ -128,7 +128,7 @@ void BacteriumEvo::nextPhase()
   
   // Invisible food
   int test = m_phase % m_numTests;
-  if(test == m_invTest)
+  if(test == m_invTest-1)
     objects[1]->setVisibility(false);
   else
     objects[1]->setVisibility(true);
@@ -141,7 +141,7 @@ void BacteriumEvo::nextPhase()
   }
   
   // Every time we enter a new environment
-  if(m_phase < m_numPhases && m_phase % m_numTests == 0)
+  if((m_phase < m_numPhases) && (test == 0))
   {
     // Change food position
     if(m_phase == 0)
@@ -159,7 +159,7 @@ void BacteriumEvo::nextPhase()
   }
   
   // Set agent position and orientation
-  bool skipReset = !m_envReset && (m_phase % m_numTests == 0) && (m_phase > 0);
+  bool skipReset = !m_envReset && (test == 0) && (m_phase > 0);
   if(!skipReset)
   {
     float p = 0.55 + m_randInitProp * UniformRandom(-0.1, 0.1);
