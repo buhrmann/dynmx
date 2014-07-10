@@ -51,8 +51,12 @@ void Bacterium::update(float dt)
   m_ctrnn->setExternalInput(0, sensed);
   
   if(m_topology.getNumInputs() > 1)
-    //m_ctrnn->setExternalInput(1, getSensedEnergy());
-    m_ctrnn->setExternalInput(1, m_torusSensor->getLevel());
+  {
+    if (m_engReplFoodSens)
+      m_ctrnn->setExternalInput(1, getSensedEnergy());
+    else
+      m_ctrnn->setExternalInput(1, m_torusSensor->getLevel());
+  }
   
   if(m_topology.getNumInputs() > 2)
     m_ctrnn->setExternalInput(2, m_gradientSensor->getDerivative());

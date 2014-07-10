@@ -134,6 +134,8 @@ protected:
   float m_evMax;
   float m_food;
   
+  bool m_engReplFoodSens;
+  
   float m_time;
   
 }; // class

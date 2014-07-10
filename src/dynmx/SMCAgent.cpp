@@ -97,6 +97,8 @@ void SMCAgent::init()
     m_evMin = xml.getChild("Energy").getAttributeValue<float>("evMin", 0);
     m_evMax = xml.getChild("Energy").getAttributeValue<float>("evMax", 10);
     
+    m_engReplFoodSens = xml.getChild("Energy").getAttributeValue<bool>("engReplFoodSens", false);
+    
     getEnvironment().fromXml(xml.getChild("Environment"));
   }
   
