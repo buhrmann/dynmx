@@ -408,7 +408,7 @@ void GA::mutate(uint16_t winner, uint16_t loser)
     }
 
     // Gaussian mutation
-    if ((m_mutationRate < 1) && (ran1(&m_idum) < m_mutationRate))
+    if (ran1(&m_idum) < m_mutationRate)
     {
       //const double mutation = (-1.0 + 2.0 * ran1(&m_idum)) * randGausLength;
       //const double mutation = gasdev(&m_idum) * m_maxMutation;

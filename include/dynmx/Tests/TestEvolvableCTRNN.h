@@ -59,7 +59,7 @@ void TestEvolvableCTRNN::decodeGenome(const double* g)
 {
   dmx::NetLimits limits;
   limits.tau.set(0.2, 2.0);
-  m_topology.decode(*m_ctrnn, g, limits);
+  m_topology.decode(*m_ctrnn, g);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -92,7 +92,7 @@ void App::prepareSettings( Settings *settings )
     fps = SETTINGS->getChild("Config/Globals/FrameRate")["Value"].as<int>();
   }
   m_fixedTimeStep = 1.0 / (float) fps;  // Simulation integration time step
-  settings->setFrameRate(fps);          // How many FPS the app gets updated with
+  //settings->setFrameRate(fps);          // How many FPS the app gets updated with
   
   // Fullscreen
   if (SETTINGS->hasChild("Config/Globals/FullScreen"))

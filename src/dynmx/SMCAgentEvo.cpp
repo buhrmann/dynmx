@@ -45,7 +45,6 @@ void SMCAgentEvo::init()
   if (SETTINGS->hasChild("Config/GA/Evolvable"))
   {
     const ci::XmlTree& xml = SETTINGS->getChild("Config/GA/Evolvable");
-    m_netLimits.fromXml(xml.getChild("NetLimits"));
     m_trialDuration = xml.getChild("Trial").getValue<double>(10.0);
     m_fitnessEvalDelay = xml.getChild("FitnessEvalDelay").getValue<double>(8.0);    
   }
@@ -87,7 +86,7 @@ int SMCAgentEvo::getNumGenes()
 //----------------------------------------------------------------------------------------------------------------------
 void SMCAgentEvo::decodeGenome(const double* genome)
 {
-  m_agent->getTopology().decode(m_agent->getCTRNN(), genome, m_netLimits);
+  m_agent->getTopology().decode(m_agent->getCTRNN(), genome);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

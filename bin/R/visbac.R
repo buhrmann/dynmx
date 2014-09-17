@@ -16,10 +16,11 @@ foldersNoReLearn = c("14_06_04__18_40_41", "14_06_04__17_08_45", "14_06_04__17_0
             "14_06_04__19_15_17", "14_06_04__19_15_19", "14_06_20__09_13_36",
             "14_06_24__12_10_01")
 
-foldersReLearn = c("14_06_27__12_10_18", "14_06_27__09_48_58", "14_06_27__11_58_09")
+foldersReLearn = c("14_06_27__12_10_18", "14_06_27__09_48_58", "14_06_27__11_58_09",
+                   "14_07_03__18_42_42", "14_07_11__13_33_03")
 
 
-folder = foldersReLearn[[1]]
+folder = foldersReLearn[[5]]
 
 file = paste(dir, folder, "/State.txt", sep="")
 cfgfnm = paste(dir, folder, "/Bacterium.xml", sep="")
@@ -73,11 +74,33 @@ for (i in c(0:(totalPh-1))){
 # Main Euclidean trajectory plot
 trajs = ggplot(D, aes(x = PosX, y = PosY)) + 
   geom_path(data=cs, aes(x,y), color=alpha("green", 0.3), size=3) +
-  geom_path(aes(color = time)) +
+  geom_path(aes(color = SensedEnergy)) +
   coord_fixed() +
-  theme_classic() + scale_color_gradient(limits=c(0, phlength), low="red", high="black", guide=F) +
+  theme_classic() + 
+  scale_color_gradient(limits=c(0, 1), low="red", high="blue", guide=F) +
+  #scale_color_gradientn(colours=rainbow(7), guide=F) +
   facet_wrap(~phase, ncol=numPh) +
   ggtitle(sprintf("EvoStage=%i F=%1.2f TestStage=%i\n", stageEvo, fit, stageTest))
 
 print(trajs)
 
+# Print neural trajectories
+varname = "NeuralOutput"
+varnums = c(0:8)
+vars = c("Time", "Distance", paste(varname, varnums, sep=""))
+
+trial = 0
+phase = 5
+
+Dtr = D[D$tr==trial & D$nph==phase, vars]
+Dm = melt(Dtr, id.vars="Time")
+
+ggplot(Dm, aes(x = Time, y = value)) + 
+  geom_line() +
+  theme_minimal() +
+  theme(panel.margin = unit(1.5, "line")) +
+  #theme(axis.ticks = element_blank(), axis.text.y = element_blank()) +
+  #scale_y_continuous(breaks=NULL) +
+  #scale_y_continuous(breaks=seq(-1,1,1)) +
+  facet_grid(variable ~ ., scales="free")
+  

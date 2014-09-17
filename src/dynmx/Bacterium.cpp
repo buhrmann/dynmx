@@ -121,6 +121,7 @@ void Bacterium::record(Recorder& recorder)
   const std::vector<Positionable*>& objects = getEnvironment().getObjects();
   float foodR = ((Torus*)objects[1])->getRadius();
   recorder.push_back("foodR", foodR);
+  recorder.push_back("Distance", m_position.length() - foodR);
 }
 
 

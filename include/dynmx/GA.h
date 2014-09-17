@@ -25,7 +25,7 @@
 namespace dmx
 {
 
-#define GA_BOUND_CHECK 0  // 0 = clamping, 1 = mirroring
+#define GA_BOUND_CHECK 1  // 0 = clamping, 1 = mirroring
 #define MAX_NUM_PARALLEL_EVALS 8
 
 #define NON_EVAL -100000.f // MAX_NEG_FLOAT
@@ -71,6 +71,7 @@ public:
   /// Returns complete population, e.g. for drawing
   const double* const* getPopulation() const { return m_genomes; };
   float* getFitnesses() const {return m_fitnesses; };
+  double* getGenome(int i) { return m_genomes[i]; };
 
   void setRandomSeed(long seed) { m_idum = seed; };
   void setDemeWidth(int width) { m_demeWidth = width; };

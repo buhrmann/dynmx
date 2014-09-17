@@ -94,6 +94,10 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/Users/thomasbuhrmann/Code/dynmx/bin/Configs/Bacterium.xml"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/thomasbuhrmann/Code/dynmx/bin/Configs/legbac.xml"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

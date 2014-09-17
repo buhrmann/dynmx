@@ -29,6 +29,7 @@ class Evolvable : public Model
 public:
   virtual int getNumGenes() = 0;
   virtual void decodeGenome(const double* genome) = 0;
+  virtual void processGenome(double* genome) {};
   virtual float getFitness() = 0;
   virtual void nextTrial(int trial = 0) {};
   virtual void nextStage(int stage){};

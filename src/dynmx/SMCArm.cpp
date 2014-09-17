@@ -476,7 +476,7 @@ int SMCArm::getNumGenes()
 //----------------------------------------------------------------------------------------------------------------------
 void SMCArm::decodeGenome(const double* genome)
 {
-  m_topology.decode(*m_ctrnn, genome, m_netLimits);
+  m_topology.decode(*m_ctrnn, genome);
   
   // Hack: check if new encode method roundtrips
 #if 0

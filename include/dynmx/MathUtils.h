@@ -102,7 +102,7 @@ static double map01To(double val, const Range& r)
   
 static double mapTo01(double val, const Range& r)
 {
-  return map01To(val, r.min, r.max);
+  return mapTo01(val, r.min, r.max);
 }
   
 
@@ -167,7 +167,60 @@ static inline std::string toString (T& t)
   ss << t;
   return ss.str();
 }
- 
+
+// Create a 2d array with default values
+// Receiver responsible for clean-up!
+//----------------------------------------------------------------------------------------------------------------------
+template<class T>
+T** createArray2d(int n, int m, T init)
+{
+  T** a = new T* [n];
+  for (int i = 0; i < n; ++i)
+  {
+    a[i] = new T [m];
+    std::fill(a[i], a[i]+m, init);
+  }
+  
+  return a;
+}
+
+// Fill a 2d array with same value
+//----------------------------------------------------------------------------------------------------------------------
+template<class T>
+void fillArray2d(T** a, int n, int m, T val)
+{
+  for (int i = 0; i < n; ++i)
+    for (int j = 0; j < m; ++j)
+      a[i][j] = val;
+}
+
+// Print arrays
+//----------------------------------------------------------------------------------------------------------------------
+template<class T>
+void printArray(T* a, int n)
+{
+  for (int i = 0; i < n; ++i)
+  {
+    std::cout << a[i] << "\t";
+  }
+  std::cout << std::endl;
+}
+  
+template<class T>
+void printArray2d(T** a, int n, int m)
+{
+  for (int i = 0; i < n; ++i)
+  {
+    std::cout << i << ": \t";
+    for (int j = 0; j < m; ++j)
+    {
+      std::cout << a[i][j] << "\t";
+    }
+    std::cout << std::endl;
+  }
+}
+  
+  
 // Serialising of std::vec from and to ci::XmlTree
 //----------------------------------------------------------------------------------------------------------------------
 // Write vec to xml

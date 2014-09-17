@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Config>
+    <Globals>
+        <Visual Value="0"/>
+        <WindowSize Width="1000" Height="800"/>
+        <FrameRate Value="10"/>
+        <FullScreen Value="0"/>
+        <VSync Value="0"/>
+        <Model Value="GA"/>
+        <DebugLevel Value="0"/>
+        <PlotDuration Value="0.5"/>
+        <OutputFolder Name="~/Experiments/LegBac/Evo"/>
+    </Globals>
+    <GA>
+        <Evolvable Name="LegBac">
+            <Trials legDur="150" bacDur="150" bacFoodDur="30" legNum="0" bacNum="3" legFitMax="78" bacFitMax="0.5">0</Trials>
+            <Topology symmetric="0" weightCutoff="0" adaptive="0" initialWeights="1" rulePerConn="1" noiseUniform="1">
+                <Inputs asNeurons="1">1</Inputs>
+                <Hidden laterallyConnected="1">5</Hidden>
+                <Outputs laterallyConnected="0">0</Outputs>
+                <NetLimits>
+                    <Weight min="-12.0" max="12.0"/>
+                    <Bias min="-12.0" max="12.0"/>
+                    <Gain min="-12.0" max="12.0"/>
+                    <TimeConstant min="0.05" max="5"/>
+                    <MeanDecay min="0.9" max="1"/>
+                    <WeightDecay min="0" max="0.1"/>
+                    <NoiseVar min="0" max="10"/>
+                    <LearnRate min="0" max="0.1"/>
+                </NetLimits>
+            </Topology>
+        </Evolvable>    
+        <Incremental initialMutation="0.1" seedOnly="1" seedAll="1" elitist="0" initialStage="0">0</Incremental>
+        <LoadFrom>~/Experiments/LegBac/Evo/14_09_01__13_50_40/GA_Result.xml</LoadFrom>
+        <PopulationSize>200</PopulationSize>
+        <DemeSize>10</DemeSize>
+        <NumGenerations OutputInterval="10">5000</NumGenerations>
+        <Mutation Rate="1.0" Var="0.1" VarReduced="0.01" ReduceAt="4000">
+            <IntraGenomePD>Gaussian</IntraGenomePD>
+            <InterGenomePD>Gaussian</InterGenomePD>
+        </Mutation>
+        <Recombination Rate="0.8" RateReduced="0.75"/>
+        <Trials Combine="Mult" numStageMult="10">3</Trials>
+        <GenomeMod>1</GenomeMod>
+        <AvoidReevaluation>0</AvoidReevaluation>
+        <SaveBestEachGeneration>0</SaveBestEachGeneration>
+        <AutoEval>1</AutoEval>
+        <Stages FitThreshold="100" NumGensAbove="10" Max="10"/>
+        <Eval Run="0" Stage="0">
+            <NumTrials>3</NumTrials>
+            <RecordState>0</RecordState>
+            <LoadFrom>~/Experiments/LegBac/Evo/14_09_01__17_05_28/GA_BestGenome.xml</LoadFrom>
+        </Eval>
+    </GA>
+</Config>

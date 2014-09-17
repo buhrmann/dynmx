@@ -698,8 +698,9 @@ void Plot::addPoint(float p, int pID)
     m_maxY = p;
   if(p < m_minY)
     m_minY = p;
-    
-  if(m_points[pID].size() > m_N)
+  
+  const size_t numPoints = m_points[pID].size();
+  if(numPoints > m_N)
     m_points[pID].erase(m_points[pID].begin());    
 }
 

@@ -13,17 +13,17 @@
 
 namespace dmx
 {
-  
+
+//----------------------------------------------------------------------------------------------------------------------
+// NetLimits
 //----------------------------------------------------------------------------------------------------------------------
 void NetLimits::toXml(ci::XmlTree& xml) const
 {
   ci::XmlTree netXml ("NetLimits", "");
-  
   weight.toXml(netXml, "Weight");
   bias.toXml(netXml, "Bias");
   gain.toXml(netXml, "Gain");
-  tau.toXml(netXml, "TimeConstant");  
-  
+  tau.toXml(netXml, "TimeConstant");
   xml.push_back(netXml);
 }
 
@@ -37,265 +37,280 @@ void NetLimits::fromXml(const ci::XmlTree& xml)
     gain.fromXml(xml, "Gain");
     tau.fromXml(xml, "TimeConstant");
   }
-   
-}  
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Topology
+//----------------------------------------------------------------------------------------------------------------------
+Topology::Topology() :
+  m_N(5),
+  m_connections(NULL),
+  m_inputsAreNeurons(true),
+  m_weightCutoff(0),
+  m_symmetric(false),
+  m_outputsLaterallyConnected(false),
+  m_hiddenLaterallyConnected(true)
+{
+  setSize(1, 3, 1);
+  calcNumParameters();
+};
+
+// Create from xml
+//----------------------------------------------------------------------------------------------------------------------
+Topology::Topology(const ci::XmlTree& xml) :
+  m_connections(NULL)
+{
+  fromXml(xml);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+void Topology::destroyMatrix()
+{
+  // Destroy matrix
+  if(m_connections != NULL)
+  {
+    for(int i = 0; i < m_N; i++)
+    {
+      delete [] m_connections[i];
+    }
+    delete [] m_connections;
+  }
+  
+  m_connections = NULL;
+}
+  
+//----------------------------------------------------------------------------------------------------------------------
+void Topology::buildMatrix()
+{
+  if(m_connections == NULL)
+  {
+    // Create matrix
+    m_connections = new bool*[m_N];
+    for(int i = 0; i < m_N; i++)
+    {
+      m_connections[i] = new bool[m_N];
+      for(int j = 0; j < m_N; j++)
+      {
+        m_connections[i][j] = calcConn(i, j);
+      }
+    }
+  }
+}
 
 // Returns the number of neurons in a layer that are uniquely encoded, taking into account symmetries and evenness
 //----------------------------------------------------------------------------------------------------------------------
 int Topology::getNumUniqueNeurons(LayerName layer) const
 {
-  if(size[layer] == 1)
-    return 1;
-  
-  if(symmetric)
+  if(m_symmetric)
   {
-    if(even(size[layer]))
-      return size[layer] / 2;       // e.g. 2 if 4 neurons in layer
+    if(even(m_size[layer]))
+      return m_size[layer] / 2;       // e.g. 2 if 4 neurons in layer
     else
-      return 1 + (size[layer] / 2); // e.g. 3 if 5 neurons in layer
+      return 1 + (m_size[layer] / 2); // e.g. 3 if 5 neurons in layer
   }
   else 
   {
-    return size[layer];
+    return m_size[layer];
   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-int Topology::getNumParameters() const 
+int Topology::getLayerFirst(LayerName l) const
 {
-  int N = 0;
-  int numUniqueInputs = getNumUniqueNeurons(kLyr_Input);
-  int numUniqueHidden = getNumUniqueNeurons(kLyr_Hidden);
-  int numUniqueOutputs = getNumUniqueNeurons(kLyr_Output);
-  
-  // Input layer: gains
-  // -------------------------------
-  // If inputs are not dedicated neurons, we need to encode gains.
-  if(!inputsAreNeurons)
+  if (l == kLyr_Input)
   {
-    N += numUniqueInputs;
+    return 0;
   }
-  
-  // Weights to hidden layer
-  // If we have neurons as inputs, we need connections between inputs and hidden layer.
-  // Symmetry means first and last hidden neuron receive same connections from inputs (though in reverse order).
-  // But: the connections from input to given hidden neuron have to be different. Symmetry here would mean first 
-  // and last sensor are ambiguous.
-  if(inputsAreNeurons)
+  else
   {
-    N += numUniqueHidden * size[kLyr_Input];
+    const int numInputs = m_inputsAreNeurons ? m_size[kLyr_Input] : 0;
+    if (l == kLyr_Hidden)
+      return numInputs;
+    else
+      return numInputs + m_size[kLyr_Hidden];
   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+void Topology::getLayerFirstLast(LayerName l, int& first, int& last, bool unique) const
+{
+  first = getLayerFirst(l);
+  last = first + (unique ? getNumUniqueNeurons(l) : m_size[l]) - 1;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+int Topology::calcNumUniqueConnections()
+{
+  m_numConn = 0;
+  const int numUniqueHidden = getNumUniqueNeurons(kLyr_Hidden);
+  const int numUniqueOutputs = getNumUniqueNeurons(kLyr_Output);
   
+  // Inputs to hidden
+  if(m_inputsAreNeurons)
+    m_numConn += numUniqueHidden * m_size[kLyr_Input];
   
-  // Hidden layer: biases and time constants
-  // --------------------------------------
-  N += 2 * numUniqueHidden;
+  // Hidden intralayer weights
+  if(m_hiddenLaterallyConnected)
+    m_numConn += numUniqueHidden * m_size[kLyr_Hidden];
   
-  // Intralayer weights
-  N += numUniqueHidden * size[kLyr_Hidden];
+  // Hidden layer to output
+  m_numConn += numUniqueOutputs * m_size[kLyr_Hidden];
   
+  // Output intralayer weights
+  if(m_outputsLaterallyConnected)
+    m_numConn += numUniqueOutputs * m_size[kLyr_Output];
   
-  // Output layer: biases and time constants
-  // ---------------------------------------
-  N += 2 * numUniqueOutputs;
+  return m_numConn;
+}
   
-  // Weights from hidden layer
-  N += numUniqueOutputs * size[kLyr_Hidden];
+//----------------------------------------------------------------------------------------------------------------------
+int Topology::calcNumParameters()
+{
+  m_numParams = 0;
+
+  // Input layer gains
+  if(!m_inputsAreNeurons)
+    m_numParams += getNumUniqueNeurons(kLyr_Input);
+
+  // Biases and time constants
+  m_numParams += 2 * (getNumUniqueNeurons(kLyr_Hidden) + getNumUniqueNeurons(kLyr_Output));
   
-  // Intralayer weights
-  if(outputsLaterallyConnected)
+  // Connections
+  m_numParams += calcNumUniqueConnections();
+  return m_numParams;
+}
+  
+//----------------------------------------------------------------------------------------------------------------------
+void Topology::decodeLayerParams(CTRNN& net, LayerName layer, const double* params, int& I, const Range& r, Setter1Func f) const
+{
+  int first, last;
+  getLayerFirstLast(layer, first, last, false);
+  const int numUnique = getNumUniqueNeurons(layer);
+  
+  for(int i = 0; i < numUnique; ++i)
   {
-    N += numUniqueOutputs * size[kLyr_Output];
+    double p = r.decode(params[I++]);
+    (net.*f)(first + i, p);
+    
+    if(m_symmetric)
+      (net.*f)(last - i, p);
   }
+}
+ 
+//----------------------------------------------------------------------------------------------------------------------
+void Topology::encodeLayerParams(CTRNN& net, LayerName layer, double* params, int& I, const Range& r, Getter1Func f) const
+{
+  int first, lastUnique;
+  getLayerFirstLast(layer, first, lastUnique, true);
+
+  for(int i = first; i <= lastUnique; ++i)
+  {
+    params[I++] = r.encode((net.*f)(i));
+  }
+}
   
-  return N;
+// Decodes weights from layer pre to layer post (can be same layer)
+//----------------------------------------------------------------------------------------------------------------------
+void Topology::decodeLayerConnections(CTRNN& net, LayerName layerPre, LayerName layerPost, const double* params, int& I,
+                                     const Range& r, Setter2Func f, bool self) const
+{
+  int firstPre, lastPre;
+  int firstPost, lastPost;
+  getLayerFirstLast(layerPre, firstPre, lastPre, false);
+  getLayerFirstLast(layerPost, firstPost, lastPost, false);
+  const int numUniquePost = getNumUniqueNeurons(layerPost);
+  
+  int from, to;
+  for(int i = 0; i < numUniquePost; ++i)
+  {
+    for(int j = 0; j < m_size[layerPre]; ++j)
+    {
+      from = firstPre + j;
+      to = firstPost + i;
+      
+      // Check how to handle self-connections
+      if (self || (from != to))
+      {
+        double p = r.decode(params[I++]);
+        (net.*f)(from, to, p);
+        
+        if(m_symmetric)
+        {
+          // Ensure middle neurons, if odd number, isn't decoded twice
+          int toSym = lastPost - i;
+          if(toSym != to)
+          {
+            int fromSym = lastPre - j;
+            (net.*f)(fromSym, toSym, p);
+          }
+        } // symmetric
+      } // self-connection
+    }
+  }
+}
+  
+//----------------------------------------------------------------------------------------------------------------------
+void Topology::encodeLayerConnections(CTRNN& net, LayerName pre, LayerName post, double* params, int& I, const Range& r,
+                                      Getter2Func f, bool self) const
+{
+  int numUniquePost = getNumUniqueNeurons(post);
+  int numPre = m_size[pre];
+  int firstPre = getLayerFirst(pre);
+  int firstPost = getLayerFirst(post);
+  
+  for(int i = 0; i < numUniquePost; ++i)
+  {
+    for(int j = 0; j < numPre; ++j)
+    {
+      int from = firstPre + j;
+      int to = firstPost + i;
+      if (self || (from != to))
+        params[I++] = r.encode((net.*f)(from, to));
+    }
+  }
 }
   
 //----------------------------------------------------------------------------------------------------------------------  
 // Input neurons are placeholder neurons only and are arranged in a layer different from real neurons.
-// Each real neuron receives connections from all input neurons.
 // Real neurons are are arranged in a bilaterally symmetric layer. I.e. first and last neuron are identical, as well
 // as the second and second to last etc...
 //----------------------------------------------------------------------------------------------------------------------
-bool Topology::decode(CTRNN& ctrnn, const double* params, const NetLimits& limits) const
+bool Topology::decode(CTRNN& ctrnn, const double* params) const
 {
-  
-  int I = 0; // tracks starting index of a range of parameters
-  
-  int numUniqueInputs = getNumUniqueNeurons(Topology::kLyr_Input);
-  int numUniqueHidden = getNumUniqueNeurons(Topology::kLyr_Hidden);
-  int numUniqueOutputs = getNumUniqueNeurons(Topology::kLyr_Output);
-  int numInputs = getNumInputs();
-  int numInputNeurons = getInputsAreNeurons() ? numInputs : 0;
-  int numHidden = getNumHidden();
+  int I = 0;
   
   // Input gains, if inputs are not neurons (in which case weights take care of individual weighting)
-  int lastInput = numInputs - 1;  
-  if(!getInputsAreNeurons())
+  if(m_inputsAreNeurons)
   {
-    for(int i = 0; i < numUniqueInputs; ++i)
-    {
-      double gain = map01To(params[I], limits.gain);
-      ctrnn.setGain(i, gain);
-      ++I;
-      
-      if(isSymmetric())
-      {
-        ctrnn.setGain(lastInput - i, gain);  
-      }
-    }
+    for(int i = 0; i < m_size[kLyr_Input]; ++i)
+      ctrnn.setInputNeuron(i);
+  }
+  else
+  {
+    decodeLayerParams(ctrnn, kLyr_Input, params, I, m_limits.gain, &CTRNN::setGain);
   }
   
-  // Weights from input to hidden layer
-  int firstHidden = numInputNeurons;  
-  int lastHidden = numInputNeurons + numHidden - 1;
-  if(getInputsAreNeurons())
-  {
-    for(int i = 0; i < numUniqueHidden; ++i)
-    {
-      for(int j = 0; j < numInputs; ++j)
-      {
-        double weight = map01To(params[I], limits.weight);
-        int from = j;
-        int to = firstHidden + i;
-        ctrnn.setWeight(from, to, cutWeight(weight)); // from ->to
-        ctrnn.setInputNeuron(from);
-        ++I;
-        
-        // If network is symmetric, this means connections from hidden layer to first hidden neuron
-        // should be the same as those to last hidden neuron, though in reverse order. 
-        if(isSymmetric())
-        {
-          // Ensure middle hidden, if odd number, isn't decoded twice          
-          int toSym = lastHidden - i;
-          if(toSym != to)
-          {
-            int fromSym = lastInput - j;
-            ctrnn.setWeight(fromSym, toSym, cutWeight(weight));
-            ctrnn.setInputNeuron(fromSym);
-          }
-        } // if symmetric
-      } // for numInputs
-    } // for numUniqueHidden
-  }
+  // Neural parameters
+  decodeLayerParams(ctrnn, kLyr_Hidden, params, I, m_limits.bias, &CTRNN::setBias);
+  decodeLayerParams(ctrnn, kLyr_Output, params, I, m_limits.bias, &CTRNN::setBias);
+  decodeLayerParams(ctrnn, kLyr_Hidden, params, I, m_limits.tau, &CTRNN::setTimeConstant);
+  decodeLayerParams(ctrnn, kLyr_Output, params, I, m_limits.tau, &CTRNN::setTimeConstant);
   
+  // Connections
+  if(m_inputsAreNeurons)
+    decodeLayerConnections(ctrnn, kLyr_Input, kLyr_Hidden, params, I, m_limits.weight, &CTRNN::setWeight);
   
-  // Hidden layer: biases and time constants
-  for(int i = 0; i < numUniqueHidden; ++i)
-  {
-    double bias = map01To(params[I], limits.bias);
-    double tau = map01To(params[I + 1], limits.tau);
-    ctrnn.setBias(firstHidden + i, bias);
-    ctrnn.setTimeConstant(firstHidden + i, tau);
-    I += 2;
-    
-    if(isSymmetric())
-    {
-      int iSym = lastHidden - i;
-      ctrnn.setBias(iSym, bias);
-      ctrnn.setTimeConstant(iSym, tau);      
-    }
-  }
+  decodeLayerConnections(ctrnn, kLyr_Hidden, kLyr_Output, params, I, m_limits.weight, &CTRNN::setWeight);
   
-  // Hidden intralayer weights
-  for(int i = 0; i < numUniqueHidden; ++i)
-  {
-    for(int j = 0; j < numHidden; ++j)
-    {
-      double weight = map01To(params[I], limits.weight);
-      int from = firstHidden + j;
-      int to = firstHidden + i;
-      ctrnn.setWeight(from, to, cutWeight(weight));
-      ++I;
-      
-      if(isSymmetric())
-      {
-        // Ensure middle hidden, if odd number, isn't decoded twice
-        int toSym = lastHidden - i;
-        if(toSym != to)
-        {
-          int fromSym = lastHidden - j;
-          ctrnn.setWeight(fromSym, toSym, cutWeight(weight));
-        }
-      }
-    }
-  }  
+  if(m_hiddenLaterallyConnected)
+    decodeLayerConnections(ctrnn, kLyr_Hidden, kLyr_Hidden, params, I, m_limits.weight, &CTRNN::setWeight);
   
-  // Output layer: biases and time constants
-  int firstOutput = numInputNeurons + numHidden;
-  int lastOutput = firstOutput + getNumOutputs() - 1;
-  for(int i = 0; i < numUniqueOutputs; ++i)
-  {
-    double bias = map01To(params[I], limits.bias);
-    double tau = map01To(params[I + 1], limits.tau);
-    ctrnn.setBias(firstOutput + i, bias);
-    ctrnn.setTimeConstant(firstOutput + i, tau);
-    I += 2;
-    
-    if(isSymmetric())
-    {
-      int iSym = lastOutput - i;
-      ctrnn.setBias(iSym, bias);
-      ctrnn.setTimeConstant(iSym, tau);      
-    }
-  }  
+  if(m_outputsLaterallyConnected)
+    decodeLayerConnections(ctrnn, kLyr_Output, kLyr_Output, params, I, m_limits.weight, &CTRNN::setWeight);
   
-  // Weights from hidden layer to outputs
-  for(int i = 0; i < numUniqueOutputs; ++i)
-  {
-    for(int j = 0; j < numHidden; ++j)
-    {
-      double weight = map01To(params[I], limits.weight);
-      int from = firstHidden + j;
-      int to = firstOutput + i;      
-      ctrnn.setWeight(from, to, cutWeight(weight)); // from ->to
-      ++I;
-      
-      // If network is symmetric, this means connections from hidden layer to first hidden neuron
-      // should be the same as those to last hidden neuron, though in reverse order. 
-      if(isSymmetric())
-      {
-        // Ensure middle hidden, if odd number, isn't decoded twice          
-        int toSym = lastOutput - i;
-        if(toSym != to)
-        {
-          int fromSym = lastHidden - j;
-          ctrnn.setWeight(fromSym, toSym, cutWeight(weight));
-        }
-      } // if symmetric
-    } // for numInputs
-  } // for numUniqueHidden
-  
-  
-  // Output intralayer weights
-  if(getOutputsAreLaterallyConnected())
-  {
-    for(int i = 0; i < numUniqueOutputs; ++i)
-    {
-      for(int j = 0; j < getNumOutputs(); ++j)
-      {
-        double weight = map01To(params[I], limits.weight);
-        int from = firstOutput + j;
-        int to = firstOutput + i;
-        ctrnn.setWeight(from, to, cutWeight(weight));
-        ++I;
-        
-        if(isSymmetric())
-        {
-          // Ensure middle output, if odd number, isn't decoded twice
-          int toSym = lastOutput - i;
-          if(toSym != to)
-          {
-            int fromSym = lastOutput - j;
-            ctrnn.setWeight(fromSym, toSym, cutWeight(weight));
-          }
-        }
-      }
-    }  
-  }
   
   // Check we decoded correctly!
-  int numReqParams = getNumParameters();
+  int numReqParams = Topology::getNumParameters();
   bool correct = I == numReqParams;
   assert(correct);
   
@@ -308,122 +323,100 @@ bool Topology::decode(CTRNN& ctrnn, const double* params, const NetLimits& limit
 // Real neurons are are arranged in a bilaterally symmetric layer. I.e. first and last neuron are identical, as well
 // as the second and second to last etc...
 //----------------------------------------------------------------------------------------------------------------------
-bool Topology::encode(CTRNN& ctrnn, double* params, const NetLimits& limits) const
+bool Topology::encode(CTRNN& ctrnn, double* params) const
 {
-  
-  int I = 0; // tracks starting index of a range of parameters
-  
-  int numUniqueInputs = getNumUniqueNeurons(Topology::kLyr_Input);
-  int numUniqueHidden = getNumUniqueNeurons(Topology::kLyr_Hidden);
-  int numUniqueOutputs = getNumUniqueNeurons(Topology::kLyr_Output);
-  int numInputs = getNumInputs();
-  int numInputNeurons = getInputsAreNeurons() ? numInputs : 0;
-  int numHidden = getNumHidden();
+  int I = 0;
   
   // Input gains, if inputs are not neurons (in which case weights take care of individual weighting)
-  //int lastInput = numInputs - 1;
-  if(!getInputsAreNeurons())
+  if(!m_inputsAreNeurons)
   {
-    for(int i = 0; i < numUniqueInputs; ++i)
-    {
-      params[I++] = limits.gain.encode(ctrnn.getGain(i));
-    }
+    encodeLayerParams(ctrnn, kLyr_Input, params, I, m_limits.gain, &CTRNN::getGain);
   }
   
-  // Weights from input to hidden layer
-  int firstHidden = numInputNeurons;
-  //int lastHidden = numInputNeurons + numHidden - 1;
-  if(getInputsAreNeurons())
-  {
-    for(int i = 0; i < numUniqueHidden; ++i)
-    {
-      for(int j = 0; j < numInputs; ++j)
-      {
-        int from = j;
-        int to = firstHidden + i;
-        params[I++] = limits.weight.encode(ctrnn.getWeight(from, to));
-      }
-    }
-  }
+  // Neural parameters
+  encodeLayerParams(ctrnn, kLyr_Hidden, params, I, m_limits.bias, &CTRNN::getBias);
+  encodeLayerParams(ctrnn, kLyr_Output, params, I, m_limits.bias, &CTRNN::getBias);
+  encodeLayerParams(ctrnn, kLyr_Hidden, params, I, m_limits.tau, &CTRNN::getTimeConstant);
+  encodeLayerParams(ctrnn, kLyr_Output, params, I, m_limits.tau, &CTRNN::getTimeConstant);
   
-  // Hidden layer: biases and time constants
-  for(int i = 0; i < numUniqueHidden; ++i)
-  {
-    params[I++] = limits.bias.encode(ctrnn.getBias(firstHidden + i));
-    params[I++] = limits.tau.encode(ctrnn.getTimeConstant(firstHidden + i));
-  }
+  // Connections
+  if(m_inputsAreNeurons)
+    encodeLayerConnections(ctrnn, kLyr_Input, kLyr_Hidden, params, I, m_limits.weight, &CTRNN::getWeight);
   
-  // Hidden intralayer weights
-  for(int i = 0; i < numUniqueHidden; ++i)
-  {
-    for(int j = 0; j < numHidden; ++j)
-    {
-      int from = firstHidden + j;
-      int to = firstHidden + i;
-      params[I++] = limits.weight.encode(ctrnn.getWeight(from, to));
-    }
-  }
+  encodeLayerConnections(ctrnn, kLyr_Hidden, kLyr_Output, params, I, m_limits.weight, &CTRNN::getWeight);
   
-  // Output layer: biases and time constants
-  int firstOutput = numInputNeurons + numHidden;
-  //int lastOutput = firstOutput + getNumOutputs() - 1;
-  for(int i = 0; i < numUniqueOutputs; ++i)
-  {
-    params[I++] = limits.bias.encode(ctrnn.getBias(firstOutput + i));
-    params[I++] = limits.tau.encode(ctrnn.getTimeConstant(firstOutput + i));
-  }
+  if(m_hiddenLaterallyConnected)
+    encodeLayerConnections(ctrnn, kLyr_Hidden, kLyr_Hidden, params, I, m_limits.weight, &CTRNN::getWeight);
   
-  // Weights from hidden layer to outputs
-  for(int i = 0; i < numUniqueOutputs; ++i)
-  {
-    for(int j = 0; j < numHidden; ++j)
-    {
-      int from = firstHidden + j;
-      int to = firstOutput + i;
-      params[I++] = limits.weight.encode(ctrnn.getWeight(from, to));
-    }
-  }
-  
-  
-  // Output intralayer weights
-  if(getOutputsAreLaterallyConnected())
-  {
-    for(int i = 0; i < numUniqueOutputs; ++i)
-    {
-      for(int j = 0; j < getNumOutputs(); ++j)
-      {
-        int from = firstOutput + j;
-        int to = firstOutput + i;
-        params[I++] = limits.weight.encode(ctrnn.getWeight(from, to));
-      }
-    }  
-  }
+  if(m_outputsLaterallyConnected)
+    encodeLayerConnections(ctrnn, kLyr_Output, kLyr_Output, params, I, m_limits.weight, &CTRNN::getWeight);
   
   // Check we decoded correctly!
-  int numReqParams = getNumParameters();
+  int numReqParams = Topology::getNumParameters();
   bool correct = I == numReqParams;
   assert(correct);
   
   return correct;
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+bool Topology::calcConn(int from, int to) const
+{
+  // Only non-inputs reveive incomming connections
+  if (to >= m_size[kLyr_Input])
+  {
+    if (isHidden(to))
+    {
+      // Receiver is hidden
+      const bool fromIsInput = from < m_size[kLyr_Input];
+      if(fromIsInput || (isHidden(from) && m_hiddenLaterallyConnected))
+        return true;
+    }
+    else if (isHidden(from) || (isOutput(from) && m_outputsLaterallyConnected))
+    {
+      // Receiver is output and origin hidden or other output (if lateral allowed)
+      return true;
+    }
+  }
+  
+  return false;
+}
+  
+//----------------------------------------------------------------------------------------------------------------------
+void Topology::randomiseWeights(CTRNN* net, float min, float max)
+{
+  for (int i = 0; i < m_N; ++i)
+  {
+    for (int j = 0; j < m_N; ++j)
+    {
+      if(m_connections[j][i])
+      {
+        net->setWeight(j, i, UniformRandom(min, max));
+      }
+    }
+  }
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 void Topology::toXml(ci::XmlTree& xml) const
 {
   ci::XmlTree topXml ("Topology", "");
-  topXml.setAttribute("symmetric", symmetric);
-  topXml.setAttribute("weightCutoff", weightCutoff);
+  topXml.setAttribute("symmetric", m_symmetric);
+  topXml.setAttribute("weightCutoff", m_weightCutoff);
   
-  ci::XmlTree inputs ("Inputs", toString(size[0]));
-  inputs.setAttribute("asNeurons", inputsAreNeurons);
+  ci::XmlTree inputs ("Inputs", toString(m_size[0]));
+  inputs.setAttribute("asNeurons", m_inputsAreNeurons);
   topXml.push_back(inputs);
   
-  topXml.push_back(ci::XmlTree ("Hidden", toString(size[1])));
+  ci::XmlTree hidden ("Hidden", toString(m_size[1]));
+  hidden.setAttribute("laterallyConnected", m_hiddenLaterallyConnected);
+  topXml.push_back(hidden);
   
-  ci::XmlTree outputs ("Outputs", toString(size[2]));
-  outputs.setAttribute("laterallyConnected", outputsLaterallyConnected);  
+  ci::XmlTree outputs ("Outputs", toString(m_size[2]));
+  outputs.setAttribute("laterallyConnected", m_outputsLaterallyConnected);
   topXml.push_back(outputs);
+  
+  m_limits.toXml(topXml); 
   
   xml.push_back(topXml);
 }
@@ -431,18 +424,31 @@ void Topology::toXml(ci::XmlTree& xml) const
 //----------------------------------------------------------------------------------------------------------------------  
 void Topology::fromXml(const ci::XmlTree& xml)
 {
-  if (xml.getTag() == "Topology")
+  assert(xml.getTag() == "Topology");
+  
+  destroyMatrix();
+  
+  m_symmetric = xml.getAttributeValue<bool>("symmetric");
+  m_weightCutoff = xml.getAttributeValue<double>("weightCutoff", 0.0);
+  
+  m_size[0] = xml.getChild("Inputs").getValue<int>();
+  m_size[1] = xml.getChild("Hidden").getValue<int>();
+  m_size[2] = xml.getChild("Outputs").getValue<int>();
+  
+  m_inputsAreNeurons = xml.getChild("Inputs").getAttributeValue<bool>("asNeurons");
+  m_outputsLaterallyConnected = xml.getChild("Outputs").getAttributeValue<bool>("laterallyConnected", true);
+  m_hiddenLaterallyConnected = xml.getChild("Hidden").getAttributeValue<bool>("laterallyConnected", true);
+  
+  m_N = calcSize();
+  
+  buildMatrix();
+  
+  if(xml.hasChild("NetLimits"))
   {
-    symmetric = xml.getAttributeValue<bool>("symmetric");
-    weightCutoff = xml.getAttributeValue<double>("weightCutoff", 0.0);
-    
-    size[0] = xml.getChild("Inputs").getValue<int>();
-    size[1] = xml.getChild("Hidden").getValue<int>();
-    size[2] = xml.getChild("Outputs").getValue<int>();
-    
-    inputsAreNeurons = xml.getChild("Inputs").getAttributeValue<bool>("asNeurons");
-    outputsLaterallyConnected = xml.getChild("Outputs").getAttributeValue<bool>("laterallyConnected");        
+    m_limits.fromXml(xml.getChild("NetLimits"));
   }
+  
+  calcNumParameters();
 }
 
 } // namespace

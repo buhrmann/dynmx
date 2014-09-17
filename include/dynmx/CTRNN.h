@@ -109,13 +109,13 @@ public:
   };  
 
   CTRNN(int newsize = 4);
-  ~CTRNN();
+  virtual ~CTRNN();
   
   // Your regular CTRNN update all neurons are treated as standard neurons
   void update(double stepsize);
   
   // Dynamically switches between regular CTRNN update and other update functions, without branching (uses fct pointer)
-  void updateDynamic(double stepsize);  
+  virtual void updateDynamic(double stepsize);
 
     
   // Accessors
@@ -140,7 +140,7 @@ public:
   void setGain(int i, double value) { gains[i] = value; };
   void setTimeConstant(int i, double value) { taus[i] = value; Rtaus[i] = 1 / value; };
   void setExternalInput(int i, double value) { externalinputs[i] = value; };
-  void setWeight(int from, int to, double value) { weights[from][to] = value; };  
+  void setWeight(int from, int to, double value) { weights[from][to] = value; };
   void setCenterCrossing();
   void setInputNeuron(int i);
   
@@ -163,8 +163,8 @@ public:
   
   void leakWeights(float tau, float cutoff=0.0f);
   
-  void toXml(ci::XmlTree& xml);
-  void fromXml(const ci::XmlTree& xml);
+  virtual void toXml(ci::XmlTree& xml);
+  virtual void fromXml(const ci::XmlTree& xml);
   
   void record(Recorder& recorder);    
   

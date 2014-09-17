@@ -159,7 +159,23 @@ void GARunner::init()
     {
       // Not incremental
       m_stage = 0;
-      reset(true);
+      
+      // Allow for evolvable model-specific genome modification (such as centre-crossing seeding)
+      if (ga.hasChild("GenomeMod") && ga.getChild("GenomeMod").getValue<bool>())
+      {
+        // First randomise genomes, then process them, finally setup evolvable
+        m_ga->reset(true);
+        for (int i = 0; i < populationSize; ++i)
+        {
+          m_evolvable->processGenome(m_ga->getGenome(i));
+        }
+        reset(false);
+      }
+      else
+      {
+        // No preprocessing of genomes by evolvable
+        reset(true);
+      }
     }
     
     // What to save out in xml

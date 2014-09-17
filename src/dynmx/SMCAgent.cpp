@@ -308,7 +308,11 @@ void SMCAgent::record(Recorder& recorder)
   recorder.push_back("Angle", m_angle);  
   recorder.push_back("AngularSpeed", m_angularSpeed);
   recorder.push_back("Sensor", m_sensedValue);  
-  recorder.push_back("SensorDer", m_sensedValueDerivative);    
+  recorder.push_back("SensorDer", m_sensedValueDerivative);
+  recorder.push_back("Energy", m_energy);
+  recorder.push_back("SensedEnergy", getSensedEnergy());
+  recorder.push_back("Food", m_food);
+  recorder.push_back("Time", m_time);
   
   // ctrnn
   m_ctrnn->record(recorder);

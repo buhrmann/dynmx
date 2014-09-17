@@ -173,7 +173,7 @@ int SMCAgentMeta1d::getNumGenes()
 //----------------------------------------------------------------------------------------------------------------------
 void SMCAgentMeta1d::decodeGenome(const double* genome)
 {
-  m_topology.decode(*m_ctrnn, genome, m_netLimits);
+  m_topology.decode(*m_ctrnn, genome);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

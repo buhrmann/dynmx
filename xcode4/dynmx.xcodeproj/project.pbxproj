@@ -21,7 +21,10 @@
 		D60C452E1778935A00CF2635 /* SMCAgentMeta1d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D60C452D1778935900CF2635 /* SMCAgentMeta1d.cpp */; };
 		D61E196718BD3C5B00C6FEB4 /* GradientSensor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D61E196618BD3C5B00C6FEB4 /* GradientSensor.cpp */; };
 		D630C7951645396700F2ABE5 /* Topology.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D630C7941645396700F2ABE5 /* Topology.cpp */; };
+		D6317E3C19AB5F0C0073FCCD /* LegBac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6317E3B19AB5F0C0073FCCD /* LegBac.cpp */; };
 		D63189F918BBB6DB00095777 /* Bacterium.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D63189F818BBB6DB00095777 /* Bacterium.cpp */; };
+		D656F7E119AC9E6D00FFF749 /* LegBacView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D656F7E019AC9E6D00FFF749 /* LegBacView.cpp */; };
+		D656F7E519ACA7BC00FFF749 /* LegBacViz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D656F7E419ACA7BC00FFF749 /* LegBacViz.cpp */; };
 		D668798B17B4F7C300FC1166 /* SMCArm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D668798917B4F7C300FC1166 /* SMCArm.cpp */; };
 		D681B49718BF59A6002E9114 /* BacteriumEvo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D681B49518BF59A6002E9114 /* BacteriumEvo.cpp */; };
 		D6B4697F18C9D0FF006C0544 /* Sensor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6B4697E18C9D0FF006C0544 /* Sensor.cpp */; };
@@ -67,6 +70,8 @@
 		D6D9F20F14DC6A93009C0C95 /* glut32.dll in Resources */ = {isa = PBXBuildFile; fileRef = D6D9F20C14DC6A93009C0C95 /* glut32.dll */; };
 		D6D9F21014DC6A93009C0C95 /* glut32.lib in Frameworks */ = {isa = PBXBuildFile; fileRef = D6D9F20D14DC6A93009C0C95 /* glut32.lib */; };
 		D6E6E57014E15C2E00FE6B07 /* Spin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6E6E56F14E15C2E00FE6B07 /* Spin.cpp */; };
+		D6F7473A19B5D97800403AE7 /* AdapNN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6F7473919B5D97800403AE7 /* AdapNN.cpp */; };
+		D6F7473D19BF18AC00403AE7 /* AdapTop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6F7473C19BF18AC00403AE7 /* AdapTop.cpp */; };
 		D6FFB99D14F860900057C7AD /* EvoArmCoConDecoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6FFB99C14F860900057C7AD /* EvoArmCoConDecoder.cpp */; };
 /* End PBXBuildFile section */
 
@@ -97,8 +102,16 @@
 		D630C7961645397F00F2ABE5 /* SMCAgentGaussian.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCAgentGaussian.h; path = ../include/dynmx/SMCAgentGaussian.h; sourceTree = "<group>"; };
 		D630C7971645397F00F2ABE5 /* SMCAgentLineDis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCAgentLineDis.h; path = ../include/dynmx/SMCAgentLineDis.h; sourceTree = "<group>"; };
 		D630C7981645397F00F2ABE5 /* Topology.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Topology.h; path = ../include/dynmx/Topology.h; sourceTree = "<group>"; };
+		D6317E3A19AB5E170073FCCD /* LegBac.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = LegBac.h; path = ../include/dynmx/LegBac.h; sourceTree = "<group>"; };
+		D6317E3B19AB5F0C0073FCCD /* LegBac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LegBac.cpp; path = ../src/dynmx/LegBac.cpp; sourceTree = "<group>"; };
+		D6317E3D19AB607D0073FCCD /* BodyLeg.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BodyLeg.h; path = ../include/dynmx/BodyLeg.h; sourceTree = "<group>"; };
+		D6317E3E19AB60900073FCCD /* BodyBac.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BodyBac.h; path = ../include/dynmx/BodyBac.h; sourceTree = "<group>"; };
 		D631899E18BBB6BF00095777 /* Bacterium.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Bacterium.h; path = ../include/dynmx/Bacterium.h; sourceTree = "<group>"; };
 		D63189F818BBB6DB00095777 /* Bacterium.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Bacterium.cpp; path = ../src/dynmx/Bacterium.cpp; sourceTree = "<group>"; };
+		D656F7E019AC9E6D00FFF749 /* LegBacView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LegBacView.cpp; path = ../src/dynmx/LegBacView.cpp; sourceTree = "<group>"; };
+		D656F7E219AC9F7300FFF749 /* LegBacView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = LegBacView.h; path = ../include/dynmx/LegBacView.h; sourceTree = "<group>"; };
+		D656F7E319ACA79F00FFF749 /* LegBacViz.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = LegBacViz.h; path = ../include/dynmx/LegBacViz.h; sourceTree = "<group>"; };
+		D656F7E419ACA7BC00FFF749 /* LegBacViz.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LegBacViz.cpp; path = ../src/dynmx/LegBacViz.cpp; sourceTree = "<group>"; };
 		D665B83317DCD705001A3AA2 /* SMCArmView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCArmView.h; path = ../include/dynmx/SMCArmView.h; sourceTree = "<group>"; };
 		D668798817B4F77400FC1166 /* SMCArm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SMCArm.h; path = ../include/dynmx/SMCArm.h; sourceTree = "<group>"; };
 		D668798917B4F7C300FC1166 /* SMCArm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SMCArm.cpp; path = ../src/dynmx/SMCArm.cpp; sourceTree = "<group>"; };
@@ -211,6 +224,10 @@
 		D6E6E56D14E15C1300FE6B07 /* Spin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Spin.h; path = ../include/dynmx/Spin.h; sourceTree = "<group>"; };
 		D6E6E56F14E15C2E00FE6B07 /* Spin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Spin.cpp; path = ../src/dynmx/Spin.cpp; sourceTree = "<group>"; };
 		D6ED21B51775B38200B6134D /* SMCAgentMeta1d.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SMCAgentMeta1d.h; path = ../src/dynmx/SMCAgentMeta1d.h; sourceTree = "<group>"; };
+		D6F7473819B5D95F00403AE7 /* AdapNN.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AdapNN.h; path = ../include/dynmx/AdapNN.h; sourceTree = "<group>"; };
+		D6F7473919B5D97800403AE7 /* AdapNN.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AdapNN.cpp; path = ../src/dynmx/AdapNN.cpp; sourceTree = "<group>"; };
+		D6F7473B19BF189200403AE7 /* AdapTop.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AdapTop.h; path = ../include/dynmx/AdapTop.h; sourceTree = "<group>"; };
+		D6F7473C19BF18AC00403AE7 /* AdapTop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AdapTop.cpp; path = ../src/dynmx/AdapTop.cpp; sourceTree = "<group>"; };
 		D6FFB99A14F860390057C7AD /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Log.h; path = ../include/dynmx/Log.h; sourceTree = "<group>"; };
 		D6FFB99C14F860900057C7AD /* EvoArmCoConDecoder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EvoArmCoConDecoder.cpp; path = ../src/dynmx/EvoArmCoConDecoder.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -244,6 +261,7 @@
 				D6ED21B41775B2E100B6134D /* ANN */,
 				D6ED21B31775B2C000B6134D /* GA */,
 				D6D9F0F414DC62BD009C0C95 /* Tests */,
+				D6317E3919AB5D410073FCCD /* Learn */,
 				D6E6E57214E15DC100FE6B07 /* SMC */,
 				D6E6E57314E15E6E00FE6B07 /* Spin */,
 				D6E6E57114E15D6F00FE6B07 /* Arm */,
@@ -343,6 +361,21 @@
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D6317E3919AB5D410073FCCD /* Learn */ = {
+			isa = PBXGroup;
+			children = (
+				D6317E3A19AB5E170073FCCD /* LegBac.h */,
+				D6317E3B19AB5F0C0073FCCD /* LegBac.cpp */,
+				D6317E3D19AB607D0073FCCD /* BodyLeg.h */,
+				D6317E3E19AB60900073FCCD /* BodyBac.h */,
+				D656F7E219AC9F7300FFF749 /* LegBacView.h */,
+				D656F7E019AC9E6D00FFF749 /* LegBacView.cpp */,
+				D656F7E319ACA79F00FFF749 /* LegBacViz.h */,
+				D656F7E419ACA7BC00FFF749 /* LegBacViz.cpp */,
+			);
+			name = Learn;
 			sourceTree = "<group>";
 		};
 		D6D9F0F414DC62BD009C0C95 /* Tests */ = {
@@ -570,6 +603,10 @@
 				D6D9F0D314DC62A4009C0C95 /* CTRNN.h */,
 				D6D9F10814DC62D6009C0C95 /* CTRNNViz.cpp */,
 				D6D9F0D414DC62A4009C0C95 /* CTRNNViz.h */,
+				D6F7473B19BF189200403AE7 /* AdapTop.h */,
+				D6F7473C19BF18AC00403AE7 /* AdapTop.cpp */,
+				D6F7473819B5D95F00403AE7 /* AdapNN.h */,
+				D6F7473919B5D97800403AE7 /* AdapNN.cpp */,
 			);
 			name = ANN;
 			sourceTree = "<group>";
@@ -637,6 +674,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D6317E3C19AB5F0C0073FCCD /* LegBac.cpp in Sources */,
 				D6D9F12314DC62D6009C0C95 /* App.cpp in Sources */,
 				D6D9F12414DC62D6009C0C95 /* Arm.cpp in Sources */,
 				D6D9F12514DC62D6009C0C95 /* ArmMuscled.cpp in Sources */,
@@ -652,18 +690,22 @@
 				D6D9F12D14DC62D6009C0C95 /* Dynmx.cpp in Sources */,
 				D6D9F12E14DC62D6009C0C95 /* EPController.cpp in Sources */,
 				D6D9F12F14DC62D6009C0C95 /* EvoArmCoCon.cpp in Sources */,
+				D656F7E519ACA7BC00FFF749 /* LegBacViz.cpp in Sources */,
 				D6D9F13014DC62D6009C0C95 /* GA.cpp in Sources */,
 				D6D9F13114DC62D6009C0C95 /* GARunner.cpp in Sources */,
+				D6F7473A19B5D97800403AE7 /* AdapNN.cpp in Sources */,
 				D6D9F13214DC62D6009C0C95 /* GATester.cpp in Sources */,
 				D6D9F13314DC62D6009C0C95 /* GAViz.cpp in Sources */,
 				D6D9F13414DC62D6009C0C95 /* Light.cpp in Sources */,
 				D61E196718BD3C5B00C6FEB4 /* GradientSensor.cpp in Sources */,
 				D6D9F13514DC62D6009C0C95 /* Muscle.cpp in Sources */,
 				D6D9F13614DC62D6009C0C95 /* MuscleBiWrap.cpp in Sources */,
+				D656F7E119AC9E6D00FFF749 /* LegBacView.cpp in Sources */,
 				D6D9F13714DC62D6009C0C95 /* MuscleMonoWrap.cpp in Sources */,
 				D6D9F13814DC62D6009C0C95 /* PD.cpp in Sources */,
 				D6D9F13914DC62D6009C0C95 /* Random.cpp in Sources */,
 				D6D9F13A14DC62D6009C0C95 /* Recorder.cpp in Sources */,
+				D6F7473D19BF18AC00403AE7 /* AdapTop.cpp in Sources */,
 				D6D9F13B14DC62D6009C0C95 /* Reflex.cpp in Sources */,
 				D6D9F13C14DC62D6009C0C95 /* Registry.cpp in Sources */,
 				D6D9F13D14DC62D6009C0C95 /* Scene.cpp in Sources */,
@@ -775,11 +817,13 @@
 				CLANG_WARN__EXIT_TIME_DESTRUCTORS = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_CHECK_RETURN_VALUE_OF_OPERATOR_NEW = YES;
+				GCC_ENABLE_CPP_RTTI = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.cpp;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
 				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES;
+				GCC_UNROLL_LOOPS = YES;
 				GCC_VERSION = "";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
@@ -795,6 +839,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/boost\"";
+				LLVM_LTO = NO;
 				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
@@ -818,12 +863,14 @@
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = NO;
 				CLANG_WARN__EXIT_TIME_DESTRUCTORS = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_ENABLE_CPP_RTTI = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.cpp;
-				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_OPTIMIZATION_LEVEL = fast;
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
 				GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES;
+				GCC_UNROLL_LOOPS = YES;
 				GCC_VERSION = "";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
@@ -839,6 +886,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/boost\"";
+				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
