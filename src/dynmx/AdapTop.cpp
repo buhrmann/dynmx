@@ -63,7 +63,12 @@ void AdapTop::fromXml(const ci::XmlTree& xml)
   m_initialWeights = xml.getAttributeValue<bool>("initialWeights", true);
   m_rulePerConnection = xml.getAttributeValue<bool>("rulePerConn", true);
   m_noiseUniform = xml.getAttributeValue<bool>("noiseUniform", true);
-
+  m_useAntiHebb = xml.getAttributeValue<bool>("antiHebb", false);
+  m_actFunc = xml.getAttributeValue<std::string>("actFunc", "Sigmoid");
+  
+  std::string scaleName = xml.getAttributeValue<std::string>("synScaling", "None");
+  m_scaling = AdapNN::getScaling(scaleName);
+  
   if(xml.hasChild("NetLimits"))
   {
     m_limits.fromXml(xml.getChild("NetLimits"));
@@ -83,6 +88,8 @@ void AdapTop::toXml(ci::XmlTree& xml) const
   top.setAttribute("initialWeights", m_initialWeights);
   top.setAttribute("rulePerConn", m_rulePerConnection);
   top.setAttribute("noiseUniform", m_noiseUniform);
+  top.setAttribute("antiHebb", m_useAntiHebb);
+  top.setAttribute("actFunc", m_actFunc);
   
   // Add limits
   ci::XmlTree& limXml = xml.getChild("Topology/NetLimits");
@@ -105,6 +112,7 @@ int AdapTop::getNumAdapParams() const
   {
     // Neurons and synapses have separate learning rules
     // Unique adaptive synapses are all unique synapses except for self-connections (accounting for symmetry):
+    
     const int numUniqueAdapSyn = getNumUniqueConnections() - getNumUniqueNeurons(kLyr_Hidden) - getNumUniqueNeurons(kLyr_Output);
     const int numUniqueNeurons = getNumUniqueNeurons(kLyr_Input) + getNumUniqueNeurons(kLyr_Hidden) + getNumUniqueNeurons(kLyr_Output);
     return (numUniqueAdapSyn * synSpecParams) + (numUniqueNeurons * neuSpecParams) + netSpecParams;
@@ -195,7 +203,14 @@ bool AdapTop::decode(CTRNN& net, const double* params) const
 void AdapTop::decodeAdap(AdapNN& net, const double* params, int& I) const
 {  
   // Network-wide parameters
-  net.setNoiseUniform(m_noiseUniform); // Not evolved but specifiable in Topology xml
+  // Not evolved but specifiable in Topology xml
+  net.setNoiseUniform(m_noiseUniform);
+  net.useAntiHebbSwitch(m_useAntiHebb);
+
+  if(m_actFunc == "Tanh")
+    net.setActivationFunction(CTRNN::kAF_Tanh);
+  
+  net.setSynapticScaling(m_scaling);
   
   net.setRewardMeanFilter(m_limits.meanDecay.decode(params[I++]));
   net.setNoiseVar(m_limits.noiseVar.decode(params[I++]));
@@ -221,13 +236,13 @@ void AdapTop::decodeAdap(AdapNN& net, const double* params, int& I) const
     decodeLayerConnections(net, kLyr_Hidden, kLyr_Output, params, I, m_limits.weightDecay, wdsetter, false);
     decodeLayerConnections(net, kLyr_Hidden, kLyr_Output, params, I, m_limits.learnRate, lrsetter, false);
     
-    if(m_hiddenLaterallyConnected)
+    if(m_hiddenLateral)
     {
       decodeLayerConnections(net, kLyr_Hidden, kLyr_Hidden, params, I, m_limits.weightDecay, wdsetter, false);
       decodeLayerConnections(net, kLyr_Hidden, kLyr_Hidden, params, I, m_limits.learnRate, lrsetter, false);
     }
     
-    if(m_outputsLaterallyConnected)
+    if(m_outputsLateral)
     {
       decodeLayerConnections(net, kLyr_Output, kLyr_Output, params, I, m_limits.weightDecay, wdsetter, false);
       decodeLayerConnections(net, kLyr_Output, kLyr_Output, params, I, m_limits.learnRate, lrsetter, false);
@@ -288,13 +303,13 @@ void AdapTop::encodeAdap(AdapNN& net, double* params, int& I) const
     encodeLayerConnections(net, kLyr_Hidden, kLyr_Output, params, I, m_limits.weightDecay, wdgetter, false);
     encodeLayerConnections(net, kLyr_Hidden, kLyr_Output, params, I, m_limits.learnRate, lrgetter, false);
     
-    if(m_hiddenLaterallyConnected)
+    if(m_hiddenLateral)
     {
       encodeLayerConnections(net, kLyr_Hidden, kLyr_Hidden, params, I, m_limits.weightDecay, wdgetter, false);
       encodeLayerConnections(net, kLyr_Hidden, kLyr_Hidden, params, I, m_limits.learnRate, lrgetter, false);
     }
     
-    if(m_outputsLaterallyConnected)
+    if(m_outputsLateral)
     {
       encodeLayerConnections(net, kLyr_Output, kLyr_Output, params, I, m_limits.weightDecay, wdgetter, false);
       encodeLayerConnections(net, kLyr_Output, kLyr_Output, params, I, m_limits.learnRate, lrgetter, false);

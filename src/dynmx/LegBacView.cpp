@@ -8,6 +8,8 @@
 
 #include "LegBacView.h"
 #include "LegBac.h"
+#include "CTRNN.h"
+#include "AdapNN.h"
 
 namespace dmx
 {
@@ -120,7 +122,7 @@ void LegBacView::update(float dt)
   
   // Update fitness-related data
   if(!m_agent->m_legged)
-    m_fitnessPlot->addPoint(m_agent->getBac().getReward(), 0);
+    m_fitnessPlot->addPoint(((AdapNN*)m_agent->getCTRNN())->getReward(), 0);
   
   if(m_followCam)
   {

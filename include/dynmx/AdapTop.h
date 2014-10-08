@@ -10,11 +10,10 @@
 #define dynmx_AdapTop_h
 
 #include "Topology.h"
+#include "AdapNN.h"
 
 namespace dmx
 {
-  
-class AdapNN;
 
 // Helper for storing the ranges of parameters
 //--------------------------------------------------------------------------------------------------------------------
@@ -34,6 +33,8 @@ class AdapTop : public Topology
 {
   
 public:
+  
+  virtual ~AdapTop() {};
   
   typedef void (AdapNN::*ConnSetter)(int, int, double);
   
@@ -58,6 +59,9 @@ protected:
   bool m_initialWeights;
   bool m_rulePerConnection;
   bool m_noiseUniform;
+  bool m_useAntiHebb;
+  std::string m_actFunc;
+  AdapNN::SynScaling m_scaling;
   
   AdapNetLimits m_limits;
 };

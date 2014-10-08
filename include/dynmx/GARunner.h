@@ -89,7 +89,8 @@ public:
   {
     kGATrialAgg_Avg,
     kGATrialAgg_Min,
-    kGATrialAgg_Mult
+    kGATrialAgg_Mult,
+    kGATrialAgg_Last
   };
   
   GARunner(Evolvable* evolvable);

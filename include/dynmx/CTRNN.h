@@ -97,6 +97,7 @@ public:
     kAF_Linear,
     kAF_Sine,
     kAF_Identity,
+    kAF_Tanh,
     kAF_NumFunctions
   };
   
@@ -146,6 +147,7 @@ public:
   
   void setGlobalActivationFunction(ActFuncName name) { m_activationFunction = getActivationFunction(name); };
   void setActivationFunction(int i, ActFuncName name) { m_activationFunctions[i] = getActivationFunction(name); };
+  void setActivationFunction(ActFuncName name) {   std::fill(m_activationFunctions, m_activationFunctions + size, getActivationFunction(name)); };
   void setUpdateFunction(int i, UpdFuncName name) {   m_updateFunctions[i] = getUpdateFunction(name); };
                       
   // Control

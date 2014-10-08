@@ -8,6 +8,7 @@
  */
 #include "CTRNNViz.h" 
 #include "MathUtils.h"
+#include "AdapNN.h"
 
 #include "cinder/gl/gl.h"
 #include "cinder/gl/Texture.h"
@@ -377,6 +378,8 @@ void CTRNNLayerViz::onMouseMove(const Vec4f& mPos)
 // CTRNNViz implementation  
 //----------------------------------------------------------------------------------------------------------------------  
 
+std::string CTRNNViz::s_weightModeNames [kWM_Num] = {"weights", "weights dt", "l-rate", "d-rate"};
+  
 // Mormalises inputs to 1, if input neurons function as placeholders  
 //----------------------------------------------------------------------------------------------------------------------  
 double CTRNNViz::getOutputNorm(int i, const CTRNN* ctrnn)
@@ -423,6 +426,7 @@ void CTRNNViz::init()
   m_font = ci::Font("PF Tempesta Seven", 8);
   
   m_mode = kRM_Layers;
+  m_weightMode = 0;
   m_selected = -1;
   m_angle = 0;
   m_labelHeight = 16;
@@ -441,6 +445,8 @@ void CTRNNViz::init()
   m_label3y = m_label2y + m_labelHeight + m_padding + m_width + m_padding;
   m_height =  m_label3y + m_labelHeight + m_padding + 3 * m_lineHeight + 2 * m_padding;
   
+  m_weightModeButton = ci::Rectf(butPos.x, m_label2y + butPos.y, butPos.x + buttonSize,  m_label2y + butPos.y + buttonSize);
+  
   // output vector
   int N = m_ctrnn->getSize();
   m_outputs = new VectorView<double>(m_ctrnn->getOutputs(), N, m_width, 1.0); 
@@ -448,7 +454,7 @@ void CTRNNViz::init()
   m_children.push_back(m_outputs);
   
   // weight matrix
-  m_weights = new MatrixView<double>(m_ctrnn->getWeights(), N, N, m_width, 20.0);
+  m_weights = new MatrixView<double>(m_ctrnn->getWeights(), N, N, m_width, -1);
   m_weights->translate(Vec4f(0, m_label2y + m_labelHeight + m_padding , 0, 1));
   m_children.push_back(m_weights);  
   
@@ -499,7 +505,11 @@ void CTRNNViz::renderAsMatrix()
   // Weights matrix label
   ci::Vec2f wLabelPos = ci::Vec2f(0, m_label2y);
   ci::gl::drawSolidRect(ci::Rectf(wLabelPos.x, wLabelPos.y, wLabelPos.x + m_width, wLabelPos.y + m_labelHeight));         
-  ci::gl::drawString("CTRNN weights ", wLabelPos + textPadding, m_textColor, m_font);    
+  ci::gl::drawString("CTRNN " + s_weightModeNames[m_weightMode], wLabelPos + textPadding, m_textColor, m_font);
+  
+  // Mode button
+  ci::gl::color(0.7f, 0.7f, 0.7f);
+  ci::gl::drawSolidRect(m_weightModeButton);
   
   // Render children (vector and matrix viz)
   for(int i = 0; i < 2; i++)
@@ -582,7 +592,7 @@ void CTRNNViz::update()
     const int& jW = m_weights->m_jSel; 
     if(iW != -1 && jW != -1)
     {      
-      sprintf(str, "weight %i > %i: %2.2f", iW, jW, m_ctrnn->getWeight(iW, jW));
+      sprintf(str, "value %i > %i: %2.6f", iW, jW, m_weights->getValue(iW, jW));
       ci::gl::drawString(str, textPos, m_textColor, m_font);
     }
   }
@@ -608,6 +618,20 @@ void CTRNNViz::onMousePress(const Vec4f& mPos)
     // We have n viz in children (but matrix viz consists of two, therefore one less)
     m_mode = (m_mode + 1) % (m_children.size() - 1);
   }
+  
+  if(m_weightModeButton.contains(ci::Vec2f(&localPos.x)) )
+  {
+    m_weightMode = (m_weightMode + 1) % kWM_Num;
+    if (m_weightMode == kWM_Weights)
+      m_weights->setDataRef(m_ctrnn->getWeights());
+    else if (m_weightMode == kWM_WDt)
+      m_weights->setDataRef(((AdapNN*)m_ctrnn)->getWeightChanges());
+    else if (m_weightMode == kWM_LRate)
+      m_weights->setDataRef(((AdapNN*)m_ctrnn)->getLearningRates());
+    else if (m_weightMode == kWM_DRate)
+      m_weights->setDataRef(((AdapNN*)m_ctrnn)->getWeightDecays());
+  }
+  
   
   NodeGroup::onMousePress(mPos);
 }

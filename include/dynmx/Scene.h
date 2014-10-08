@@ -438,7 +438,29 @@ public:
   MatrixView(const Type* const* d, int n, int m, float s = 1.0f, float maxVal = -1) : 
     m_data(d), m_N(n), m_M(m), m_scale(s/n), m_maxVal(maxVal), m_iSel(-1), m_jSel(-1) { init(); };
 
+  Type getValue(int i, int j) { return m_data[i][j]; };
+  
   virtual Node* getNode(int pickID){ if(m_uniqueID == pickID) return this; else return 0;};
+  
+  Type getMax()
+  {
+    double max = -666;
+    for (int i = 0; i < m_N; i++)
+    {
+      for (int j = 0; j < m_M; j++)
+      {
+        if(m_data[i][j] > max)
+          max = m_data[i][j];
+      }
+    }
+    return max;
+  }
+  
+  void setDataRef(const Type* const* d, float maxVal = -1)
+  {
+    m_data = d;
+    m_maxVal = (maxVal != -1) ? maxVal : getMax();
+  };
   
   virtual void update()
   {
@@ -462,6 +484,9 @@ public:
         glPushMatrix();
         glTranslatef(i, j, 0.0);
         
+        // Update max value in case values in underlying matrix are changing
+        m_maxVal = std::max(m_maxVal, fabs(m_data[i][j]));
+        // Scale
         float w = clamp(m_data[i][j] / m_maxVal, -1.0, 1.0);
         
         if(w > 0)
@@ -545,7 +570,7 @@ protected:
 
   const Type* const* m_data;
   float m_scale;
-  float m_maxVal;
+  Type m_maxVal;
   int
     m_N,
     m_M;

@@ -92,6 +92,8 @@ void GARunner::init()
       m_trialAggregation = kGATrialAgg_Mult;
     else if(trialAgg == "Min")
       m_trialAggregation = kGATrialAgg_Min;
+    else if(trialAgg == "Last")
+      m_trialAggregation = kGATrialAgg_Last;
     
     m_ga->setAvoidReevaluation(ga.getChild("AvoidReevaluation").getValue<bool>(true));
     
@@ -291,6 +293,10 @@ void GARunner::updateTrialFitness(float fitness)
   else if(m_trialAggregation == kGATrialAgg_Min)
   {
     m_accFitness = m_trial == 0 ? fitness : std::min(m_accFitness, fitness);
+  }
+  else if(m_trialAggregation == kGATrialAgg_Last)
+  {
+    m_accFitness = fitness; // Simply overwrite previous fitnesses, so ony last one will persist
   }
 
 #if DEBUGGING

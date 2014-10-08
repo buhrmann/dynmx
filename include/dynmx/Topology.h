@@ -62,8 +62,10 @@ public:
   int getSize() const { return m_N; };
   bool isSymmetric() const { return m_symmetric; };
   bool getInputsAreNeurons() const { return m_inputsAreNeurons; };
-  bool getOutputsAreLaterallyConnected() const { return m_outputsLaterallyConnected; };
-  bool getHiddenAreLaterallyConnected() const { return m_hiddenLaterallyConnected; };
+  bool getOutputsLateral() const { return m_outputsLateral; };
+  bool getOutputsSelf() const { return m_outputsSelf; };
+  bool getHiddenLateral() const { return m_hiddenLateral; };
+  bool getHiddenSelf() const { return m_hiddenSelf; };
   
   // Returns number of parameters required to encode the given topology
   int getNumInputs() const { return m_size[kLyr_Input]; };
@@ -87,6 +89,7 @@ public:
   bool connected(int from, int to) const { return m_connections[from][to]; };
   
   void randomiseWeights(CTRNN* net, float min, float max);
+  void randomiseWeights(CTRNN* net) { randomiseWeights(net, m_limits.weight.min, m_limits.weight.max);} ;
   
 protected:
   
@@ -107,8 +110,10 @@ protected:
   int m_size[3];
   bool m_symmetric;
   bool m_inputsAreNeurons;
-  bool m_outputsLaterallyConnected;
-  bool m_hiddenLaterallyConnected;
+  bool m_outputsLateral;
+  bool m_hiddenLateral;
+  bool m_hiddenSelf;
+  bool m_outputsSelf;
   double m_weightCutoff;
   bool **m_connections; // cache connectivity for quicker checks
   

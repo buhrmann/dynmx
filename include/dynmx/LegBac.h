@@ -93,7 +93,6 @@ protected:
   int m_numBacTrials;
   float m_fitness;
   float m_legDuration;
-  float m_bacDuration;
   float m_legFitMax;
   float m_bacFitMax;
 };

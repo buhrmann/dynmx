@@ -48,8 +48,8 @@ Topology::Topology() :
   m_inputsAreNeurons(true),
   m_weightCutoff(0),
   m_symmetric(false),
-  m_outputsLaterallyConnected(false),
-  m_hiddenLaterallyConnected(true)
+  m_outputsLateral(false),
+  m_hiddenLateral(true)
 {
   setSize(1, 3, 1);
   calcNumParameters();
@@ -150,14 +150,14 @@ int Topology::calcNumUniqueConnections()
     m_numConn += numUniqueHidden * m_size[kLyr_Input];
   
   // Hidden intralayer weights
-  if(m_hiddenLaterallyConnected)
+  if(m_hiddenLateral)
     m_numConn += numUniqueHidden * m_size[kLyr_Hidden];
   
   // Hidden layer to output
   m_numConn += numUniqueOutputs * m_size[kLyr_Hidden];
   
   // Output intralayer weights
-  if(m_outputsLaterallyConnected)
+  if(m_outputsLateral)
     m_numConn += numUniqueOutputs * m_size[kLyr_Output];
   
   return m_numConn;
@@ -302,10 +302,10 @@ bool Topology::decode(CTRNN& ctrnn, const double* params) const
   
   decodeLayerConnections(ctrnn, kLyr_Hidden, kLyr_Output, params, I, m_limits.weight, &CTRNN::setWeight);
   
-  if(m_hiddenLaterallyConnected)
+  if(m_hiddenLateral)
     decodeLayerConnections(ctrnn, kLyr_Hidden, kLyr_Hidden, params, I, m_limits.weight, &CTRNN::setWeight);
   
-  if(m_outputsLaterallyConnected)
+  if(m_outputsLateral)
     decodeLayerConnections(ctrnn, kLyr_Output, kLyr_Output, params, I, m_limits.weight, &CTRNN::setWeight);
   
   
@@ -345,10 +345,10 @@ bool Topology::encode(CTRNN& ctrnn, double* params) const
   
   encodeLayerConnections(ctrnn, kLyr_Hidden, kLyr_Output, params, I, m_limits.weight, &CTRNN::getWeight);
   
-  if(m_hiddenLaterallyConnected)
+  if(m_hiddenLateral)
     encodeLayerConnections(ctrnn, kLyr_Hidden, kLyr_Hidden, params, I, m_limits.weight, &CTRNN::getWeight);
   
-  if(m_outputsLaterallyConnected)
+  if(m_outputsLateral)
     encodeLayerConnections(ctrnn, kLyr_Output, kLyr_Output, params, I, m_limits.weight, &CTRNN::getWeight);
   
   // Check we decoded correctly!
@@ -369,10 +369,10 @@ bool Topology::calcConn(int from, int to) const
     {
       // Receiver is hidden
       const bool fromIsInput = from < m_size[kLyr_Input];
-      if(fromIsInput || (isHidden(from) && m_hiddenLaterallyConnected))
+      if(fromIsInput || (isHidden(from) && m_hiddenLateral))
         return true;
     }
-    else if (isHidden(from) || (isOutput(from) && m_outputsLaterallyConnected))
+    else if (isHidden(from) || (isOutput(from) && m_outputsLateral))
     {
       // Receiver is output and origin hidden or other output (if lateral allowed)
       return true;
@@ -409,11 +409,11 @@ void Topology::toXml(ci::XmlTree& xml) const
   topXml.push_back(inputs);
   
   ci::XmlTree hidden ("Hidden", toString(m_size[1]));
-  hidden.setAttribute("laterallyConnected", m_hiddenLaterallyConnected);
+  hidden.setAttribute("lateral", m_hiddenLateral);
   topXml.push_back(hidden);
   
   ci::XmlTree outputs ("Outputs", toString(m_size[2]));
-  outputs.setAttribute("laterallyConnected", m_outputsLaterallyConnected);
+  outputs.setAttribute("lateral", m_outputsLateral);
   topXml.push_back(outputs);
   
   m_limits.toXml(topXml); 
@@ -436,8 +436,8 @@ void Topology::fromXml(const ci::XmlTree& xml)
   m_size[2] = xml.getChild("Outputs").getValue<int>();
   
   m_inputsAreNeurons = xml.getChild("Inputs").getAttributeValue<bool>("asNeurons");
-  m_outputsLaterallyConnected = xml.getChild("Outputs").getAttributeValue<bool>("laterallyConnected", true);
-  m_hiddenLaterallyConnected = xml.getChild("Hidden").getAttributeValue<bool>("laterallyConnected", true);
+  m_outputsLateral = xml.getChild("Outputs").getAttributeValue<bool>("lateral", true);
+  m_hiddenLateral = xml.getChild("Hidden").getAttributeValue<bool>("lateral", true);
   
   m_N = calcSize();
   

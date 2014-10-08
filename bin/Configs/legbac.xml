@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Config>
     <Globals>
-        <Visual Value="0"/>
+        <Visual Value="1"/>
         <WindowSize Width="1000" Height="800"/>
         <FrameRate Value="10"/>
         <FullScreen Value="0"/>
@@ -13,43 +13,45 @@
     </Globals>
     <GA>
         <Evolvable Name="LegBac">
-            <Trials legDur="150" bacDur="150" bacFoodDur="30" legNum="0" bacNum="3" legFitMax="78" bacFitMax="0.5">0</Trials>
-            <Topology symmetric="0" weightCutoff="0" adaptive="0" initialWeights="1" rulePerConn="1" noiseUniform="1">
+            <Trials legDur="150" bacFoodDur="400" bacNumFoods="6" legNum="0" bacNum="10" legFitMax="78" bacFitMax="0.5">0</Trials>
+            <Topology symmetric="0" weightCutoff="0" actFunc="Sigmoid" adaptive="1" initialWeights="0" rulePerConn="1" noiseUniform="1" antiHebb="0" synScaling="HomeoReg">
                 <Inputs asNeurons="1">1</Inputs>
-                <Hidden laterallyConnected="1">5</Hidden>
-                <Outputs laterallyConnected="0">0</Outputs>
+                <Hidden lateral="1" self="0">5</Hidden>
+                <Outputs lateral="1" self="0">1</Outputs>
                 <NetLimits>
-                    <Weight min="-12.0" max="12.0"/>
-                    <Bias min="-12.0" max="12.0"/>
+                    <Weight min="-8.0" max="8.0"/>
+                    <Bias min="-6" max="-5"/>
                     <Gain min="-12.0" max="12.0"/>
-                    <TimeConstant min="0.05" max="5"/>
-                    <MeanDecay min="0.9" max="1"/>
-                    <WeightDecay min="0" max="0.1"/>
-                    <NoiseVar min="0" max="10"/>
-                    <LearnRate min="0" max="0.1"/>
+                    <TimeConstant min="0.05" max="2"/>
+                    <MeanDecay min="0.001" max="0.5"/>
+                    <WeightDecay min="0.001" max="0.1"/>
+                    <NoiseVar min="0" max="4"/>
+                    <LearnRate min="0.01" max="1.0"/>
                 </NetLimits>
             </Topology>
         </Evolvable>    
-        <Incremental initialMutation="0.1" seedOnly="1" seedAll="1" elitist="0" initialStage="0">0</Incremental>
-        <LoadFrom>~/Experiments/LegBac/Evo/14_09_01__13_50_40/GA_Result.xml</LoadFrom>
-        <PopulationSize>200</PopulationSize>
+        <Incremental initialMutation="0.1" seedOnly="1" seedAll="1" elitist="0" initialStage="0">1</Incremental>
+        <LoadFrom>~/Experiments/LegBac/Evo/14_10_06__14_02_15/GA_Result.xml</LoadFrom>
+        <Saved>14_09_01__13_50_40</Saved>
+        <PopulationSize>100</PopulationSize>
         <DemeSize>10</DemeSize>
-        <NumGenerations OutputInterval="10">5000</NumGenerations>
-        <Mutation Rate="1.0" Var="0.1" VarReduced="0.01" ReduceAt="4000">
+        <NumGenerations OutputInterval="1">100</NumGenerations>
+        <Mutation Rate="1.0" Var="0.1" VarReduced="0.01" ReduceAt="80">
             <IntraGenomePD>Gaussian</IntraGenomePD>
             <InterGenomePD>Gaussian</InterGenomePD>
         </Mutation>
         <Recombination Rate="0.8" RateReduced="0.75"/>
-        <Trials Combine="Mult" numStageMult="10">3</Trials>
-        <GenomeMod>1</GenomeMod>
+        <Trials Combine="Avg" numStageMult="10">10</Trials>
+        <GenomeMod>0</GenomeMod>
         <AvoidReevaluation>0</AvoidReevaluation>
         <SaveBestEachGeneration>0</SaveBestEachGeneration>
         <AutoEval>1</AutoEval>
         <Stages FitThreshold="100" NumGensAbove="10" Max="10"/>
-        <Eval Run="0" Stage="0">
-            <NumTrials>3</NumTrials>
+        <Eval Run="1" Stage="0">
+            <NumTrials>10</NumTrials>
             <RecordState>0</RecordState>
-            <LoadFrom>~/Experiments/LegBac/Evo/14_09_01__17_05_28/GA_BestGenome.xml</LoadFrom>
+            <LoadFrom>~/Experiments/LegBac/Evo/14_10_06__15_59_21/GA_BestGenome.xml</LoadFrom>
+            <Saved>14_09_01__17_05_28</Saved>
         </Eval>
     </GA>
 </Config>

@@ -106,6 +106,17 @@ public:
     kRM_NumModes
   };
   
+  enum WeightRenderMode
+  {
+    kWM_Weights = 0,
+    kWM_WDt,    
+    kWM_LRate,
+    kWM_DRate,
+    kWM_Num
+  };
+  
+  static std::string s_weightModeNames [kWM_Num];
+  
   CTRNNViz(const CTRNN* ctrnn, float width, const Topology* top = 0) : m_ctrnn(ctrnn), m_width(width), m_topology(top) { init(); };
   
   void setCTRNN(const CTRNN* ctrnn) { m_ctrnn = ctrnn; };
@@ -128,6 +139,7 @@ protected:
   ci::Vec2f m_mPos;
   
   uint8_t m_mode;
+  uint8_t m_weightMode;
   float m_width;
   float m_height;
   float m_labelHeight;
@@ -142,6 +154,7 @@ protected:
   ci::ColorA m_labelColor;
   
   ci::Rectf m_modeButton;
+  ci::Rectf m_weightModeButton;
   
   const CTRNN* m_ctrnn;
   const Topology* m_topology;

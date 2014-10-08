@@ -42,9 +42,11 @@ public:
   virtual void init();
   virtual void reset();
   virtual void update(float dt);
+  virtual bool hasFinished() { return m_fitnesses.size() >= m_maxNumFoods; };
   
   void randomiseFood();
   void setNet(CTRNN* net) { m_net = net; };
+  void setFoodPresentation(int num, float duration) { m_maxNumFoods = num; m_foodDur = duration; };
 
   float getReward() const { return m_reward; };
   float getFitness() const { return m_fitness; };
@@ -59,6 +61,7 @@ protected:
   float m_maxSpeed;
   float m_maxAngSpeed;
   float m_foodDur;
+  int m_maxNumFoods;
   
   CTRNN* m_net;
   
@@ -172,10 +175,11 @@ inline void BodyBac::update(float dt)
 //----------------------------------------------------------------------------------------------------------------------
 inline float BodyBac::getFinalFitness()
 {
-  // Average distance relative to initial distance and normalized to [0,1]
-  //float fit = (m_initDist - (m_fitness / m_time)) / m_initDist;
-  float fit = mean(m_fitnesses);
-  //std::cout << "#Foods " << m_fitnesses.size() << ". Mean : " << fit << std::endl;
+  //float fit = mean(m_fitnesses);
+  //float fit = m_fitnesses[m_fitnesses.size() - 1];
+  float mu, sd;
+  stdev(m_fitnesses, mu, sd, m_fitnesses.size()/2, 0);
+  float fit = mu - 0.5*sd;
   
   return fit;
 }

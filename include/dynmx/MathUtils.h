@@ -293,11 +293,34 @@ static inline T max(std::vector<T>& vec, int i0 = 0, int iN = 0)
 // Vector mean
 //----------------------------------------------------------------------------------------------------------------------
 template<class T>
-static inline T mean(std::vector<T>& vec)
+static inline T mean(std::vector<T>& vec, int i0 = 0, int iN = 0)
 {
-  return sum(vec) / (T) vec.size();
+  int last = (iN == 0) ? vec.size() : iN;
+  int N = last - i0;
+  return sum(vec, i0, last) / (T) N;
 }
 
+// Standard deviation
+//----------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+template<class T>
+static inline void stdev(std::vector<T>& vec, T& m, T& sd, int i0 = 0, int iN = 0)
+{
+  int last = (iN == 0) ? vec.size() : iN;
+  int N = last - i0;
+  assert(N > 1);
+  
+  m = mean(vec, i0, last);
+  
+  T accum = 0;
+  std::for_each(vec.begin() + i0, vec.begin() + last, [&](const double d)
+  {
+    accum += (d - m) * (d - m);
+  });
+  
+  sd = sqrt(accum / (N-1));
+}
+  
 // Element-wise sum of two vectors
 //----------------------------------------------------------------------------------------------------------------------
 template<class T>

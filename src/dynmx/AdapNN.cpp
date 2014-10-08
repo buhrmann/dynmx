@@ -19,6 +19,8 @@ namespace dmx
 #define DEFAULT_NOISEVAR 0.0
 #define DEFAULT_WDECAY 0.0
 #define DEFAULT_LRATE 0.0
+
+std::string AdapNN::s_synScalingNames [kSynSc_Num] = {"Oja", "Turr", "HomeoReg", "None"};
   
 //----------------------------------------------------------------------------------------------------------------------
 AdapNN::AdapNN(Topology* top) :
@@ -34,6 +36,7 @@ AdapNN::AdapNN(Topology* top) :
   // Reset states
   m_R = 0;
   m_meanR = 0;
+  m_reward = 0;
   
   // Initialize parameters to sensible defaults
   // Network-specific:
@@ -41,16 +44,18 @@ AdapNN::AdapNN(Topology* top) :
   m_useAntiHebbSwitch = false;
   m_rdecay = DEFAULT_RDECAY;
   m_noiseVar = DEFAULT_NOISEVAR;
-  m_preMeanSubFac = 1.0f;
+  m_preMeanSubFac = 0.0f;
+  
+  m_scaling = kSynSc_HomeoReg;
   
   // Neuron-specific:
   m_ndecay = new float[size];
   setNeuralMeanFilters(DEFAULT_NDECAY);
   
   // Synapse-specific
-  m_wdecay = createArray2d<float>(size, size, DEFAULT_WDECAY);
-  m_lrate = createArray2d<float>(size, size, DEFAULT_LRATE);
-  
+  m_wdecay = createArray2d<double>(size, size, DEFAULT_WDECAY);
+  m_lrate = createArray2d<double>(size, size, DEFAULT_LRATE);
+  m_wdt = createArray2d<double>(size, size, 0.0);
 }
   
 //----------------------------------------------------------------------------------------------------------------------
@@ -65,16 +70,21 @@ void AdapNN::setReward(float r)
 {
   m_R = r;
   m_meanR = (m_rdecay * m_meanR) + (1 - m_rdecay) * m_R;
+  m_reward = m_R - m_meanR;
+  
+  m_reward = std::max(0.0f, m_reward);
 }
   
 //----------------------------------------------------------------------------------------------------------------------
 void AdapNN::updateDynamic(double dt)
 {
-  // Update neural states and output
-  // Needs noise! Relies on externalinputs being reset afterwards!!
+  // Update neural states and output with noise
   for (int i = m_topology->getNumInputs(); i < size; ++i)
-    externalinputs[i] += m_noiseUniform ? UniformRandom(- m_noiseVar, m_noiseVar) : GaussianRandom(0, m_noiseVar);
-    
+  {
+    float noiseVar = m_noiseVar/2.0 * outputs[i]/2.0;
+    externalinputs[i] = m_noiseUniform ? UniformRandom(- noiseVar, noiseVar) : GaussianRandom(0, noiseVar);
+  }
+  
   CTRNN::updateDynamic(dt);
   
   // Update eligibility traces (mean neural firing rates)
@@ -84,30 +94,51 @@ void AdapNN::updateDynamic(double dt)
   }
   
   // Update weights: wji is the connection from j to i, i.e. j is pre-synaptic neuron
-  if (m_lrate != 0)
+  for (int i = m_topology->getNumInputs(); i < size; i++)
   {
-    for (int i = m_topology->getNumInputs(); i < size; i++)
+    for (int j = 0; j < size; j++)
     {
-      for (int j = 0; j < size; j++)
+      if(adaptive(j, i))
       {
-        if(adaptive(j, i))
+        float eji = (outputs[j] - m_preMeanSubFac * m_meanOut[j]) * (outputs[i] - m_meanOut[i]);
+        //float eji = outputs[j] * outputs[i];
+        
+        if (m_useAntiHebbSwitch)
+          eji *= sign(m_reward);
+        
+        m_wdt[j][i] = m_lrate[j][i] * m_reward * eji;
+        
+        // Scaling
+        float scalar = 0;
+        if (kSynSc_Oja == m_scaling)
         {
-          float reward = m_R - m_meanR;
-          float eji = (outputs[j] - m_preMeanSubFac * m_meanOut[j]) * (outputs[i] - m_meanOut[i]);
-          if (m_useAntiHebbSwitch)
-            eji *= sign(reward);
-          
-          float dwji = m_lrate[j][i] * reward * eji;
-          dwji -= m_wdecay[j][i] * weights[j][i];
-          weights[j][i] += dwji;
+          scalar = -weights[j][i] * sqr(m_meanOut[i]);
         }
+        else if (kSynSc_Turr == m_scaling)
+        {
+          scalar = (0.5 - m_meanOut[i]) * sign(weights[j][i]) * pow(weights[j][i], 1);
+        }
+        else if (kSynSc_HomeoReg == m_scaling)
+        {
+          if(m_meanOut[i] < 0.25)
+            scalar = 16 * sqr(m_meanOut[i] - 0.25) * sqr(weights[j][i]);
+          else if (m_meanOut[i] > 0.75)
+            scalar = -16 * sqr(m_meanOut[i] - 0.75) * sqr(weights[j][i]);
+          else
+            scalar = 0;
+        }
+
+        m_wdt[j][i] += m_lrate[j][i] * m_wdecay[j][i] * scalar;
+        
+        // Limit
+        float wmax = 10;
+        float l = (wmax - fabs(weights[j][i])) / wmax;
+        m_wdt[j][i] *= l;
+        
+        weights[j][i] += m_wdt[j][i];
       }
-    } // end weights loop
-  }
-  
-  // Reset external inputs so they don't grow infinitely due to noise
-  for (int i = 0; i < size; ++i)
-    externalinputs[i] = 0;
+    }
+  } // end weights loop
 }
   
 //----------------------------------------------------------------------------------------------------------------------

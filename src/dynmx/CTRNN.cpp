@@ -159,6 +159,8 @@ CTRNN::ActivationFunction CTRNN::getActivationFunction(ActFuncName name)
       return &linearActivation;
     case kAF_Identity:
       return &identity;
+    case kAF_Tanh:
+      return &tanh;
   }
 }
 
