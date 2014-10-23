@@ -68,16 +68,32 @@ void LegBacViz::drawBac()
 {
   m_pTM->rotate(ci::Vec3f(0.0f, 0.0f, 1.0f), m_agent->m_bac.m_angle);
   
+  const float r = m_agent->m_bac.m_radius;
+  
   // Agent in local space
   glPushMatrix();
   glMultMatrixf(*m_pTM);
-  glColor4f(0.5, 0.5, 0.5, 0.5);
-  drawDisk(m_agent->m_bac.m_radius, 0, 16, 2, GLU_FILL);
+  glColor4f(0.75, 0.75, 0.75, 0.75);
+  drawDisk(r, 0, 16, 2, GLU_FILL);
   glColor3f(0,0,0);
-  drawDisk(m_agent->m_bac.m_radius, 0, 16, 2, GLU_SILHOUETTE);
-  
-  drawBasis(m_agent->m_bac.m_radius);
+  drawDisk(r, 0, 16, 2, GLU_SILHOUETTE);
+  ci::gl::drawLine(ci::Vec2f(0,0), ci::Vec2f(r,0));
+  //drawBasis(r);
   glPopMatrix();
+  
+  // Sensors in world space
+  for(int i = 0; i < m_agent->m_bac.m_sensors.size(); ++i)
+  {
+    const ci::Vec2f& p = m_agent->m_bac.m_sensors[i].m_position;
+    const ci::Vec2f& d = m_agent->m_bac.m_sensors[i].m_direction;
+    const float s = m_agent->m_bac.m_sensors[i].m_signal;
+    const ci::Vec3f c = getColorMapRainbow(s);
+    glColor3f(0,0,0);
+    ci::gl::drawStrokedCircle(p, r/3, 16);
+    ci::gl::drawLine(p, p + d * r);
+    glColor3f(c.x, c.y, c.z);
+    ci::gl::drawSolidCircle(p, r/3, 16);
+  }
 
   // Food in world space
   glPushMatrix();

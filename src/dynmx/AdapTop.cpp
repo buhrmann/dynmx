@@ -111,9 +111,13 @@ int AdapTop::getNumAdapParams() const
   else
   {
     // Neurons and synapses have separate learning rules
-    // Unique adaptive synapses are all unique synapses except for self-connections (accounting for symmetry):
+    // Unique adaptive synapses are all unique synapses except for self-connections if they exist (accounting for symmetry):
+    int numUniqueAdapSyn = getNumUniqueConnections();
+    if (m_hiddenSelf)
+      numUniqueAdapSyn -= getNumUniqueNeurons(kLyr_Hidden);
+    if (m_outputsSelf)
+      numUniqueAdapSyn -= getNumUniqueNeurons(kLyr_Output);
     
-    const int numUniqueAdapSyn = getNumUniqueConnections() - getNumUniqueNeurons(kLyr_Hidden) - getNumUniqueNeurons(kLyr_Output);
     const int numUniqueNeurons = getNumUniqueNeurons(kLyr_Input) + getNumUniqueNeurons(kLyr_Hidden) + getNumUniqueNeurons(kLyr_Output);
     return (numUniqueAdapSyn * synSpecParams) + (numUniqueNeurons * neuSpecParams) + netSpecParams;
   }

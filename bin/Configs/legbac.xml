@@ -13,11 +13,11 @@
     </Globals>
     <GA>
         <Evolvable Name="LegBac">
-            <Trials legDur="150" bacFoodDur="400" bacNumFoods="6" legNum="0" bacNum="10" legFitMax="78" bacFitMax="0.5">0</Trials>
-            <Topology symmetric="0" weightCutoff="0" actFunc="Sigmoid" adaptive="1" initialWeights="0" rulePerConn="1" noiseUniform="1" antiHebb="0" synScaling="HomeoReg">
-                <Inputs asNeurons="1">1</Inputs>
+            <Trials legDur="150" bacFoodDur="100" bacNumFoods="20" legNum="0" bacNum="10" legFitMax="78" bacFitMax="0.5">0</Trials>
+            <Topology symmetric="0" weightCutoff="0" actFunc="Sigmoid" adaptive="1" initialWeights="0" rulePerConn="0" noiseUniform="1" antiHebb="0" synScaling="HomeoReg">
+                <Inputs asNeurons="1">2</Inputs>
                 <Hidden lateral="1" self="0">5</Hidden>
-                <Outputs lateral="1" self="0">1</Outputs>
+                <Outputs lateral="0" self="0">2</Outputs>
                 <NetLimits>
                     <Weight min="-8.0" max="8.0"/>
                     <Bias min="-6" max="-5"/>
@@ -30,13 +30,13 @@
                 </NetLimits>
             </Topology>
         </Evolvable>    
-        <Incremental initialMutation="0.1" seedOnly="1" seedAll="1" elitist="0" initialStage="0">1</Incremental>
+        <Incremental initialMutation="0.1" seedOnly="1" seedAll="1" elitist="0" initialStage="0">0</Incremental>
         <LoadFrom>~/Experiments/LegBac/Evo/14_10_06__14_02_15/GA_Result.xml</LoadFrom>
         <Saved>14_09_01__13_50_40</Saved>
         <PopulationSize>100</PopulationSize>
         <DemeSize>10</DemeSize>
-        <NumGenerations OutputInterval="1">100</NumGenerations>
-        <Mutation Rate="1.0" Var="0.1" VarReduced="0.01" ReduceAt="80">
+        <NumGenerations OutputInterval="1">300</NumGenerations>
+        <Mutation Rate="1.0" Var="0.1" VarReduced="0.01" ReduceAt="250">
             <IntraGenomePD>Gaussian</IntraGenomePD>
             <InterGenomePD>Gaussian</InterGenomePD>
         </Mutation>
@@ -50,7 +50,7 @@
         <Eval Run="1" Stage="0">
             <NumTrials>10</NumTrials>
             <RecordState>0</RecordState>
-            <LoadFrom>~/Experiments/LegBac/Evo/14_10_06__15_59_21/GA_BestGenome.xml</LoadFrom>
+            <LoadFrom>~/Experiments/LegBac/Evo/14_10_22__14_52_21/GA_BestGenome.xml</LoadFrom>
             <Saved>14_09_01__17_05_28</Saved>
         </Eval>
     </GA>

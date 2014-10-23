@@ -49,7 +49,9 @@ Topology::Topology() :
   m_weightCutoff(0),
   m_symmetric(false),
   m_outputsLateral(false),
-  m_hiddenLateral(true)
+  m_hiddenLateral(true),
+  m_outputsSelf(true),
+  m_hiddenSelf(true)  
 {
   setSize(1, 3, 1);
   calcNumParameters();
@@ -148,17 +150,25 @@ int Topology::calcNumUniqueConnections()
   // Inputs to hidden
   if(m_inputsAreNeurons)
     m_numConn += numUniqueHidden * m_size[kLyr_Input];
-  
+
   // Hidden intralayer weights
   if(m_hiddenLateral)
+  {
     m_numConn += numUniqueHidden * m_size[kLyr_Hidden];
+    if(!m_hiddenSelf)
+      m_numConn -= numUniqueHidden;
+  }
   
   // Hidden layer to output
   m_numConn += numUniqueOutputs * m_size[kLyr_Hidden];
   
   // Output intralayer weights
   if(m_outputsLateral)
+  {
     m_numConn += numUniqueOutputs * m_size[kLyr_Output];
+    if(!m_outputsSelf)
+      m_numConn -= numUniqueOutputs;
+  }
   
   return m_numConn;
 }
@@ -303,10 +313,10 @@ bool Topology::decode(CTRNN& ctrnn, const double* params) const
   decodeLayerConnections(ctrnn, kLyr_Hidden, kLyr_Output, params, I, m_limits.weight, &CTRNN::setWeight);
   
   if(m_hiddenLateral)
-    decodeLayerConnections(ctrnn, kLyr_Hidden, kLyr_Hidden, params, I, m_limits.weight, &CTRNN::setWeight);
+    decodeLayerConnections(ctrnn, kLyr_Hidden, kLyr_Hidden, params, I, m_limits.weight, &CTRNN::setWeight, m_hiddenSelf);
   
   if(m_outputsLateral)
-    decodeLayerConnections(ctrnn, kLyr_Output, kLyr_Output, params, I, m_limits.weight, &CTRNN::setWeight);
+    decodeLayerConnections(ctrnn, kLyr_Output, kLyr_Output, params, I, m_limits.weight, &CTRNN::setWeight, m_outputsSelf);
   
   
   // Check we decoded correctly!
@@ -346,10 +356,10 @@ bool Topology::encode(CTRNN& ctrnn, double* params) const
   encodeLayerConnections(ctrnn, kLyr_Hidden, kLyr_Output, params, I, m_limits.weight, &CTRNN::getWeight);
   
   if(m_hiddenLateral)
-    encodeLayerConnections(ctrnn, kLyr_Hidden, kLyr_Hidden, params, I, m_limits.weight, &CTRNN::getWeight);
+    encodeLayerConnections(ctrnn, kLyr_Hidden, kLyr_Hidden, params, I, m_limits.weight, &CTRNN::getWeight, m_hiddenSelf);
   
   if(m_outputsLateral)
-    encodeLayerConnections(ctrnn, kLyr_Output, kLyr_Output, params, I, m_limits.weight, &CTRNN::getWeight);
+    encodeLayerConnections(ctrnn, kLyr_Output, kLyr_Output, params, I, m_limits.weight, &CTRNN::getWeight, m_outputsSelf);
   
   // Check we decoded correctly!
   int numReqParams = Topology::getNumParameters();
@@ -369,16 +379,20 @@ bool Topology::calcConn(int from, int to) const
     {
       // Receiver is hidden
       const bool fromIsInput = from < m_size[kLyr_Input];
-      if(fromIsInput || (isHidden(from) && m_hiddenLateral))
-        return true;
+      bool allowedSelf = m_hiddenSelf || (to != from);
+      bool allowedNonSelf = fromIsInput || (isHidden(from) && m_hiddenLateral);
+      return allowedSelf && allowedNonSelf;
     }
-    else if (isHidden(from) || (isOutput(from) && m_outputsLateral))
+    else
     {
       // Receiver is output and origin hidden or other output (if lateral allowed)
-      return true;
+      bool allowedSelf = m_outputsSelf || (to != from);
+      bool allowedNonSelf = isHidden(from) || (isOutput(from) && m_outputsLateral);
+      return allowedSelf && allowedNonSelf;
     }
   }
   
+  // Receiver is inputs
   return false;
 }
   
@@ -410,10 +424,12 @@ void Topology::toXml(ci::XmlTree& xml) const
   
   ci::XmlTree hidden ("Hidden", toString(m_size[1]));
   hidden.setAttribute("lateral", m_hiddenLateral);
+  hidden.setAttribute("self", m_hiddenSelf);
   topXml.push_back(hidden);
   
   ci::XmlTree outputs ("Outputs", toString(m_size[2]));
   outputs.setAttribute("lateral", m_outputsLateral);
+  outputs.setAttribute("self", m_outputsSelf);
   topXml.push_back(outputs);
   
   m_limits.toXml(topXml); 
@@ -438,6 +454,8 @@ void Topology::fromXml(const ci::XmlTree& xml)
   m_inputsAreNeurons = xml.getChild("Inputs").getAttributeValue<bool>("asNeurons");
   m_outputsLateral = xml.getChild("Outputs").getAttributeValue<bool>("lateral", true);
   m_hiddenLateral = xml.getChild("Hidden").getAttributeValue<bool>("lateral", true);
+  m_outputsSelf = xml.getChild("Outputs").getAttributeValue<bool>("self", true);
+  m_hiddenSelf = xml.getChild("Hidden").getAttributeValue<bool>("self", true);
   
   m_N = calcSize();
   

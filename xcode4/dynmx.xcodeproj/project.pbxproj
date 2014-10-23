@@ -28,6 +28,7 @@
 		D668798B17B4F7C300FC1166 /* SMCArm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D668798917B4F7C300FC1166 /* SMCArm.cpp */; };
 		D681B49718BF59A6002E9114 /* BacteriumEvo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D681B49518BF59A6002E9114 /* BacteriumEvo.cpp */; };
 		D6B4697F18C9D0FF006C0544 /* Sensor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6B4697E18C9D0FF006C0544 /* Sensor.cpp */; };
+		D6C568C819E5519400E77FBA /* BodyBac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6C568C719E5519400E77FBA /* BodyBac.cpp */; };
 		D6D9F12314DC62D6009C0C95 /* App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10014DC62D6009C0C95 /* App.cpp */; };
 		D6D9F12414DC62D6009C0C95 /* Arm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10114DC62D6009C0C95 /* Arm.cpp */; };
 		D6D9F12514DC62D6009C0C95 /* ArmMuscled.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6D9F10214DC62D6009C0C95 /* ArmMuscled.cpp */; };
@@ -121,6 +122,7 @@
 		D6B4697D18C9D0EB006C0544 /* Sensor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Sensor.h; path = ../include/dynmx/Sensor.h; sourceTree = "<group>"; };
 		D6B4697E18C9D0FF006C0544 /* Sensor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Sensor.cpp; path = ../src/dynmx/Sensor.cpp; sourceTree = "<group>"; };
 		D6B8F87417E766E900C70C75 /* Signal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Signal.h; path = ../include/dynmx/Signal.h; sourceTree = "<group>"; };
+		D6C568C719E5519400E77FBA /* BodyBac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BodyBac.cpp; path = ../src/dynmx/BodyBac.cpp; sourceTree = "<group>"; };
 		D6D9F0C614DC62A4009C0C95 /* App.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = App.h; path = ../include/dynmx/App.h; sourceTree = "<group>"; };
 		D6D9F0C714DC62A4009C0C95 /* Arm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Arm.h; path = ../include/dynmx/Arm.h; sourceTree = "<group>"; };
 		D6D9F0C814DC62A4009C0C95 /* ArmMuscled.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArmMuscled.h; path = ../include/dynmx/ArmMuscled.h; sourceTree = "<group>"; };
@@ -370,6 +372,7 @@
 				D6317E3B19AB5F0C0073FCCD /* LegBac.cpp */,
 				D6317E3D19AB607D0073FCCD /* BodyLeg.h */,
 				D6317E3E19AB60900073FCCD /* BodyBac.h */,
+				D6C568C719E5519400E77FBA /* BodyBac.cpp */,
 				D656F7E219AC9F7300FFF749 /* LegBacView.h */,
 				D656F7E019AC9E6D00FFF749 /* LegBacView.cpp */,
 				D656F7E319ACA79F00FFF749 /* LegBacViz.h */,
@@ -678,6 +681,7 @@
 				D6D9F12314DC62D6009C0C95 /* App.cpp in Sources */,
 				D6D9F12414DC62D6009C0C95 /* Arm.cpp in Sources */,
 				D6D9F12514DC62D6009C0C95 /* ArmMuscled.cpp in Sources */,
+				D6C568C819E5519400E77FBA /* BodyBac.cpp in Sources */,
 				D6D9F12614DC62D6009C0C95 /* ArmMuscledViz.cpp in Sources */,
 				D6D9F12714DC62D6009C0C95 /* ArmPD.cpp in Sources */,
 				D681B49718BF59A6002E9114 /* BacteriumEvo.cpp in Sources */,
