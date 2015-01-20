@@ -45,6 +45,7 @@ public:
   ci::Vec2f m_direction;
   
   static float s_sigma;
+  static float s_maxSensorAng;
 };
   
   
@@ -73,6 +74,7 @@ public:
   virtual void update(float dt);
   virtual bool hasFinished() { return m_fitnesses.size() >= m_maxNumFoods; };
   
+  void resetPosition();
   void randomiseFood();
   void setNet(CTRNN* net) { m_net = net; };
   void setFoodPresentation(int num, float duration) { m_maxNumFoods = num; m_foodDur = duration; };
@@ -86,7 +88,6 @@ protected:
   
   // Parameters
   float m_radius;
-  float m_sensorSig;
   float m_maxSpeed;
   float m_maxAngSpeed;
   float m_foodDur;

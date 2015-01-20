@@ -54,6 +54,8 @@ public:
   Topology(const ci::XmlTree& xml);
   virtual ~Topology(){ destroyMatrix(); };
   
+  virtual void reset(CTRNN* net) {};
+  
   // Convenience setters and getters
   void setSize(int l0, int l1, int l2) { destroyMatrix(); m_size[0] = l0; m_size[1] = l1; m_size[2] = l2; m_N = calcSize(); buildMatrix(); };
   void setSymmetric(bool s) { m_symmetric = s; };
@@ -76,6 +78,8 @@ public:
   void getLayerFirstLast(LayerName l, int& first, int& last, bool unique=false) const;
   int getLayerFirst(LayerName l) const;
   
+  const NetLimits& getLimits() const { return m_limits; };
+  
   virtual void toXml(ci::XmlTree& xml) const;
   virtual void fromXml(const ci::XmlTree& xml);
   
@@ -90,6 +94,8 @@ public:
   
   void randomiseWeights(CTRNN* net, float min, float max);
   void randomiseWeights(CTRNN* net) { randomiseWeights(net, m_limits.weight.min, m_limits.weight.max);} ;
+  
+  virtual bool isAdaptive() const { return false; };
   
 protected:
   

@@ -378,7 +378,7 @@ void CTRNNLayerViz::onMouseMove(const Vec4f& mPos)
 // CTRNNViz implementation  
 //----------------------------------------------------------------------------------------------------------------------  
 
-std::string CTRNNViz::s_weightModeNames [kWM_Num] = {"weights", "weights dt", "l-rate", "d-rate"};
+std::string CTRNNViz::s_weightModeNames [kWM_Num] = {"weights", "weights dt", "learn-rate", "decay", "syn-scale"};
   
 // Mormalises inputs to 1, if input neurons function as placeholders  
 //----------------------------------------------------------------------------------------------------------------------  
@@ -548,7 +548,9 @@ void CTRNNViz::update()
   
   // text box
   ci::Vec2f textBoxPos = dLabelPos + ci::Vec2f(0, m_labelHeight + m_padding);
-  const float textBoxH = 3 * m_lineHeight + 2 * m_padding;
+  float textBoxH = 3 * m_lineHeight + 2 * m_padding;
+  if (m_topology->isAdaptive())
+    textBoxH += 2 * m_lineHeight;
   ci::gl::drawSolidRect(ci::Rectf(textBoxPos.x, textBoxPos.y, textBoxPos.x + m_width, textBoxPos.y + textBoxH));
   
   // text
@@ -583,7 +585,13 @@ void CTRNNViz::update()
     ci::gl::drawString(str, textPos + ci::Vec2f(0, m_lineHeight), m_textColor, m_font);      
     
     sprintf(str, "e: %2.2f | i: %2.2f | y: %2.2f | out: %1.3f", m_ctrnn->getExternalInput(i), m_ctrnn->getInput(i), m_ctrnn->getState(i), m_ctrnn->getOutput(i));
-    ci::gl::drawString(str, textPos + ci::Vec2f(0, 2 * m_lineHeight), m_textColor, m_font);            
+    ci::gl::drawString(str, textPos + ci::Vec2f(0, 2 * m_lineHeight), m_textColor, m_font);
+    
+    if (m_topology->isAdaptive())
+    {
+      sprintf(str, "mean-out: %2.2f | mean-diff: %2.2f", ((AdapNN*)m_ctrnn)->getMeanOutput(i), m_ctrnn->getOutput(i) - ((AdapNN*)m_ctrnn)->getMeanOutput(i));
+      ci::gl::drawString(str, textPos + ci::Vec2f(0, 4 * m_lineHeight), m_textColor, m_font);
+    }
   }
   
   if(m_mode == kRM_Matrix)
@@ -624,12 +632,15 @@ void CTRNNViz::onMousePress(const Vec4f& mPos)
     m_weightMode = (m_weightMode + 1) % kWM_Num;
     if (m_weightMode == kWM_Weights)
       m_weights->setDataRef(m_ctrnn->getWeights());
-    else if (m_weightMode == kWM_WDt)
+    else if (m_weightMode == kWM_dW)
       m_weights->setDataRef(((AdapNN*)m_ctrnn)->getWeightChanges());
     else if (m_weightMode == kWM_LRate)
       m_weights->setDataRef(((AdapNN*)m_ctrnn)->getLearningRates());
     else if (m_weightMode == kWM_DRate)
       m_weights->setDataRef(((AdapNN*)m_ctrnn)->getWeightDecays());
+    else if (m_weightMode == kWM_SScale)
+      m_weights->setDataRef(((AdapNN*)m_ctrnn)->getSynapticScales());
+    
   }
   
   

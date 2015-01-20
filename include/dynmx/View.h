@@ -46,6 +46,7 @@ public:
   virtual void init();
   virtual void update(float dt){}; // E.g. for updating internal calculated data after a simulation step
   virtual void draw();
+  virtual void reset() { m_scene2d.reset(); m_scene3d.reset(); };
   
   virtual int getDesiredFrameRate() { return DEFAULT_VIEW_FRAME_RATE; } ;
 

@@ -109,9 +109,10 @@ public:
   enum WeightRenderMode
   {
     kWM_Weights = 0,
-    kWM_WDt,    
+    kWM_dW,
     kWM_LRate,
     kWM_DRate,
+    kWM_SScale,
     kWM_Num
   };
   

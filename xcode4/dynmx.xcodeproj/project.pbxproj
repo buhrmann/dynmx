@@ -20,6 +20,7 @@
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		D60C452E1778935A00CF2635 /* SMCAgentMeta1d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D60C452D1778935900CF2635 /* SMCAgentMeta1d.cpp */; };
 		D61E196718BD3C5B00C6FEB4 /* GradientSensor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D61E196618BD3C5B00C6FEB4 /* GradientSensor.cpp */; };
+		D62F5BC91A09299900AA5BCA /* BodyLeg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D62F5BC81A09299900AA5BCA /* BodyLeg.cpp */; };
 		D630C7951645396700F2ABE5 /* Topology.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D630C7941645396700F2ABE5 /* Topology.cpp */; };
 		D6317E3C19AB5F0C0073FCCD /* LegBac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6317E3B19AB5F0C0073FCCD /* LegBac.cpp */; };
 		D63189F918BBB6DB00095777 /* Bacterium.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D63189F818BBB6DB00095777 /* Bacterium.cpp */; };
@@ -99,6 +100,7 @@
 		D60C453017789DD500CF2635 /* SMCAgentViz1d.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SMCAgentViz1d.h; path = ../src/dynmx/SMCAgentViz1d.h; sourceTree = "<group>"; };
 		D61E196518BD3ABC00C6FEB4 /* GradientSensor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GradientSensor.h; path = ../include/dynmx/GradientSensor.h; sourceTree = "<group>"; };
 		D61E196618BD3C5B00C6FEB4 /* GradientSensor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GradientSensor.cpp; path = ../src/dynmx/GradientSensor.cpp; sourceTree = "<group>"; };
+		D62F5BC81A09299900AA5BCA /* BodyLeg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BodyLeg.cpp; path = ../src/dynmx/BodyLeg.cpp; sourceTree = "<group>"; };
 		D630C7941645396700F2ABE5 /* Topology.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Topology.cpp; path = ../src/dynmx/Topology.cpp; sourceTree = "<group>"; };
 		D630C7961645397F00F2ABE5 /* SMCAgentGaussian.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCAgentGaussian.h; path = ../include/dynmx/SMCAgentGaussian.h; sourceTree = "<group>"; };
 		D630C7971645397F00F2ABE5 /* SMCAgentLineDis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMCAgentLineDis.h; path = ../include/dynmx/SMCAgentLineDis.h; sourceTree = "<group>"; };
@@ -371,6 +373,7 @@
 				D6317E3A19AB5E170073FCCD /* LegBac.h */,
 				D6317E3B19AB5F0C0073FCCD /* LegBac.cpp */,
 				D6317E3D19AB607D0073FCCD /* BodyLeg.h */,
+				D62F5BC81A09299900AA5BCA /* BodyLeg.cpp */,
 				D6317E3E19AB60900073FCCD /* BodyBac.h */,
 				D6C568C719E5519400E77FBA /* BodyBac.cpp */,
 				D656F7E219AC9F7300FFF749 /* LegBacView.h */,
@@ -711,6 +714,7 @@
 				D6D9F13A14DC62D6009C0C95 /* Recorder.cpp in Sources */,
 				D6F7473D19BF18AC00403AE7 /* AdapTop.cpp in Sources */,
 				D6D9F13B14DC62D6009C0C95 /* Reflex.cpp in Sources */,
+				D62F5BC91A09299900AA5BCA /* BodyLeg.cpp in Sources */,
 				D6D9F13C14DC62D6009C0C95 /* Registry.cpp in Sources */,
 				D6D9F13D14DC62D6009C0C95 /* Scene.cpp in Sources */,
 				D6D9F13E14DC62D6009C0C95 /* Simulation.cpp in Sources */,

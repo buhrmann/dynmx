@@ -50,8 +50,10 @@ void LegBac::init()
     }
     
     m_numLegTrials = xml.getChild("Trials").getAttributeValue<int>("legNum", 0);
+    float legDuration = xml.getChild("Trials").getAttributeValue<float>("legDur", 10);
+    m_leg.setDuration(legDuration);
+    
     m_numBacTrials = xml.getChild("Trials").getAttributeValue<int>("bacNum", 0);
-    m_legDuration = xml.getChild("Trials").getAttributeValue<float>("legDur", 10);
     int bacNumFoods = xml.getChild("Trials").getAttributeValue<int>("bacNumFoods", 10);
     float bacFoodDur = xml.getChild("Trials").getAttributeValue<float>("bacFoodDur", 10);
     m_bac.setFoodPresentation(bacNumFoods, bacFoodDur);
@@ -70,8 +72,9 @@ void LegBac::reset()
   m_time = 0.0f;
   m_fitness = 0;
   
-  if(m_adaptive)
-    m_topology->randomiseWeights(m_ctrnn);
+  if(m_adaptive){
+    ((AdapNN*)m_ctrnn)->reset();
+  }
   
   m_ctrnn->zeroStates();
   
@@ -93,6 +96,8 @@ void LegBac::update(float dt)
   if (m_legged)
   {
     m_leg.update(dt);
+    if(m_adaptive)
+      ((AdapNN*)m_ctrnn)->setReward(m_leg.getReward());
   }
   else
   {
@@ -125,7 +130,7 @@ void LegBac::nextTrial(int trial)
 bool LegBac::hasFinished()
 {
   if(m_legged)
-    return m_time >= m_legDuration;
+    return m_leg.hasFinished();
   else
     return m_bac.hasFinished();
 }

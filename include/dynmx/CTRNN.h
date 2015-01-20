@@ -138,8 +138,10 @@ public:
   void setStateDynamic(int i, double value) { states[i] = value; outputs[i] = (*m_activationFunctions[i])(states[i] + biases[i]); };
   void setOutput(int i, double value) { outputs[i] = value; states[i] = InverseSigmoid(value)/gains[i] - biases[i]; };
   void setBias(int i, double value) { biases[i] = value; };
+  void setBiases(double value) { std::fill(biases, biases+size, value); };
   void setGain(int i, double value) { gains[i] = value; };
   void setTimeConstant(int i, double value) { taus[i] = value; Rtaus[i] = 1 / value; };
+  void setTimeConstants(double value) { std:fill(taus, taus+size, value); std::fill(Rtaus, Rtaus+size, 1/value); };
   void setExternalInput(int i, double value) { externalinputs[i] = value; };
   void setWeight(int from, int to, double value) { weights[from][to] = value; };
   void setCenterCrossing();

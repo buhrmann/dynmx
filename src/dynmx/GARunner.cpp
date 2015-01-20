@@ -235,7 +235,6 @@ void GARunner::update(float dt)
   else
   {
     // End of trial
-    //-------------------------------------------------------
     const float fitness = m_evolvable->getFitness();
    
     updateTrialFitness(fitness);
@@ -244,7 +243,6 @@ void GARunner::update(float dt)
     m_time = 0.0;
     
     // Finished all trials? Move on to evaluate next genome.
-    //-------------------------------------------------------
     if (m_trial == m_numTrials)
     {
       
@@ -265,7 +263,6 @@ void GARunner::update(float dt)
       m_accFitness = 0.0;  
       
       // End of one "generation"
-      //-------------------------------------------------------
       const uint32_t currentGen = m_ga->getCurrentGeneration();
       if (m_prevGeneration != currentGen)
       {
@@ -347,7 +344,6 @@ void GARunner::finishGeneration(int currentGen, float dt)
   }
   
   // When the maximum number of generations has been reached.
-  //---------------------------------------------------------
   if (hasFinished())
   {
     finishRun(bestGenome, bestFitness, dt);

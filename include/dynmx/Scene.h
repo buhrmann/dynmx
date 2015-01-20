@@ -428,7 +428,7 @@ protected:
   
 
 //----------------------------------------------------------------------------------------------------------------------
-// A matrix viz node
+// A matrix viz nodeq
 //----------------------------------------------------------------------------------------------------------------------
 template<class Type>
 class MatrixView : public Node
@@ -439,8 +439,10 @@ public:
     m_data(d), m_N(n), m_M(m), m_scale(s/n), m_maxVal(maxVal), m_iSel(-1), m_jSel(-1) { init(); };
 
   Type getValue(int i, int j) { return m_data[i][j]; };
-  
   virtual Node* getNode(int pickID){ if(m_uniqueID == pickID) return this; else return 0;};
+  virtual void reset() {
+    m_maxVal = getMax();
+  };
   
   Type getMax()
   {
@@ -477,6 +479,7 @@ public:
     glTranslatef(0.5, 0.5, 0.0);
     
     cinder::Vec3f col;
+    double maxNow = -1;
     for(int i = 0; i < m_N; i++)
     {
       for(int j = 0; j < m_M; j++)
@@ -485,7 +488,8 @@ public:
         glTranslatef(i, j, 0.0);
         
         // Update max value in case values in underlying matrix are changing
-        m_maxVal = std::max(m_maxVal, fabs(m_data[i][j]));
+        //m_maxVal = std::max(m_maxVal, fabs(m_data[i][j]));
+        maxNow = std::max(maxNow, fabs(m_data[i][j]));
         // Scale
         float w = clamp(m_data[i][j] / m_maxVal, -1.0, 1.0);
         
@@ -517,6 +521,8 @@ public:
         glPopMatrix();
       }
     }
+    
+    m_maxVal = maxNow;
     
     glPopMatrix();
     glPopAttrib();
@@ -574,7 +580,6 @@ protected:
   int
     m_N,
     m_M;
-
 };
 
 //----------------------------------------------------------------------------------------------------------------------

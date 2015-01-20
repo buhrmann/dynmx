@@ -14,6 +14,7 @@
 #include <cmath>
 #include <numeric>
 #include <sstream>
+#include <iomanip>
 #include "float.h"
 
 namespace dmx
@@ -40,6 +41,12 @@ static const float asinh(float v)
 }
 #endif
 
+//----------------------------------------------------------------------------------------------------------------------
+template<class T>
+static inline T clamp(T Value, T Min, T Max)
+{
+  return (Value < Min)? Min : (Value > Max)? Max : Value;
+}
   
 // Map one range to another
 //----------------------------------------------------------------------------------------------------------------------
@@ -88,8 +95,10 @@ struct Range
     }
   }
   
-  double encode(double v) const { return mapTo01(v, min, max); }
-  double decode(double v) const { return map01To(v, min, max); }
+  double encode(double v) const { return mapTo01(v, min, max); };
+  double decode(double v) const { return map01To(v, min, max); };
+  double clamp(double v) const { return (v < min) ? min : (v > max) ? max : v;
+ };
   
   double min, max;
 };
@@ -117,13 +126,6 @@ static const double degreesToRadians(double deg) { return deg * DEG_TO_RAD; };
 //----------------------------------------------------------------------------------------------------------------------
 static const float radiansToDegrees(float rad) { return rad * RAD_TO_DEG; };
 static const double radiansToDegrees(double rad) { return rad * RAD_TO_DEG; };
-
-//----------------------------------------------------------------------------------------------------------------------
-template<class T>
-static inline T clamp(T Value, T Min, T Max)
-{
-  return (Value < Min)? Min : (Value > Max)? Max : Value;
-}
 
 //----------------------------------------------------------------------------------------------------------------------
 template<class T>
@@ -197,24 +199,24 @@ void fillArray2d(T** a, int n, int m, T val)
 // Print arrays
 //----------------------------------------------------------------------------------------------------------------------
 template<class T>
-void printArray(T* a, int n)
+void printArray(T* a, int n, int prec=4)
 {
   for (int i = 0; i < n; ++i)
   {
-    std::cout << a[i] << "\t";
+    std::cout << std::setprecision(prec) << std::fixed << a[i] << "\t";
   }
   std::cout << std::endl;
 }
   
 template<class T>
-void printArray2d(T** a, int n, int m)
+void printArray2d(T** a, int n, int m, int prec=4)
 {
   for (int i = 0; i < n; ++i)
   {
     std::cout << i << ": \t";
     for (int j = 0; j < m; ++j)
     {
-      std::cout << a[i][j] << "\t";
+      std::cout << std::setprecision(prec) << std::fixed << a[i][j] << "\t";
     }
     std::cout << std::endl;
   }

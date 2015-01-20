@@ -68,7 +68,7 @@ public:
   const BodyLeg& getLeg() const { return m_leg; };
   const BodyBac& getBac() const { return m_bac; };
   const ci::Vec2f& getPos() const { if (m_legged) return m_leg.m_position; else return m_bac.m_position; };
-  
+  float getReward() const { return m_legged ? m_leg.getReward() : m_bac.getReward(); };
   
 protected:
   
@@ -92,7 +92,6 @@ protected:
   int m_numLegTrials;
   int m_numBacTrials;
   float m_fitness;
-  float m_legDuration;
   float m_legFitMax;
   float m_bacFitMax;
 };

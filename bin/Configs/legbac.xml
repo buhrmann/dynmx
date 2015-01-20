@@ -13,27 +13,29 @@
     </Globals>
     <GA>
         <Evolvable Name="LegBac">
-            <Trials legDur="150" bacFoodDur="100" bacNumFoods="20" legNum="0" bacNum="10" legFitMax="78" bacFitMax="0.5">0</Trials>
-            <Topology symmetric="0" weightCutoff="0" actFunc="Sigmoid" adaptive="1" initialWeights="0" rulePerConn="0" noiseUniform="1" antiHebb="0" synScaling="HomeoReg">
+            <Trials legDur="100" bacFoodDur="100" bacNumFoods="30" legNum="5" bacNum="5" legFitMax="78" bacFitMax="0.5">0</Trials>
+            <Topology symmetric="0" weightCutoff="0" actFunc="Sigmoid" adaptive="1" initialWeights="0" rulePerConn="0" noiseUniform="1" antiHebb="0" synScaling="HomeoPre" preMeanSubFac="0" evolveBiases="1" evolveTaus="1" evolvePrePostFac="1">
                 <Inputs asNeurons="1">2</Inputs>
-                <Hidden lateral="1" self="0">5</Hidden>
-                <Outputs lateral="0" self="0">2</Outputs>
+                <Hidden lateral="1" self="0">3</Hidden>
+                <Outputs lateral="1" self="0">3</Outputs>
                 <NetLimits>
-                    <Weight min="-8.0" max="8.0"/>
-                    <Bias min="-6" max="-5"/>
+                    <Weight min="-12.0" max="12.0"/>
+                    <Bias min="-12" max="12"/>
                     <Gain min="-12.0" max="12.0"/>
-                    <TimeConstant min="0.05" max="2"/>
-                    <MeanDecay min="0.001" max="0.5"/>
-                    <WeightDecay min="0.001" max="0.1"/>
-                    <NoiseVar min="0" max="4"/>
-                    <LearnRate min="0.01" max="1.0"/>
+                    <TimeConstant min="0.5" max="5.0"/>
+                    <MeanDecay min="0.0" max="1"/>
+                    <WeightDecay min="0.0" max="0.1"/>
+                    <NoiseVar min="0" max="6"/>
+                    <LearnRate min="-1" max="1"/>
+                    <SynapticScale min="0.0" max="4"/>
+                    <PrePostFac min="-1" max="1"/>
                 </NetLimits>
             </Topology>
         </Evolvable>    
         <Incremental initialMutation="0.1" seedOnly="1" seedAll="1" elitist="0" initialStage="0">0</Incremental>
-        <LoadFrom>~/Experiments/LegBac/Evo/14_10_06__14_02_15/GA_Result.xml</LoadFrom>
+        <LoadFrom>~/Experiments/LegBac/Evo/15_01_12__10_36_17/GA_Result.xml</LoadFrom>
         <Saved>14_09_01__13_50_40</Saved>
-        <PopulationSize>100</PopulationSize>
+        <PopulationSize>50</PopulationSize>
         <DemeSize>10</DemeSize>
         <NumGenerations OutputInterval="1">300</NumGenerations>
         <Mutation Rate="1.0" Var="0.1" VarReduced="0.01" ReduceAt="250">
@@ -50,7 +52,7 @@
         <Eval Run="1" Stage="0">
             <NumTrials>10</NumTrials>
             <RecordState>0</RecordState>
-            <LoadFrom>~/Experiments/LegBac/Evo/14_10_22__14_52_21/GA_BestGenome.xml</LoadFrom>
+            <LoadFrom>~/Experiments/LegBac/Evo/15_01_19__11_31_32/GA_BestGenome.xml</LoadFrom>
             <Saved>14_09_01__17_05_28</Saved>
         </Eval>
     </GA>

@@ -19,11 +19,11 @@ namespace dmx
 //--------------------------------------------------------------------------------------------------------------------
 struct AdapNetLimits
 {
-  AdapNetLimits() : meanDecay(0,1), noiseVar(-10,10), weightDecay(0,0.1), learnRate(0, 1) {};
+  AdapNetLimits() : meanDecay(0,1), noiseVar(-10,10), weightDecay(0,0.1), learnRate(0, 1), synScale(0,1), prePostFac(-1,1) {};
   void toXml(ci::XmlTree& xml) const;
   void fromXml(const ci::XmlTree& xml);
   
-  Range meanDecay, noiseVar, weightDecay, learnRate;
+  Range meanDecay, noiseVar, weightDecay, learnRate, synScale, prePostFac;
 };
   
 //----------------------------------------------------------------------------------------------------------------------
@@ -41,14 +41,22 @@ public:
   AdapTop();
   AdapTop(const ci::XmlTree& xml);
   
+  virtual void reset(CTRNN* net);
+  
   // These are crucial for GA
   virtual int getNumParameters() const;
   virtual bool decode(CTRNN& ctrnn, const double* params) const;
   virtual bool encode(CTRNN& ctrnn, double* params) const;
   
-  
   virtual void toXml(ci::XmlTree& xml) const;
   virtual void fromXml(const ci::XmlTree& xml);
+  
+  virtual bool isAdaptive() const { return true; };
+  
+  bool m_evolveBiases;
+  bool m_evolveTaus;
+  bool m_evolveSynScaleMode;
+  bool m_evolvePrePostFac;
 
 protected:
   

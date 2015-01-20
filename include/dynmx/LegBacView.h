@@ -64,6 +64,14 @@ protected:
   ci::Vec3f m_scenePos;
   bool m_followCam;
   
+  float m_lrate;
+  float m_ndecay;
+  float m_wdecay;
+  float m_synscale;
+  float m_noiseVar;
+  bool m_useReward;
+  bool m_nncontrol;
+  
 }; // class
 
   

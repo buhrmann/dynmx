@@ -144,6 +144,7 @@ void App::keyUp(ci::app::KeyEvent event)
     }
     case ci::app::KeyEvent::KEY_r:
       m_model->reset();
+      m_view->reset();
       break;
   }
   

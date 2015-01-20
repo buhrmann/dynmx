@@ -84,7 +84,7 @@ void LegBacView::setupScene()
   
   m_fitnessPlot = new dmx::Plot(columnWidth2, plotHeight, 2, 200);
   m_fitnessPlot->translate(ci::Vec4f(0, 2 * plotHeight + 2 * vSpace, 0, 1));
-  m_fitnessPlot->setTitle("Fitness");
+  m_fitnessPlot->setTitle("Fitness/Reward");
   column2->m_children.push_back(m_fitnessPlot);
   
   m_scene2d.m_children.push_back(column1);
@@ -114,15 +114,15 @@ void LegBacView::update(float dt)
   if(m_agent->m_legged)
   {
     m_plot->addPoint(m_agent->m_leg.m_sensor, 0);
-    m_plot->addPoint(m_agent->m_leg.m_force, 1);
-    m_plot->addPoint(m_agent->m_leg.m_velocity.x, 2);
-    m_plot->addPoint(m_agent->m_leg.m_angSpeed, 3);
+    m_plot->addPoint(m_agent->m_leg.m_force / m_agent->m_leg.s_maxLegForce, 1);
+    m_plot->addPoint(m_agent->m_leg.m_velocity.x / m_agent->m_leg.s_maxVelocity, 2);
+    m_plot->addPoint(m_agent->m_leg.m_angSpeed / m_agent->m_leg.s_maxAngSpeed, 3);
   }
   //m_plot->addPoint(val, 0);
   
   // Update fitness-related data
-  if(!m_agent->m_legged)
-    m_fitnessPlot->addPoint(((AdapNN*)m_agent->getCTRNN())->getReward(), 0);
+  m_fitnessPlot->addPoint(((AdapNN*)m_agent->getCTRNN())->getReward(), 0);
+  m_fitnessPlot->addPoint(m_agent->getReward(), 1);
   
   if(m_followCam)
   {
@@ -131,6 +131,17 @@ void LegBacView::update(float dt)
     m_cam.setCenterOfInterestPoint(pos);
     m_cam.setWorldUp(ci::Vec3f(0,0,1));
     m_cam3d.setCurrentCam(m_cam);
+  }
+  
+  if(m_nncontrol)
+  {
+    AdapNN* nn = (AdapNN*) m_agent->getCTRNN();
+    nn->setLearningRates(m_lrate);
+    nn->setNeuralMeanFilters(m_ndecay);
+    nn->setWeightDecays(m_wdecay);
+    nn->setSynapticScales(m_synscale);
+    nn->setNoiseVar(m_noiseVar);
+    nn->usesReward(m_useReward);
   }
 }
   
@@ -175,10 +186,27 @@ void LegBacView::buildGui()
   m_gui->addParam("FPS", &m_fixedFrameRate, -1, 300, m_fixedFrameRate);
   
   m_gui->addPanel();
-  m_gui->addLabel("Agent Controls");
+  m_gui->addLabel("Trial");
   char tstr [5];
   sprintf(tstr, "Time: %2.2f", m_agent->getTime());
   m_timeLabel = m_gui->addLabel(tstr);
+  
+  m_lrate = 0.25;
+  m_ndecay = 0.84;
+  m_wdecay = 0.05;
+  m_synscale = 0.9;
+  m_noiseVar = 3.9;
+  m_useReward = false;
+  m_nncontrol = false;
+  m_gui->addPanel();
+  m_gui->addLabel("Agent Controls");
+  m_gui->addParam("Overwrite", &m_nncontrol);
+  m_gui->addParam("Reward", &m_useReward);
+  m_gui->addParam("NoiseVar", &m_noiseVar, 0.0, 5, m_noiseVar);
+  m_gui->addParam("Nu", &m_lrate, 0.01, 1, m_lrate);
+  m_gui->addParam("Mean-Decay", &m_ndecay, 0.5, 1.0, m_ndecay);
+  m_gui->addParam("Weight-Decay", &m_wdecay, 0.0, 0.1, m_wdecay);
+  m_gui->addParam("SynScale", &m_synscale, 0.0, 1.0, m_synscale);
   
   m_gui->addPanel();
   m_gui->addLabel("View Controls");
