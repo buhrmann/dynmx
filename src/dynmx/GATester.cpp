@@ -130,7 +130,7 @@ void GATester::reset()
   m_accFitness = 0.0f;
   m_trial = 0;
   m_evolvable->reset();
-  
+  m_evolvable->nextTrial(m_trial);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

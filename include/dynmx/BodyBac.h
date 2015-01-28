@@ -78,6 +78,7 @@ public:
   void randomiseFood();
   void setNet(CTRNN* net) { m_net = net; };
   void setFoodPresentation(int num, float duration) { m_maxNumFoods = num; m_foodDur = duration; };
+  void invertVision();
 
   float getReward() const { return m_reward; };
   float getFitness() const { return m_fitness; };

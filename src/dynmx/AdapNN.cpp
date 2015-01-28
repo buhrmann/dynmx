@@ -659,6 +659,7 @@ void AdapNN::toXml(ci::XmlTree& xml)
   nn.setAttribute("hebbSwitch", m_useAntiHebbSwitch);
   nn.setAttribute("preMeanFac", m_preMeanSubFac);
   nn.setAttribute("rewardDecay", m_rdecay);
+  nn.setAttribute("synapticScaling", s_synScalingNames[m_scaling]);
   
   ci::XmlTree::Iter neuron = nn.begin("Neuron");
   for (; neuron != nn.end(); ++neuron)
@@ -692,6 +693,7 @@ void AdapNN::fromXml(const ci::XmlTree& xml)
     m_useAntiHebbSwitch = xml.getAttributeValue<bool>("hebbSwitch", false);
     m_preMeanSubFac = xml.getAttributeValue<float>("preMeanFac", 1);
     m_rdecay = xml.getAttributeValue<float>("rewardDecay", 0);
+    m_scaling = getScaling(xml.getAttributeValue<std::string>("synapticScaling", "None"));
     
     ci::XmlTree::ConstIter neuron = xml.begin("Neuron");
     for (; neuron != xml.end(); ++neuron)

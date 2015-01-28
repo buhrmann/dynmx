@@ -87,6 +87,7 @@ protected:
   ci::Vec2f m_velocity;
   
   // Params
+  int m_inversionTrial;
   
   // Fitness related
   int m_numLegTrials;

@@ -15,10 +15,12 @@ namespace dmx
 
 //--------------------------------------------------------------------------------------------------------------------
 void App::setup()
-{ 
-  std::cout << "App::setup()" << std::endl;
+{
+  if (SETTINGS->hasChild("Config/Globals/Paused"))
+    m_paused = SETTINGS->getChild("Config/Globals/Paused").getValue<bool>(false);
+  else
+    m_paused = false;
   
-  m_paused = false;
   m_useFixedTimeStep = true;  
   m_prevTime = getElapsedSeconds();
   
@@ -73,8 +75,6 @@ void App::update(float dt)
 //--------------------------------------------------------------------------------------------------------------------
 void App::prepareSettings( Settings *settings )
 {
-  std::cout << "App::prepareSettings()" << std::endl;
-  
   // Window size
   int w = 800;
   int h = 600;

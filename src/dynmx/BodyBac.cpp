@@ -9,6 +9,7 @@
 #include "BodyBac.h"
 
 #include <numeric>
+#include <algorithm>
 
 namespace dmx
 {
@@ -108,6 +109,14 @@ void BodyBac::reset()
   m_fitness = 0;
   m_fitnesses.clear();
   m_time = 0;
+}
+  
+//----------------------------------------------------------------------------------------------------------------------
+void BodyBac::invertVision()
+{
+  // Reverse the order of sensors, such that when we iterate over them to assign sensed values to neurons, they
+  // get assigned in reversed order
+  std::reverse(m_sensors.begin(), m_sensors.end());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

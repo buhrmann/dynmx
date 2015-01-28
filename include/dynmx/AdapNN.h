@@ -59,6 +59,8 @@ public:
   float getReward() { return m_reward; };
   float getRewardMeanFilter() const { return m_rdecay; };
   float getNoiseVar() const { return m_noiseVar; };
+  float getPresynMeanFactor() const { return m_preMeanSubFac; };
+  SynScaling getSynapticScaling() { return m_scaling; };
   
   void usesReward(bool b) { m_useReward = b; };
   bool usesReward() const { return m_useReward; };

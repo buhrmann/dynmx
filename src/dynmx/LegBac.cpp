@@ -60,6 +60,8 @@ void LegBac::init()
     
     m_bacFitMax = xml.getChild("Trials").getAttributeValue<float>("bacFitMax", 1);
     m_legFitMax = xml.getChild("Trials").getAttributeValue<float>("legFitMax", 1);
+    
+    m_inversionTrial = xml.getChild("Adaptations").getAttributeValue<int>("inversionTrial", -1);
   }
   
   m_legged = m_numLegTrials > 0;
@@ -124,6 +126,9 @@ void LegBac::nextTrial(int trial)
   // Swap bodies ...
   if (m_legged && (trial == m_numLegTrials))
     m_legged = false;
+  
+  if(!m_legged && (trial == m_inversionTrial))
+    m_bac.invertVision();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

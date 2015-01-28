@@ -23,6 +23,7 @@ void AdapNetLimits::toXml(ci::XmlTree& xml) const
   learnRate.toXml(xml, "LearnRate");
   synScale.toXml(xml, "SynapticScale");
   prePostFac.toXml(xml, "PrePostFac");
+  preMeanFac.toXml(xml, "PreMeanFac");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -35,7 +36,7 @@ void AdapNetLimits::fromXml(const ci::XmlTree& xml)
     noiseVar.fromXml(xml, "NoiseVar");
     learnRate.fromXml(xml, "LearnRate");
     synScale.fromXml(xml, "SynapticScale");
-    prePostFac.fromXml(xml, "PrePostFac");
+    preMeanFac.fromXml(xml, "PreMeanFac");
   }
 }
 
@@ -64,6 +65,7 @@ void AdapTop::fromXml(const ci::XmlTree& xml)
 {
   Topology::fromXml(xml);
   
+  m_useReward = xml.getAttributeValue<bool>("useReward", false);
   m_initialWeights = xml.getAttributeValue<bool>("initialWeights", true);
   m_rulePerConnection = xml.getAttributeValue<bool>("rulePerConn", true);
   m_noiseUniform = xml.getAttributeValue<bool>("noiseUniform", true);
@@ -72,6 +74,7 @@ void AdapTop::fromXml(const ci::XmlTree& xml)
   m_evolveBiases = xml.getAttributeValue<bool>("evolveBiases", false);
   m_evolveTaus = xml.getAttributeValue<bool>("evolveTaus", false);
   m_evolvePrePostFac = xml.getAttributeValue<bool>("evolvePrePostFac", false);
+  m_evolvePreMeanFac = xml.getAttributeValue<bool>("evolvePreMeanFac", false);
   
   std::string scaleName = xml.getAttributeValue<std::string>("synScaling", "None");
   if (scaleName == "Evolve") {
@@ -98,6 +101,7 @@ void AdapTop::toXml(ci::XmlTree& xml) const
   
   // Now append to it
   ci::XmlTree& top = xml.getChild("Topology");
+  top.setAttribute("useReward", m_useReward);
   top.setAttribute("adaptive", 1);
   top.setAttribute("initialWeights", m_initialWeights);
   top.setAttribute("rulePerConn", m_rulePerConnection);
@@ -108,6 +112,7 @@ void AdapTop::toXml(ci::XmlTree& xml) const
   top.setAttribute("evolveBiases", m_evolveBiases);
   top.setAttribute("evolveTaus", m_evolveTaus);
   top.setAttribute("evolvePrePostFac", m_evolvePrePostFac);
+  top.setAttribute("evolvePreMeanFac", m_evolvePreMeanFac);
   
   // Add limits
   ci::XmlTree& limXml = xml.getChild("Topology/NetLimits");
@@ -146,16 +151,17 @@ void AdapTop::reset(CTRNN* net)
 int AdapTop::getNumAdapParams() const
 {
   int synSpecParams = 3;  // lrate and wdecay and synscale
-  if (m_evolvePrePostFac) {
+  if (m_evolvePrePostFac)
     synSpecParams += 2;   // pre and post factors
-  }
   
   int neuSpecParams = 1; // mean decay
   
   int netSpecParams = 2; // reward decay, noise variance
-  if (m_evolveSynScaleMode) {
+  if (m_evolveSynScaleMode)
     netSpecParams += 1;
-  }
+  
+  if (m_evolvePreMeanFac) // Presynaptic mean subtraction factor
+    netSpecParams += 1;
   
   if(! m_rulePerConnection)
   {
@@ -210,7 +216,7 @@ int AdapTop::getNumParameters() const
   
 // Create AdapNN from genome params
 //----------------------------------------------------------------------------------------------------------------------
-bool AdapTop::decode(CTRNN& net, const double* params) const
+bool AdapTop::decode(CTRNN& net, const double* params)
 {
   int I = 0;
   
@@ -267,10 +273,11 @@ bool AdapTop::decode(CTRNN& net, const double* params) const
 }
   
 //----------------------------------------------------------------------------------------------------------------------
-void AdapTop::decodeAdap(AdapNN& net, const double* params, int& I) const
+void AdapTop::decodeAdap(AdapNN& net, const double* params, int& I)
 {  
   // Network-wide parameters
   // Not evolved but specifiable in Topology xml
+  net.usesReward(m_useReward);
   net.setNoiseUniform(m_noiseUniform);
   net.useAntiHebbSwitch(m_useAntiHebb);
 
@@ -281,10 +288,14 @@ void AdapTop::decodeAdap(AdapNN& net, const double* params, int& I) const
     int mode_idx = (int) (params[I++] * AdapNN::kSynSc_Num);
     AdapNN::SynScaling s =  static_cast<AdapNN::SynScaling> (mode_idx);
     net.setSynapticScaling(s);
+    m_scaling = s;
   }
   else {
     net.setSynapticScaling(m_scaling);
   }
+  
+  if (m_evolvePreMeanFac)
+    net.setPresynMeanFactor(m_limits.preMeanFac.decode(params[I++]));
   
   net.setRewardMeanFilter(m_limits.meanDecay.decode(params[I++]));
   net.setNoiseVar(m_limits.noiseVar.decode(params[I++]));
@@ -385,6 +396,9 @@ void AdapTop::decodeAdap(AdapNN& net, const double* params, int& I) const
 void AdapTop::encodeAdap(AdapNN& net, double* params, int& I) const
 {
   // Network-wide parameters
+  if (m_evolvePreMeanFac)
+    params[I++] = m_limits.preMeanFac.encode(net.getPresynMeanFactor());
+  
   params[I++] = m_limits.meanDecay.encode(net.getRewardMeanFilter());
   params[I++] = m_limits.noiseVar.encode(net.getNoiseVar());
   

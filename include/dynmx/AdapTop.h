@@ -19,11 +19,12 @@ namespace dmx
 //--------------------------------------------------------------------------------------------------------------------
 struct AdapNetLimits
 {
-  AdapNetLimits() : meanDecay(0,1), noiseVar(-10,10), weightDecay(0,0.1), learnRate(0, 1), synScale(0,1), prePostFac(-1,1) {};
+  AdapNetLimits() : meanDecay(0,1), noiseVar(-10,10), weightDecay(0,0.1), learnRate(0, 1), synScale(0,1),
+                    prePostFac(-1,1), preMeanFac(0,1) {};
   void toXml(ci::XmlTree& xml) const;
   void fromXml(const ci::XmlTree& xml);
   
-  Range meanDecay, noiseVar, weightDecay, learnRate, synScale, prePostFac;
+  Range meanDecay, noiseVar, weightDecay, learnRate, synScale, prePostFac, preMeanFac;
 };
   
 //----------------------------------------------------------------------------------------------------------------------
@@ -45,7 +46,7 @@ public:
   
   // These are crucial for GA
   virtual int getNumParameters() const;
-  virtual bool decode(CTRNN& ctrnn, const double* params) const;
+  virtual bool decode(CTRNN& ctrnn, const double* params);
   virtual bool encode(CTRNN& ctrnn, double* params) const;
   
   virtual void toXml(ci::XmlTree& xml) const;
@@ -57,13 +58,15 @@ public:
   bool m_evolveTaus;
   bool m_evolveSynScaleMode;
   bool m_evolvePrePostFac;
+  bool m_evolvePreMeanFac;
 
 protected:
   
   int getNumAdapParams() const;
-  void decodeAdap(AdapNN& net, const double* params, int& I) const;
+  void decodeAdap(AdapNN& net, const double* params, int& I);
   void encodeAdap(AdapNN& net, double* params, int& I) const;
   
+  bool m_useReward;
   bool m_initialWeights;
   bool m_rulePerConnection;
   bool m_noiseUniform;

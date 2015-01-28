@@ -85,7 +85,7 @@ public:
   
   // These are crucial for GA
   virtual int getNumParameters() const { return m_numParams; };
-  virtual bool decode(CTRNN& ctrnn, const double* params) const;
+  virtual bool decode(CTRNN& ctrnn, const double* params);
   virtual bool encode(CTRNN& ctrnn, double* params) const;
   
   bool isHidden(int n) const { return (n >= m_size[kLyr_Input]) && (n < (m_size[kLyr_Input] + m_size[kLyr_Hidden])); };

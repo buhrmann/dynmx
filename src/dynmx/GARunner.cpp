@@ -220,6 +220,7 @@ void GARunner::reset(bool randomiseGenomes)
   // setup simulation model
   m_evolvable->decodeGenome(m_ga->getCurrentGenome());
   m_evolvable->reset();
+  m_evolvable->nextTrial(m_trial);
   m_evolvable->nextStage(m_stage);
 }
 

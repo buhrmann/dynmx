@@ -66,7 +66,7 @@ public:
   // Getters
   SMCEnvironment& getEnvironment() { return m_environment; };
   CTRNN& getCTRNN() { return *m_ctrnn; };
-  const Topology& getTopology() const { return m_topology; };  
+  Topology& getTopology() { return m_topology; };  
   DistanceSensor* getDistanceSensor() const { return m_distanceSensor; };
   GradientSensor* getGradientSensor() const { return m_gradientSensor; };
   TorusSensor* getTorusSensor() const { return m_torusSensor; };

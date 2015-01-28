@@ -285,7 +285,7 @@ void Topology::encodeLayerConnections(CTRNN& net, LayerName pre, LayerName post,
 // Real neurons are are arranged in a bilaterally symmetric layer. I.e. first and last neuron are identical, as well
 // as the second and second to last etc...
 //----------------------------------------------------------------------------------------------------------------------
-bool Topology::decode(CTRNN& ctrnn, const double* params) const
+bool Topology::decode(CTRNN& ctrnn, const double* params)
 {
   int I = 0;
   
