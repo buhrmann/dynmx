@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Config>
     <Globals>
-        <Visual Value="1"/>
+        <Visual Value="0"/>
         <WindowSize Width="1000" Height="800"/>
         <FrameRate Value="10"/>
         <FullScreen Value="0"/>
@@ -15,8 +15,8 @@
     <GA>
         <Evolvable Name="LegBac">
             <Trials legDur="100" bacFoodDur="100" bacNumFoods="30" legNum="0" bacNum="10" legFitMax="78" bacFitMax="0.5">0</Trials>
-            <Adaptations inversionTrial="0"/>
-            <Topology symmetric="0" weightCutoff="0" actFunc="Sigmoid" adaptive="1" initialWeights="0" rulePerConn="0" noiseUniform="1" antiHebb="0" synScaling="HomeoPre" evolvePreMeanFac="0" evolveBiases="1" evolveTaus="1" evolvePrePostFac="1" useReward="0">
+            <Adaptations inversionTrial="5"/>
+            <Topology symmetric="0" weightCutoff="0" actFunc="Sigmoid" adaptive="1" initialWeights="0" rulePerConn="0" noiseUniform="1" antiHebb="0" synScaling="HomeoPre" evolvePreMeanFac="1" evolveBiases="1" evolveTaus="1" evolvePrePostFac="1" useReward="1">
                 <Inputs asNeurons="1">2</Inputs>
                 <Hidden lateral="1" self="0">3</Hidden>
                 <Outputs lateral="1" self="0">3</Outputs>
@@ -55,7 +55,7 @@
         <Eval Run="1" Stage="0">
             <NumTrials>10</NumTrials>
             <RecordState>0</RecordState>
-            <LoadFrom>~/Experiments/LegBac/Evo/15_01_26__10_50_35/GA_BestGenome.xml</LoadFrom>
+            <LoadFrom>~/Experiments/LegBac/Evo/15_01_28__19_19_17/GA_BestGenome.xml</LoadFrom>
             <Saved>14_09_01__17_05_28</Saved>
         </Eval>
     </GA>
