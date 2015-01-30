@@ -61,7 +61,9 @@ void LegBac::init()
     m_bacFitMax = xml.getChild("Trials").getAttributeValue<float>("bacFitMax", 1);
     m_legFitMax = xml.getChild("Trials").getAttributeValue<float>("legFitMax", 1);
     
-    m_inversionTrial = xml.getChild("Adaptations").getAttributeValue<int>("inversionTrial", -1);
+    m_visualInversionTrial = xml.getChild("Adaptations").getAttributeValue<int>("visualInversionTrial", -1);
+    m_visualShiftTrial = xml.getChild("Adaptations").getAttributeValue<int>("visualShiftTrial", -1);
+    m_motorInversionTrial = xml.getChild("Adaptations").getAttributeValue<int>("motorInversionTrial", -1);
   }
   
   m_legged = m_numLegTrials > 0;
@@ -123,12 +125,24 @@ float LegBac::getFitness()
 //----------------------------------------------------------------------------------------------------------------------
 void LegBac::nextTrial(int trial)
 {
+  // Make sure that at the beginning of a new evaluation previously applied inversions are reverted
+  if (trial == 0 && !m_legged)
+    m_bac.resetMorphology();
+  
   // Swap bodies ...
   if (m_legged && (trial == m_numLegTrials))
     m_legged = false;
   
-  if(!m_legged && (trial == m_inversionTrial))
+  //   Perturbations / Adaptations
+  if(!m_legged && (trial == m_visualInversionTrial))
     m_bac.invertVision();
+  
+  if(!m_legged && (trial == m_visualShiftTrial))
+    m_bac.shiftVision(90);
+  
+  if(!m_legged && (trial == m_motorInversionTrial))
+    m_bac.invertMotors();
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------

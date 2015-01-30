@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>6C1EFF1C-6B1D-4712-8E20-2D86E3868A34</string>
+	<key>IDESourceControlProjectName</key>
+	<string>dynmx</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>AD4B458D0D225ED63FAE0155615993B7D3ECE020</key>
+		<string>github.com:synergenz/Cinder.git</string>
+		<key>EDF752844F758044598B41C9720D168B3FF5BBDD</key>
+		<string>github.com:synergenz/dynmx.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>xcode4/dynmx.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>AD4B458D0D225ED63FAE0155615993B7D3ECE020</key>
+		<string>../../../../Cinder</string>
+		<key>EDF752844F758044598B41C9720D168B3FF5BBDD</key>
+		<string>../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>github.com:synergenz/dynmx.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>EDF752844F758044598B41C9720D168B3FF5BBDD</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>AD4B458D0D225ED63FAE0155615993B7D3ECE020</string>
+			<key>IDESourceControlWCCName</key>
+			<string>Cinder</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>EDF752844F758044598B41C9720D168B3FF5BBDD</string>
+			<key>IDESourceControlWCCName</key>
+			<string>dynmx</string>
+		</dict>
+	</array>
+</dict>
+</plist>

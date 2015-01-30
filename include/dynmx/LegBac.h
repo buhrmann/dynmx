@@ -87,7 +87,9 @@ protected:
   ci::Vec2f m_velocity;
   
   // Params
-  int m_inversionTrial;
+  int m_visualInversionTrial;
+  int m_visualShiftTrial;
+  int m_motorInversionTrial;
   
   // Fitness related
   int m_numLegTrials;

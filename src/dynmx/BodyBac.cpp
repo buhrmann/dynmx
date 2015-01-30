@@ -67,15 +67,13 @@ void BodyBac::init()
   m_maxSpeed = 0.5f;
   m_maxAngSpeed = 1.0f;
   m_foodDur = 1.0f;
+  m_sensorAngRange = degreesToRadians(120.0f);
   
   const int numSensors = 2;
-  const float angRange = degreesToRadians(120.0f);
   for (int i = 0; i < numSensors; ++i)
-  {
-    const float a = -angRange/2 + (i * (angRange/(numSensors-1)));
-    m_sensors.push_back(LightSensor(a, m_radius));
-  }
+    m_sensors.push_back(LightSensor(0, m_radius));
   
+  resetMorphology();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -97,6 +95,23 @@ void BodyBac::resetPosition()
   for(auto& s : m_sensors)
     s.setPosition(m_position, m_angle);
 }
+  
+//----------------------------------------------------------------------------------------------------------------------
+void BodyBac::resetMorphology()
+{
+  // Reset sensor order
+  const int numSensors = m_sensors.size();
+  for (int i = 0; i < numSensors; ++i)
+  {
+    const float a = -m_sensorAngRange/2 + (i * (m_sensorAngRange/(numSensors - 1)));
+    m_sensors[i].setAngle(a);
+    m_sensors[i].setPosition(m_position, m_angle);
+  }
+  
+  // Reset motor order
+  m_motorId1 = 1;
+  m_motorId2 = 2;
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 void BodyBac::reset()
@@ -114,9 +129,22 @@ void BodyBac::reset()
 //----------------------------------------------------------------------------------------------------------------------
 void BodyBac::invertVision()
 {
-  // Reverse the order of sensors, such that when we iterate over them to assign sensed values to neurons, they
-  // get assigned in reversed order
+  // Reverse the order of sensors, such that when we iterate over them neurons receive left-right reversed information
   std::reverse(m_sensors.begin(), m_sensors.end());
+}
+  
+//----------------------------------------------------------------------------------------------------------------------
+void BodyBac::shiftVision(float degrees)
+{
+  // Reverse the order of sensors, such that when we iterate over them neurons receive left-right reversed information
+  for(auto& s : m_sensors)
+    s.setAngle(s.m_angle + degreesToRadians(degrees));
+}
+  
+//----------------------------------------------------------------------------------------------------------------------
+void BodyBac::invertMotors()
+{
+  std::swap(m_motorId1, m_motorId2);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -134,8 +162,8 @@ void BodyBac::update(float dt)
 
   // Move
   const int N = m_net->getSize();
-  const float mot1 = m_net->getOutput(N-1);
-  const float mot2 = m_net->getOutput(N-2);
+  const float mot1 = m_net->getOutput(N - m_motorId1);
+  const float mot2 = m_net->getOutput(N - m_motorId2);
   float angSpeed = m_maxAngSpeed * (mot1 - mot2) / m_radius;
   float fwdSpeed = m_maxSpeed * (mot1 + mot2) / 2;
   

@@ -35,6 +35,7 @@ public:
 
   float sense(const ci::Vec2f& lightPos);
   void setPosition(const ci::Vec2f& newPos, float a);
+  void setAngle(float a) { m_angle = a; };
   
   float m_angle;
   float m_offset;
@@ -78,7 +79,12 @@ public:
   void randomiseFood();
   void setNet(CTRNN* net) { m_net = net; };
   void setFoodPresentation(int num, float duration) { m_maxNumFoods = num; m_foodDur = duration; };
+  
+  // Mutations
+  void resetMorphology();
   void invertVision();
+  void shiftVision(float degrees=180);
+  void invertMotors();
 
   float getReward() const { return m_reward; };
   float getFitness() const { return m_fitness; };
@@ -92,10 +98,13 @@ protected:
   float m_maxSpeed;
   float m_maxAngSpeed;
   float m_foodDur;
+  float m_sensorAngRange;
   int m_maxNumFoods;
   
   CTRNN* m_net;
   std::vector<LightSensor> m_sensors;
+  int m_motorId1;
+  int m_motorId2;
   
   // State
   float m_time;
