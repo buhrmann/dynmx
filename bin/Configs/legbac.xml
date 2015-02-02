@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Config>
     <Globals>
-        <Visual Value="1"/>
+        <Visual Value="0"/>
         <WindowSize Width="1000" Height="800"/>
         <FrameRate Value="10"/>
         <FullScreen Value="0"/>
         <VSync Value="0"/>
         <Model Value="GA"/>
-        <DebugLevel Value="3"/>
+        <DebugLevel Value="0"/>
         <PlotDuration Value="0.5"/>
         <OutputFolder Name="~/Experiments/LegBac/Evo"/>
         <Paused>0</Paused>
     </Globals>
     <GA>
         <Evolvable Name="LegBac">
-            <Trials legDur="100" bacFoodDur="100" bacNumFoods="30" legNum="0" bacNum="10" legFitMax="78" bacFitMax="0.5">0</Trials>
-            <Adaptations visualInversionTrial="-1" visualShiftTrial="0" motorInversionTrial="-1"/>
+            <Trials legDur="100" bacFoodDur="100" bacNumFoods="30" legNum="6" bacNum="0" legFitMax="78" bacFitMax="0.5">0</Trials>
+            <Adaptations visualInversionTrial="-1" visualShiftTrial="-1" motorInversionTrial="-1"/>
             <Topology symmetric="0" weightCutoff="0" actFunc="Sigmoid" adaptive="1" initialWeights="0" rulePerConn="0" noiseUniform="1" antiHebb="0" synScaling="HomeoPre" evolvePreMeanFac="1" evolveBiases="1" evolveTaus="1" evolvePrePostFac="1" useReward="1">
                 <Inputs asNeurons="1">2</Inputs>
                 <Hidden lateral="1" self="0">3</Hidden>
@@ -46,13 +46,13 @@
             <InterGenomePD>Gaussian</InterGenomePD>
         </Mutation>
         <Recombination Rate="0.8" RateReduced="0.75"/>
-        <Trials Combine="Avg" numStageMult="10">10</Trials>
+        <Trials Combine="Avg" numStageMult="10">6</Trials>
         <GenomeMod>0</GenomeMod>
         <AvoidReevaluation>0</AvoidReevaluation>
         <SaveBestEachGeneration>0</SaveBestEachGeneration>
         <AutoEval>0</AutoEval>
         <Stages FitThreshold="100" NumGensAbove="10" Max="10"/>
-        <Eval Run="1" Stage="0">
+        <Eval Run="0" Stage="0">
             <NumTrials>10</NumTrials>
             <RecordState>0</RecordState>
             <LoadFrom>~/Experiments/LegBac/Evo/15_01_29__19_41_20/GA_BestGenome.xml</LoadFrom>

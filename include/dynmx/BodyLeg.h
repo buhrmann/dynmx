@@ -46,6 +46,8 @@ public:
   
   void setNet(CTRNN* net) { m_net = net; };
   void setDuration(float d) { m_duration = d; };
+  void setNumTrials(int n) { m_numTrials = n;};
+  void nextTrial(int t);
   
   float getReward() const { return m_reward; };
   float getFitness() const { return m_fitness; };
@@ -68,7 +70,9 @@ protected:
   float s_minLegSensor;
   float s_maxLegSensor;
   
+  int m_numTrials;
   float m_duration;
+  float m_startingAngle;
   
   // State
   float m_time;

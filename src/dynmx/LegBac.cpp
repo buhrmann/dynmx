@@ -52,6 +52,7 @@ void LegBac::init()
     m_numLegTrials = xml.getChild("Trials").getAttributeValue<int>("legNum", 0);
     float legDuration = xml.getChild("Trials").getAttributeValue<float>("legDur", 10);
     m_leg.setDuration(legDuration);
+    m_leg.setNumTrials(m_numLegTrials);
     
     m_numBacTrials = xml.getChild("Trials").getAttributeValue<int>("bacNum", 0);
     int bacNumFoods = xml.getChild("Trials").getAttributeValue<int>("bacNumFoods", 10);
@@ -77,10 +78,12 @@ void LegBac::reset()
   m_fitness = 0;
   
   if(m_adaptive){
+    // Randomise non-evolved parameters (weights etc.)
     ((AdapNN*)m_ctrnn)->reset();
   }
-  
-  m_ctrnn->zeroStates();
+  else {
+    m_ctrnn->zeroStates();
+  }
   
   if (m_legged)
   {
@@ -125,24 +128,28 @@ float LegBac::getFitness()
 //----------------------------------------------------------------------------------------------------------------------
 void LegBac::nextTrial(int trial)
 {
-  // Make sure that at the beginning of a new evaluation previously applied inversions are reverted
-  if (trial == 0 && !m_legged)
-    m_bac.resetMorphology();
-  
-  // Swap bodies ...
-  if (m_legged && (trial == m_numLegTrials))
-    m_legged = false;
-  
-  //   Perturbations / Adaptations
-  if(!m_legged && (trial == m_visualInversionTrial))
-    m_bac.invertVision();
-  
-  if(!m_legged && (trial == m_visualShiftTrial))
-    m_bac.shiftVision(90);
-  
-  if(!m_legged && (trial == m_motorInversionTrial))
-    m_bac.invertMotors();
+  if (m_legged) {
+    if (trial == m_numLegTrials) {
+      // Swap bodies ...
+      m_legged = false;
+    }
+    
+    m_leg.nextTrial(trial);
+  }
+  else {
+    // Make sure that at the beginning of a new evaluation previously applied inversions are reverted
+    if (trial == 0)
+      m_bac.resetMorphology();
 
+    if (trial == m_visualInversionTrial)
+      m_bac.invertVision();
+    
+    if (trial == m_visualShiftTrial)
+      m_bac.shiftVision(90);
+    
+    if(trial == m_motorInversionTrial)
+      m_bac.invertMotors();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

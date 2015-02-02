@@ -36,7 +36,9 @@ void BodyLeg::init()
   m_sensorRange = s_maxLegSensor - s_minLegSensor;
   m_sensorOffset = s_minLegSensor / m_sensorRange;
   
+  m_numTrials = 1;
   m_duration = 10.0f;
+  m_startingAngle = s_forwardAngleLimit;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -48,7 +50,7 @@ void BodyLeg::reset()
   m_velocity.set(0,0);
   m_footDown = false;
   
-  m_angle = s_forwardAngleLimit; //UniformRandom(s_backwardAngleLimit, s_forwardAngleLimit);
+  m_angle = m_startingAngle; //UniformRandom(s_backwardAngleLimit, s_forwardAngleLimit);
   m_sensor = (m_angle / m_sensorRange) - m_sensorOffset; // Normalised sensor
   m_angSpeed = m_forwardForce = m_backwardForce = 0.0;
   m_joint = m_position;
@@ -60,6 +62,12 @@ void BodyLeg::reset()
   
   m_reward = 0;
   m_fitness = 0;
+}
+  
+//----------------------------------------------------------------------------------------------------------------------
+void BodyLeg::nextTrial(int t)
+{
+  m_startingAngle = s_backwardAngleLimit + (s_forwardAngleLimit - s_backwardAngleLimit) * (t / (m_numTrials - 1.0f));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
