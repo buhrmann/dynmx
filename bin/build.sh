@@ -7,7 +7,7 @@ cd `dirname $0`
 git pull origin master
 
 # Build project
-xcodebuild -project ../xcode4/dynmx.xcodeproj CONFIGURATION_BUIL_DIR="../xcode4" CONFIGURATION_TEMP_DIR="../xcode4/build/dynmx.build/Release"
+xcodebuild clean build -project ../xcode4/dynmx.xcodeproj CONFIGURATION_BUIL_DIR="../xcode4" CONFIGURATION_TEMP_DIR="../xcode4/build/dynmx.build/Release"
 
 
 
