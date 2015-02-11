@@ -49,6 +49,8 @@ public:
   void setNumTrials(int n) { m_numTrials = n;};
   void nextTrial(int t);
   
+  void useRewardInput(bool r) { m_useRewardInput = r; };
+  
   float getReward() const { return m_reward; };
   float getFitness() const { return m_fitness; };
   float getFinalFitness();
@@ -70,6 +72,7 @@ protected:
   float s_minLegSensor;
   float s_maxLegSensor;
   
+  bool m_useRewardInput;
   int m_numTrials;
   float m_duration;
   float m_startingAngle;

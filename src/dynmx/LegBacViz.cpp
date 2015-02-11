@@ -66,14 +66,16 @@ void LegBacViz::drawLeg()
 //----------------------------------------------------------------------------------------------------------------------
 void LegBacViz::drawBac()
 {
-  m_pTM->rotate(ci::Vec3f(0.0f, 0.0f, 1.0f), m_agent->m_bac.m_angle);
+  const BodyBac& bac = m_agent->m_bac;
+  m_pTM->rotate(ci::Vec3f(0.0f, 0.0f, 1.0f), bac.m_angle);
   
-  const float r = m_agent->m_bac.m_radius;
+  const float r = bac.m_radius;
   
   // Agent in local space
   glPushMatrix();
   glMultMatrixf(*m_pTM);
-  glColor4f(0.75, 0.75, 0.75, 0.75);
+  ci::Vec3f c = getColorMapBlueRed(bac.m_reward);
+  glColor4f(c.x, c.y, c.z, 0.75);
   drawDisk(r, 0, 16, 2, GLU_FILL);
   glColor3f(0,0,0);
   drawDisk(r, 0, 16, 2, GLU_SILHOUETTE);
@@ -82,28 +84,39 @@ void LegBacViz::drawBac()
   glPopMatrix();
   
   // Sensors in world space
-  for(int i = 0; i < m_agent->m_bac.m_sensors.size(); ++i)
+  for(int i = 0; i < bac.m_sensors.size(); ++i)
   {
-    const ci::Vec2f& p = m_agent->m_bac.m_sensors[i].m_position;
-    const ci::Vec2f& d = m_agent->m_bac.m_sensors[i].m_direction;
-    const float s = m_agent->m_bac.m_sensors[i].m_signal;
+    const ci::Vec2f& p = bac.m_sensors[i].m_position;
+    const ci::Vec2f& d = bac.m_sensors[i].m_direction;
+    ci::Vec2f l1 = d; l1.rotate(LightSensor::s_maxSensorAng);
+    ci::Vec2f l2 = d; l2.rotate(-LightSensor::s_maxSensorAng);
+    const float s = bac.m_sensors[i].m_signal;
     const ci::Vec3f c = getColorMapRainbow(s);
     glColor3f(0,0,0);
     ci::gl::drawStrokedCircle(p, r/3, 16);
-    ci::gl::drawLine(p, p + d * r);
+    //ci::gl::drawLine(p, p + d * r);
+    ci::gl::drawLine(p, p + l1 * r);
+    ci::gl::drawLine(p, p + l2 * r);
     glColor3f(c.x, c.y, c.z);
     ci::gl::drawSolidCircle(p, r/3, 16);
   }
 
-  // Food in world space
-  glPushMatrix();
-  glColor4f(0.8, 0.8, 0, 0.75);
-  ci::gl::drawLine(m_agent->m_bac.m_position, m_agent->m_bac.m_foodPos);
-  ci::gl::translate(m_agent->m_bac.m_foodPos);
-  drawDisk(m_agent->m_bac.m_radius, 0, 16, 2, GLU_FILL);
-  glColor3f(0,0,0);
-  drawDisk(m_agent->m_bac.m_radius, 0, 16, 2, GLU_SILHOUETTE);
-  glPopMatrix();
+  // Lights in world space
+  for (int i=0; i < bac.m_lightPos.size(); ++i)
+  {
+    if (i == bac.m_rewardLight)
+      glColor4f(0.8, 0.8, 0, 0.75);
+    else
+      glColor4f(0.8, 0.2, 0, 0.75);
+    
+    glPushMatrix();
+    ci::gl::drawLine(bac.m_position, bac.m_lightPos[i]);
+    ci::gl::translate(bac.m_lightPos[i]);
+    drawDisk(r, 0, 16, 2, GLU_FILL);
+    glColor3f(0,0,0);
+    drawDisk(r, 0, 16, 2, GLU_SILHOUETTE);
+    glPopMatrix();
+  }
 }
   
 //----------------------------------------------------------------------------------------------------------------------

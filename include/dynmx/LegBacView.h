@@ -60,6 +60,7 @@ protected:
   Plot* m_fitnessPlot;
   
   mowa::sgui::LabelControl* m_timeLabel;
+  mowa::sgui::LabelControl* m_trialLabel;
   
   ci::Vec3f m_scenePos;
   bool m_followCam;

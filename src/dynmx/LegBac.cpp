@@ -57,17 +57,23 @@ void LegBac::init()
     m_numBacTrials = xml.getChild("Trials").getAttributeValue<int>("bacNum", 0);
     int bacNumFoods = xml.getChild("Trials").getAttributeValue<int>("bacNumFoods", 10);
     float bacFoodDur = xml.getChild("Trials").getAttributeValue<float>("bacFoodDur", 10);
-    m_bac.setFoodPresentation(bacNumFoods, bacFoodDur);
+    m_bac.setLightPresentation(bacNumFoods, bacFoodDur);
     
     m_bacFitMax = xml.getChild("Trials").getAttributeValue<float>("bacFitMax", 1);
     m_legFitMax = xml.getChild("Trials").getAttributeValue<float>("legFitMax", 1);
     
+    m_sensorInversionTrial = xml.getChild("Adaptations").getAttributeValue<int>("sensorInversionTrial", -1);
     m_visualInversionTrial = xml.getChild("Adaptations").getAttributeValue<int>("visualInversionTrial", -1);
     m_visualShiftTrial = xml.getChild("Adaptations").getAttributeValue<int>("visualShiftTrial", -1);
     m_motorInversionTrial = xml.getChild("Adaptations").getAttributeValue<int>("motorInversionTrial", -1);
+    
+    bool useRewardInput = xml.getChild("Adaptations").getAttributeValue<bool>("useRewardInput", false);
+    m_leg.useRewardInput(useRewardInput);
+    m_bac.useRewardInput(useRewardInput);
   }
   
   m_legged = m_numLegTrials > 0;
+  m_trial = 0;
   
 }
 
@@ -128,27 +134,33 @@ float LegBac::getFitness()
 //----------------------------------------------------------------------------------------------------------------------
 void LegBac::nextTrial(int trial)
 {
+  m_trial = trial;
+
+  // Make sure that at the beginning of a new evaluation previously applied inversions are reverted
+  if (trial == 0)
+    m_bac.resetMorphology();
+  
   if (m_legged) {
-    if (trial == m_numLegTrials) {
-      // Swap bodies ...
+    // Swap bodies ...
+    if (trial == m_numLegTrials)
       m_legged = false;
-    }
     
     m_leg.nextTrial(trial);
   }
   else {
-    // Make sure that at the beginning of a new evaluation previously applied inversions are reverted
-    if (trial == 0)
-      m_bac.resetMorphology();
-
+    if (trial == m_sensorInversionTrial)
+      m_bac.invertSensorFct();
+    
     if (trial == m_visualInversionTrial)
       m_bac.invertVision();
     
     if (trial == m_visualShiftTrial)
-      m_bac.shiftVision(90);
+      m_bac.shiftVision(180);
     
     if(trial == m_motorInversionTrial)
       m_bac.invertMotors();
+    
+    m_bac.nextTrial(trial);
   }
 }
 

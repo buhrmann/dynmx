@@ -31,12 +31,15 @@ public:
   {
     m_position.set(0,0);
     m_direction.set(1,0);
+    m_inverted = false;
   };
 
-  float sense(const ci::Vec2f& lightPos);
+  float sense(const std::vector<ci::Vec2f>& lights);
   void setPosition(const ci::Vec2f& newPos, float a);
   void setAngle(float a) { m_angle = a; };
+  void inverted(bool i) { m_inverted = i; };
   
+  bool m_inverted;
   float m_angle;
   float m_offset;
   float m_gain;
@@ -73,18 +76,22 @@ public:
   virtual void init();
   virtual void reset();
   virtual void update(float dt);
-  virtual bool hasFinished() { return m_fitnesses.size() >= m_maxNumFoods; };
+  virtual bool hasFinished() { return m_fitnesses.size() >= m_maxNumLights; };
+  void nextTrial(int t);
   
   void resetPosition();
-  void randomiseFood();
+  void randomiseLights();
   void setNet(CTRNN* net) { m_net = net; };
-  void setFoodPresentation(int num, float duration) { m_maxNumFoods = num; m_foodDur = duration; };
+  void setLightPresentation(int num, float duration) { m_maxNumLights = num; m_lightDur = duration; };
   
   // Mutations
   void resetMorphology();
   void invertVision();
+  void invertSensorFct();
   void shiftVision(float degrees=180);
   void invertMotors();
+  
+  void useRewardInput(bool r) { m_useRewardInput = r; };
 
   float getReward() const { return m_reward; };
   float getFitness() const { return m_fitness; };
@@ -97,16 +104,18 @@ protected:
   float m_radius;
   float m_maxSpeed;
   float m_maxAngSpeed;
-  float m_foodDur;
+  float m_lightDur;
   float m_sensorAngRange;
-  int m_maxNumFoods;
+  int m_maxNumLights;
   
   CTRNN* m_net;
   std::vector<LightSensor> m_sensors;
   int m_motorId1;
   int m_motorId2;
+  bool m_useRewardInput;
   
   // State
+  int m_rewardLight;
   float m_time;
   float m_angle;
   float m_fitness;
@@ -116,7 +125,7 @@ protected:
   
   ci::Vec2f m_position;
   ci::Vec2f m_velocity;
-  ci::Vec2f m_foodPos;
+  std::vector<ci::Vec2f> m_lightPos;
 };
   
 } // namespace

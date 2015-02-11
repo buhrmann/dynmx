@@ -264,13 +264,12 @@ void AdapNN::updateHebbStab(double dt)
     for (int pre = 0; pre < size; pre++)
       if(m_topology->connected(pre, post))
       {
-        // Reward stability
         float eji = m_lrate[pre][post] * (outputs[pre] - m_preMeanSubFac*m_meanAct[pre]) * (outputs[post] - m_meanAct[post]);
-        eji += m_lrate[pre][post] * ((m_preFac[pre][post] * outputs[pre]) + (m_postFac[pre][post] * outputs[post]));
-        //eji *= fabs(weights[pre][post]);
         
         if(m_useReward)
           eji *= sign(m_reward);
+
+        eji += m_lrate[pre][post] * ((m_preFac[pre][post] * outputs[pre]) + (m_postFac[pre][post] * outputs[post]));
         
         m_dw[pre][post] = eji;
         
@@ -278,8 +277,8 @@ void AdapNN::updateHebbStab(double dt)
         m_dw[pre][post] += synscale;
         
         // If in homeostatic limits
-        if(synscale == 0)
-          m_dw[pre][post] -= m_wdecay[pre][post] * weights[pre][post];
+//        if(synscale == 0)
+        m_dw[pre][post] -= m_wdecay[pre][post] * weights[pre][post];
         
         hardLimitDw(pre, post);
         validate(pre, post);

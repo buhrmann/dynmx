@@ -18,7 +18,7 @@ namespace dmx
 // LightSensor implementation
 //----------------------------------------------------------------------------------------------------------------------
 float LightSensor::s_sigma = -1 / (2 * sqr(50.f)); // At x, sensor reaches half of its maximum
-float LightSensor::s_maxSensorAng = 3 * PI_OVER_FOUR;
+float LightSensor::s_maxSensorAng = PI_OVER_FOUR;
   
 //----------------------------------------------------------------------------------------------------------------------
 void LightSensor::setPosition(const ci::Vec2f& newPos, float a)
@@ -28,27 +28,33 @@ void LightSensor::setPosition(const ci::Vec2f& newPos, float a)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-float LightSensor::sense(const ci::Vec2f& lightPos)
+float LightSensor::sense(const std::vector<ci::Vec2f>& lights)
 {
-  // Shadow test
-  ci::Vec2f lightDir = (lightPos - m_position).normalized();
-  float cosangle = lightDir.dot(m_direction);
-  float angle = acos(clamp(cosangle, -1.f, 1.f));
-  if (angle > s_maxSensorAng)
-  {
-    m_signal = 0;
-    return m_signal;
+  m_signal = m_inverted ? 1 : 0;
+  
+  for(auto& lightPos : lights) {
+
+    // Shadow test
+    ci::Vec2f lightDir = (lightPos - m_position).normalized();
+    float cosangle = lightDir.dot(m_direction);
+    float angle = acos(clamp(cosangle, -1.f, 1.f));
+    if (angle > s_maxSensorAng)
+      continue;
+    
+    // Distance scaling
+    float d = m_position.distance(lightPos);
+    const float maxD = 50.0f;
+    float s = 1.0 - (min(d, maxD) / maxD);
+    //float s = m_gain * exp(dSq * s_sigma);
+    
+    bool angleSensitive = false;
+    if (angleSensitive)
+      s *= 1 - (angle / s_maxSensorAng);
+    
+    m_signal += m_inverted ? -s : s;
   }
   
-  // Distance scaling
-  float dSq = m_position.distanceSquared(lightPos);
-  //m_signal = m_gain / dSq;
-  m_signal = m_gain * exp(dSq * s_sigma);
-  
-  bool angleSensitive = true;
-  if (angleSensitive)
-    m_signal *= 1 - (angle / s_maxSensorAng);
-  
+  m_signal *= m_gain;
   return m_signal;
 }
 
@@ -66,10 +72,15 @@ void BodyBac::init()
   m_radius = 0.55;
   m_maxSpeed = 0.5f;
   m_maxAngSpeed = 1.0f;
-  m_foodDur = 1.0f;
+  m_lightDur = 1.0f;
   m_sensorAngRange = degreesToRadians(120.0f);
+  m_rewardLight = 0;
   
-  const int numSensors = 2;
+  const int numLights = 1;
+  for (int i = 0; i < numLights; ++i)
+    m_lightPos.push_back(ci::Vec2f());
+  
+  const int numSensors = 1;
   for (int i = 0; i < numSensors; ++i)
     m_sensors.push_back(LightSensor(0, m_radius));
   
@@ -77,12 +88,16 @@ void BodyBac::init()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void BodyBac::randomiseFood()
+void BodyBac::randomiseLights()
 {
-  float fang = UniformRandom(0, TWO_PI);
-  float fdist = 20.0f + UniformRandom(0, 20);
-  m_foodPos = m_position + ci::Vec2f(fdist * cos(fang), fdist * sin(fang));
-  m_initDist = m_position.distance(m_foodPos);
+  for (int i = 0; i < m_lightPos.size(); ++i) {
+    float fang = UniformRandom(PI_OVER_FOUR, PI_OVER_FOUR + PI_OVER_TWO);
+    float dir = i==0 ? 1 : -1;
+    fang *= dir;
+    float fdist = 20.0f + UniformRandom(0, 20);
+    m_lightPos[i] = m_position + ci::Vec2f(fdist * cos(fang), fdist * sin(fang));
+  }
+  m_initDist = m_position.distance(m_lightPos[m_rewardLight]);
 }
   
 //----------------------------------------------------------------------------------------------------------------------
@@ -101,24 +116,45 @@ void BodyBac::resetMorphology()
 {
   // Reset sensor order
   const int numSensors = m_sensors.size();
-  for (int i = 0; i < numSensors; ++i)
+  if (numSensors > 1)
   {
-    const float a = -m_sensorAngRange/2 + (i * (m_sensorAngRange/(numSensors - 1)));
-    m_sensors[i].setAngle(a);
-    m_sensors[i].setPosition(m_position, m_angle);
+    for (int i = 0; i < numSensors; ++i)
+    {
+      const float a = -m_sensorAngRange/2 + (i * (m_sensorAngRange/(numSensors - 1)));
+      m_sensors[i].setAngle(a);
+      m_sensors[i].setPosition(m_position, m_angle);
+    }
+  }
+  else
+  {
+    m_sensors[0].setAngle(0);
+    m_sensors[0].setPosition(m_position, m_angle);
   }
   
   // Reset motor order
   m_motorId1 = 1;
   m_motorId2 = 2;
+  
+  for(auto& s : m_sensors)
+    s.inverted(false);
+
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+void BodyBac::nextTrial(int t)
+{
+  if (m_lightPos.size() > 1)
+    m_rewardLight = t % 2;
+}
+  
+  
 //----------------------------------------------------------------------------------------------------------------------
 void BodyBac::reset()
 {
   resetPosition();
   
-  randomiseFood();
+  randomiseLights();
+  //  m_rewardLight = ProbabilisticChoice(0.5);
   
   m_reward = 0;
   m_fitness = 0;
@@ -131,6 +167,13 @@ void BodyBac::invertVision()
 {
   // Reverse the order of sensors, such that when we iterate over them neurons receive left-right reversed information
   std::reverse(m_sensors.begin(), m_sensors.end());
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+void BodyBac::invertSensorFct()
+{
+  for(auto& s : m_sensors)
+    s.inverted(true);
 }
   
 //----------------------------------------------------------------------------------------------------------------------
@@ -153,9 +196,12 @@ void BodyBac::update(float dt)
   // Sense
   for (int i = 0; i < m_sensors.size(); ++i)
   {
-    const float s = m_sensors[i].sense(m_foodPos);
+    const float s = m_sensors[i].sense(m_lightPos);
     m_net->setExternalInput(i, s);
   }
+  
+  if (m_useRewardInput)
+    m_net->setExternalInput(m_sensors.size(), m_reward);
   
   // Update net
   m_net->updateDynamic(dt);
@@ -180,8 +226,9 @@ void BodyBac::update(float dt)
   m_time += dt;
   
   // Update fitness
-  m_fitness += dt * m_position.distance(m_foodPos);
-  if(m_time >= m_foodDur)
+  float d = m_position.distance(m_lightPos[m_rewardLight]);
+  m_fitness += dt * d;
+  if(m_time >= m_lightDur)
   {
     // Save fitness for this presentation of food
     float fit = 1 - ((m_fitness / m_time) / m_initDist);
@@ -190,17 +237,16 @@ void BodyBac::update(float dt)
     //std::cout << "Food# " << m_fitnesses.size() << " : " << fit << std::endl;
     
     // New presentation
-    //resetPosition();
-    randomiseFood();
+    randomiseLights();
     m_time = 0;
     m_fitness = 0;
   }
   
   // Calculate instant reward
-  ci::Vec2f desDir = (m_foodPos - m_position).normalized();
+  ci::Vec2f desDir = (m_lightPos[m_rewardLight] - m_position).normalized();
   float proj = m_velocity.dot(desDir);
   m_reward = clamp(proj, -1.0f, 1.0f) / m_maxSpeed;
-  
+//  m_reward = d < 5 ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -210,7 +256,7 @@ float BodyBac::getFinalFitness()
   //float fit = m_fitnesses[m_fitnesses.size() - 1];
   float mu, sd;
   stdev(m_fitnesses, mu, sd, m_fitnesses.size()/2, 0);
-  float fit = mu - 2.0*sd;
+  float fit = mu - 4.0*sd;
   
   return fit;
 }

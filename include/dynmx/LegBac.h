@@ -69,6 +69,7 @@ public:
   const BodyBac& getBac() const { return m_bac; };
   const ci::Vec2f& getPos() const { if (m_legged) return m_leg.m_position; else return m_bac.m_position; };
   float getReward() const { return m_legged ? m_leg.getReward() : m_bac.getReward(); };
+  int getTrial() const { return m_trial; };
   
 protected:
   
@@ -78,6 +79,7 @@ protected:
   BodyLeg m_leg;
   BodyBac m_bac;
 
+  int m_trial;
   bool m_adaptive;
   
   // States
@@ -87,6 +89,7 @@ protected:
   ci::Vec2f m_velocity;
   
   // Params
+  int m_sensorInversionTrial;
   int m_visualInversionTrial;
   int m_visualShiftTrial;
   int m_motorInversionTrial;

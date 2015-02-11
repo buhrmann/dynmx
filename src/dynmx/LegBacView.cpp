@@ -95,10 +95,14 @@ void LegBacView::setupScene()
 //--------------------------------------------------------------------------------------------------------------------
 void LegBacView::update(float dt)
 {
-  float time = m_agent->getTime();
   char tstr [16];
+  float time = m_agent->getTime();
   sprintf(tstr, "Time: %2.2f", time);
   m_timeLabel->setText(tstr);
+  
+  int trial = m_agent->getTrial();
+  sprintf(tstr, "Trial: %d", trial);
+  m_trialLabel->setText(tstr);
   
   if(time < 0.01)
     reset();
@@ -186,7 +190,7 @@ void LegBacView::buildGui()
   m_gui->addParam("FPS", &m_fixedFrameRate, -1, 300, m_fixedFrameRate);
   
   m_gui->addPanel();
-  m_gui->addLabel("Trial");
+  m_trialLabel = m_gui->addLabel("Trial");
   char tstr [5];
   sprintf(tstr, "Time: %2.2f", m_agent->getTime());
   m_timeLabel = m_gui->addLabel(tstr);
