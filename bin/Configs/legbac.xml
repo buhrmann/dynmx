@@ -14,9 +14,9 @@
     </Globals>
     <GA>
         <Evolvable Name="LegBac">
-            <Trials legDur="100" bacFoodDur="100" bacNumFoods="30" legNum="3" bacNum="3" legFitMax="78" bacFitMax="0.5">0</Trials>
-            <Adaptations visualInversionTrial="-1" visualShiftTrial="-1" motorInversionTrial="-1"/>
-            <Topology symmetric="0" weightCutoff="0" actFunc="Sigmoid" adaptive="1" initialWeights="0" rulePerConn="0" noiseUniform="1" antiHebb="0" synScaling="HomeoPre" evolvePreMeanFac="1" evolveBiases="1" evolveTaus="1" evolvePrePostFac="1" useReward="1">
+            <Trials legDur="100" bacFoodDur="100" bacNumFoods="30" legNum="0" bacNum="6" legFitMax="78" bacFitMax="0.5">0</Trials>
+            <Adaptations useRewardInput="0" sensorInversionTrial="5" visualInversionTrial="-1" visualShiftTrial="3" motorInversionTrial="-1"/>
+            <Topology symmetric="0" weightCutoff="0" actFunc="Sigmoid" adaptive="1" initialWeights="0" rulePerConn="0" noiseUniform="1" antiHebb="0" synScaling="Evolved" evolvePreMeanFac="1" evolveBiases="1" evolveTaus="1" evolvePrePostFac="1" useReward="1">
                 <Inputs asNeurons="1">2</Inputs>
                 <Hidden lateral="1" self="0">3</Hidden>
                 <Outputs lateral="1" self="0">3</Outputs>
@@ -28,7 +28,7 @@
                     <MeanDecay min="0.0" max="1"/>
                     <WeightDecay min="0.0" max="0.1"/>
                     <NoiseVar min="0" max="6"/>
-                    <LearnRate min="-1" max="1"/>
+                    <LearnRate min="-0.01" max="0.01"/>
                     <SynapticScale min="0.0" max="4"/>
                     <PrePostFac min="-1" max="1"/>
                     <PreMeanFac min="0" max="1"/>
@@ -36,9 +36,9 @@
             </Topology>
         </Evolvable>    
         <Incremental initialMutation="0.1" seedOnly="1" seedAll="1" elitist="0" initialStage="0">0</Incremental>
-        <LoadFrom>~/Experiments/LegBac/Evo/15_01_12__10_36_17/GA_Result.xml</LoadFrom>
+        <LoadFrom>~/Experiments/LegBac/Evo/15_02_05__21_36_05/GA_Result.xml</LoadFrom>
         <Saved>14_09_01__13_50_40</Saved>
-        <PopulationSize>100</PopulationSize>
+        <PopulationSize>50</PopulationSize>
         <DemeSize>10</DemeSize>
         <NumGenerations OutputInterval="1">300</NumGenerations>
         <Mutation Rate="1.0" Var="0.1" VarReduced="0.01" ReduceAt="250">
@@ -55,7 +55,7 @@
         <Eval Run="0" Stage="0">
             <NumTrials>6</NumTrials>
             <RecordState>0</RecordState>
-            <LoadFrom>~/Experiments/LegBac/Evo/15_02_02__12_01_45/GA_BestGenome.xml</LoadFrom>
+            <LoadFrom>~/Experiments/LegBac/Evo/15_02_10__17_55_45/GA_BestGenome.xml</LoadFrom>
             <Saved>14_09_01__17_05_28</Saved>
         </Eval>
     </GA>
